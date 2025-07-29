@@ -6,14 +6,12 @@ def test_register(client):
         'email': 'test@example.com',
         'password': 'password',
         'password2': 'password'
-    })
-    assert response.status_code == 302 # Should redirect to login
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Congratulations, you are now a registered user!' in response.data
     user = User.query.filter_by(username='testuser').first()
     assert user is not None
     assert user.email == 'test@example.com'
-
-    response = client.get(response.location) # Follow the redirect
-    assert b'Congratulations, you are now a registered user!' in response.data
 
 def test_login_logout(client):
     # Register a user first
