@@ -6,33 +6,33 @@
       {% else %}
       <title>Pictogram-Tree Builder</title>
       {% endif %}
+      <style>
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .nav-left a, .nav-right a {
+            margin: 0 10px;
+        }
+      </style>
     </head>
     <body>
-        <style>
-            body {
-                display: flex;
-            }
-            .nav {
-                border-right: 1px solid #ccc;
-                padding: 20px;
-                height: 100vh;
-            }
-            .content {
-                padding: 20px;
-            }
-        </style>
-        <div class="nav">
-            <h2>Menu</h2>
-            <ul>
-                <li><a href="{{ url_for('main.index') }}">Home</a></li>
+        <div class="navbar">
+            <div class="nav-left">
+                <a href="{{ url_for('main.index') }}">Home</a>
                 {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('main.builder') }}">Builder</a></li>
-                <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
-                {% else %}
-                <li><a href="{{ url_for('main.login') }}">Login</a></li>
-                <li><a href="{{ url_for('main.register') }}">Register</a></li>
+                <a href="{{ url_for('main.builder') }}">Tree Builder</a>
                 {% endif %}
-            </ul>
+            </div>
+            <div class="nav-right">
+                {% if current_user.is_anonymous %}
+                <a href="{{ url_for('main.login') }}">Login</a>
+                {% else %}
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+                {% endif %}
+            </div>
         </div>
         <div class="content">
             {% with messages = get_flashed_messages() %}
