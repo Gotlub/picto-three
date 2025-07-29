@@ -1,6 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Tree Builder</h1>
-    <p>This is where the magic happens!</p>
+<style>
+    .builder-container {
+        display: flex;
+    }
+    .tree-display {
+        flex-grow: 1;
+        border: 1px solid #eee;
+        padding: 10px;
+    }
+    .image-sidebar {
+        width: 200px;
+        padding: 10px;
+        border-left: 1px solid #ccc;
+    }
+    .image-sidebar img {
+        width: 100%;
+        cursor: pointer;
+    }
+</style>
+
+<h1>Tree Builder</h1>
+<div class="builder-container">
+    <div class="tree-display" id="tree-display">
+        <!-- Tree will be built here -->
+    </div>
+    <div class="image-sidebar" id="image-sidebar">
+        <h2>Images</h2>
+        <!-- Images will be loaded here -->
+    </div>
+</div>
+
+<script id="images-data" type="application/json">
+    {{ images | tojson | safe }}
+</script>
+<script src="{{ url_for('static', filename='js/builder.js') }}"></script>
 {% endblock %}
