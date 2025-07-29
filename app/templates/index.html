@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Welcome to the Pictogram-Tree Builder</h1>
-    {% if current_user.is_authenticated %}
-        <p>Hi, {{ current_user.username }}!</p>
-    {% endif %}
+    <div class="p-5 mb-4 bg-light rounded-3">
+      <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to Pictogram-Tree Builder</h1>
+        <p class="col-md-8 fs-4">Create and share your own pictogram trees.</p>
+        {% if current_user.is_authenticated %}
+            <p>Hi, {{ current_user.username }}!</p>
+        {% else %}
+            <a class="btn btn-primary btn-lg" href="{{ url_for('main.login') }}" role="button">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
 {% endblock %}
