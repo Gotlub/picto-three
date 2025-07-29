@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 Flask-Migrate
 pytest
 Flask-Login
+Flask-WTF
