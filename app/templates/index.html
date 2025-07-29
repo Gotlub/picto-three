@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    <p>Welcome to the Pictogram-Tree Builder.</p>
+    <h1>Welcome to the Pictogram-Tree Builder</h1>
+    {% if current_user.is_authenticated %}
+        <p>Hi, {{ current_user.username }}!</p>
+    {% endif %}
 {% endblock %}

@@ -8,7 +8,6 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/')
 @bp.route('/index')
-@login_required
 def index():
     return render_template('index.html', title='Home')
 
@@ -44,3 +43,8 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
+
+@bp.route('/builder')
+@login_required
+def builder():
+    return render_template('builder.html', title='Tree Builder')
