@@ -4,3 +4,4 @@ Flask-Migrate
 pytest
 Flask-Login
 Flask-WTF
+email-validator
