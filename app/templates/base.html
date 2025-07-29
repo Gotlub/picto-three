@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pictogram-Tree Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+            </ul>
+            <div class="language-selector">
+                <ul>
+                    <li><a href="#"><img src="{{ url_for('static', filename='img/flags/FR.png') }}" alt="FR"></a></li>
+                    <li><a href="#"><img src="{{ url_for('static', filename='img/flags/EN.png') }}" alt="EN"></a></li>
+                    <li><a href="#"><img src="{{ url_for('static', filename='img/flags/ES.png') }}" alt="ES"></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 Pictogram-Tree Builder</p>
+    </footer>
+</body>
+</html>

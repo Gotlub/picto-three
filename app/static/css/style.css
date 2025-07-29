@@ -1,0 +1,19 @@
+.language-selector {
+    float: right;
+}
+
+.language-selector ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.language-selector li {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.language-selector img {
+    width: 24px;
+    height: 18px;
+}
