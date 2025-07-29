@@ -31,14 +31,29 @@ L'application permet aux utilisateurs de s'inscrire, de se connecter et de const
     pip install -r requirements.txt
     ```
 
-4.  **Initialiser la base de données :**
+4.  **Configurer l'application Flask :**
+    - Sur Windows (cmd) :
+      ```
+      set FLASK_APP=pictogram.py
+      ```
+    - Sur Windows (PowerShell) :
+      ```
+      $env:FLASK_APP="pictogram.py"
+      ```
+    - Sur macOS/Linux :
+      ```
+      export FLASK_APP=pictogram.py
+      ```
+
+5.  **Initialiser la base de données :**
+    *Note : La commande `flask db init` ne doit être exécutée qu'une seule fois pour le projet.*
     ```bash
     flask db init
     flask db migrate -m "Initial migration."
     flask db upgrade
     ```
 
-5.  **Lancer l'application :**
+6.  **Lancer l'application :**
     ```bash
     flask run
     ```
