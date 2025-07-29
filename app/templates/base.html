@@ -9,8 +9,18 @@
         <title>Pictogram-Tree Builder</title>
         {% endif %}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            .content {
+                flex: 1;
+            }
+        </style>
     </head>
-    <body>
+    <body class="d-flex flex-column">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url_for('main.index') }}">Pictogram-Tree Builder</a>
@@ -43,7 +53,7 @@
             </div>
         </nav>
 
-        <div class="container mt-4">
+        <main class="container mt-4 content">
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -52,8 +62,18 @@
             {% endif %}
             {% endwith %}
             {% block content %}{% endblock %}
-        </div>
+        </main>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="container">
+                {% if current_user.is_authenticated %}
+                <span class="text-muted">Logged in as: {{ current_user.username }}</span>
+                {% else %}
+                <span class="text-muted">Pictogram-Tree Builder</span>
+                {% endif %}
+            </div>
+        </footer>
     </body>
 </html>
