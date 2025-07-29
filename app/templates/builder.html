@@ -3,13 +3,13 @@
 {% block content %}
 <div class="row">
     <div class="col-md-9">
-        <h2>Tree Builder</h2>
+        <h2>{{ _('Tree Builder') }}</h2>
         <div class="tree-display border p-3" id="tree-display" style="min-height: 400px;">
             <!-- Tree will be built here -->
         </div>
     </div>
     <div class="col-md-3">
-        <h2>Images</h2>
+        <h2>{{ _('Images') }}</h2>
         <div class="image-sidebar border p-3" id="image-sidebar">
             {% for image in images %}
                 <img src="{{ image.path }}" alt="{{ image.name }}" data-image-id="{{ image.id }}" class="img-fluid mb-2" style="cursor: pointer;">

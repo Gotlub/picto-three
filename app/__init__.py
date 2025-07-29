@@ -1,13 +1,15 @@
-from flask import Flask
+from flask import Flask, request, current_app, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
 from flask_login import LoginManager
+from flask_babel import Babel, _
 
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
 login.login_view = 'main.login'
+babel = Babel()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -16,8 +18,15 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+    babel.init_app(app)
 
     from app.routes import bp as main_bp
     app.register_blueprint(main_bp)
 
     return app
+
+@babel.localeselector
+def get_locale():
+    if 'language' in session and session['language'] in current_app.config['LANGUAGES']:
+        return session['language']
+    return request.accept_languages.best_match(current_app.config['LANGUAGES'])

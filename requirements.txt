@@ -5,3 +5,4 @@ pytest
 Flask-Login
 Flask-WTF
 email-validator
+Flask-Babel

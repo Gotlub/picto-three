@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, Blueprint, request
+from flask import render_template, flash, redirect, url_for, Blueprint, request, session
 from app import db
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
@@ -56,3 +56,8 @@ def builder():
     user_images = Image.query.filter_by(user_id=current_user.id).all()
     all_images = images + user_images
     return render_template('builder.html', title='Tree Builder', images=all_images)
+
+@bp.route('/language/<language>')
+def set_language(language=None):
+    session['language'] = language
+    return redirect(request.referrer)
