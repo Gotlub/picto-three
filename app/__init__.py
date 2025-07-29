@@ -18,14 +18,13 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
-    babel.init_app(app)
+    babel.init_app(app, locale_selector=get_locale)
 
     from app.routes import bp as main_bp
     app.register_blueprint(main_bp)
 
     return app
 
-@babel.localeselector
 def get_locale():
     if 'language' in session and session['language'] in current_app.config['LANGUAGES']:
         return session['language']
