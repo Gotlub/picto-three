@@ -2,6 +2,7 @@ from flask import Flask, request, current_app, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
+from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from flask_babel import Babel, _
 
@@ -11,10 +12,11 @@ login = LoginManager()
 login.login_view = 'main.login'
 babel = Babel()
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-
+    csrf = CSRFProtect(app)
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)

@@ -40,9 +40,9 @@
                                 {{ _('Language') }}
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='en') }}">English</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='fr') }}">Français</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='es') }}">Español</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='en') }}">🇬🇧 English</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='fr') }}">🇫🇷 Français</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='es') }}">🇪🇸 Español</a></li>
                             </ul>
                         </li>
                         {% if current_user.is_anonymous %}
