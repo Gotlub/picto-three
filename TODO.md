@@ -51,7 +51,8 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - *Détails : La structure de la page `builder.html` a été mise en place avec une zone pour l'arbre et une barre latérale pour les images, en utilisant la grille Bootstrap.*
 - [x] Implémenter en JS la logique pour afficher les images publiques et celles de l'utilisateur au niveau 0.
   - *Détails : Un script `builder.js` charge les données des images depuis le template et les affiche dans la barre latérale.*
-- [ ] Implémenter en JS la logique du pattern Composite : un objet `Node` qui peut contenir des enfants.
+- [x] Implémenter en JS la logique du pattern Composite : un objet `Node` qui peut contenir des enfants.
+  - *Détails : Les classes `Node` et `Tree` ont été créées dans `builder.js` pour gérer la structure de l'arbre.*
 - [ ] Implémenter en JS la sélection d'une image : mise en surbrillance, les autres sont grisées.
 - [ ] Implémenter en JS l'affichage du niveau suivant lorsqu'une image est sélectionnée.
 - [ ] Implémenter en JS l'ajout d'une nouvelle image à un niveau donné (visuellement d'abord).

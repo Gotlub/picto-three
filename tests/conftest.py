@@ -6,7 +6,8 @@ def app():
     app = create_app()
     app.config.update({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "WTF_CSRF_ENABLED": False  # Disable CSRF for tests
     })
 
     with app.app_context():
