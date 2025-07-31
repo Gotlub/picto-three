@@ -1,0 +1,14 @@
+.node.selected > img {
+    border: 3px solid #007bff;
+    border-radius: 5px;
+}
+
+.children {
+    padding-left: 20px;
+    margin-left: 10px;
+    border-left: 1px solid #ccc;
+}
+
+.node {
+    margin: 5px 0;
+}
