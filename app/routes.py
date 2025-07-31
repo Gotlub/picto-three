@@ -50,10 +50,11 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 @bp.route('/builder')
-@login_required
 def builder():
     images = Image.query.filter_by(is_public=True).all()
-    user_images = Image.query.filter_by(user_id=current_user.id).all()
+    user_images = []
+    if current_user.is_authenticated:
+        user_images = Image.query.filter_by(user_id=current_user.id).all()
     all_images = images + user_images
     return render_template('builder.html', title='Tree Builder', images=all_images)
 

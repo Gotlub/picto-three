@@ -15,6 +15,5 @@ def test_register_page(client):
 
 def test_builder_page_unauthenticated(client):
     response = client.get('/builder')
-    assert response.status_code == 302 # Redirect to login
-    assert b'Redirecting...' in response.data
-    assert b'/login' in response.data
+    assert response.status_code == 200
+    assert b'Tree Builder' in response.data
