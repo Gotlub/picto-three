@@ -12,3 +12,8 @@
 .node {
     margin: 5px 0;
 }
+
+.image-sidebar img.grayscale {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}

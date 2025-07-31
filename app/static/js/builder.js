@@ -33,6 +33,11 @@ class TreeBuilder {
         this.root = null;
         this.selectedNode = null;
         this.init();
+        this.treeDisplay.addEventListener('click', (e) => {
+            if (e.target === this.treeDisplay) {
+                this.deselectAllNodes();
+            }
+        });
     }
 
     init() {
@@ -68,6 +73,32 @@ class TreeBuilder {
         }
         this.selectedNode = node;
         this.selectedNode.element.classList.add('selected');
+        this.updateSidebar();
+    }
+
+    deselectAllNodes() {
+        if (this.selectedNode) {
+            this.selectedNode.element.classList.remove('selected');
+            this.selectedNode = null;
+        }
+        this.updateSidebar();
+    }
+
+    updateSidebar() {
+        const sidebarImages = this.imageSidebar.querySelectorAll('img');
+        if (this.selectedNode) {
+            sidebarImages.forEach(img => {
+                if (img.dataset.imageId !== this.selectedNode.image.id.toString()) {
+                    img.classList.add('grayscale');
+                } else {
+                    img.classList.remove('grayscale');
+                }
+            });
+        } else {
+            sidebarImages.forEach(img => {
+                img.classList.remove('grayscale');
+            });
+        }
     }
 
     renderTree() {
