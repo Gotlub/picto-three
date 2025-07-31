@@ -59,6 +59,14 @@ L'application permet aux utilisateurs de s'inscrire, de se connecter et de const
     ```
 L'application sera accessible à l'adresse `http://127.0.0.1:5000`.
 
+## Ajout des pictogrammes à la base de données
+
+Pour scanner le dossier `app/static/images/pictograms` et ajouter toutes les images trouvées à la base de données, exécutez la commande suivante à la racine du projet :
+
+```bash
+python add_test_images.py
+```
+
 ## Contribution via Agents IA
 
 Ce projet est piloté par des agents. Veuillez vous référer aux fichiers `AGENTS.md` et `GEMINI.md` pour les instructions et le workflow de développement.
