@@ -19,7 +19,7 @@
 </div>
 
 <script id="images-data" type="application/json">
-    {{ images | tojson | safe }}
+    {{ images_json | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/builder.js') }}"></script>
 {% endblock %}

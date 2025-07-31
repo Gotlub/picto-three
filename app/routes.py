@@ -1,3 +1,4 @@
+import json
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session
 from app import db
 from app.forms import LoginForm, RegistrationForm
@@ -51,12 +52,15 @@ def register():
 
 @bp.route('/builder')
 def builder():
-    images = Image.query.filter_by(is_public=True).all()
+    public_images = Image.query.filter_by(is_public=True).all()
     user_images = []
     if current_user.is_authenticated:
         user_images = Image.query.filter_by(user_id=current_user.id).all()
-    all_images = images + user_images
-    return render_template('builder.html', title='Tree Builder', images=all_images)
+
+    all_images = public_images + user_images
+    images_json = json.dumps([image.to_dict() for image in all_images])
+
+    return render_template('builder.html', title='Tree Builder', images_json=images_json, images=all_images)
 
 @bp.route('/language/<language>')
 def set_language(language=None):

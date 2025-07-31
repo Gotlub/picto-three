@@ -17,3 +17,10 @@ def test_builder_page_unauthenticated(client):
     response = client.get('/builder')
     assert response.status_code == 200
     assert b'Tree Builder' in response.data
+
+def test_builder_page_loads_images(client):
+    response = client.get('/builder')
+    assert response.status_code == 200
+    assert b'images-data' in response.data
+    # Check for a specific image that should be public
+    assert b'acorn-bold' in response.data

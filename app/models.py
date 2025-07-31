@@ -29,6 +29,16 @@ class Image(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     is_public = db.Column(db.Boolean, default=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'path': self.path,
+            'name': self.name,
+            'description': self.description,
+            'user_id': self.user_id,
+            'is_public': self.is_public,
+        }
+
     def __repr__(self):
         return '<Image {}>'.format(self.name)
 
