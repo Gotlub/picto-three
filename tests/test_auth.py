@@ -7,6 +7,9 @@ def get_csrf_token(html):
     match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
     return match.group(1) if match else None
 
+def test_app_config(app):
+    assert app.config["TESTING"] is True
+    assert app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///test.db"
 
 def test_register(client):
     # 1. Récupère le formulaire de registre (GET)
@@ -29,9 +32,9 @@ def test_register(client):
     user = User.query.filter_by(username='testuser').first()
     assert user is not None
     assert user.email == 'test@example.com'
-    if user:
-        db.session.delete(user)
-        db.session.commit()
+    #if user:
+        #db.session.delete(user)
+        #db.session.commit()
 
 
 def test_login_logout(client):
@@ -67,6 +70,6 @@ def test_login_logout(client):
         assert response.status_code == 200
         assert b'Hi, testuser!' not in response.data
         assert b'Login' in response.data
-        if user:
-            db.session.delete(user)
-            db.session.commit()
+        #if user:
+        #    db.session.delete(user)
+        #    db.session.commit()

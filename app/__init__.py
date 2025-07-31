@@ -11,11 +11,13 @@ migrate = Migrate()
 login = LoginManager()
 login.login_view = 'main.login'
 babel = Babel()
+config_class = Config
 
-
-def create_app(config_class=Config):
+def create_app( config_override = None):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    if config_override:
+        app.config.update(config_override)
     csrf = CSRFProtect(app)
     db.init_app(app)
     migrate.init_app(app, db)

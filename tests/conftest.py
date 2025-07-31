@@ -3,16 +3,14 @@ from app import create_app, db
 
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config.update({
+    app = create_app({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///app.db"
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db"
     })
 
     with app.app_context():
-        #db.create_all()
+        db.create_all()
         yield app
-        #db.drop_all()
 
 @pytest.fixture
 def client(app):
