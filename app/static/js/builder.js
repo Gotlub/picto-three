@@ -38,6 +38,11 @@ class TreeBuilder {
                 this.deselectAllNodes();
             }
         });
+
+        const saveBtn = document.getElementById('save-tree-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveTree());
+        }
     }
 
     init() {
@@ -120,6 +125,90 @@ class TreeBuilder {
             this.renderChildren(child, child.element);
         });
         parentElement.appendChild(childrenContainer);
+    }
+
+    getTreeAsJSON() {
+        if (!this.root) {
+            return null;
+        }
+
+        const nodes = {};
+        const roots = [];
+
+        // Helper function to traverse the tree and populate the nodes object
+        const traverse = (node) => {
+            if (!node) return;
+            nodes[node.image.id] = {
+                image_id: node.image.id,
+                children: node.children.map(child => child.image.id)
+            };
+            node.children.forEach(traverse);
+        };
+
+        // Find all root nodes (nodes with no parent)
+        const allNodes = new Set();
+        const childNodes = new Set();
+        const traverseForAllNodes = (node) => {
+            if (!node) return;
+            allNodes.add(node);
+            node.children.forEach(child => {
+                childNodes.add(child);
+                traverseForAllNodes(child);
+            });
+        };
+        traverseForAllNodes(this.root);
+
+        allNodes.forEach(node => {
+            if (!childNodes.has(node)) {
+                roots.push(node.image.id);
+            }
+        });
+
+        // Populate the nodes object
+        traverse(this.root);
+
+        return {
+            version: '1.0',
+            tree: {
+                nodes: nodes,
+                roots: roots
+            }
+        };
+    }
+
+    async saveTree() {
+        const treeName = document.getElementById('tree-name').value;
+        if (!treeName) {
+            alert('Please enter a name for the tree.');
+            return;
+        }
+
+        const isPublic = document.getElementById('tree-is-public').checked;
+        const jsonData = this.getTreeAsJSON();
+
+        if (!jsonData) {
+            alert('The tree is empty.');
+            return;
+        }
+
+        const response = await fetch('/api/tree/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: treeName,
+                is_public: isPublic,
+                json_data: jsonData,
+            }),
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            alert('Tree saved successfully!');
+        } else {
+            alert(`Error saving tree: ${result.message}`);
+        }
     }
 }
 

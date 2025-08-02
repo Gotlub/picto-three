@@ -15,6 +15,19 @@
                 <img src="{{ image.path }}" alt="{{ image.name }}" data-image-id="{{ image.id }}" class="img-fluid mb-2" style="cursor: pointer;">
             {% endfor %}
         </div>
+        <hr>
+        <div class="save-tree-form">
+            <h3>{{ _('Save Tree') }}</h3>
+            <div class="form-group">
+                <label for="tree-name">{{ _('Tree Name') }}</label>
+                <input type="text" id="tree-name" class="form-control" placeholder="{{ _('Enter tree name') }}">
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="tree-is-public" class="form-check-input">
+                <label class="form-check-label" for="tree-is-public">{{ _('Make Public') }}</label>
+            </div>
+            <button id="save-tree-btn" class="btn btn-primary mt-2">{{ _('Save Tree') }}</button>
+        </div>
     </div>
 </div>
 

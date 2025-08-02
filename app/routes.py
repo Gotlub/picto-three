@@ -1,11 +1,12 @@
 import json
-from flask import render_template, flash, redirect, url_for, Blueprint, request, session
+from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify
 from app import db
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree
 
 bp = Blueprint('main', __name__)
+api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @bp.route('/')
 @bp.route('/index')
@@ -66,3 +67,28 @@ def builder():
 def set_language(language=None):
     session['language'] = language
     return redirect(request.referrer)
+
+@api_bp.route('/tree/save', methods=['POST'])
+@login_required
+def save_tree():
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+
+    tree_name = data.get('name')
+    is_public = data.get('is_public', False)
+    json_data = data.get('json_data')
+
+    if not tree_name or not json_data:
+        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
+    tree = Tree(
+        user_id=current_user.id,
+        name=tree_name,
+        is_public=is_public,
+        json_data=json.dumps(json_data) # Ensure json_data is stored as a string
+    )
+    db.session.add(tree)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'Tree saved successfully', 'tree_id': tree.id})
