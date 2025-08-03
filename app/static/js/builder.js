@@ -28,6 +28,7 @@ class Node {
 class TreeBuilder {
     constructor() {
         this.imageSidebar = document.getElementById('image-sidebar');
+        this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.root = null;
@@ -57,6 +58,10 @@ class TreeBuilder {
         const loadBtn = document.getElementById('load-tree-btn');
         if (loadBtn) {
             loadBtn.addEventListener('click', () => alert('Loading tree...'));
+        }
+
+        if (this.imageSearch) {
+            this.imageSearch.addEventListener('input', () => this.filterImages());
         }
     }
 
@@ -224,6 +229,21 @@ class TreeBuilder {
         } else {
             alert(`Error saving tree: ${result.message}`);
         }
+    }
+
+    filterImages() {
+        const searchTerm = this.imageSearch.value.toLowerCase();
+        const imageItems = this.imageSidebar.querySelectorAll('.image-item');
+
+        imageItems.forEach(item => {
+            const name = item.dataset.imageName.toLowerCase();
+            const path = item.dataset.imagePath.toLowerCase();
+            if (name.includes(searchTerm) || path.includes(searchTerm)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     }
 }
 

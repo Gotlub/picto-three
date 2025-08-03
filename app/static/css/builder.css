@@ -26,6 +26,18 @@
 }
 
 .image-sidebar {
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
+}
+
+.image-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.image-item img {
+    height: 20px;
+    margin-right: 10px;
 }

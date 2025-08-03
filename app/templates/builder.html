@@ -4,16 +4,7 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Left Sidebar -->
-        <div class="col-md-3 sidebar">
-            <!-- Images Section -->
-            <h4>{{ _('Images') }}</h4>
-            <div class="image-sidebar border p-3" id="image-sidebar">
-                {% for image in images %}
-                    <img src="{{ url_for('static', filename=image.path.replace('app/static/', '')) }}" alt="{{ image.name }}" data-image-id="{{ image.id }}" class="img-fluid mb-2" style="cursor: pointer;">
-                {% endfor %}
-            </div>
-            <hr>
-
+        <div class="col-md-2 sidebar">
             <!-- File Operations Section -->
             <h4>{{ _('File Operations') }}</h4>
             <div class="d-grid gap-2">
@@ -47,10 +38,25 @@
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-9">
+        <div class="col-md-7">
             <h2>{{ _('Tree Builder') }}</h2>
             <div class="tree-display border p-3" id="tree-display" style="min-height: 80vh;">
                 <!-- Tree will be built here -->
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-md-3 sidebar">
+            <!-- Images Section -->
+            <h4>{{ _('Images') }}</h4>
+            <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
+            <div class="image-sidebar border p-3" id="image-sidebar">
+                {% for image in images %}
+                    <div class="image-item" data-image-id="{{ image.id }}" data-image-name="{{ image.name }}" data-image-path="{{ image.path }}">
+                        <img src="{{ url_for('static', filename=image.path.replace('app/static/', '')) }}" alt="{{ image.name }}">
+                        <span>{{ image.name }}</span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
