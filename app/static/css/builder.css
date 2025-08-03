@@ -1,0 +1,43 @@
+.node.selected > img {
+    border: 3px solid #007bff;
+    border-radius: 5px;
+}
+
+.children {
+    padding-left: 20px;
+    margin-left: 10px;
+    border-left: 1px solid #ccc;
+}
+
+.node {
+    margin: 5px 0;
+}
+
+.image-sidebar img.grayscale {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.sidebar {
+    height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.image-sidebar {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.image-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.image-item img {
+    height: 20px;
+    margin-right: 10px;
+}

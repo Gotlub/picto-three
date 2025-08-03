@@ -1,25 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-9">
-        <h2>{{ _('Tree Builder') }}</h2>
-        <div class="tree-display border p-3" id="tree-display" style="min-height: 400px;">
-            <!-- Tree will be built here -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Sidebar -->
+        <div class="col-md-2 sidebar">
+            <!-- File Operations Section -->
+            <h4>{{ _('File Operations') }}</h4>
+            <div class="d-grid gap-2">
+                <button id="import-json-btn" class="btn btn-secondary">{{ _('Import from JSON') }}</button>
+                <button id="export-json-btn" class="btn btn-secondary">{{ _('Export to JSON') }}</button>
+            </div>
+            <hr>
+
+            <!-- Database Operations Section -->
+            {% if current_user.is_authenticated %}
+                <h4>{{ _('Database Operations') }}</h4>
+                <div class="save-tree-form">
+                    <h5>{{ _('Save Tree') }}</h5>
+                    <div class="form-group mb-2">
+                        <label for="tree-name">{{ _('Tree Name') }}</label>
+                        <input type="text" id="tree-name" class="form-control" placeholder="{{ _('Enter tree name') }}">
+                    </div>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" id="tree-is-public" class="form-check-input">
+                        <label class="form-check-label" for="tree-is-public">{{ _('Make Public') }}</label>
+                    </div>
+                    <button id="save-tree-btn" class="btn btn-primary w-100">{{ _('Save Tree') }}</button>
+                </div>
+                <hr>
+                <div class="load-tree-form">
+                    <h5>{{ _('Load Tree') }}</h5>
+                    <div id="tree-list" class="mb-2"></div>
+                    <button id="load-tree-btn" class="btn btn-success w-100">{{ _('Load Tree') }}</button>
+                </div>
+            {% endif %}
         </div>
-    </div>
-    <div class="col-md-3">
-        <h2>{{ _('Images') }}</h2>
-        <div class="image-sidebar border p-3" id="image-sidebar">
-            {% for image in images %}
-                <img src="{{ image.path }}" alt="{{ image.name }}" data-image-id="{{ image.id }}" class="img-fluid mb-2" style="cursor: pointer;">
-            {% endfor %}
+
+        <!-- Main Content -->
+        <div class="col-md-7">
+            <h2>{{ _('Tree Builder') }}</h2>
+            <div class="tree-display border p-3" id="tree-display" style="min-height: 80vh;">
+                <!-- Tree will be built here -->
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-md-3 sidebar">
+            <!-- Images Section -->
+            <h4>{{ _('Images') }}</h4>
+            <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
+            <div class="image-sidebar border p-3" id="image-sidebar">
+                {% for image in images %}
+                    <div class="image-item" data-image-id="{{ image.id }}" data-image-name="{{ image.name }}" data-image-path="{{ image.path }}">
+                        <img src="{{ url_for('static', filename=image.path.replace('app/static/', '')) }}" alt="{{ image.name }}">
+                        <span>{{ image.name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
 
 <script id="images-data" type="application/json">
-    {{ images | tojson | safe }}
+    {{ images_json | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/builder.js') }}"></script>
 {% endblock %}

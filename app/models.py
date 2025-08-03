@@ -29,6 +29,16 @@ class Image(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     is_public = db.Column(db.Boolean, default=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'path': self.path,
+            'name': self.name,
+            'description': self.description,
+            'user_id': self.user_id,
+            'is_public': self.is_public,
+        }
+
     def __repr__(self):
         return '<Image {}>'.format(self.name)
 
@@ -38,6 +48,15 @@ class Tree(db.Model):
     name = db.Column(db.String(64))
     is_public = db.Column(db.Boolean, default=False)
     json_data = db.Column(db.Text)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'is_public': self.is_public,
+            'json_data': self.json_data,
+        }
 
     def __repr__(self):
         return '<Tree {}>'.format(self.name)
