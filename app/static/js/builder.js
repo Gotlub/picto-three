@@ -43,6 +43,21 @@ class TreeBuilder {
         if (saveBtn) {
             saveBtn.addEventListener('click', () => this.saveTree());
         }
+
+        const importBtn = document.getElementById('import-json-btn');
+        if (importBtn) {
+            importBtn.addEventListener('click', () => alert('Importing from JSON...'));
+        }
+
+        const exportBtn = document.getElementById('export-json-btn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => alert('Exporting to JSON...'));
+        }
+
+        const loadBtn = document.getElementById('load-tree-btn');
+        if (loadBtn) {
+            loadBtn.addEventListener('click', () => alert('Loading tree...'));
+        }
     }
 
     init() {
