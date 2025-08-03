@@ -1,79 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-9">
-        <h2>{{ _('Tree Builder') }}</h2>
-        <div class="tree-display border p-3" id="tree-display" style="min-height: 400px;">
-            <!-- Tree will be built here -->
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="accordion" id="sidebarAccordion">
-            <!-- Section: Images -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        {{ _('Images') }}
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#sidebarAccordion">
-                    <div class="accordion-body image-sidebar" id="image-sidebar">
-                        {% for image in images %}
-                            <img src="{{ image.path }}" alt="{{ image.name }}" data-image-id="{{ image.id }}" class="img-fluid mb-2" style="cursor: pointer;">
-                        {% endfor %}
-                    </div>
-                </div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Sidebar -->
+        <div class="col-md-3 sidebar">
+            <!-- Images Section -->
+            <h4>{{ _('Images') }}</h4>
+            <div class="image-sidebar border p-3" id="image-sidebar">
+                {% for image in images %}
+                    <img src="{{ url_for('static', filename=image.path.replace('app/static/', '')) }}" alt="{{ image.name }}" data-image-id="{{ image.id }}" class="img-fluid mb-2" style="cursor: pointer;">
+                {% endfor %}
             </div>
+            <hr>
 
-            <!-- Section: File Operations -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        {{ _('File Operations') }}
-                    </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#sidebarAccordion">
-                    <div class="accordion-body">
-                        <button id="import-json-btn" class="btn btn-secondary w-100 mb-2">{{ _('Import from JSON') }}</button>
-                        <button id="export-json-btn" class="btn btn-secondary w-100">{{ _('Export to JSON') }}</button>
-                    </div>
-                </div>
+            <!-- File Operations Section -->
+            <h4>{{ _('File Operations') }}</h4>
+            <div class="d-grid gap-2">
+                <button id="import-json-btn" class="btn btn-secondary">{{ _('Import from JSON') }}</button>
+                <button id="export-json-btn" class="btn btn-secondary">{{ _('Export to JSON') }}</button>
             </div>
+            <hr>
 
-            <!-- Section: Database Operations (Authenticated users only) -->
+            <!-- Database Operations Section -->
             {% if current_user.is_authenticated %}
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingThree">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        {{ _('Database Operations') }}
-                    </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#sidebarAccordion">
-                    <div class="accordion-body">
-                        <div class="save-tree-form">
-                            <h5>{{ _('Save Tree') }}</h5>
-                            <div class="form-group mb-2">
-                                <label for="tree-name">{{ _('Tree Name') }}</label>
-                                <input type="text" id="tree-name" class="form-control" placeholder="{{ _('Enter tree name') }}">
-                            </div>
-                            <div class="form-check mb-2">
-                                <input type="checkbox" id="tree-is-public" class="form-check-input">
-                                <label class="form-check-label" for="tree-is-public">{{ _('Make Public') }}</label>
-                            </div>
-                            <button id="save-tree-btn" class="btn btn-primary w-100">{{ _('Save Tree') }}</button>
-                        </div>
-                        <hr>
-                        <div class="load-tree-form">
-                            <h5>{{ _('Load Tree') }}</h5>
-                            <!-- This will be populated with a list of trees later -->
-                            <div id="tree-list" class="mb-2"></div>
-                            <button id="load-tree-btn" class="btn btn-success w-100">{{ _('Load Tree') }}</button>
-                        </div>
+                <h4>{{ _('Database Operations') }}</h4>
+                <div class="save-tree-form">
+                    <h5>{{ _('Save Tree') }}</h5>
+                    <div class="form-group mb-2">
+                        <label for="tree-name">{{ _('Tree Name') }}</label>
+                        <input type="text" id="tree-name" class="form-control" placeholder="{{ _('Enter tree name') }}">
                     </div>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" id="tree-is-public" class="form-check-input">
+                        <label class="form-check-label" for="tree-is-public">{{ _('Make Public') }}</label>
+                    </div>
+                    <button id="save-tree-btn" class="btn btn-primary w-100">{{ _('Save Tree') }}</button>
                 </div>
-            </div>
+                <hr>
+                <div class="load-tree-form">
+                    <h5>{{ _('Load Tree') }}</h5>
+                    <div id="tree-list" class="mb-2"></div>
+                    <button id="load-tree-btn" class="btn btn-success w-100">{{ _('Load Tree') }}</button>
+                </div>
             {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <h2>{{ _('Tree Builder') }}</h2>
+            <div class="tree-display border p-3" id="tree-display" style="min-height: 80vh;">
+                <!-- Tree will be built here -->
+            </div>
         </div>
     </div>
 </div>
