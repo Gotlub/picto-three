@@ -49,5 +49,14 @@ class Tree(db.Model):
     is_public = db.Column(db.Boolean, default=False)
     json_data = db.Column(db.Text)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'is_public': self.is_public,
+            'json_data': self.json_data,
+        }
+
     def __repr__(self):
         return '<Tree {}>'.format(self.name)

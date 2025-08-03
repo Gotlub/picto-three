@@ -68,6 +68,16 @@ def set_language(language=None):
     session['language'] = language
     return redirect(request.referrer)
 
+@api_bp.route('/trees/load', methods=['GET'])
+def load_trees():
+    public_trees = Tree.query.filter_by(is_public=True).all()
+    user_trees = []
+    if current_user.is_authenticated:
+        user_trees = Tree.query.filter_by(user_id=current_user.id).all()
+
+    all_trees = public_trees + user_trees
+    return jsonify([tree.to_dict() for tree in all_trees])
+
 @api_bp.route('/tree/save', methods=['POST'])
 @login_required
 def save_tree():

@@ -30,7 +30,9 @@ class TreeBuilder {
         this.imageSidebar = document.getElementById('image-sidebar');
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
+        this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
+        this.savedTrees = [];
         this.root = null;
         this.selectedNode = null;
         this.init();
@@ -47,22 +49,24 @@ class TreeBuilder {
 
         const importBtn = document.getElementById('import-json-btn');
         if (importBtn) {
-            importBtn.addEventListener('click', () => alert('Importing from JSON...'));
+            importBtn.addEventListener('click', () => this.importTreeFromJSON());
         }
 
         const exportBtn = document.getElementById('export-json-btn');
         if (exportBtn) {
-            exportBtn.addEventListener('click', () => alert('Exporting to JSON...'));
+            exportBtn.addEventListener('click', () => this.exportTreeToJSON());
         }
 
         const loadBtn = document.getElementById('load-tree-btn');
         if (loadBtn) {
-            loadBtn.addEventListener('click', () => alert('Loading tree...'));
+            loadBtn.addEventListener('click', () => this.loadTree());
         }
 
         if (this.imageSearch) {
             this.imageSearch.addEventListener('input', () => this.filterImages());
         }
+
+        this.loadSavedTrees();
     }
 
     init() {
@@ -238,6 +242,112 @@ class TreeBuilder {
                 item.style.display = 'none';
             }
         });
+    }
+
+    async loadSavedTrees() {
+        const response = await fetch('/api/trees/load');
+        this.savedTrees = await response.json();
+        this.renderTreeList();
+    }
+
+    renderTreeList() {
+        if (!this.treeList) return;
+        this.treeList.innerHTML = '';
+        const select = document.createElement('select');
+        select.id = 'tree-select';
+        select.className = 'form-control';
+
+        this.savedTrees.forEach(tree => {
+            const option = document.createElement('option');
+            option.value = tree.id;
+            option.textContent = tree.name;
+            select.appendChild(option);
+        });
+        this.treeList.appendChild(select);
+    }
+
+    loadTree() {
+        const select = document.getElementById('tree-select');
+        if (!select) return;
+
+        const treeId = parseInt(select.value, 10);
+        const treeToLoad = this.savedTrees.find(tree => tree.id === treeId);
+
+        if (treeToLoad) {
+            const treeData = JSON.parse(treeToLoad.json_data);
+            this.rebuildTreeFromJSON(treeData);
+        }
+    }
+
+    rebuildTreeFromJSON(treeData) {
+        this.root = null;
+        this.selectedNode = null;
+
+        const nodes = {};
+        for (const nodeId in treeData.tree.nodes) {
+            const nodeData = treeData.tree.nodes[nodeId];
+            const image = this.images.find(img => img.id === nodeData.image_id);
+            if (image) {
+                nodes[nodeId] = new Node(image, this);
+            }
+        }
+
+        for (const nodeId in treeData.tree.nodes) {
+            const nodeData = treeData.tree.nodes[nodeId];
+            const parentNode = nodes[nodeId];
+            if (parentNode) {
+                nodeData.children.forEach(childId => {
+                    const childNode = nodes[childId];
+                    if (childNode) {
+                        parentNode.addChild(childNode);
+                    }
+                });
+            }
+        }
+
+        if (treeData.tree.roots.length > 0) {
+            this.root = nodes[treeData.tree.roots[0]];
+        }
+
+        this.renderTree();
+    }
+
+    exportTreeToJSON() {
+        const jsonData = this.getTreeAsJSON();
+        if (!jsonData) {
+            alert('The tree is empty.');
+            return;
+        }
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "tree.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    importTreeFromJSON() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const treeData = JSON.parse(event.target.result);
+                        this.rebuildTreeFromJSON(treeData);
+                    } catch (error) {
+                        alert('Error parsing JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
     }
 }
 

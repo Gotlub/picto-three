@@ -73,3 +73,37 @@ def test_save_tree_missing_data(client):
     data = response.get_json()
     assert data['status'] == 'error'
     assert data['message'] == 'Missing required fields'
+
+def test_load_trees_unauthenticated(client):
+    response = client.get('/api/trees/load')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+
+def test_load_trees_authenticated(client):
+    # Register and login user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    login(client, 'testuser', 'password')
+
+    # Create a tree for the user
+    tree_data = {
+        "name": "My Test Tree",
+        "is_public": False,
+        "json_data": {"version": "1.0", "tree": {"nodes": {}, "roots": []}}
+    }
+    client.post('/api/tree/save', json=tree_data)
+
+    # Create a public tree
+    public_tree_data = {
+        "name": "Public Tree",
+        "is_public": True,
+        "json_data": {"version": "1.0", "tree": {"nodes": {}, "roots": []}}
+    }
+    client.post('/api/tree/save', json=public_tree_data)
+
+    response = client.get('/api/trees/load')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 3
