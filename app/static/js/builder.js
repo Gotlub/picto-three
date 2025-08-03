@@ -67,15 +67,9 @@ class TreeBuilder {
 
     init() {
         this.images.forEach(image => {
-            const imgElement = document.createElement('img');
-            imgElement.src = image.path;
-            imgElement.alt = image.name;
-            imgElement.dataset.imageId = image.id;
-            // The existing code in builder.html already adds the images to the sidebar,
-            // so we don't need to append them again. We just need to add the event listeners.
-            const existingImg = this.imageSidebar.querySelector(`[data-image-id='${image.id}']`);
-            if (existingImg) {
-                existingImg.addEventListener('click', () => this.handleImageClick(image));
+            const imageItem = this.imageSidebar.querySelector(`[data-image-id='${image.id}']`);
+            if (imageItem) {
+                imageItem.addEventListener('click', () => this.handleImageClick(image));
             }
         });
     }
@@ -239,7 +233,7 @@ class TreeBuilder {
             const name = item.dataset.imageName.toLowerCase();
             const path = item.dataset.imagePath.toLowerCase();
             if (name.includes(searchTerm) || path.includes(searchTerm)) {
-                item.style.display = '';
+                item.style.display = 'flex';
             } else {
                 item.style.display = 'none';
             }
