@@ -150,20 +150,17 @@ class TreeBuilder {
             return null;
         }
 
-        const nodes = {};
-        const roots = [];
-
-        // Helper function to traverse the tree and populate the nodes object
-        const traverse = (node) => {
-            if (!node) return;
-            nodes[node.image.id] = {
-                image_id: node.image.id,
-                children: node.children.map(child => child.image.id)
+        const buildNode = (node) => {
+            const nodeData = {
+                id: node.image.id,
+                children: []
             };
-            node.children.forEach(traverse);
+            node.children.forEach(child => {
+                nodeData.children.push(buildNode(child));
+            });
+            return nodeData;
         };
 
-        // Find all root nodes (nodes with no parent)
         const allNodes = new Set();
         const childNodes = new Set();
         const traverseForAllNodes = (node) => {
@@ -176,21 +173,15 @@ class TreeBuilder {
         };
         traverseForAllNodes(this.root);
 
+        const roots = [];
         allNodes.forEach(node => {
             if (!childNodes.has(node)) {
-                roots.push(node.image.id);
+                roots.push(buildNode(node));
             }
         });
 
-        // Populate the nodes object
-        traverse(this.root);
-
         return {
-            version: '1.0',
-            tree: {
-                nodes: nodes,
-                roots: roots
-            }
+            roots: roots
         };
     }
 
@@ -283,30 +274,27 @@ class TreeBuilder {
         this.root = null;
         this.selectedNode = null;
 
-        const nodes = {};
-        for (const nodeId in treeData.tree.nodes) {
-            const nodeData = treeData.tree.nodes[nodeId];
-            const image = this.images.find(img => img.id === nodeData.image_id);
-            if (image) {
-                nodes[nodeId] = new Node(image, this);
+        const buildNode = (nodeData) => {
+            const image = this.images.find(img => img.id === nodeData.id);
+            if (!image) {
+                return null;
             }
-        }
-
-        for (const nodeId in treeData.tree.nodes) {
-            const nodeData = treeData.tree.nodes[nodeId];
-            const parentNode = nodes[nodeId];
-            if (parentNode) {
-                nodeData.children.forEach(childId => {
-                    const childNode = nodes[childId];
+            const newNode = new Node(image, this);
+            if (nodeData.children) {
+                nodeData.children.forEach(childData => {
+                    const childNode = buildNode(childData);
                     if (childNode) {
-                        parentNode.addChild(childNode);
+                        newNode.addChild(childNode);
                     }
                 });
             }
-        }
+            return newNode;
+        };
 
-        if (treeData.tree.roots.length > 0) {
-            this.root = nodes[treeData.tree.roots[0]];
+        if (treeData.roots && treeData.roots.length > 0) {
+            // For now, we only support one root visually.
+            // This can be extended later to support multiple root nodes on the canvas.
+            this.root = buildNode(treeData.roots[0]);
         }
 
         this.renderTree();

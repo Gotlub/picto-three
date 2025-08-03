@@ -37,13 +37,12 @@ def test_save_tree_authenticated(client):
         "name": "My Test Tree",
         "is_public": True,
         "json_data": {
-            "version": "1.0",
-            "tree": {
-                "nodes": {
-                    "node-1": {"image_id": 1, "children": []}
-                },
-                "roots": ["node-1"]
-            }
+            "roots": [
+                {
+                    "id": 1,
+                    "children": []
+                }
+            ]
         }
     }
     response = client.post('/api/tree/save', json=tree_data)
@@ -58,7 +57,7 @@ def test_save_tree_authenticated(client):
     assert tree.name == "My Test Tree"
     assert tree.is_public is True
     saved_json_data = json.loads(tree.json_data)
-    assert saved_json_data['version'] == '1.0'
+    assert 'roots' in saved_json_data
 
 def test_save_tree_missing_data(client):
     # Register a user
