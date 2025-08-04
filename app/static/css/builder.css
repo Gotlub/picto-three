@@ -1,6 +1,7 @@
-.node.selected > img {
-    border: 3px solid #007bff;
+.node.selected {
+    border: 2px solid #007bff;
     border-radius: 5px;
+    background-color: #e7f1ff;
 }
 
 .children {
@@ -11,6 +12,8 @@
 
 .node {
     margin: 5px 0;
+    padding: 5px;
+    border: 1px solid transparent; /* Add a transparent border to prevent layout shift on selection */
 }
 
 .image-sidebar img.grayscale {
