@@ -12,7 +12,7 @@ class Node {
 
     createElement(builder) {
         const nodeElement = document.createElement('div');
-        nodeElement.classList.add('node', 'image-item'); // Reuse image-item class
+        nodeElement.classList.add('node', 'image-item');
 
         const imgElement = document.createElement('img');
         imgElement.src = this.image.path;
@@ -25,7 +25,7 @@ class Node {
         nodeElement.appendChild(nameElement);
 
         nodeElement.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent event bubbling to parent nodes
+            e.stopPropagation();
             builder.selectNode(this);
         });
         return nodeElement;
@@ -37,9 +37,7 @@ class TreeBuilder {
         this.imageSidebar = document.getElementById('image-sidebar');
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
-        this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
-        this.savedTrees = [];
         this.root = null;
         this.selectedNode = null;
         this.init();
@@ -115,18 +113,20 @@ class TreeBuilder {
     }
 
     updateSidebar() {
-        const sidebarImages = this.imageSidebar.querySelectorAll('img');
+        const sidebarImages = this.imageSidebar.querySelectorAll('.image-item img');
         if (this.selectedNode) {
             sidebarImages.forEach(img => {
-                if (img.dataset.imageId !== this.selectedNode.image.id.toString()) {
-                    img.classList.add('grayscale');
+                const imageItem = img.closest('.image-item');
+                if (imageItem.dataset.imageId !== this.selectedNode.image.id.toString()) {
+                    imageItem.classList.add('grayscale');
                 } else {
-                    img.classList.remove('grayscale');
+                    imageItem.classList.remove('grayscale');
                 }
             });
         } else {
             sidebarImages.forEach(img => {
-                img.classList.remove('grayscale');
+                const imageItem = img.closest('.image-item');
+                imageItem.classList.remove('grayscale');
             });
         }
     }
