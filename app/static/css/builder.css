@@ -26,7 +26,7 @@
 .node::before {
     content: "";
     position: absolute;
-    top: 15px;
+    top: 22px;
     left: -10px;
     width: 10px;
     height: 1px;
@@ -40,10 +40,15 @@
 .node-content {
     display: flex;
     align-items: center;
+    cursor: pointer;
+}
+
+.node-content:hover {
+    background-color: #f0f0f0;
 }
 
 .node img {
-    height: 30px;
+    height: 45px;
     margin-right: 10px;
 }
 
