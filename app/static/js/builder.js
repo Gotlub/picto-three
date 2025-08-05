@@ -15,7 +15,7 @@ class Node {
         nodeElement.classList.add('node');
 
         const imgElement = document.createElement('img');
-        imgElement.src = this.image.path;
+        imgElement.src = this.image.path.replace('app/', '');
         imgElement.alt = this.image.name;
         nodeElement.appendChild(imgElement);
 
