@@ -1,4 +1,4 @@
-.node.selected .node-content {
+.node-content.selected {
     border: 3px solid #007bff;
     border-radius: 5px;
 }
