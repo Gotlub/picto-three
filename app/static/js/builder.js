@@ -3,7 +3,9 @@ class Node {
         this.image = image;
         this.builder = builder;
         this.children = [];
-        this.element = this.createElement(builder);
+        if (image.id !== 'root') {
+            this.element = this.createElement(builder);
+        }
     }
 
     addChild(node) {
@@ -44,7 +46,7 @@ class TreeBuilder {
         this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
-        this.root = null;
+        this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
         this.selectedNode = null;
         this.rootSelected = false;
         this.init();
@@ -103,23 +105,16 @@ class TreeBuilder {
     handleImageClick(image) {
         const newNode = new Node(image, this);
         if (this.rootSelected) {
-            // This is a simplified approach to adding a new root.
-            // A more robust implementation would handle multiple roots.
-            if (!this.root) {
-                this.root = newNode;
-            } else {
-                // For simplicity, we'll just replace the root.
-                // A better approach might be to create a new tree or add to a list of roots.
-                this.root = newNode;
-            }
-            this.selectNode(this.root);
+            this.rootNode.addChild(newNode);
+            this.selectNode(newNode);
             this.rootSelected = false;
             this.treeDisplay.classList.remove('root-selected');
-        } else if (!this.root) {
-            this.root = newNode;
-            this.selectNode(this.root);
         } else if (this.selectedNode) {
             this.selectedNode.addChild(newNode);
+            this.selectNode(newNode);
+        } else {
+            // If no node is selected, add to the root
+            this.rootNode.addChild(newNode);
             this.selectNode(newNode);
         }
         this.renderTree();
@@ -157,11 +152,7 @@ class TreeBuilder {
         }
 
         if (confirm('Are you sure you want to delete the selected node and all its children?')) {
-            if (this.selectedNode === this.root) {
-                this.root = null;
-            } else {
-                this.removeNode(this.root, this.selectedNode);
-            }
+            this.removeNode(this.rootNode, this.selectedNode);
             this.selectedNode = null;
             this.renderTree();
         }
@@ -194,10 +185,10 @@ class TreeBuilder {
 
     renderTree() {
         this.treeDisplay.innerHTML = '';
-        if (this.root) {
-            this.treeDisplay.appendChild(this.root.element);
-            this.renderChildren(this.root, this.root.element);
-        }
+        this.rootNode.children.forEach(child => {
+            this.treeDisplay.appendChild(child.element);
+            this.renderChildren(child, child.element);
+        });
     }
 
     renderChildren(node, parentElement) {
@@ -211,10 +202,6 @@ class TreeBuilder {
     }
 
     getTreeAsJSON() {
-        if (!this.root) {
-            return null;
-        }
-
         const buildNode = (node) => {
             const nodeData = {
                 id: node.image.id,
@@ -226,23 +213,9 @@ class TreeBuilder {
             return nodeData;
         };
 
-        const allNodes = new Set();
-        const childNodes = new Set();
-        const traverseForAllNodes = (node) => {
-            if (!node) return;
-            allNodes.add(node);
-            node.children.forEach(child => {
-                childNodes.add(child);
-                traverseForAllNodes(child);
-            });
-        };
-        traverseForAllNodes(this.root);
-
         const roots = [];
-        allNodes.forEach(node => {
-            if (!childNodes.has(node)) {
-                roots.push(buildNode(node));
-            }
+        this.rootNode.children.forEach(child => {
+            roots.push(buildNode(child));
         });
 
         return {
@@ -336,7 +309,7 @@ class TreeBuilder {
     }
 
     rebuildTreeFromJSON(treeData) {
-        this.root = null;
+        this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
         this.selectedNode = null;
 
         const buildNode = (nodeData) => {
@@ -356,10 +329,13 @@ class TreeBuilder {
             return newNode;
         };
 
-        if (treeData.roots && treeData.roots.length > 0) {
-            // For now, we only support one root visually.
-            // This can be extended later to support multiple root nodes on the canvas.
-            this.root = buildNode(treeData.roots[0]);
+        if (treeData.roots) {
+            treeData.roots.forEach(rootData => {
+                const rootNode = buildNode(rootData);
+                if (rootNode) {
+                    this.rootNode.addChild(rootNode);
+                }
+            });
         }
 
         this.renderTree();
