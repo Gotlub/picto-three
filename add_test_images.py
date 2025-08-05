@@ -35,7 +35,7 @@ def main():
                         path=image_path,
                         name=name,
                         description=description,
-                        is_public=True,
+                        is_public=(False, True)[image_path.startswith('app/static/images/pictograms/public')],
                         user_id=None
                     )
                     db.session.add(image)
