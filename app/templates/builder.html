@@ -39,7 +39,11 @@
 
         <!-- Main Content -->
         <div class="col-md-7">
-            <h2 class="mb-4">{{ _('Tree Builder') }}</h2>
+            <div class="d-flex align-items-center mb-4">
+                <h2 class="mb-0">{{ _('Tree Builder') }}</h2>
+                <button id="root-btn" class="btn btn-info ms-3">{{ _('Root') }}</button>
+                <button id="delete-btn" class="btn btn-danger ms-3">{{ _('Delete') }}</button>
+            </div>
             <div class="tree-display border p-3 rounded" id="tree-display" style="min-height: 80vh;">
                 <!-- Tree will be built here -->
             </div>

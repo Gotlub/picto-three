@@ -1,4 +1,5 @@
-.node-content.selected {
+.node-content.selected,
+.tree-display.root-selected {
     border: 3px solid #007bff;
     border-radius: 5px;
 }

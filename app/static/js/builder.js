@@ -46,6 +46,7 @@ class TreeBuilder {
         this.savedTrees = [];
         this.root = null;
         this.selectedNode = null;
+        this.rootSelected = false;
         this.init();
         this.treeDisplay.addEventListener('click', (e) => {
             if (e.target === this.treeDisplay) {
@@ -77,6 +78,16 @@ class TreeBuilder {
             this.imageSearch.addEventListener('input', () => this.filterImages());
         }
 
+        const rootBtn = document.getElementById('root-btn');
+        if (rootBtn) {
+            rootBtn.addEventListener('click', () => this.selectRoot());
+        }
+
+        const deleteBtn = document.getElementById('delete-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
+        }
+
         this.loadSavedTrees();
     }
 
@@ -91,7 +102,20 @@ class TreeBuilder {
 
     handleImageClick(image) {
         const newNode = new Node(image, this);
-        if (!this.root) {
+        if (this.rootSelected) {
+            // This is a simplified approach to adding a new root.
+            // A more robust implementation would handle multiple roots.
+            if (!this.root) {
+                this.root = newNode;
+            } else {
+                // For simplicity, we'll just replace the root.
+                // A better approach might be to create a new tree or add to a list of roots.
+                this.root = newNode;
+            }
+            this.selectNode(this.root);
+            this.rootSelected = false;
+            this.treeDisplay.classList.remove('root-selected');
+        } else if (!this.root) {
             this.root = newNode;
             this.selectNode(this.root);
         } else if (this.selectedNode) {
@@ -102,9 +126,7 @@ class TreeBuilder {
     }
 
     selectNode(node) {
-        if (this.selectedNode) {
-            this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
-        }
+        this.deselectAllNodes();
         this.selectedNode = node;
         if (this.selectedNode) {
             this.selectedNode.element.querySelector('.node-content').classList.add('selected');
@@ -117,7 +139,40 @@ class TreeBuilder {
             this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
             this.selectedNode = null;
         }
+        this.rootSelected = false;
+        this.treeDisplay.classList.remove('root-selected');
         this.updateSidebar();
+    }
+
+    selectRoot() {
+        this.deselectAllNodes();
+        this.rootSelected = true;
+        this.treeDisplay.classList.add('root-selected');
+    }
+
+    deleteSelectedNode() {
+        if (!this.selectedNode) {
+            alert('Please select a node to delete.');
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete the selected node and all its children?')) {
+            if (this.selectedNode === this.root) {
+                this.root = null;
+            } else {
+                this.removeNode(this.root, this.selectedNode);
+            }
+            this.selectedNode = null;
+            this.renderTree();
+        }
+    }
+
+    removeNode(parent, nodeToRemove) {
+        if (!parent) {
+            return;
+        }
+        parent.children = parent.children.filter(child => child !== nodeToRemove);
+        parent.children.forEach(child => this.removeNode(child, nodeToRemove));
     }
 
     updateSidebar() {
