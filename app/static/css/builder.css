@@ -4,19 +4,46 @@
 }
 
 .children {
+    position: relative;
     padding-left: 20px;
     margin-left: 10px;
-    border-left: 1px solid #ccc;
+}
+
+.children::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 1px;
+    height: 100%;
+    background-color: #ccc;
 }
 
 .node {
-    display: flex;
-    align-items: center;
+    position: relative;
+}
+
+.node::before {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: -10px;
+    width: 10px;
+    height: 1px;
+    background-color: #ccc;
+}
+
+.node {
     margin: 5px 0;
 }
 
+.node-content {
+    display: flex;
+    align-items: center;
+}
+
 .node img {
-    height: 20px;
+    height: 30px;
     margin-right: 10px;
 }
 

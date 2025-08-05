@@ -14,14 +14,19 @@ class Node {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
 
+        const contentElement = document.createElement('div');
+        contentElement.classList.add('node-content');
+
         const imgElement = document.createElement('img');
         imgElement.src = this.image.path.replace('app/', '');
         imgElement.alt = this.image.name;
-        nodeElement.appendChild(imgElement);
+        contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');
         nameElement.textContent = this.image.name;
-        nodeElement.appendChild(nameElement);
+        contentElement.appendChild(nameElement);
+
+        nodeElement.appendChild(contentElement);
 
         nodeElement.addEventListener('click', (e) => {
             e.stopPropagation();
