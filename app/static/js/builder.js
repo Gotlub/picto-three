@@ -106,7 +106,9 @@ class TreeBuilder {
             this.selectedNode.element.classList.remove('selected');
         }
         this.selectedNode = node;
-        this.selectedNode.element.classList.add('selected');
+        if (this.selectedNode) {
+            this.selectedNode.element.classList.add('selected');
+        }
         this.updateSidebar();
     }
 
