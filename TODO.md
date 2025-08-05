@@ -31,7 +31,7 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - *Détails : Routes `/login`, `/logout` et template `login.html` créés, avec un formulaire de validation (`LoginForm`).*
 - [x] Gérer la session utilisateur (ex: avec Flask-Login).
   - *Détails : Flask-Login a été initialisé et configuré pour gérer les sessions utilisateur et protéger les routes.*
-- [ ] Le footer doit afficher le nom de l'utilisateur connecté.
+- [x] Le footer doit afficher le nom de l'utilisateur connecté.
   - *Note : Le menu de navigation supérieur affiche maintenant le statut de l'utilisateur (connecté/déconnecté), ce qui remplit une fonction similaire.*
 
 ## Jalon 2 : Structure des Pages et Navigation
@@ -58,12 +58,12 @@ Liste des jalons et tâches à réaliser par les agents IA.
 
 ## Jalon 4 : Persistance des Arbres (Backend & Frontend)
 
-- [ ] Créer une route API (`/api/tree/save`) qui reçoit une structure JSON de l'arbre et la sauvegarde en BDD (modèle `Tree`).
-- [ ] Lier le bouton "Sauvegarder" du menu latéral à cette API.
-- [ ] Créer une route API (`/api/trees/load`) qui renvoie les arbres de l'utilisateur et les arbres publics.
-- [ ] Lier le bouton "Charger un arbre existant" à cette API et afficher les arbres chargés.
-- [ ] Implémenter la fonctionnalité d'export en JSON.
-- [ ] Implémenter la fonctionnalité d'import depuis un JSON.
+- [x] Créer une route API (`/api/tree/save`) qui reçoit une structure JSON de l'arbre et la sauvegarde en BDD (modèle `Tree`).
+- [x] Lier le bouton "Sauvegarder" du menu latéral à cette API.
+- [x] Créer une route API (`/api/trees/load`) qui renvoie les arbres de l'utilisateur et les arbres publics.
+- [x] Lier le bouton "Charger un arbre existant" à cette API et afficher les arbres chargés.
+- [x] Implémenter la fonctionnalité d'export en JSON.
+- [x] Implémenter la fonctionnalité d'import depuis un JSON.
 
 ## Jalon 5 : Gestion des Images et Finalisation
 

@@ -1,9 +1,13 @@
+# Pictogram-Tree Builder
+
+## Projet Pictogram-Tree Builder
 Ce projet est un site web permettant de créer des arbres composites de pictogrammes. Il est conçu pour être simple d'utilisation, notamment pour des publics spécifiques comme les personnes avec TSA. L'application est développée et maintenue principalement par des agents IA.
 
 ## Description
 
 L'application permet aux utilisateurs de s'inscrire, de se connecter et de construire des arborescences visuelles où chaque nœud est une image. Ces arbres peuvent être sauvegardés, partagés publiquement, ou exportés au format JSON.
 
+![Pictogram-Tree Builder](app/static/images/capture01.png)
 ## Pile Technologique
 
 *   **Backend:** Python 3.10+ avec [Flask](https://flask.palletsprojects.com/)
