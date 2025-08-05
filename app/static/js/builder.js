@@ -103,18 +103,18 @@ class TreeBuilder {
 
     selectNode(node) {
         if (this.selectedNode) {
-            this.selectedNode.element.classList.remove('selected');
+            this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
         }
         this.selectedNode = node;
         if (this.selectedNode) {
-            this.selectedNode.element.classList.add('selected');
+            this.selectedNode.element.querySelector('.node-content').classList.add('selected');
         }
         this.updateSidebar();
     }
 
     deselectAllNodes() {
         if (this.selectedNode) {
-            this.selectedNode.element.classList.remove('selected');
+            this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
             this.selectedNode = null;
         }
         this.updateSidebar();
