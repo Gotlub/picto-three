@@ -13,12 +13,18 @@ class Node {
     createElement(builder) {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
+
         const imgElement = document.createElement('img');
         imgElement.src = this.image.path;
         imgElement.alt = this.image.name;
         nodeElement.appendChild(imgElement);
+
+        const nameElement = document.createElement('span');
+        nameElement.textContent = this.image.name;
+        nodeElement.appendChild(nameElement);
+
         nodeElement.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent event bubbling to parent nodes
+            e.stopPropagation();
             builder.selectNode(this);
         });
         return nodeElement;

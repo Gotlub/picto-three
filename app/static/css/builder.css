@@ -10,7 +10,14 @@
 }
 
 .node {
+    display: flex;
+    align-items: center;
     margin: 5px 0;
+}
+
+.node img {
+    height: 20px;
+    margin-right: 10px;
 }
 
 .image-sidebar img.grayscale {
