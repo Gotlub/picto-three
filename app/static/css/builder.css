@@ -10,7 +10,18 @@
 }
 
 .node {
+    display: flex;
+    align-items: center;
     margin: 5px 0;
+}
+
+.node img {
+    height: 24px;
+    margin-right: 8px;
+}
+
+.node span {
+    font-size: 16px;
 }
 
 .image-sidebar img.grayscale {

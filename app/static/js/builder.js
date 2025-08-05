@@ -17,6 +17,9 @@ class Node {
         imgElement.src = this.image.path;
         imgElement.alt = this.image.name;
         nodeElement.appendChild(imgElement);
+        const nameElement = document.createElement('span');
+        nameElement.textContent = this.image.name;
+        nodeElement.appendChild(nameElement);
         nodeElement.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent event bubbling to parent nodes
             builder.selectNode(this);
