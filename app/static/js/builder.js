@@ -142,9 +142,6 @@ class TreeBuilder {
         if (this.root) {
             this.treeDisplay.appendChild(this.root.element);
             this.renderChildren(this.root, this.root.element);
-            if (this.selectedNode) {
-                this.selectedNode.element.classList.add('selected');
-            }
         }
     }
 
