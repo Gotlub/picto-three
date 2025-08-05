@@ -154,7 +154,8 @@ class TreeBuilder {
         if (confirm('Are you sure you want to delete the selected node and all its children?')) {
             this.removeNode(this.rootNode, this.selectedNode);
             this.selectedNode = null;
-            this.renderTree();
+            const treeData = this.getTreeAsJSON();
+            this.rebuildTreeFromJSON(treeData);
         }
     }
 
