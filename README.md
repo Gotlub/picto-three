@@ -35,6 +35,28 @@ L'application permet aux utilisateurs de s'inscrire, de se connecter et de const
     pip install -r requirements.txt
     ```
 
+    **Note sur `python-magic` :**
+    La bibliothèque `python-magic` est utilisée pour la validation des types de fichiers. Son installation peut varier en fonction de votre système d'exploitation.
+
+    - **Sur Windows :**
+      Le paquet `python-magic-bin` dans `requirements.txt` inclut les binaires nécessaires. Aucune étape supplémentaire n'est requise.
+
+    - **Sur macOS (via Homebrew) :**
+      ```bash
+      brew install libmagic
+      ```
+
+    - **Sur les systèmes basés sur Debian/Ubuntu :**
+      ```bash
+      sudo apt-get update
+      sudo apt-get install -y libmagic1
+      ```
+
+    - **Sur les systèmes basés sur Red Hat/CentOS :**
+      ```bash
+      sudo yum install -y file-devel
+      ```
+
 4.  **Configurer l'application Flask :**
     - Sur Windows (cmd) :
       ```
