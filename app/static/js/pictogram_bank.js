@@ -62,7 +62,12 @@ class ImageNode extends BaseNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        imgElement.src = this.data.path.replace('app/', '/');
+        const staticIndex = this.data.path.indexOf('static/');
+        if (staticIndex !== -1) {
+            imgElement.src = '/' + this.data.path.substring(staticIndex);
+        } else {
+            imgElement.src = this.data.path; // Fallback
+        }
         imgElement.alt = this.data.name;
         contentElement.appendChild(imgElement);
 
@@ -239,7 +244,13 @@ class PictogramBank {
             return;
         }
 
-        const imagePath = this.selectedNode.data.path.replace('app/', '/');
+        const staticIndex = this.selectedNode.data.path.indexOf('static/');
+        let imagePath;
+        if (staticIndex !== -1) {
+            imagePath = '/' + this.selectedNode.data.path.substring(staticIndex);
+        } else {
+            imagePath = this.selectedNode.data.path; // Fallback
+        }
         const link = document.createElement('a');
         link.href = imagePath;
         link.download = this.selectedNode.data.name;
