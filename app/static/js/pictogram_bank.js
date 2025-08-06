@@ -226,9 +226,13 @@ class PictogramBank {
             return;
         }
 
+        const descriptionInput = document.getElementById('image-description');
+        const description = descriptionInput.value.trim();
+
         const formData = new FormData();
         formData.append('file', file);
         formData.append('folder_id', parentId);
+        formData.append('description', description);
 
         const response = await fetch('/api/image/upload', {
             method: 'POST',

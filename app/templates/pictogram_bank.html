@@ -30,8 +30,12 @@
             <div class="mb-3">
                 <label for="image-upload-file" class="form-label">{{ _('Upload from disk') }}</label>
                 <input type="file" id="image-upload-file" class="form-control" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp">
-                <button id="upload-image-btn" class="btn btn-secondary mt-2">{{ _('Upload') }}</button>
             </div>
+            <div class="mb-3">
+                <label for="image-description" class="form-label">{{ _('Description (optional)') }}</label>
+                <input type="text" id="image-description" class="form-control">
+            </div>
+            <button id="upload-image-btn" class="btn btn-secondary mt-2">{{ _('Upload') }}</button>
             <hr>
 
             <!-- Export Image Section -->

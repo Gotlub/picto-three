@@ -105,7 +105,7 @@ def load_trees():
     if current_user.is_authenticated:
         user_trees = Tree.query.filter_by(user_id=current_user.id).all()
 
-    all_trees = list(set(public_trees + user_trees))
+    all_trees = public_trees + user_trees
     return jsonify([tree.to_dict() for tree in all_trees])
 
 @api_bp.route('/pictograms', methods=['GET'])
@@ -182,6 +182,8 @@ def upload_image():
     file.seek(0)
 
     folder_id = request.form.get('folder_id')
+    description = request.form.get('description', '')
+
     if not folder_id:
         return jsonify({'status': 'error', 'message': 'No folder_id specified'}), 400
 
@@ -200,7 +202,7 @@ def upload_image():
             path=file_path,
             user_id=current_user.id,
             folder_id=folder.id,
-            description="" # Or get from form
+            description=description
         )
         db.session.add(new_image)
         db.session.commit()
