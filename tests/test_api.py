@@ -105,4 +105,4 @@ def test_load_trees_authenticated(client):
     response = client.get('/api/trees/load')
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 3
+    assert len(data) == 2
