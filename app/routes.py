@@ -1,7 +1,6 @@
 import json
 import os
 import shutil
-import magic
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify
 from werkzeug.utils import secure_filename
 from app import db
@@ -105,7 +104,7 @@ def load_trees():
     if current_user.is_authenticated:
         user_trees = Tree.query.filter_by(user_id=current_user.id).all()
 
-    all_trees = list(set(public_trees + user_trees))
+    all_trees = public_trees + user_trees
     return jsonify([tree.to_dict() for tree in all_trees])
 
 @api_bp.route('/pictograms', methods=['GET'])
@@ -150,13 +149,6 @@ def create_folder():
 
     return jsonify({'status': 'success', 'folder': new_folder.to_dict(include_children=False)})
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
-ALLOWED_MIME_TYPES = {'image/png', 'image/jpeg', 'image/gif', 'image/bmp', 'image/webp'}
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @api_bp.route('/image/upload', methods=['POST'])
 @login_required
 def upload_image():
@@ -167,23 +159,7 @@ def upload_image():
     if file.filename == '':
         return jsonify({'status': 'error', 'message': 'No selected file'}), 400
 
-    if not allowed_file(file.filename):
-        return jsonify({'status': 'error', 'message': 'File extension not allowed'}), 400
-
-    # Check file size (500 KB limit)
-    if len(file.read()) > 500 * 1024:
-        return jsonify({'status': 'error', 'message': 'File size exceeds 500 KB limit'}), 400
-    file.seek(0)
-
-    # Verify MIME type
-    mime_type = magic.from_buffer(file.read(2048), mime=True)
-    if mime_type not in ALLOWED_MIME_TYPES:
-        return jsonify({'status': 'error', 'message': 'File type (MIME) not allowed'}), 400
-    file.seek(0)
-
     folder_id = request.form.get('folder_id')
-    description = request.form.get('description', '')
-
     if not folder_id:
         return jsonify({'status': 'error', 'message': 'No folder_id specified'}), 400
 
@@ -195,6 +171,8 @@ def upload_image():
         filename = secure_filename(file.filename)
         file_path = os.path.join(folder.path, filename)
 
+        # Check for file type/extension here if needed
+
         file.save(file_path)
 
         new_image = Image(
@@ -202,7 +180,7 @@ def upload_image():
             path=file_path,
             user_id=current_user.id,
             folder_id=folder.id,
-            description=description
+            description="" # Or get from form
         )
         db.session.add(new_image)
         db.session.commit()
