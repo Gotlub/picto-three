@@ -62,7 +62,7 @@ class ImageNode extends BaseNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        const newSrc = this.data.path.replace('app/', '/');
+        const newSrc = this.data.path.slice(4);
         console.log(`Original path: ${this.data.path}, New src: ${newSrc}`);
         imgElement.src = newSrc;
         imgElement.alt = this.data.name;
@@ -241,11 +241,11 @@ class PictogramBank {
             return;
         }
 
-        const imagePath = this.selectedNode.data.path.replace('app/', '/');
+        const imagePath = this.selectedNode.data.path.slice(4);
         console.log(`Exporting image with path: ${imagePath}`);
         const link = document.createElement('a');
         link.href = imagePath;
-        link.download = this.selectedNode.data.name;
+        link.download = imagePath;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
