@@ -1,3 +1,36 @@
+// --- Tooltip Manager ---
+class TooltipManager {
+    constructor() {
+        this.tooltipElement = document.createElement('div');
+        this.tooltipElement.id = 'image-tooltip';
+        document.body.appendChild(this.tooltipElement);
+        this.timer = null;
+    }
+
+    attach(element) {
+        element.addEventListener('mouseenter', (e) => {
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                const previewImg = document.createElement('img');
+                previewImg.src = element.src;
+                this.tooltipElement.innerHTML = '';
+                this.tooltipElement.appendChild(previewImg);
+
+                // Position and show
+                this.tooltipElement.style.left = `${e.pageX + 15}px`;
+                this.tooltipElement.style.top = `${e.pageY + 15}px`;
+                this.tooltipElement.style.display = 'block';
+            }, 1000);
+        });
+
+        element.addEventListener('mouseleave', () => {
+            clearTimeout(this.timer);
+            this.tooltipElement.style.display = 'none';
+        });
+    }
+}
+
+
 // --- Node classes for the sidebar ---
 
 class SidebarNode {
@@ -56,7 +89,7 @@ class FolderNode extends SidebarNode {
         const childrenContainer = this.element.querySelector('.children-container');
 
         if (this.isOpen) {
-            icon.src = '/static/images/pictograms/public/bold/folder--open-bold.png';
+            icon.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
             childrenContainer.style.display = 'block';
             if (!this.areChildrenLoaded) {
                 await this.loadChildren();
@@ -121,6 +154,7 @@ class ImageNode extends SidebarNode {
         imgElement.src = imgPath;
         imgElement.alt = this.data.name;
         imgElement.classList.add('image-icon');
+        this.builder.tooltipManager.attach(imgElement); // Attach tooltip logic
         contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');
@@ -164,6 +198,7 @@ class Node {
         const imgPath = this.image.path.startsWith('app/') ? this.image.path.substring(3) : this.image.path;
         imgElement.src = imgPath;
         imgElement.alt = this.image.name;
+        this.builder.tooltipManager.attach(imgElement); // Attach tooltip logic
         contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');
@@ -194,6 +229,8 @@ class TreeBuilder {
 
         this.sidebarRootNodes = [];
         this.savedTrees = [];
+
+        this.tooltipManager = new TooltipManager();
 
         this.initSidebar();
         this.initEventListeners();
@@ -237,7 +274,7 @@ class TreeBuilder {
                     const parentNode = current.closest('.folder-node');
                     if (parentNode) {
                         const icon = parentNode.querySelector('.folder-icon');
-                        if (icon) icon.src = '/static/images/pictograms/public/bold/folder--open-bold.png';
+                        if (icon) icon.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
                     }
                 }
                 current = current.parentElement;

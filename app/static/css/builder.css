@@ -48,14 +48,10 @@
     background-color: #f0f0f0;
 }
 
-.node img {
+.node img,
+.sidebar-node img {
     height: 45px;
     margin-right: 10px;
-}
-
-.image-sidebar img.grayscale {
-    filter: grayscale(100%);
-    opacity: 0.5;
 }
 
 .sidebar {
@@ -65,19 +61,32 @@
     border-right: 1px solid #ddd;
 }
 
-.image-sidebar {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.image-item {
+/* The new tree structure in the sidebar */
+.sidebar-node {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
     cursor: pointer;
 }
 
-.image-item img {
-    height: 20px;
-    margin-right: 10px;
+.sidebar-node .node-content:hover {
+    background-color: #f0f0f0;
+}
+
+/* Tooltip styles */
+#image-tooltip {
+    position: absolute;
+    display: none;
+    padding: 5px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1000;
+    pointer-events: none; /* So the tooltip doesn't interfere with mouse events */
+    width: 100px; /* Fixed width for consistency */
+}
+
+#image-tooltip img {
+    width: 100%;
+    height: auto;
 }
