@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex align-items-center mb-4">
+                <h2 class="mb-0">{{ _('My Pictograms') }}</h2>
+                <button id="root-btn" class="btn btn-info ms-3">{{ _('Root') }}</button>
+                <button id="delete-btn" class="btn btn-danger ms-3">{{ _('Delete') }}</button>
+            </div>
+            <div class="tree-display border p-3 rounded" id="pictogram-display" style="min-height: 80vh;">
+                <!-- Pictogram tree will be built here -->
+            </div>
+        </div>
+
+        <!-- Right Sidebar for Actions -->
+        <div class="col-md-3 sidebar">
+            <!-- Create Folder Section -->
+            <h4>{{ _('Create Folder') }}</h4>
+            <div class="input-group mb-3">
+                <input type="text" id="new-folder-name" class="form-control" placeholder="{{ _('Folder name') }}">
+                <button id="create-folder-btn" class="btn btn-primary">{{ _('Create') }}</button>
+            </div>
+            <hr>
+
+            <!-- Upload Image Section -->
+            <h4>{{ _('Import Image') }}</h4>
+            <div class="mb-3">
+                <label for="image-upload-file" class="form-label">{{ _('Upload from disk') }}</label>
+                <input type="file" id="image-upload-file" class="form-control">
+                <button id="upload-image-btn" class="btn btn-secondary mt-2">{{ _('Upload') }}</button>
+            </div>
+            <hr>
+
+            <!-- Export Image Section -->
+            <h4>{{ _('Export Image') }}</h4>
+            <button id="export-image-btn" class="btn btn-success" disabled>{{ _('Download Selected Image') }}</button>
+        </div>
+    </div>
+</div>
+
+<script id="pictogram-data" type="application/json">
+    {{ pictograms_json | safe }}
+</script>
+<script src="{{ url_for('static', filename='js/pictogram_bank.js') }}"></script>
+{% endblock %}

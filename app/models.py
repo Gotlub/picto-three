@@ -21,6 +21,35 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+class Folder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
+    path = db.Column(db.String(256), nullable=False)
+
+    user = db.relationship('User', backref=db.backref('folders', lazy=True))
+    parent = db.relationship('Folder', remote_side=[id], backref=db.backref('children', lazy='dynamic'))
+    images = db.relationship('Image', backref='folder', lazy='dynamic')
+
+    def to_dict(self, include_children=True):
+        data = {
+            'id': self.id,
+            'type': 'folder',
+            'name': self.name,
+            'user_id': self.user_id,
+            'parent_id': self.parent_id,
+            'path': self.path,
+            'children': []
+        }
+        if include_children:
+            data['children'] = [child.to_dict() for child in self.children] + \
+                               [image.to_dict() for image in self.images]
+        return data
+
+    def __repr__(self):
+        return f'<Folder {self.name}>'
+
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(256))
@@ -28,15 +57,18 @@ class Image(db.Model):
     description = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     is_public = db.Column(db.Boolean, default=False)
+    folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
 
     def to_dict(self):
         return {
             'id': self.id,
+            'type': 'image',
             'path': self.path,
             'name': self.name,
             'description': self.description,
             'user_id': self.user_id,
             'is_public': self.is_public,
+            'folder_id': self.folder_id,
         }
 
     def __repr__(self):

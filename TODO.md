@@ -74,3 +74,27 @@ Liste des jalons et tâches à réaliser par les agents IA.
 - [x] Finaliser le style CSS de toute l'application.
   - *Détails : Le framework Bootstrap a été intégré pour un style de base cohérent et responsive.*
 - [ ] Ajouter la vidéo de présentation et les liens sur la page d'accueil.
+
+## Jalon 6 : Gestion des Images Utilisateur (Banque de Pictogrammes)
+
+- [x] **Mise à jour de la base de données et des modèles**
+    - [x] Créer un nouveau modèle `Folder` dans `app/models.py`.
+    - [x] Ajouter une clé étrangère `folder_id` au modèle `Image`.
+    - [x] Générer et appliquer une migration de base de données.
+- [x] **Mise à jour du processus d'inscription**
+    - [x] Modifier la route `/register` pour créer un répertoire personnel pour chaque nouvel utilisateur.
+    - [x] Ajouter une entrée pour le dossier racine de l'utilisateur dans la table `folder`.
+- [x] **Développement du backend pour la banque de pictogrammes**
+    - [x] Créer une nouvelle route `/pictogram-bank`.
+    - [x] Créer les points d'accès API (`GET /api/pictograms`, `POST /api/folder/create`, `POST /api/image/upload`, `DELETE /api/item/delete`).
+- [x] **Développement du frontend : Page de la banque de pictogrammes**
+    - [x] Créer un nouveau template `app/templates/pictogram_bank.html`.
+    - [x] Mettre en place une mise en page à deux colonnes.
+    - [x] Afficher l'arborescence des dossiers et des images.
+    - [x] Ajouter les formulaires pour les actions (créer, importer, exporter).
+- [x] **Logique JavaScript côté client**
+    - [x] Créer un nouveau fichier `app/static/js/pictogram_bank.js`.
+    - [x] Implémenter la logique de l'arborescence (pattern Composite).
+    - [x] Gérer les interactions utilisateur et les appels API.
+- [x] **Mise à jour de la navigation**
+    - [x] Ajouter le lien "banque de pictogrammes" dans la barre de navigation.
