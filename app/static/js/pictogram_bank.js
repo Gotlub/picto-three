@@ -140,7 +140,22 @@ class PictogramBank {
         this.selectedNode = this.rootNode;
     }
 
+    countItems(node) {
+        let count = 1; // Count the node itself
+        for (const child of node.children) {
+            count += this.countItems(child);
+        }
+        return count;
+    }
+
     async createFolder() {
+        const totalItems = this.countItems(this.rootNode);
+        console.log(`Total items before creation: ${totalItems}`);
+        if (totalItems >= 500) {
+            alert('You have reached the maximum limit of 500 items (folders and images).');
+            return;
+        }
+
         const folderNameInput = document.getElementById('new-folder-name');
         const name = folderNameInput.value.trim();
         if (!name) {
@@ -176,10 +191,22 @@ class PictogramBank {
     }
 
     async uploadImage() {
+        const totalItems = this.countItems(this.rootNode);
+        console.log(`Total items before upload: ${totalItems}`);
+        if (totalItems >= 500) {
+            alert('You have reached the maximum limit of 500 items (folders and images).');
+            return;
+        }
+
         const fileInput = document.getElementById('image-upload-file');
         const file = fileInput.files[0];
         if (!file) {
             alert('Please select a file to upload.');
+            return;
+        }
+
+        if (file.size > 500 * 1024) {
+            alert('The image size cannot exceed 500 KB.');
             return;
         }
 
