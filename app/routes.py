@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from pathlib import Path
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify
 from werkzeug.utils import secure_filename
 from app import db
@@ -47,15 +48,15 @@ def register():
         db.session.commit()
 
         # Create user's personal pictogram directory
-        user_path = os.path.join('app', 'static', 'images', 'pictograms', user.username)
-        os.makedirs(user_path, exist_ok=True)
+        user_path = Path('app') / 'static' / 'images' / 'pictograms' / user.username
+        user_path.mkdir(parents=True, exist_ok=True)
 
         # Create root folder for the user
         root_folder = Folder(
             name=user.username,
             user_id=user.id,
             parent_id=None,
-            path=user_path
+            path=user_path.as_posix()
         )
         db.session.add(root_folder)
         db.session.commit()
@@ -131,9 +132,10 @@ def create_folder():
         return jsonify({'status': 'error', 'message': 'Parent folder not found or not owned by user'}), 404
 
     # Create physical directory
-    new_path = os.path.join(parent_folder.path, name)
+    parent_path = Path(parent_folder.path)
+    new_path = parent_path / name
     try:
-        os.makedirs(new_path, exist_ok=True)
+        new_path.mkdir(parents=True, exist_ok=True)
     except OSError as e:
         return jsonify({'status': 'error', 'message': f'Could not create directory: {e}'}), 500
 
@@ -142,7 +144,7 @@ def create_folder():
         name=name,
         user_id=current_user.id,
         parent_id=parent_id,
-        path=new_path
+        path=new_path.as_posix()
     )
     db.session.add(new_folder)
     db.session.commit()
@@ -169,7 +171,8 @@ def upload_image():
 
     if file:
         filename = secure_filename(file.filename)
-        file_path = os.path.join(folder.path, filename)
+        folder_path = Path(folder.path)
+        file_path = folder_path / filename
 
         # Check for file type/extension here if needed
 
@@ -177,7 +180,7 @@ def upload_image():
 
         new_image = Image(
             name=filename,
-            path=file_path,
+            path=file_path.as_posix(),
             user_id=current_user.id,
             folder_id=folder.id,
             description="" # Or get from form
