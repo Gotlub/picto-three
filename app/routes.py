@@ -71,15 +71,22 @@ def register():
 
 @bp.route('/builder')
 def builder():
-    public_images = Image.query.filter_by(is_public=True).all()
-    user_images = []
+    root_folders = []
+
+    # Get public root folder, assuming it's the one with no user and no parent
+    public_root = Folder.query.filter_by(user_id=None, parent_id=None).first()
+    if public_root:
+        root_folders.append(public_root.to_dict())
+
+    # Get user's personal root folder if authenticated
     if current_user.is_authenticated:
-        user_images = Image.query.filter_by(user_id=current_user.id).all()
+        user_root = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
+        if user_root:
+            root_folders.append(user_root.to_dict())
 
-    all_images = public_images + user_images
-    images_json = json.dumps([image.to_dict() for image in all_images])
+    initial_data_json = json.dumps(root_folders)
 
-    return render_template('builder.html', title='Tree Builder', images_json=images_json, images=all_images)
+    return render_template('builder.html', title='Tree Builder', initial_data_json=initial_data_json)
 
 @bp.route('/pictogram-bank')
 @login_required
@@ -113,9 +120,28 @@ def load_trees():
 def get_pictograms():
     root_folder = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
     if not root_folder:
-        return jsonify({'error': 'Root folder not found'}), 404
+        # If user has no root folder, return a default root structure
+        return jsonify({'id': 'root', 'type': 'folder', 'name': current_user.username, 'children': []})
 
-    return jsonify(root_folder.to_dict())
+    return jsonify(root_folder.to_dict(include_children=True))
+
+
+@api_bp.route('/folder/<int:folder_id>/contents', methods=['GET'])
+def get_folder_contents(folder_id):
+    folder = Folder.query.get_or_404(folder_id)
+
+    # Security check: Ensure the user has access to this folder.
+    # A folder is accessible if it's public (user_id is None) or belongs to the current user.
+    if folder.user_id is not None and (not current_user.is_authenticated or folder.user_id != current_user.id):
+        return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
+
+    child_folders = [child.to_dict() for child in folder.children]
+    child_images = [image.to_dict() for image in folder.images]
+
+    return jsonify({
+        'folders': child_folders,
+        'images': child_images
+    })
 
 @api_bp.route('/folder/create', methods=['POST'])
 @login_required

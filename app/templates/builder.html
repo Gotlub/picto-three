@@ -54,20 +54,15 @@
             <!-- Images Section -->
             <h4>{{ _('Images') }}</h4>
             <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
-            <div class="image-sidebar border p-3" id="image-sidebar">
-                {% for image in images %}
-                    <div class="image-item" data-image-id="{{ image.id }}" data-image-name="{{ image.name }}" data-image-path="{{ image.path }}">
-                        <img src="{{ url_for('static', filename=image.path.replace('app/static/', '')) }}" alt="{{ image.name }}">
-                        <span>{{ image.name }}</span>
-                    </div>
-                {% endfor %}
+            <div class="image-sidebar border p-3" id="image-sidebar" style="height: 80vh; overflow-y: auto;">
+                <!-- The dynamic tree of folders and images will be built here by builder.js -->
             </div>
         </div>
     </div>
 </div>
 
-<script id="images-data" type="application/json">
-    {{ images_json | safe }}
+<script id="initial-tree-data" type="application/json">
+    {{ initial_data_json | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/builder.js') }}"></script>
 {% endblock %}

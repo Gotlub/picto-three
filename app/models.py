@@ -32,7 +32,7 @@ class Folder(db.Model):
     parent = db.relationship('Folder', remote_side=[id], backref=db.backref('children', lazy='dynamic'))
     images = db.relationship('Image', backref='folder', lazy='dynamic')
 
-    def to_dict(self, include_children=True):
+    def to_dict(self, include_children=False):
         data = {
             'id': self.id,
             'type': 'folder',
@@ -40,11 +40,13 @@ class Folder(db.Model):
             'user_id': self.user_id,
             'parent_id': self.parent_id,
             'path': self.path,
-            'children': []
         }
         if include_children:
             data['children'] = [child.to_dict() for child in self.children] + \
                                [image.to_dict() for image in self.images]
+        else:
+            # Optionally, indicate that there are children to fetch
+            data['has_children'] = self.children.count() > 0 or self.images.count() > 0
         return data
 
     def __repr__(self):
