@@ -71,15 +71,34 @@ def register():
 
 @bp.route('/builder')
 def builder():
-    public_images = Image.query.filter_by(is_public=True).all()
-    user_images = []
-    if current_user.is_authenticated:
-        user_images = Image.query.filter_by(user_id=current_user.id).all()
+    initial_folders = []
 
-    all_images = public_images + user_images
+    # Get public root folder
+    public_root = Folder.query.filter_by(user_id=None, parent_id=None).first()
+    if public_root:
+        initial_folders.append(public_root.to_dict())
+
+    # Get user's root folder if authenticated
+    if current_user.is_authenticated:
+        user_root = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
+        if user_root:
+            initial_folders.append(user_root.to_dict())
+
+    # The initial data for the right sidebar tree
+    initial_tree_data_json = json.dumps(initial_folders)
+
+    # We still need all images for the left panel's "load tree" functionality for now.
+    # This could be refactored later.
+    all_images = Image.query.all()
     images_json = json.dumps([image.to_dict() for image in all_images])
 
-    return render_template('builder.html', title='Tree Builder', images_json=images_json, images=all_images)
+
+    return render_template(
+        'builder.html',
+        title='Tree Builder',
+        initial_tree_data_json=initial_tree_data_json,
+        images_json=images_json # Still needed for existing logic
+    )
 
 @bp.route('/pictogram-bank')
 @login_required
@@ -88,7 +107,7 @@ def pictogram_bank():
     if not root_folder:
         pictograms_json = json.dumps({'id': 'root', 'type': 'folder', 'name': 'root', 'children': []})
     else:
-        pictograms_json = json.dumps(root_folder.to_dict())
+        pictograms_json = json.dumps(root_folder.to_dict(include_children=True))
 
     return render_template('pictogram_bank.html', title='Pictogram Bank', pictograms_json=pictograms_json)
 
@@ -108,6 +127,29 @@ def load_trees():
     all_trees = list(set(public_trees + user_trees))
     return jsonify([tree.to_dict() for tree in all_trees])
 
+@api_bp.route('/folder/contents', methods=['GET'])
+def get_folder_contents():
+    parent_id = request.args.get('parent_id', type=int)
+    if parent_id is None:
+        return jsonify({'status': 'error', 'message': 'parent_id is required'}), 400
+
+    parent_folder = Folder.query.get(parent_id)
+    if not parent_folder:
+        return jsonify({'status': 'error', 'message': 'Folder not found'}), 404
+
+    # Security check: If the folder is not public, user must be logged in and own it
+    if parent_folder.user_id is not None:
+        if not current_user.is_authenticated or parent_folder.user_id != current_user.id:
+            return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+
+    child_folders = [folder.to_dict() for folder in parent_folder.children.order_by(Folder.name).all()]
+    child_images = [image.to_dict() for image in parent_folder.images.order_by(Image.name).all()]
+
+    contents = child_folders + child_images
+
+    return jsonify(contents)
+
+
 @api_bp.route('/pictograms', methods=['GET'])
 @login_required
 def get_pictograms():
@@ -115,7 +157,7 @@ def get_pictograms():
     if not root_folder:
         return jsonify({'error': 'Root folder not found'}), 404
 
-    return jsonify(root_folder.to_dict())
+    return jsonify(root_folder.to_dict(include_children=True))
 
 @api_bp.route('/folder/create', methods=['POST'])
 @login_required

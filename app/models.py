@@ -32,7 +32,7 @@ class Folder(db.Model):
     parent = db.relationship('Folder', remote_side=[id], backref=db.backref('children', lazy='dynamic'))
     images = db.relationship('Image', backref='folder', lazy='dynamic')
 
-    def to_dict(self, include_children=True):
+    def to_dict(self, include_children=False):
         data = {
             'id': self.id,
             'type': 'folder',
@@ -40,11 +40,15 @@ class Folder(db.Model):
             'user_id': self.user_id,
             'parent_id': self.parent_id,
             'path': self.path,
-            'children': []
         }
         if include_children:
-            data['children'] = [child.to_dict() for child in self.children] + \
+            data['children'] = [child.to_dict(include_children=True) for child in self.children] + \
                                [image.to_dict() for image in self.images]
+        else:
+            # Add a has_children flag to indicate that the folder is expandable
+            has_subfolders = self.children.first() is not None
+            has_images = self.images.first() is not None
+            data['has_children'] = has_subfolders or has_images
         return data
 
     def __repr__(self):

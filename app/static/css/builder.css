@@ -81,3 +81,31 @@
     height: 20px;
     margin-right: 10px;
 }
+
+/* Styles for the new image tree sidebar */
+#image-sidebar-tree {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.image-tree-node .node-content {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 2px 0;
+}
+
+.image-tree-node .node-content:hover {
+    background-color: #f0f0f0;
+}
+
+.image-tree-node img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.image-tree-node .children {
+    padding-left: 20px;
+    border-left: 1px dashed #ccc;
+    margin-left: 10px;
+}

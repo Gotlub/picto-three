@@ -1,3 +1,189 @@
+// --- Start of new Image Tree for Right Sidebar ---
+
+class ImageTreeNode {
+    constructor(data, imageTree) {
+        this.data = data;
+        this.imageTree = imageTree;
+        this.element = this.createElement();
+        this.children = [];
+        this.parent = null;
+    }
+
+    createElement() {
+        throw new Error("createElement must be implemented by subclass");
+    }
+}
+
+class ImageTreeFolderNode extends ImageTreeNode {
+    constructor(data, imageTree) {
+        super(data, imageTree);
+        this.expanded = false;
+        this.childrenLoaded = false;
+    }
+
+    createElement() {
+        const nodeElement = document.createElement('div');
+        nodeElement.classList.add('image-tree-node', 'folder');
+        nodeElement.dataset.id = this.data.id;
+
+        const contentElement = document.createElement('div');
+        contentElement.classList.add('node-content');
+
+        const icon = document.createElement('img');
+        icon.src = '/static/images/pictograms/public/bold/folder-bold.png';
+        this.icon = icon;
+        contentElement.appendChild(icon);
+
+        const nameElement = document.createElement('span');
+        nameElement.textContent = this.data.name;
+        contentElement.appendChild(nameElement);
+
+        nodeElement.appendChild(contentElement);
+
+        this.childrenContainer = document.createElement('div');
+        this.childrenContainer.classList.add('children');
+        this.childrenContainer.style.display = 'none';
+        nodeElement.appendChild(this.childrenContainer);
+
+        contentElement.addEventListener('click', () => this.toggle());
+
+        return nodeElement;
+    }
+
+    toggle() {
+        this.expanded = !this.expanded;
+        if (this.expanded) {
+            this.icon.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
+            this.childrenContainer.style.display = '';
+            if (!this.childrenLoaded) {
+                this.loadChildren();
+            }
+        } else {
+            this.icon.src = '/static/images/pictograms/public/bold/folder-bold.png';
+            this.childrenContainer.style.display = 'none';
+        }
+    }
+
+    async loadChildren() {
+        if (this.childrenLoaded) return;
+
+        const response = await fetch(`/api/folder/contents?parent_id=${this.data.id}`);
+        const childrenData = await response.json();
+
+        this.childrenLoaded = true;
+        this.childrenContainer.innerHTML = ''; // Clear any loading indicator
+
+        if (childrenData.length === 0) {
+            const noItems = document.createElement('div');
+            noItems.classList.add('image-tree-node', 'info');
+            noItems.textContent = 'Empty folder';
+            this.childrenContainer.appendChild(noItems);
+        } else {
+            childrenData.forEach(childData => {
+                let childNode;
+                if (childData.type === 'folder') {
+                    childNode = new ImageTreeFolderNode(childData, this.imageTree);
+                } else {
+                    childNode = new ImageTreeImageNode(childData, this.imageTree);
+                }
+                childNode.parent = this;
+                this.children.push(childNode);
+                this.childrenContainer.appendChild(childNode.element);
+            });
+        }
+    }
+
+    filter(term, visibleNodes) {
+        const nameMatch = this.data.name.toLowerCase().includes(term);
+        let childrenMatch = false;
+
+        this.children.forEach(child => {
+            if (child.filter(term, visibleNodes)) {
+                childrenMatch = true;
+            }
+        });
+
+        if (nameMatch || childrenMatch) {
+            this.element.style.display = '';
+            visibleNodes.add(this);
+            if (childrenMatch && !this.expanded) {
+                 this.toggle();
+            }
+        } else {
+            this.element.style.display = 'none';
+        }
+        return nameMatch || childrenMatch;
+    }
+}
+
+class ImageTreeImageNode extends ImageTreeNode {
+    createElement() {
+        const nodeElement = document.createElement('div');
+        nodeElement.classList.add('image-tree-node', 'image');
+        nodeElement.dataset.id = this.data.id;
+
+        const contentElement = document.createElement('div');
+        contentElement.classList.add('node-content');
+
+        const imgElement = document.createElement('img');
+        imgElement.src = this.data.path.replace('app/static', '/static');
+        imgElement.alt = this.data.name;
+        contentElement.appendChild(imgElement);
+
+        const nameElement = document.createElement('span');
+        nameElement.textContent = this.data.name;
+        contentElement.appendChild(nameElement);
+
+        nodeElement.appendChild(contentElement);
+
+        contentElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.imageTree.onImageClick(this.data);
+        });
+
+        return nodeElement;
+    }
+
+    filter(term, visibleNodes) {
+        const nameMatch = this.data.name.toLowerCase().includes(term);
+        if (nameMatch) {
+            this.element.style.display = '';
+            visibleNodes.add(this);
+        } else {
+            this.element.style.display = 'none';
+        }
+        return nameMatch;
+    }
+}
+
+class ImageTree {
+    constructor(containerId, initialData, onImageClick) {
+        this.container = document.getElementById(containerId);
+        this.initialData = initialData;
+        this.onImageClick = onImageClick;
+        this.rootNodes = [];
+        this.init();
+    }
+
+    init() {
+        this.container.innerHTML = '';
+        this.initialData.forEach(data => {
+            const node = new ImageTreeFolderNode(data, this);
+            this.rootNodes.push(node);
+            this.container.appendChild(node.element);
+        });
+    }
+
+    filter(term) {
+        const visibleNodes = new Set();
+        this.rootNodes.forEach(node => node.filter(term.toLowerCase(), visibleNodes));
+    }
+}
+
+
+// --- End of new Image Tree for Right Sidebar ---
+
+
 class Node {
     constructor(image, builder) {
         this.image = image;
@@ -40,7 +226,6 @@ class Node {
 
 class TreeBuilder {
     constructor() {
-        this.imageSidebar = document.getElementById('image-sidebar');
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
         this.treeList = document.getElementById('tree-list');
@@ -49,7 +234,11 @@ class TreeBuilder {
         this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
         this.selectedNode = null;
         this.rootSelected = false;
-        this.init();
+
+        // New Image Tree initialization
+        const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
+        this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
+
         this.treeDisplay.addEventListener('click', (e) => {
             if (e.target === this.treeDisplay) {
                 this.deselectAllNodes();
@@ -93,15 +282,6 @@ class TreeBuilder {
         this.loadSavedTrees();
     }
 
-    init() {
-        this.images.forEach(image => {
-            const imageItem = this.imageSidebar.querySelector(`[data-image-id='${image.id}']`);
-            if (imageItem) {
-                imageItem.addEventListener('click', () => this.handleImageClick(image));
-            }
-        });
-    }
-
     handleImageClick(image) {
         const newNode = new Node(image, this);
         if (this.rootSelected) {
@@ -126,7 +306,6 @@ class TreeBuilder {
         if (this.selectedNode) {
             this.selectedNode.element.querySelector('.node-content').classList.add('selected');
         }
-        this.updateSidebar();
     }
 
     deselectAllNodes() {
@@ -136,7 +315,6 @@ class TreeBuilder {
         }
         this.rootSelected = false;
         this.treeDisplay.classList.remove('root-selected');
-        this.updateSidebar();
     }
 
     selectRoot() {
@@ -165,23 +343,6 @@ class TreeBuilder {
         }
         parent.children = parent.children.filter(child => child !== nodeToRemove);
         parent.children.forEach(child => this.removeNode(child, nodeToRemove));
-    }
-
-    updateSidebar() {
-        const sidebarImages = this.imageSidebar.querySelectorAll('img');
-        if (this.selectedNode) {
-            sidebarImages.forEach(img => {
-                if (img.dataset.imageId !== this.selectedNode.image.id.toString()) {
-                    img.classList.add('grayscale');
-                } else {
-                    img.classList.remove('grayscale');
-                }
-            });
-        } else {
-            sidebarImages.forEach(img => {
-                img.classList.remove('grayscale');
-            });
-        }
     }
 
     renderTree() {
@@ -260,18 +421,8 @@ class TreeBuilder {
     }
 
     filterImages() {
-        const searchTerm = this.imageSearch.value.toLowerCase();
-        const imageItems = this.imageSidebar.querySelectorAll('.image-item');
-
-        imageItems.forEach(item => {
-            const name = item.dataset.imageName.toLowerCase();
-            const path = item.dataset.imagePath.toLowerCase();
-            if (name.includes(searchTerm) || path.includes(searchTerm)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+        const searchTerm = this.imageSearch.value;
+        this.imageTree.filter(searchTerm);
     }
 
     async loadSavedTrees() {
@@ -316,6 +467,7 @@ class TreeBuilder {
         const buildNode = (nodeData) => {
             const image = this.images.find(img => img.id === nodeData.id);
             if (!image) {
+                console.error('Image not found for id:', nodeData.id);
                 return null;
             }
             const newNode = new Node(image, this);
