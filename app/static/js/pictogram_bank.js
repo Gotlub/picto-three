@@ -210,6 +210,12 @@ class PictogramBank {
             return;
         }
 
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type. Please upload a valid image file (.jpg, .jpeg, .png, .gif, .bmp, .webp).');
+            return;
+        }
+
         let parentId;
         if (this.selectedNode && this.selectedNode instanceof FolderNode) {
             parentId = this.selectedNode.data.id;
