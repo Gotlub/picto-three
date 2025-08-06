@@ -105,7 +105,7 @@ def load_trees():
     if current_user.is_authenticated:
         user_trees = Tree.query.filter_by(user_id=current_user.id).all()
 
-    all_trees = public_trees + user_trees
+    all_trees = list(set(public_trees + user_trees))
     return jsonify([tree.to_dict() for tree in all_trees])
 
 @api_bp.route('/pictograms', methods=['GET'])
