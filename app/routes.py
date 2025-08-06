@@ -55,7 +55,7 @@ def register():
             name=user.username,
             user_id=user.id,
             parent_id=None,
-            path=user_path
+            path=user_path.replace('\\', '/')
         )
         db.session.add(root_folder)
         db.session.commit()
@@ -104,7 +104,8 @@ def load_trees():
     if current_user.is_authenticated:
         user_trees = Tree.query.filter_by(user_id=current_user.id).all()
 
-    all_trees = public_trees + user_trees
+    # Combine public and user trees and avoid duplicate
+    all_trees = list(set(public_trees + user_trees))
     return jsonify([tree.to_dict() for tree in all_trees])
 
 @api_bp.route('/pictograms', methods=['GET'])
@@ -142,7 +143,7 @@ def create_folder():
         name=name,
         user_id=current_user.id,
         parent_id=parent_id,
-        path=new_path
+        path=new_path.replace('\\', '/')
     )
     db.session.add(new_folder)
     db.session.commit()
@@ -177,7 +178,7 @@ def upload_image():
 
         new_image = Image(
             name=filename,
-            path=file_path,
+            path=file_path.replace('\\', '/'),
             user_id=current_user.id,
             folder_id=folder.id,
             description="" # Or get from form
