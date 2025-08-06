@@ -98,3 +98,19 @@ Liste des jalons et tâches à réaliser par les agents IA.
     - [x] Gérer les interactions utilisateur et les appels API.
 - [x] **Mise à jour de la navigation**
     - [x] Ajouter le lien "banque de pictogrammes" dans la barre de navigation.
+
+## Jalon 7 : Traduction Multilingue (Futur)
+
+- **Étape 1 : Préparation des chaînes de texte**
+  - Lister toutes les chaînes de texte (strings) utilisées dans le frontend (templates).
+  - Convertir chaque chaîne en une variable identifiable pour la traduction (par exemple, en utilisant `_('key')`).
+
+- **Étape 2 : Gestion de la langue de l'utilisateur**
+  - Créer une variable globale `language` associée à l'utilisateur (attribut en session).
+  - Les valeurs possibles seront `"EN"`, `"FR"`, `"ES"`.
+  - La langue sera modifiable via un sélecteur dans le menu.
+  - La langue par défaut sera `"EN"`.
+
+- **Étape 3 : Implémentation de la logique de traduction**
+  - Créer des fichiers de traduction séparés pour chaque langue (`EN`, `FR`, `ES`).
+  - Implémenter la logique pour que les templates affichent la traduction correspondante en fonction de la variable `language` de la session.

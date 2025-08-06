@@ -227,8 +227,7 @@ class PictogramBank {
 
             const result = await response.json();
             if (result.status === 'success') {
-                this.removeNodeFromTree(this.selectedNode);
-                this.deselectAllNodes();
+                window.location.href = '/pictogram-bank';
             } else {
                 alert(`Error deleting item: ${result.message}`);
             }
