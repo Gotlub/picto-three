@@ -121,11 +121,11 @@ def get_pictograms():
 @login_required
 def create_folder():
     data = request.get_json()
-    if not data or 'name' not in data or 'parent_id' not in data:
+    if not data or 'name' not in data or 'parent_id' not in data or not data.get('name').strip():
         return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
 
     parent_id = data.get('parent_id')
-    name = data.get('name')
+    name = data.get('name').strip()
 
     parent_folder = Folder.query.get(parent_id)
     if not parent_folder or parent_folder.user_id != current_user.id:
