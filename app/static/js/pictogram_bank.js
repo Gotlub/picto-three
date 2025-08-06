@@ -66,6 +66,15 @@ class ImageNode extends BaseNode {
         console.log(`Original path: ${this.data.path}, New src: ${newSrc}`);
         imgElement.src = newSrc;
         imgElement.alt = this.data.name;
+
+        // Add tooltip events
+        imgElement.addEventListener('mouseover', (e) => {
+            tooltip.show(e, imgElement.src);
+        });
+        imgElement.addEventListener('mouseout', (e) => {
+            tooltip.hide(e);
+        });
+
         contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');

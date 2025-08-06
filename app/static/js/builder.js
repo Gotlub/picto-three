@@ -128,6 +128,15 @@ class ImageTreeImageNode extends ImageTreeNode {
         const imgElement = document.createElement('img');
         imgElement.src = this.data.path.replace('app/static', '/static');
         imgElement.alt = this.data.name;
+
+        // Add tooltip events
+        imgElement.addEventListener('mouseover', (e) => {
+            tooltip.show(e, imgElement.src);
+        });
+        imgElement.addEventListener('mouseout', (e) => {
+            tooltip.hide(e);
+        });
+
         contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');
@@ -208,6 +217,15 @@ class Node {
         const imgElement = document.createElement('img');
         imgElement.src = this.image.path.replace('app/', '');
         imgElement.alt = this.image.name;
+
+        // Add tooltip events
+        imgElement.addEventListener('mouseover', (e) => {
+            tooltip.show(e, imgElement.src);
+        });
+        imgElement.addEventListener('mouseout', (e) => {
+            tooltip.hide(e);
+        });
+
         contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');
