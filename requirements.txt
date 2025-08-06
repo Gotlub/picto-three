@@ -6,3 +6,4 @@ Flask-Login
 Flask-WTF
 email-validator
 Flask-Babel
+python-magic
