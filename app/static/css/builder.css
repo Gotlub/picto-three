@@ -54,6 +54,41 @@
     margin-right: 10px;
 }
 
+/* --- Unified Indentation Rules for Both Trees --- */
+.children,
+.sidebar-node .children-container {
+    position: relative;
+    padding-left: 20px;
+    margin-left: 10px;
+}
+
+.children::before,
+.sidebar-node .children-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 1px;
+    height: 100%;
+    background-color: #ccc;
+}
+
+.node,
+.sidebar-node {
+    position: relative;
+}
+
+.node::before,
+.sidebar-node::before {
+    content: "";
+    position: absolute;
+    top: 22px; /* Half of image height */
+    left: -10px;
+    width: 10px;
+    height: 1px;
+    background-color: #ccc;
+}
+
 .sidebar {
     height: 90vh;
     overflow-y: auto;

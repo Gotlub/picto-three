@@ -106,3 +106,63 @@ def test_load_trees_authenticated(client):
     assert response.status_code == 200
     data = response.get_json()
     assert len(data) == 2
+
+def test_get_bulk_images(client):
+    """Test the bulk image fetching endpoint."""
+    from app.models import User, Image
+    from app import db
+
+    with client.application.app_context():
+        user = User(username='bulkuser', email='bulkuser@test.com')
+        user.set_password('password')
+        other_user = User(username='otheruser', email='otheruser@test.com')
+        other_user.set_password('password')
+        db.session.add_all([user, other_user])
+        db.session.commit()
+
+        public_image = Image(name='public_image.png', path='static/images/public_image.png', is_public=True)
+        private_image = Image(name='private_image.png', path='static/images/private_image.png', user_id=user.id, is_public=False)
+        other_private_image = Image(name='other_private.png', path='static/images/other_private.png', user_id=other_user.id, is_public=False)
+        db.session.add_all([public_image, private_image, other_private_image])
+        db.session.commit()
+
+        ids_to_fetch = [public_image.id, private_image.id, other_private_image.id]
+        public_image_id = public_image.id
+        private_image_id = private_image.id
+        other_private_image_id = other_private_image.id
+
+    # Anonymous user should only get the public image
+    response = client.post('/api/images/bulk', json={'ids': ids_to_fetch})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]['id'] == public_image_id
+
+    # Authenticated user should get public and their own private images
+    login(client, 'bulkuser', 'password')
+    response = client.post('/api/images/bulk', json={'ids': ids_to_fetch})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 2
+    returned_ids = {img['id'] for img in data}
+    assert public_image_id in returned_ids
+    assert private_image_id in returned_ids
+    assert other_private_image_id not in returned_ids
+    logout(client)
+
+def test_get_bulk_images_invalid_data(client):
+    """Test bulk image endpoint with invalid data."""
+    with client.application.app_context():
+        user = User(username='testuser_invalid_bulk', email='invalid@test.com')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+
+    login(client, 'testuser_invalid_bulk', 'password')
+
+    response = client.post('/api/images/bulk', json={})
+    assert response.status_code == 400
+    response = client.post('/api/images/bulk', json={'image_ids': [1, 2]})
+    assert response.status_code == 400
+    response = client.post('/api/images/bulk', json={'ids': 'not-a-list'})
+    assert response.status_code == 400

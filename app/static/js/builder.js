@@ -53,7 +53,7 @@ class FolderNode extends SidebarNode {
     createElement() {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('sidebar-node', 'folder-node');
-        nodeElement.style.paddingLeft = `${(this.data.depth || 0) * 15}px`;
+        // nodeElement.style.paddingLeft = `${(this.data.depth || 0) * 15}px`; // Removed for CSS-based indentation
         nodeElement.dataset.name = this.data.name; // For searching
 
         const contentElement = document.createElement('div');
@@ -143,7 +143,7 @@ class ImageNode extends SidebarNode {
     createElement() {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('sidebar-node', 'image-node');
-        nodeElement.style.paddingLeft = `${(this.data.depth || 0) * 15}px`;
+        // nodeElement.style.paddingLeft = `${(this.data.depth || 0) * 15}px`; // Removed for CSS-based indentation
         nodeElement.dataset.name = this.data.name; // For searching
 
         const contentElement = document.createElement('div');
@@ -441,9 +441,69 @@ class TreeBuilder {
         this.treeList.appendChild(select);
     }
 
-    loadTree() {
-        alert('Loading saved trees is temporarily unavailable. This feature is being updated.');
-        console.error("Load Tree: This functionality needs a new backend endpoint to fetch image details from IDs.");
+    async loadTree() {
+        const select = document.getElementById('tree-select');
+        if (!select || !select.value) return;
+
+        const treeId = parseInt(select.value, 10);
+        const treeToLoad = this.savedTrees.find(tree => tree.id === treeId);
+
+        if (treeToLoad) {
+            const treeData = JSON.parse(treeToLoad.json_data);
+            await this.rebuildTreeFromJSON(treeData);
+        }
+    }
+
+    async rebuildTreeFromJSON(treeData) {
+        this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
+        this.selectedNode = null;
+        this.treeDisplay.innerHTML = '';
+
+        const allImageIds = new Set();
+        const collectIds = (nodes) => {
+            for (const node of nodes) {
+                allImageIds.add(node.id);
+                if (node.children) {
+                    collectIds(node.children);
+                }
+            }
+        };
+        collectIds(treeData.roots);
+
+        const response = await fetch('/api/images/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: Array.from(allImageIds) })
+        });
+        const imagesData = await response.json();
+        const imagesMap = new Map(imagesData.map(img => [img.id, img]));
+
+        const buildNode = (nodeData) => {
+            const image = imagesMap.get(nodeData.id);
+            if (!image) {
+                console.warn(`Image with ID ${nodeData.id} not found in bulk fetch.`);
+                return null;
+            }
+            const newNode = new Node(image, this);
+            if (nodeData.children) {
+                nodeData.children.forEach(childData => {
+                    const childNode = buildNode(childData);
+                    if (childNode) {
+                        newNode.addChild(childNode);
+                    }
+                });
+            }
+            return newNode;
+        };
+
+        treeData.roots.forEach(rootData => {
+            const rootNode = buildNode(rootData);
+            if (rootNode) {
+                this.rootNode.addChild(rootNode);
+            }
+        });
+
+        this.renderTree();
     }
 
     exportTreeToJSON() {
@@ -460,8 +520,26 @@ class TreeBuilder {
     }
 
     importTreeFromJSON() {
-        alert('Importing trees is temporarily unavailable. This feature is being updated.');
-        console.error("Import Tree: This functionality needs a new backend endpoint to fetch image details from IDs.");
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    try {
+                        const treeData = JSON.parse(event.target.result);
+                        await this.rebuildTreeFromJSON(treeData);
+                    } catch (error) {
+                        alert('Error parsing JSON file.');
+                        console.error(error);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
     }
 }
 

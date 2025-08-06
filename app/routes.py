@@ -143,6 +143,33 @@ def get_folder_contents(folder_id):
         'images': child_images
     })
 
+
+@api_bp.route('/images/bulk', methods=['POST'])
+def get_bulk_images():
+    data = request.get_json()
+    if not data or 'ids' not in data:
+        return jsonify({'status': 'error', 'message': 'Invalid data: missing image IDs'}), 400
+
+    image_ids = data.get('ids')
+    if not isinstance(image_ids, list):
+        return jsonify({'status': 'error', 'message': 'Invalid data: IDs should be a list'}), 400
+
+    # Query the database for all images with the given IDs.
+    # We also need to respect privacy. A user can only fetch public images or their own.
+
+    # Build a query for public images
+    public_images_query = Image.query.filter(Image.id.in_(image_ids), Image.is_public == True)
+
+    # Build a query for user-owned images if authenticated
+    if current_user.is_authenticated:
+        user_images_query = Image.query.filter(Image.id.in_(image_ids), Image.user_id == current_user.id)
+        # Combine the queries
+        images = public_images_query.union(user_images_query).all()
+    else:
+        images = public_images_query.all()
+
+    return jsonify([image.to_dict() for image in images])
+
 @api_bp.route('/folder/create', methods=['POST'])
 @login_required
 def create_folder():
