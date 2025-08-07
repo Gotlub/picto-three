@@ -199,9 +199,7 @@ class Node {
         this.builder = builder;
         this.children = [];
         this.parent = null;
-        if (image.id !== 'root') {
-            this.element = this.createElement(builder);
-        }
+        this.element = this.createElement(builder);
     }
 
     addChild(node) {
@@ -212,14 +210,18 @@ class Node {
     createElement(builder) {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
-        nodeElement.setAttribute('draggable', 'true');
+        nodeElement.setAttribute('draggable', this.image.id !== 'root');
 
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        imgElement.src = this.image.path.replace('app/', '');
+        if (this.image.path) {
+            const path = this.image.path.startsWith('/static') ? this.image.path : this.image.path.replace('app/', '');
+            imgElement.src = path;
+        }
         imgElement.alt = this.image.name;
+
 
         // Add tooltip events
         imgElement.addEventListener('mouseover', (e) => {
@@ -236,6 +238,10 @@ class Node {
         contentElement.appendChild(nameElement);
 
         nodeElement.appendChild(contentElement);
+
+        const childrenContainer = document.createElement('div');
+        childrenContainer.classList.add('children');
+        nodeElement.appendChild(childrenContainer);
 
         nodeElement.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -274,13 +280,12 @@ class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
-        this.rootElement = this.createRootElement();
-        this.treeDisplay.appendChild(this.rootElement);
         this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
-        this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
+        this.rootNode = new Node({ id: 'root', name: 'Root', path: '/static/images/pictograms/public/bold/folder-open-bold.png' }, this);
         this.selectedNode = null;
+        this.rootSelected = false;
         this.draggedNode = null;
 
         // New Image Tree initialization
@@ -317,6 +322,11 @@ class TreeBuilder {
             this.imageSearch.addEventListener('input', () => this.filterImages());
         }
 
+        const rootBtn = document.getElementById('root-btn');
+        if (rootBtn) {
+            rootBtn.addEventListener('click', () => this.selectRoot());
+        }
+
         const deleteBtn = document.getElementById('delete-btn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
@@ -325,38 +335,13 @@ class TreeBuilder {
         this.loadSavedTrees();
     }
 
-    createRootElement() {
-        const nodeElement = document.createElement('div');
-        nodeElement.classList.add('node', 'root-node');
-        nodeElement.setAttribute('draggable', 'false');
-
-        const contentElement = document.createElement('div');
-        contentElement.classList.add('node-content');
-
-        const imgElement = document.createElement('img');
-        imgElement.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
-        imgElement.alt = 'Root';
-
-        contentElement.appendChild(imgElement);
-
-        const nameElement = document.createElement('span');
-        nameElement.textContent = 'Root';
-        contentElement.appendChild(nameElement);
-
-        nodeElement.appendChild(contentElement);
-
-        nodeElement.addEventListener('click', () => {
-            this.selectNode(this.rootNode);
-        });
-
-        return nodeElement;
-    }
-
     handleImageClick(image) {
         const newNode = new Node(image, this);
-        if (this.selectedNode === this.rootNode) {
+        if (this.rootSelected) {
             this.rootNode.addChild(newNode);
             this.selectNode(newNode);
+            this.rootSelected = false;
+            this.treeDisplay.classList.remove('root-selected');
         } else if (this.selectedNode) {
             this.selectedNode.addChild(newNode);
             this.selectNode(newNode);
@@ -375,6 +360,10 @@ class TreeBuilder {
     }
 
     handleDragStart(e, node) {
+        if (node.image.id === 'root') {
+            e.preventDefault();
+            return;
+        }
         this.draggedNode = node;
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', node.image.id); // Required for Firefox
@@ -436,27 +425,34 @@ class TreeBuilder {
     selectNode(node) {
         this.deselectAllNodes();
         this.selectedNode = node;
-        if (this.selectedNode === this.rootNode) {
-            this.rootElement.querySelector('.node-content').classList.add('selected');
-        } else if (this.selectedNode && this.selectedNode.element) {
+        if (this.selectedNode) {
             this.selectedNode.element.querySelector('.node-content').classList.add('selected');
         }
     }
 
     deselectAllNodes() {
         if (this.selectedNode) {
-            if (this.selectedNode === this.rootNode) {
-                this.rootElement.querySelector('.node-content').classList.remove('selected');
-            } else if (this.selectedNode.element) {
-                this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
-            }
+            this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
             this.selectedNode = null;
         }
+        this.rootSelected = false;
+        this.treeDisplay.classList.remove('root-selected');
+    }
+
+    selectRoot() {
+        this.deselectAllNodes();
+        this.rootSelected = true;
+        this.treeDisplay.classList.add('root-selected');
     }
 
     deleteSelectedNode() {
         if (!this.selectedNode) {
             alert('Please select a node to delete.');
+            return;
+        }
+
+        if (this.selectedNode.image.id === 'root') {
+            alert('You cannot delete the root node.');
             return;
         }
 
@@ -478,20 +474,29 @@ class TreeBuilder {
 
     renderTree() {
         this.treeDisplay.innerHTML = '';
-        this.rootNode.children.forEach(child => {
-            this.treeDisplay.appendChild(child.element);
-            this.renderChildren(child, child.element);
-        });
+        if (this.rootNode && this.rootNode.element) {
+            this.treeDisplay.appendChild(this.rootNode.element);
+            this.renderChildren(this.rootNode);
+        }
     }
 
-    renderChildren(node, parentElement) {
-        const childrenContainer = document.createElement('div');
-        childrenContainer.classList.add('children');
+    renderChildren(node) {
+        const childrenContainer = node.element.querySelector('.children');
+        if (!childrenContainer) return;
+
+        childrenContainer.innerHTML = '';
+
         node.children.forEach(child => {
-            childrenContainer.appendChild(child.element);
-            this.renderChildren(child, child.element);
+            if (child.element) {
+                childrenContainer.appendChild(child.element);
+                // The children of the child are already rendered within its element,
+                // so no need to recurse here. The structure is built once.
+                // We just need to append the elements correctly.
+                // Wait, my understanding is wrong. The children elements need to be populated.
+                // The `renderChildren` needs to be recursive.
+                this.renderChildren(child);
+            }
         });
-        parentElement.appendChild(childrenContainer);
     }
 
     getTreeAsJSON() {
@@ -629,8 +634,9 @@ class TreeBuilder {
     }
 
     rebuildTreeFromJSON(treeData) {
-        this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
-        this.selectedNode = null;
+        // Clear the children of the existing rootNode
+        this.rootNode.children = [];
+        this.selectedNode = this.rootNode; // Select root by default
 
         const buildNode = (nodeData) => {
             const image = this.images.find(img => img.id === nodeData.id);
