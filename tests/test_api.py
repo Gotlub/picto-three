@@ -77,32 +77,47 @@ def test_load_trees_unauthenticated(client):
     response = client.get('/api/trees/load')
     assert response.status_code == 200
     data = response.get_json()
-    assert isinstance(data, list)
+    assert isinstance(data, dict)
+    assert 'public_trees' in data
+    assert 'user_trees' in data
+    assert isinstance(data['public_trees'], list)
+    assert isinstance(data['user_trees'], list)
+    assert len(data['user_trees']) == 0 # No user logged in
 
 def test_load_trees_authenticated(client):
     # Register and login user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
     client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    user = User.query.filter_by(username='testuser').first()
     login(client, 'testuser', 'password')
 
-    # Create a tree for the user
-    tree_data = {
-        "name": "My Test Tree",
-        "is_public": False,
-        "json_data": {"version": "1.0", "tree": {"nodes": {}, "roots": []}}
-    }
-    client.post('/api/tree/save', json=tree_data)
+    # Create a private tree for the user
+    private_tree = Tree(user_id=user.id, name="Private Tree", is_public=False, json_data='{}')
+    db.session.add(private_tree)
 
-    # Create a public tree
-    public_tree_data = {
-        "name": "Public Tree",
-        "is_public": True,
-        "json_data": {"version": "1.0", "tree": {"nodes": {}, "roots": []}}
-    }
-    client.post('/api/tree/save', json=public_tree_data)
+    # Create a public tree by this user
+    user_public_tree = Tree(user_id=user.id, name="User's Public Tree", is_public=True, json_data='{}')
+    db.session.add(user_public_tree)
+
+    # Create a public tree by another (or no) user
+    anon_public_tree = Tree(user_id=None, name="Anonymous Public Tree", is_public=True, json_data='{}')
+    db.session.add(anon_public_tree)
+    db.session.commit()
 
     response = client.get('/api/trees/load')
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 2
+
+    assert 'public_trees' in data
+    assert 'user_trees' in data
+
+    assert len(data['user_trees']) == 2
+
+    user_tree_names = {t['name'] for t in data['user_trees']}
+    assert "Private Tree" in user_tree_names
+    assert "User's Public Tree" in user_tree_names
+
+    public_tree_names = {t['name'] for t in data['public_trees']}
+    assert "Anonymous Public Tree" in public_tree_names
+    assert "User's Public Tree" not in public_tree_names

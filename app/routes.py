@@ -3,6 +3,7 @@ import os
 import shutil
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 from app import db
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
@@ -118,14 +119,27 @@ def set_language(language=None):
 
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():
-    public_trees = Tree.query.filter_by(is_public=True).all()
+    public_trees_query = Tree.query.filter_by(is_public=True)
+
     user_trees = []
     if current_user.is_authenticated:
-        user_trees = Tree.query.filter_by(user_id=current_user.id).all()
+        # Exclude public trees owned by the current user from the main public list
+        # to prevent them from appearing in both lists.
+        public_trees_query = public_trees_query.filter(or_(Tree.user_id != current_user.id, Tree.user_id == None))
+        user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).all()
 
-    # Combine public and user trees and avoid duplicate
-    all_trees = list(set(public_trees + user_trees))
-    return jsonify([tree.to_dict() for tree in all_trees])
+    public_trees = public_trees_query.all()
+
+    # Also get the user's own public trees to show them in their private list for clarity
+    if current_user.is_authenticated:
+        user_public_trees = Tree.query.filter_by(user_id=current_user.id, is_public=True).all()
+        user_trees.extend(user_public_trees)
+
+
+    return jsonify({
+        'public_trees': [tree.to_dict() for tree in public_trees],
+        'user_trees': [tree.to_dict() for tree in user_trees]
+    })
 
 @api_bp.route('/folder/contents', methods=['GET'])
 def get_folder_contents():
@@ -232,6 +246,17 @@ def upload_image():
 
     return jsonify({'status': 'error', 'message': 'File upload failed'}), 500
 
+def get_image_ids_from_tree(nodes):
+    """Recursively extracts all image IDs from a tree structure."""
+    image_ids = set()
+    for node in nodes:
+        # The 'id' in the tree data corresponds to the image ID
+        if 'id' in node:
+            image_ids.add(node['id'])
+        if 'children' in node and node['children']:
+            image_ids.update(get_image_ids_from_tree(node['children']))
+    return image_ids
+
 @api_bp.route('/tree/save', methods=['POST'])
 @login_required
 def save_tree():
@@ -246,16 +271,35 @@ def save_tree():
     if not tree_name or not json_data:
         return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
 
+    # Validate images if saving a public tree
+    if is_public:
+        if not json_data.get('roots'):
+            return jsonify({'status': 'error', 'message': 'Cannot save an empty tree as public.'}), 400
+
+        image_ids = get_image_ids_from_tree(json_data['roots'])
+        if image_ids:
+            private_images = Image.query.filter(Image.id.in_(image_ids), Image.is_public == False).all()
+            if private_images:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Public trees can only contain public images. Please remove private images before saving publicly.'
+                }), 400
+
     tree = Tree(
         user_id=current_user.id,
         name=tree_name,
         is_public=is_public,
-        json_data=json.dumps(json_data) # Ensure json_data is stored as a string
+        json_data=json.dumps(json_data)
     )
     db.session.add(tree)
     db.session.commit()
 
-    return jsonify({'status': 'success', 'message': 'Tree saved successfully', 'tree_id': tree.id})
+    return jsonify({
+        'status': 'success',
+        'message': 'Tree saved successfully',
+        'tree_id': tree.id,
+        'tree_data': json_data
+    })
 
 def delete_folder_recursive(folder):
     # Recursively delete children folders

@@ -413,8 +413,8 @@ class TreeBuilder {
         const isPublic = document.getElementById('tree-is-public').checked;
         const jsonData = this.getTreeAsJSON();
 
-        if (!jsonData) {
-            alert('The tree is empty.');
+        if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
+            alert('The tree is empty. Cannot save.');
             return;
         }
 
@@ -433,7 +433,12 @@ class TreeBuilder {
         const result = await response.json();
         if (result.status === 'success') {
             alert('Tree saved successfully!');
+            // Reload the builder with the saved tree data
+            this.rebuildTreeFromJSON(result.tree_data);
+            // Refresh the list of saved trees
+            this.loadSavedTrees();
         } else {
+            // Display specific error messages
             alert(`Error saving tree: ${result.message}`);
         }
     }
@@ -445,36 +450,68 @@ class TreeBuilder {
 
     async loadSavedTrees() {
         const response = await fetch('/api/trees/load');
-        this.savedTrees = await response.json();
+        const data = await response.json();
+        this.publicTrees = data.public_trees || [];
+        this.userTrees = data.user_trees || [];
         this.renderTreeList();
     }
 
     renderTreeList() {
         if (!this.treeList) return;
         this.treeList.innerHTML = '';
-        const select = document.createElement('select');
-        select.id = 'tree-select';
-        select.className = 'form-control';
+        this.activeTreeSelect = null; // To keep track of the currently active select element
 
-        this.savedTrees.forEach(tree => {
-            const option = document.createElement('option');
-            option.value = tree.id;
-            option.textContent = tree.name;
-            select.appendChild(option);
-        });
-        this.treeList.appendChild(select);
+        const createSelectList = (trees, title, id) => {
+            if (trees.length > 0) {
+                const titleEl = document.createElement('h6');
+                titleEl.textContent = title;
+                this.treeList.appendChild(titleEl);
+
+                const select = document.createElement('select');
+                select.id = id;
+                select.className = 'form-control mb-2 tree-select-list';
+                trees.forEach(tree => {
+                    const option = document.createElement('option');
+                    option.value = tree.id;
+                    option.textContent = tree.name;
+                    select.appendChild(option);
+                });
+
+                // When a user clicks on a select list, it becomes the active one
+                select.addEventListener('focus', () => {
+                    this.activeTreeSelect = select;
+                });
+
+                this.treeList.appendChild(select);
+            }
+        };
+
+        createSelectList(this.userTrees, 'My Private Trees', 'user-tree-select');
+        createSelectList(this.publicTrees, 'Public Trees', 'public-tree-select');
+
+        // Set the default active list if it exists
+        if (this.userTrees.length > 0) {
+            this.activeTreeSelect = document.getElementById('user-tree-select');
+        } else if (this.publicTrees.length > 0) {
+            this.activeTreeSelect = document.getElementById('public-tree-select');
+        }
     }
 
     loadTree() {
-        const select = document.getElementById('tree-select');
-        if (!select) return;
+        if (!this.activeTreeSelect || !this.activeTreeSelect.value) {
+            alert('Please select a tree to load.');
+            return;
+        }
 
-        const treeId = parseInt(select.value, 10);
-        const treeToLoad = this.savedTrees.find(tree => tree.id === treeId);
+        const treeId = parseInt(this.activeTreeSelect.value, 10);
+        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {
             const treeData = JSON.parse(treeToLoad.json_data);
             this.rebuildTreeFromJSON(treeData);
+        } else {
+            alert('Could not find the selected tree.');
         }
     }
 
