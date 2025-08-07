@@ -59,7 +59,9 @@
 }
 
 .sidebar {
-    height: 90vh;
+    position: sticky;
+    top: 56px; /* Adjust based on navbar height */
+    height: calc(100vh - 56px); /* Full height minus navbar */
     overflow-y: auto;
     padding: 20px;
     border-right: 1px solid #ddd;

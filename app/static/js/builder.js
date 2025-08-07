@@ -285,7 +285,6 @@ class TreeBuilder {
         this.savedTrees = [];
         this.rootNode = new Node({ id: 'root', name: 'Root', path: '/static/images/pictograms/public/bold/folder-open-bold.png' }, this);
         this.selectedNode = null;
-        this.rootSelected = false;
         this.draggedNode = null;
 
         // New Image Tree initialization
@@ -322,11 +321,6 @@ class TreeBuilder {
             this.imageSearch.addEventListener('input', () => this.filterImages());
         }
 
-        const rootBtn = document.getElementById('root-btn');
-        if (rootBtn) {
-            rootBtn.addEventListener('click', () => this.selectRoot());
-        }
-
         const deleteBtn = document.getElementById('delete-btn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
@@ -337,19 +331,9 @@ class TreeBuilder {
 
     handleImageClick(image) {
         const newNode = new Node(image, this);
-        if (this.rootSelected) {
-            this.rootNode.addChild(newNode);
-            this.selectNode(newNode);
-            this.rootSelected = false;
-            this.treeDisplay.classList.remove('root-selected');
-        } else if (this.selectedNode) {
-            this.selectedNode.addChild(newNode);
-            this.selectNode(newNode);
-        } else {
-            // If no node is selected, add to the root
-            this.rootNode.addChild(newNode);
-            this.selectNode(newNode);
-        }
+        const parentNode = this.selectedNode || this.rootNode;
+        parentNode.addChild(newNode);
+        this.selectNode(newNode); // Select the new node
         this.renderTree();
     }
 
@@ -425,24 +409,28 @@ class TreeBuilder {
     selectNode(node) {
         this.deselectAllNodes();
         this.selectedNode = node;
+
+        const applyHighlight = (n) => {
+            if (n.element) {
+                const content = n.element.querySelector('.node-content');
+                if (content) {
+                    content.classList.add('selected');
+                }
+            }
+            n.children.forEach(applyHighlight);
+        };
+
         if (this.selectedNode) {
-            this.selectedNode.element.querySelector('.node-content').classList.add('selected');
+            applyHighlight(this.selectedNode);
         }
     }
 
     deselectAllNodes() {
-        if (this.selectedNode) {
-            this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
-            this.selectedNode = null;
-        }
-        this.rootSelected = false;
-        this.treeDisplay.classList.remove('root-selected');
-    }
-
-    selectRoot() {
-        this.deselectAllNodes();
-        this.rootSelected = true;
-        this.treeDisplay.classList.add('root-selected');
+        const selectedElements = this.treeDisplay.querySelectorAll('.node-content.selected');
+        selectedElements.forEach(el => {
+            el.classList.remove('selected');
+        });
+        this.selectedNode = null;
     }
 
     deleteSelectedNode() {
