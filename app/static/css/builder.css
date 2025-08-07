@@ -109,3 +109,12 @@
     border-left: 1px dashed #ccc;
     margin-left: 10px;
 }
+
+/* Drag and Drop Styles */
+.node.dragging {
+    opacity: 0.4;
+}
+
+.node-content.drag-over {
+    background-color: #d3d3d3; /* light gray */
+}

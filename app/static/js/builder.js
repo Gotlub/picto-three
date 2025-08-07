@@ -198,18 +198,21 @@ class Node {
         this.image = image;
         this.builder = builder;
         this.children = [];
+        this.parent = null;
         if (image.id !== 'root') {
             this.element = this.createElement(builder);
         }
     }
 
     addChild(node) {
+        node.parent = this;
         this.children.push(node);
     }
 
     createElement(builder) {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
+        nodeElement.setAttribute('draggable', 'true');
 
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
@@ -238,6 +241,31 @@ class Node {
             e.stopPropagation();
             builder.selectNode(this);
         });
+
+        // Drag and Drop event listeners
+        nodeElement.addEventListener('dragstart', (e) => {
+            e.stopPropagation();
+            builder.handleDragStart(e, this);
+        });
+        nodeElement.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            builder.handleDragOver(e, this);
+        });
+        nodeElement.addEventListener('dragleave', (e) => {
+            e.stopPropagation();
+            builder.handleDragLeave(e, this);
+        });
+        nodeElement.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            builder.handleDrop(e, this);
+        });
+        nodeElement.addEventListener('dragend', (e) => {
+            e.stopPropagation();
+            builder.handleDragEnd(e, this);
+        });
+
         return nodeElement;
     }
 }
@@ -252,6 +280,7 @@ class TreeBuilder {
         this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
         this.selectedNode = null;
         this.rootSelected = false;
+        this.draggedNode = null;
 
         // New Image Tree initialization
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
@@ -316,6 +345,71 @@ class TreeBuilder {
             this.selectNode(newNode);
         }
         this.renderTree();
+    }
+
+    isDescendant(potentialDescendant, potentialAncestor) {
+        return potentialAncestor.children.some(child =>
+            child === potentialDescendant || this.isDescendant(potentialDescendant, child)
+        );
+    }
+
+    handleDragStart(e, node) {
+        this.draggedNode = node;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', node.image.id); // Required for Firefox
+
+        setTimeout(() => {
+            if (node.element) {
+                node.element.classList.add('dragging');
+            }
+        }, 0);
+    }
+
+    handleDragOver(e, targetNode) {
+        if (targetNode !== this.draggedNode) {
+            const targetContent = targetNode.element.querySelector('.node-content');
+            if (targetContent) {
+                targetContent.classList.add('drag-over');
+            }
+        }
+    }
+
+    handleDragLeave(e, targetNode) {
+        const targetContent = targetNode.element.querySelector('.node-content');
+        if (targetContent) {
+            targetContent.classList.remove('drag-over');
+        }
+    }
+
+    handleDrop(e, targetNode) {
+        this.handleDragLeave(e, targetNode);
+
+        const draggedNode = this.draggedNode;
+
+        if (!draggedNode || targetNode === draggedNode || this.isDescendant(targetNode, draggedNode)) {
+            if (this.isDescendant(targetNode, draggedNode)) {
+                alert("You cannot move a node into one of its own children.");
+            }
+            return;
+        }
+
+        const oldParent = draggedNode.parent;
+        if (oldParent) {
+            oldParent.children = oldParent.children.filter(child => child !== draggedNode);
+        }
+
+        targetNode.addChild(draggedNode);
+        this.renderTree();
+    }
+
+    handleDragEnd(e) {
+        if (this.draggedNode && this.draggedNode.element) {
+            this.draggedNode.element.classList.remove('dragging');
+        }
+        this.draggedNode = null;
+        document.querySelectorAll('.node-content.drag-over').forEach(el => {
+            el.classList.remove('drag-over');
+        });
     }
 
     selectNode(node) {
