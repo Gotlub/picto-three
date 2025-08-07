@@ -120,3 +120,9 @@
 .node-content.drag-over {
     background-color: #d3d3d3; /* light gray */
 }
+
+/* Style for the T-connector of the selected node */
+.node.is-selected::before {
+    height: 3px;
+    background-color: #007bff;
+}

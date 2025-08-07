@@ -326,6 +326,35 @@ class TreeBuilder {
             deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
         }
 
+        const newTreeBtn = document.getElementById('new-tree-btn');
+        if (newTreeBtn) {
+            newTreeBtn.addEventListener('click', (e) => {
+                if (this.rootNode.children.length > 0) {
+                    if (confirm('You have an unsaved tree. Are you sure you want to leave?')) {
+                        window.location.href = '/builder';
+                    }
+                } else {
+                    window.location.href = '/builder';
+                }
+            });
+        }
+
+        // Add confirmation for navigation links
+        const navLinks = document.querySelectorAll('.navbar-nav a');
+        navLinks.forEach(link => {
+            if (!link.classList.contains('dropdown-toggle')) {
+                link.addEventListener('click', (event) => {
+                    // Only show confirmation if the link navigates away from the builder
+                    const linkUrl = new URL(link.href);
+                    if (linkUrl.pathname !== window.location.pathname && this.rootNode.children.length > 0) {
+                        if (!confirm('You have an unsaved tree. Are you sure you want to leave?')) {
+                            event.preventDefault();
+                        }
+                    }
+                });
+            }
+        });
+
         this.loadSavedTrees();
     }
 
@@ -422,6 +451,9 @@ class TreeBuilder {
 
         if (this.selectedNode) {
             applyHighlight(this.selectedNode);
+            if (this.selectedNode.element) {
+                this.selectedNode.element.classList.add('is-selected');
+            }
         }
     }
 
@@ -429,6 +461,10 @@ class TreeBuilder {
         const selectedElements = this.treeDisplay.querySelectorAll('.node-content.selected');
         selectedElements.forEach(el => {
             el.classList.remove('selected');
+        });
+        const selectedNodes = this.treeDisplay.querySelectorAll('.node.is-selected');
+        selectedNodes.forEach(el => {
+            el.classList.remove('is-selected');
         });
         this.selectedNode = null;
     }

@@ -41,7 +41,6 @@
         <div class="col-md-7">
             <div class="d-flex align-items-center mb-4">
                 <h2 class="mb-0">{{ _('Tree Builder') }}</h2>
-                <button id="delete-btn" class="btn btn-danger ms-3">{{ _('Delete') }}</button>
             </div>
             <div class="tree-display border p-3 rounded" id="tree-display" style="min-height: 80vh;">
                 <!-- Tree will be built here -->
@@ -55,6 +54,11 @@
             <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
             <div class="image-sidebar border p-3" id="image-sidebar-tree">
                 <!-- The dynamic image tree will be built here -->
+            </div>
+            <hr>
+            <div class="d-grid gap-2 mt-3">
+                <button id="delete-btn" class="btn btn-danger">{{ _('Delete selected branch') }}</button>
+                <button id="new-tree-btn" class="btn btn-secondary">{{ _('New tree') }}</button>
             </div>
         </div>
     </div>
