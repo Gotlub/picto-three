@@ -3,7 +3,6 @@ import os
 import shutil
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify
 from werkzeug.utils import secure_filename
-from sqlalchemy import or_
 from app import db
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
@@ -119,22 +118,13 @@ def set_language(language=None):
 
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():
-    public_trees_query = Tree.query.filter_by(is_public=True)
+    # Public trees are all trees with is_public = True
+    public_trees = Tree.query.filter_by(is_public=True).all()
 
     user_trees = []
     if current_user.is_authenticated:
-        # Exclude public trees owned by the current user from the main public list
-        # to prevent them from appearing in both lists.
-        public_trees_query = public_trees_query.filter(or_(Tree.user_id != current_user.id, Tree.user_id == None))
+        # Private trees are user-owned trees with is_public = False
         user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).all()
-
-    public_trees = public_trees_query.all()
-
-    # Also get the user's own public trees to show them in their private list for clarity
-    if current_user.is_authenticated:
-        user_public_trees = Tree.query.filter_by(user_id=current_user.id, is_public=True).all()
-        user_trees.extend(user_public_trees)
-
 
     return jsonify({
         'public_trees': [tree.to_dict() for tree in public_trees],

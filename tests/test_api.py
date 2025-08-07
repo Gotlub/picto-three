@@ -112,12 +112,14 @@ def test_load_trees_authenticated(client):
     assert 'public_trees' in data
     assert 'user_trees' in data
 
-    assert len(data['user_trees']) == 2
-
+    # User trees should only contain the user's private trees
+    assert len(data['user_trees']) == 1
     user_tree_names = {t['name'] for t in data['user_trees']}
     assert "Private Tree" in user_tree_names
-    assert "User's Public Tree" in user_tree_names
+    assert "User's Public Tree" not in user_tree_names
 
+    # Public trees should contain all public trees
+    assert len(data['public_trees']) == 2
     public_tree_names = {t['name'] for t in data['public_trees']}
     assert "Anonymous Public Tree" in public_tree_names
-    assert "User's Public Tree" not in public_tree_names
+    assert "User's Public Tree" in public_tree_names
