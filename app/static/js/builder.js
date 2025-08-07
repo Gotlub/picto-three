@@ -470,30 +470,19 @@ class TreeBuilder {
     }
 
     deleteSelectedNode() {
-        if (!this.selectedNode) {
-            alert('Please select a node to delete.');
+        if (!this.selectedNode || this.selectedNode.image.id === 'root') {
+            alert(this.selectedNode ? 'You cannot delete the root node.' : 'Please select a node to delete.');
             return;
         }
 
-        if (this.selectedNode.image.id === 'root') {
-            alert('You cannot delete the root node.');
-            return;
+        if (confirm('Are you sure you want to delete the selected branch?')) {
+            const parent = this.selectedNode.parent;
+            if (parent) {
+                parent.children = parent.children.filter(child => child !== this.selectedNode);
+                this.selectedNode = null;
+                this.renderTree();
+            }
         }
-
-        if (confirm('Are you sure you want to delete the selected node and all its children?')) {
-            this.removeNode(this.rootNode, this.selectedNode);
-            this.selectedNode = null;
-            const treeData = this.getTreeAsJSON();
-            this.rebuildTreeFromJSON(treeData);
-        }
-    }
-
-    removeNode(parent, nodeToRemove) {
-        if (!parent) {
-            return;
-        }
-        parent.children = parent.children.filter(child => child !== nodeToRemove);
-        parent.children.forEach(child => this.removeNode(child, nodeToRemove));
     }
 
     renderTree() {
