@@ -274,12 +274,13 @@ class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
+        this.rootElement = this.createRootElement();
+        this.treeDisplay.appendChild(this.rootElement);
         this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
         this.rootNode = new Node({ id: 'root', name: 'Root' }, this);
         this.selectedNode = null;
-        this.rootSelected = false;
         this.draggedNode = null;
 
         // New Image Tree initialization
@@ -316,11 +317,6 @@ class TreeBuilder {
             this.imageSearch.addEventListener('input', () => this.filterImages());
         }
 
-        const rootBtn = document.getElementById('root-btn');
-        if (rootBtn) {
-            rootBtn.addEventListener('click', () => this.selectRoot());
-        }
-
         const deleteBtn = document.getElementById('delete-btn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
@@ -329,13 +325,38 @@ class TreeBuilder {
         this.loadSavedTrees();
     }
 
+    createRootElement() {
+        const nodeElement = document.createElement('div');
+        nodeElement.classList.add('node', 'root-node');
+        nodeElement.setAttribute('draggable', 'false');
+
+        const contentElement = document.createElement('div');
+        contentElement.classList.add('node-content');
+
+        const imgElement = document.createElement('img');
+        imgElement.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
+        imgElement.alt = 'Root';
+
+        contentElement.appendChild(imgElement);
+
+        const nameElement = document.createElement('span');
+        nameElement.textContent = 'Root';
+        contentElement.appendChild(nameElement);
+
+        nodeElement.appendChild(contentElement);
+
+        nodeElement.addEventListener('click', () => {
+            this.selectNode(this.rootNode);
+        });
+
+        return nodeElement;
+    }
+
     handleImageClick(image) {
         const newNode = new Node(image, this);
-        if (this.rootSelected) {
+        if (this.selectedNode === this.rootNode) {
             this.rootNode.addChild(newNode);
             this.selectNode(newNode);
-            this.rootSelected = false;
-            this.treeDisplay.classList.remove('root-selected');
         } else if (this.selectedNode) {
             this.selectedNode.addChild(newNode);
             this.selectNode(newNode);
@@ -415,24 +436,22 @@ class TreeBuilder {
     selectNode(node) {
         this.deselectAllNodes();
         this.selectedNode = node;
-        if (this.selectedNode) {
+        if (this.selectedNode === this.rootNode) {
+            this.rootElement.querySelector('.node-content').classList.add('selected');
+        } else if (this.selectedNode && this.selectedNode.element) {
             this.selectedNode.element.querySelector('.node-content').classList.add('selected');
         }
     }
 
     deselectAllNodes() {
         if (this.selectedNode) {
-            this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
+            if (this.selectedNode === this.rootNode) {
+                this.rootElement.querySelector('.node-content').classList.remove('selected');
+            } else if (this.selectedNode.element) {
+                this.selectedNode.element.querySelector('.node-content').classList.remove('selected');
+            }
             this.selectedNode = null;
         }
-        this.rootSelected = false;
-        this.treeDisplay.classList.remove('root-selected');
-    }
-
-    selectRoot() {
-        this.deselectAllNodes();
-        this.rootSelected = true;
-        this.treeDisplay.classList.add('root-selected');
     }
 
     deleteSelectedNode() {
