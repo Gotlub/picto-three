@@ -280,6 +280,8 @@ class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
+        this.leftSidebar = document.querySelector('.col-md-2.sidebar');
+        this.rightSidebar = document.querySelector('.col-md-3.sidebar');
         this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
@@ -291,8 +293,14 @@ class TreeBuilder {
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
 
-        this.treeDisplay.addEventListener('click', (e) => {
-            if (e.target === this.treeDisplay) {
+        document.addEventListener('click', (e) => {
+            const isClickInsideTree = this.treeDisplay.contains(e.target);
+            const isClickInsideLeftSidebar = this.leftSidebar.contains(e.target);
+            const isClickInsideRightSidebar = this.rightSidebar.contains(e.target);
+            const navbar = document.querySelector('.navbar');
+            const isClickInsideNavbar = navbar ? navbar.contains(e.target) : false;
+
+            if (!isClickInsideTree && !isClickInsideLeftSidebar && !isClickInsideRightSidebar && !isClickInsideNavbar) {
                 this.deselectAllNodes();
             }
         });
@@ -604,7 +612,9 @@ class TreeBuilder {
                 trees.forEach(tree => {
                     const option = document.createElement('option');
                     option.value = tree.id;
-                    option.textContent = tree.name;
+                    option.innerHTML = tree.username
+                        ? `<span style="color: #888;">${tree.username}</span> - ${tree.name}`
+                        : tree.name;
                     select.appendChild(option);
                 });
 
