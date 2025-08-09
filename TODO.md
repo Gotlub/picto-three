@@ -67,13 +67,12 @@ Liste des jalons et tâches à réaliser par les agents IA.
 
 ## Jalon 5 : Gestion des Images et Finalisation
 
-- [ ] Créer la route et le formulaire pour l'upload d'images par les utilisateurs authentifiés.
-- [ ] Implémenter la logique de sauvegarde des fichiers image sur le serveur dans un dossier spécifique à l'utilisateur.
+- [x] Créer la route et le formulaire pour l'upload d'images par les utilisateurs authentifiés.
+- [x] Implémenter la logique de sauvegarde des fichiers image sur le serveur dans un dossier spécifique à l'utilisateur.
 - [x] Ajouter un jeu de données d'images publiques initiales.
   - *Détails : Trois images de placeholder ont été ajoutées dans `app/static/images`.*
 - [x] Finaliser le style CSS de toute l'application.
   - *Détails : Le framework Bootstrap a été intégré pour un style de base cohérent et responsive.*
-- [ ] Ajouter la vidéo de présentation et les liens sur la page d'accueil.
 
 ## Jalon 6 : Gestion des Images Utilisateur (Banque de Pictogrammes)
 
