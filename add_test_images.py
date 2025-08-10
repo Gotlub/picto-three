@@ -57,7 +57,7 @@ def main():
             for file in files:
                 if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
                     image_path = os.path.join(root, file).replace('\\', '/')
-                    name = os.path.splitext(file)[0]
+                    name = file
                     description = f"Public pictogram: {name}"
 
                     image = Image(
