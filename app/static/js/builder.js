@@ -711,6 +711,8 @@ class TreeBuilder {
     }
 
     rebuildTreeFromJSON(treeData) {
+        // Clear the existing tree before rebuilding
+        this.rootNode.children = [];
         this.selectedNode = this.rootNode; // Select root by default
 
         const buildNode = (nodeData) => {
