@@ -199,6 +199,7 @@ class Node {
         this.builder = builder;
         this.children = [];
         this.parent = null;
+        this.description = image.description || '';
         this.element = this.createElement(builder);
     }
 
@@ -283,11 +284,21 @@ class TreeBuilder {
         this.leftSidebar = document.querySelector('.col-md-2.sidebar');
         this.rightSidebar = document.querySelector('.col-md-3.sidebar');
         this.treeList = document.getElementById('tree-list');
+        this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
         this.rootNode = new Node({ id: 'root', name: 'Root', path: '/static/images/pictograms/public/bold/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
+
+        if (this.nodeDescriptionTextarea) {
+            this.nodeDescriptionTextarea.disabled = true;
+            this.nodeDescriptionTextarea.addEventListener('input', () => {
+                if (this.selectedNode) {
+                    this.selectedNode.description = this.nodeDescriptionTextarea.value;
+                }
+            });
+        }
 
         // New Image Tree initialization
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
@@ -468,6 +479,16 @@ class TreeBuilder {
                 this.selectedNode.element.classList.add('is-selected');
             }
         }
+
+        if (this.nodeDescriptionTextarea) {
+            if (this.selectedNode) {
+                this.nodeDescriptionTextarea.value = this.selectedNode.description || '';
+                this.nodeDescriptionTextarea.disabled = false;
+            } else {
+                this.nodeDescriptionTextarea.value = '';
+                this.nodeDescriptionTextarea.disabled = true;
+            }
+        }
     }
 
     deselectAllNodes() {
@@ -480,6 +501,10 @@ class TreeBuilder {
             el.classList.remove('is-selected');
         });
         this.selectedNode = null;
+        if (this.nodeDescriptionTextarea) {
+            this.nodeDescriptionTextarea.value = '';
+            this.nodeDescriptionTextarea.disabled = true;
+        }
     }
 
     deleteSelectedNode() {
@@ -529,6 +554,7 @@ class TreeBuilder {
         const buildNode = (node) => {
             const nodeData = {
                 id: node.image.id,
+                description: node.description,
                 children: []
             };
             node.children.forEach(child => {
@@ -693,6 +719,9 @@ class TreeBuilder {
                 return null;
             }
             const newNode = new Node(image, this);
+            if (nodeData.hasOwnProperty('description')) {
+                newNode.description = nodeData.description;
+            }
             if (nodeData.children) {
                 nodeData.children.forEach(childData => {
                     const childNode = buildNode(childData);
