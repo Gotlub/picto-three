@@ -308,8 +308,9 @@ class TreeBuilder {
             const deleteBtn = document.getElementById('delete-btn');
             const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
             const isClickInsideTree = this.treeDisplay.contains(e.target);
+            const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
 
-            if (isClickOnDelete || isClickInsideTree) {
+            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription) {
                 return;
             }
 
