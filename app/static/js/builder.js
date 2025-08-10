@@ -604,6 +604,8 @@ class TreeBuilder {
         const result = await response.json();
         if (result.status === 'success') {
             alert('Tree saved successfully!');
+            // Clear the existing tree before reloading from save
+            this.rootNode.children = [];
             // Reload the builder with the saved tree data
             this.rebuildTreeFromJSON(result.tree_data);
             // Refresh the list of saved trees
@@ -711,8 +713,6 @@ class TreeBuilder {
     }
 
     rebuildTreeFromJSON(treeData) {
-        // Clear the existing tree before rebuilding
-        this.rootNode.children = [];
         this.selectedNode = this.rootNode; // Select root by default
 
         const buildNode = (nodeData) => {
