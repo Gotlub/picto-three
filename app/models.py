@@ -1,6 +1,7 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy import UniqueConstraint
 
 @login.user_loader
 def load_user(id):
@@ -86,6 +87,10 @@ class Tree(db.Model):
     json_data = db.Column(db.Text)
 
     user = db.relationship('User', backref=db.backref('trees', lazy=True))
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'name', name='_user_id_name_uc'),
+    )
 
     def to_dict(self):
         return {

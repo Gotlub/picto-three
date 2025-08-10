@@ -123,3 +123,35 @@ def test_load_trees_authenticated(client):
     public_tree_names = {t['name'] for t in data['public_trees']}
     assert "Anonymous Public Tree" in public_tree_names
     assert "User's Public Tree" in public_tree_names
+
+def test_save_tree_with_duplicate_name_fails(client):
+    # Register and login a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    login(client, 'testuser', 'password')
+
+    # Save the first tree
+    tree_data1 = {'roots': [{'id': 1, 'children': []}]}
+    response1 = client.post('/api/tree/save', json={
+        'name': 'My Duplicate Test Tree',
+        'is_public': False,
+        'json_data': tree_data1
+    })
+    assert response1.status_code == 200
+    assert response1.json['status'] == 'success'
+
+    # Attempt to save a second tree with the same name
+    tree_data2 = {'roots': [{'id': 2, 'children': []}]}
+    response2 = client.post('/api/tree/save', json={
+        'name': 'My Duplicate Test Tree',
+        'is_public': False,
+        'json_data': tree_data2
+    })
+    assert response2.status_code == 400
+    data = response2.get_json()
+    assert data['status'] == 'error'
+    assert 'A tree with this name already exists' in data['message']
+
+    # Logout
+    logout(client)

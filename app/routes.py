@@ -5,6 +5,7 @@ from flask import render_template, flash, redirect, url_for, Blueprint, request,
 from werkzeug.utils import secure_filename
 from app import db
 from app.forms import LoginForm, RegistrationForm
+from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree, Folder
 
@@ -282,7 +283,14 @@ def save_tree():
         json_data=json.dumps(json_data)
     )
     db.session.add(tree)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': 'A tree with this name already exists. Please choose a different name.'
+        }), 400
 
     return jsonify({
         'status': 'success',
