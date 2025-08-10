@@ -294,15 +294,15 @@ class TreeBuilder {
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
 
         document.addEventListener('click', (e) => {
+            const deleteBtn = document.getElementById('delete-btn');
+            const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
             const isClickInsideTree = this.treeDisplay.contains(e.target);
-            const isClickInsideLeftSidebar = this.leftSidebar.contains(e.target);
-            const isClickInsideRightSidebar = this.rightSidebar.contains(e.target);
-            const navbar = document.querySelector('.navbar');
-            const isClickInsideNavbar = navbar ? navbar.contains(e.target) : false;
 
-            if (!isClickInsideTree && !isClickInsideLeftSidebar && !isClickInsideRightSidebar && !isClickInsideNavbar) {
-                this.deselectAllNodes();
+            if (isClickOnDelete || isClickInsideTree) {
+                return;
             }
+
+            this.deselectAllNodes();
         });
 
         const saveBtn = document.getElementById('save-tree-btn');
