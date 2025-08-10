@@ -280,6 +280,8 @@ class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
+        this.leftSidebar = document.querySelector('.col-md-2.sidebar');
+        this.rightSidebar = document.querySelector('.col-md-3.sidebar');
         this.treeList = document.getElementById('tree-list');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
@@ -291,8 +293,14 @@ class TreeBuilder {
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
 
-        this.treeDisplay.addEventListener('click', (e) => {
-            if (e.target === this.treeDisplay) {
+        document.addEventListener('click', (e) => {
+            const isClickInsideTree = this.treeDisplay.contains(e.target);
+            const isClickInsideLeftSidebar = this.leftSidebar.contains(e.target);
+            const isClickInsideRightSidebar = this.rightSidebar.contains(e.target);
+            const navbar = document.querySelector('.navbar');
+            const isClickInsideNavbar = navbar ? navbar.contains(e.target) : false;
+
+            if (!isClickInsideTree && !isClickInsideLeftSidebar && !isClickInsideRightSidebar && !isClickInsideNavbar) {
                 this.deselectAllNodes();
             }
         });
@@ -337,6 +345,11 @@ class TreeBuilder {
                     window.location.href = '/builder';
                 }
             });
+        }
+
+        this.treeSearch = document.getElementById('tree-search');
+        if (this.treeSearch) {
+            this.treeSearch.addEventListener('input', () => this.filterTrees());
         }
 
         // Add confirmation for navigation links
@@ -579,6 +592,24 @@ class TreeBuilder {
         this.imageTree.filter(searchTerm);
     }
 
+    filterTrees() {
+        const searchTerm = this.treeSearch.value.toLowerCase();
+        const treeLists = document.querySelectorAll('.tree-select-list');
+
+        treeLists.forEach(select => {
+            const options = select.options;
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                const optionText = option.textContent.toLowerCase();
+                if (optionText.includes(searchTerm)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+        });
+    }
+
     async loadSavedTrees() {
         const response = await fetch('/api/trees/load');
         const data = await response.json();
@@ -604,7 +635,13 @@ class TreeBuilder {
                 trees.forEach(tree => {
                     const option = document.createElement('option');
                     option.value = tree.id;
-                    option.textContent = tree.name;
+
+                    // For private trees, just show the tree name. For public, show author.
+                    if (id === 'user-tree-select') {
+                        option.textContent = tree.name;
+                    } else {
+                        option.textContent = tree.username ? `${tree.username} - ${tree.name}` : tree.name;
+                    }
                     select.appendChild(option);
                 });
 

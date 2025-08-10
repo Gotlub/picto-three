@@ -85,10 +85,13 @@ class Tree(db.Model):
     is_public = db.Column(db.Boolean, default=False)
     json_data = db.Column(db.Text)
 
+    user = db.relationship('User', backref=db.backref('trees', lazy=True))
+
     def to_dict(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
             'name': self.name,
             'is_public': self.is_public,
             'json_data': self.json_data,

@@ -118,13 +118,13 @@ def set_language(language=None):
 
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():
-    # Public trees are all trees with is_public = True
-    public_trees = Tree.query.filter_by(is_public=True).all()
+    # Public trees are all trees with is_public = True, ordered by name
+    public_trees = Tree.query.filter_by(is_public=True).order_by(Tree.name).all()
 
     user_trees = []
     if current_user.is_authenticated:
-        # Private trees are user-owned trees with is_public = False
-        user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).all()
+        # Private trees are user-owned trees with is_public = False, ordered by name
+        user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).order_by(Tree.name).all()
 
     return jsonify({
         'public_trees': [tree.to_dict() for tree in public_trees],
