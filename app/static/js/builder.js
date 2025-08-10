@@ -347,6 +347,11 @@ class TreeBuilder {
             });
         }
 
+        this.treeSearch = document.getElementById('tree-search');
+        if (this.treeSearch) {
+            this.treeSearch.addEventListener('input', () => this.filterTrees());
+        }
+
         // Add confirmation for navigation links
         const navLinks = document.querySelectorAll('.navbar-nav a');
         navLinks.forEach(link => {
@@ -587,6 +592,24 @@ class TreeBuilder {
         this.imageTree.filter(searchTerm);
     }
 
+    filterTrees() {
+        const searchTerm = this.treeSearch.value.toLowerCase();
+        const treeLists = document.querySelectorAll('.tree-select-list');
+
+        treeLists.forEach(select => {
+            const options = select.options;
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                const optionText = option.textContent.toLowerCase();
+                if (optionText.includes(searchTerm)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+        });
+    }
+
     async loadSavedTrees() {
         const response = await fetch('/api/trees/load');
         const data = await response.json();
@@ -612,9 +635,13 @@ class TreeBuilder {
                 trees.forEach(tree => {
                     const option = document.createElement('option');
                     option.value = tree.id;
-                    option.innerHTML = tree.username
-                        ? `<span style="color: #888;">${tree.username}</span> - ${tree.name}`
-                        : tree.name;
+
+                    // For private trees, just show the tree name. For public, show author.
+                    if (id === 'user-tree-select') {
+                        option.textContent = tree.name;
+                    } else {
+                        option.textContent = tree.username ? `${tree.username} - ${tree.name}` : tree.name;
+                    }
                     select.appendChild(option);
                 });
 
