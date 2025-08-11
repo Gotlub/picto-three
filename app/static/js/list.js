@@ -266,7 +266,6 @@ class ListBuilder {
 
         // Center Panel
         this.treeDisplay = document.getElementById('tree-display');
-        this.nodeDescriptionDisplay = document.getElementById('node-description-display');
         this.treeRoot = new ReadOnlyNode({
             id: 'root',
             name: 'Root'
@@ -276,7 +275,7 @@ class ListBuilder {
         // Right Panel
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.selectImage(image), this);
-        this.imageDescriptionDisplay = document.getElementById('image-description-display');
+        this.selectedLinkDescription = document.getElementById('selected-link-description');
         this.selectedImage = null;
 
         // Bottom Panel
@@ -314,6 +313,9 @@ class ListBuilder {
         this.loadTreeBtn?.addEventListener('click', () => this.loadSelectedTree());
         this.treeSearchInput?.addEventListener('input', () => this.filterTrees());
 
+        // Right Panel - Description Editor
+        this.selectedLinkDescription?.addEventListener('input', () => this.updateSelectedLinkDescription());
+
         // Bottom Panel
         this.deleteLinkBtn.addEventListener('click', () => this.deleteSelectedLink());
         this.newChainBtn.addEventListener('click', () => this.clearChain());
@@ -332,10 +334,9 @@ class ListBuilder {
         const allImageNodes = document.querySelectorAll('#image-sidebar-tree .node-content.selected');
         allImageNodes.forEach(n => n.classList.remove('selected'));
 
-
         this.selectedTreeNode = node;
         node.element.querySelector('.node-content').classList.add('selected');
-        this.nodeDescriptionDisplay.value = node.description;
+        // No description box for tree nodes anymore
     }
 
     selectImage(imageData) {
@@ -348,7 +349,7 @@ class ListBuilder {
         this.selectedImage = imageData;
         const imageNode = document.querySelector(`#image-sidebar-tree .image[data-id='${imageData.id}'] .node-content`);
         if (imageNode) imageNode.classList.add('selected');
-        this.imageDescriptionDisplay.value = imageData.description || '';
+        // No description box for sidebar images anymore
     }
 
     // --- Drag from Source to List ---
@@ -365,6 +366,16 @@ class ListBuilder {
         }
         this.selectedChainedItem = itemToSelect;
         this.selectedChainedItem.element.classList.add('selected');
+
+        // Update and enable the description box
+        this.selectedLinkDescription.value = this.selectedChainedItem.data.description || '';
+        this.selectedLinkDescription.disabled = false;
+    }
+
+    updateSelectedLinkDescription() {
+        if (this.selectedChainedItem) {
+            this.selectedChainedItem.data.description = this.selectedLinkDescription.value;
+        }
     }
 
     addToList(sourceItem) {
@@ -386,6 +397,8 @@ class ListBuilder {
         }
         this.chainedListItems = this.chainedListItems.filter(item => item !== this.selectedChainedItem);
         this.selectedChainedItem = null;
+        this.selectedLinkDescription.value = '';
+        this.selectedLinkDescription.disabled = true;
         this.renderChainedList();
     }
 
@@ -393,6 +406,8 @@ class ListBuilder {
         if (confirm('Are you sure you want to clear the entire chain?')) {
             this.chainedListItems = [];
             this.selectedChainedItem = null;
+            this.selectedLinkDescription.value = '';
+            this.selectedLinkDescription.disabled = true;
             this.renderChainedList();
         }
     }
