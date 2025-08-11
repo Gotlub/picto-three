@@ -2,6 +2,7 @@ from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import UniqueConstraint
+from datetime import datetime
 
 @login.user_loader
 def load_user(id):
@@ -85,6 +86,8 @@ class Tree(db.Model):
     name = db.Column(db.String(64))
     is_public = db.Column(db.Boolean, default=False)
     json_data = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('trees', lazy=True))
 
@@ -100,7 +103,36 @@ class Tree(db.Model):
             'name': self.name,
             'is_public': self.is_public,
             'json_data': self.json_data,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }
 
     def __repr__(self):
         return '<Tree {}>'.format(self.name)
+
+class PictogramList(db.Model):
+    __tablename__ = 'pictogram_list'
+    id = db.Column(db.Integer, primary_key=True)
+    list_name = db.Column(db.String(64), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    is_public = db.Column(db.Boolean, default=False, index=True)
+    payload = db.Column(db.Text, nullable=False) # Storing as JSON text
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('pictogram_lists', lazy=True))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'list_name': self.list_name,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
+            'is_public': self.is_public,
+            'payload': self.payload,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<PictogramList {self.list_name}>'

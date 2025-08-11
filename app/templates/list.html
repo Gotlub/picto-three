@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex flex-column">
+    <!-- Top panels row -->
+    <div class="row flex-grow-1" style="max-height: 70%;">
+        <!-- Left Sidebar: Load/Save Menu -->
+        <div class="col-md-3 sidebar d-flex flex-column">
+            <h4>{{ _('List Operations') }}</h4>
+            <div class="d-grid gap-2">
+                <button id="import-list-json-btn" class="btn btn-secondary">{{ _('Import from JSON') }}</button>
+                <button id="export-list-json-btn" class="btn btn-secondary">{{ _('Export to JSON') }}</button>
+            </div>
+            <hr>
+
+            {% if current_user.is_authenticated %}
+            <h4>{{ _('Database Operations') }}</h4>
+            <div class="save-list-form">
+                <h5>{{ _('Save List') }}</h5>
+                <div class="form-group mb-2">
+                    <label for="list-name">{{ _('List Name') }}</label>
+                    <input type="text" id="list-name" class="form-control" placeholder="{{ _('Enter list name') }}">
+                </div>
+                <div class="form-check mb-2">
+                    <input type="checkbox" id="list-is-public" class="form-check-input">
+                    <label class="form-check-label" for="list-is-public">{{ _('Make Public') }}</label>
+                </div>
+                <button id="save-list-btn" class="btn btn-primary w-100">{{ _('Save List') }}</button>
+            </div>
+            <hr>
+            {% endif %}
+
+            <div class="load-list-form flex-grow-1 d-flex flex-column">
+                <h5>{{ _('Load List from Database') }}</h5>
+                <input type="text" id="list-search" class="form-control mb-2" placeholder="{{ _('Search lists...') }}">
+                <div id="list-container" class="flex-grow-1" style="overflow-y: auto;">
+                    <!-- Lists will be loaded here -->
+                </div>
+                <button id="load-list-btn" class="btn btn-success w-100 mt-2">{{ _('Load Selected List') }}</button>
+            </div>
+        </div>
+
+        <!-- Center Panel: Tree Visualization (Read-only) -->
+        <div class="col-md-5 d-flex flex-column">
+             <div class="d-flex justify-content-between align-items-center">
+                <h4>{{ _('Select from Tree') }}</h4>
+                <small class="text-muted">{{ _('Drag to copy to list') }}</small>
+            </div>
+            <div class="tree-display border p-3 rounded flex-grow-1" id="tree-display" style="overflow: auto;">
+                <!-- Tree will be built here -->
+            </div>
+             <div class="form-group mt-2">
+                <label for="node-description-display">{{ _('Selected Node Description') }}</label>
+                <textarea id="node-description-display" class="form-control" rows="2" readonly></textarea>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Image Browser -->
+        <div class="col-md-4 sidebar d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4>{{ _('Select from Images') }}</h4>
+                 <small class="text-muted">{{ _('Drag to copy to list') }}</small>
+            </div>
+            <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
+            <div class="image-sidebar border p-3 flex-grow-1" id="image-sidebar-tree" style="overflow: auto;">
+                <!-- The dynamic image tree will be built here -->
+            </div>
+             <div class="form-group mt-2">
+                <label for="image-description-display">{{ _('Selected Image Description') }}</label>
+                <textarea id="image-description-display" class="form-control" rows="2" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom panel row -->
+    <div class="row mt-3">
+        <div class="col-12">
+             <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>{{ _('Chained List Builder') }}</h4>
+                <div>
+                    <button id="delete-link-btn" class="btn btn-danger">{{ _('Delete Selected Link') }}</button>
+                    <button id="new-chain-btn" class="btn btn-secondary">{{ _('New Chain') }}</button>
+                </div>
+            </div>
+            <div class="chained-list-container border p-3 rounded" id="chained-list-container">
+                <!-- Chained list items will be built here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="initial-tree-data" type="application/json">
+    {{ initial_tree_data_json | safe }}
+</script>
+<script id="images-data" type="application/json">
+    {{ all_images_json | safe }}
+</script>
+
+<script src="{{ url_for('static', filename='js/list.js') }}"></script>
+{% endblock %}

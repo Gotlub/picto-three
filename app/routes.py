@@ -7,7 +7,7 @@ from app import db
 from app.forms import LoginForm, RegistrationForm
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Image, Tree, Folder
+from app.models import User, Image, Tree, Folder, PictogramList
 
 bp = Blueprint('main', __name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -112,6 +112,36 @@ def pictogram_bank():
 
     return render_template('pictogram_bank.html', title='Pictogram Bank', pictograms_json=pictograms_json)
 
+
+@bp.route('/list')
+def list_page():
+    # This logic is similar to the builder, providing the necessary data for the UI components
+    initial_folders = []
+
+    # Get public root folder
+    public_root = Folder.query.filter_by(user_id=None, parent_id=None).first()
+    if public_root:
+        initial_folders.append(public_root.to_dict())
+
+    # Get user's root folder if authenticated
+    if current_user.is_authenticated:
+        user_root = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
+        if user_root:
+            initial_folders.append(user_root.to_dict())
+
+    initial_tree_data_json = json.dumps(initial_folders)
+
+    # The list builder needs all images to reconstruct lists from saved data (which only has IDs)
+    all_images = Image.query.all()
+    all_images_json = json.dumps([image.to_dict() for image in all_images])
+
+    return render_template(
+        'list.html',
+        title='List Builder',
+        initial_tree_data_json=initial_tree_data_json,
+        all_images_json=all_images_json
+    )
+
 @bp.route('/language/<language>')
 def set_language(language=None):
     session['language'] = language
@@ -131,6 +161,103 @@ def load_trees():
         'public_trees': [tree.to_dict() for tree in public_trees],
         'user_trees': [tree.to_dict() for tree in user_trees]
     })
+
+
+@api_bp.route('/lists', methods=['GET'])
+def load_lists():
+    # Public lists are all lists with is_public = True, ordered by name
+    public_lists = PictogramList.query.filter_by(is_public=True).order_by(PictogramList.list_name).all()
+
+    user_lists = []
+    if current_user.is_authenticated:
+        # Private lists are user-owned lists with is_public = False, ordered by name
+        user_lists = PictogramList.query.filter_by(user_id=current_user.id, is_public=False).order_by(PictogramList.list_name).all()
+
+    # In to_dict(), the payload is already a string, but if it were an object, we'd need to handle it.
+    # The current to_dict returns the payload as is, which is what we want.
+    return jsonify({
+        'public_lists': [l.to_dict() for l in public_lists],
+        'user_lists': [l.to_dict() for l in user_lists]
+    })
+
+@api_bp.route('/lists', methods=['POST'])
+@login_required
+def save_list():
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+
+    list_name = data.get('list_name')
+    is_public = data.get('is_public', False)
+    payload = data.get('payload') # This is expected to be a list of dicts
+
+    if not list_name or payload is None:
+        return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
+
+    # The payload from the client is JSON, but we store it as a string in the DB.
+    payload_str = json.dumps(payload)
+
+    new_list = PictogramList(
+        user_id=current_user.id,
+        list_name=list_name,
+        is_public=is_public,
+        payload=payload_str
+    )
+    db.session.add(new_list)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': 'A list with this name may already exist or another integrity issue occurred.'
+        }), 400
+
+    # The to_dict method will handle the payload serialization for the response
+    return jsonify({
+        'status': 'success',
+        'message': 'List saved successfully',
+        'list': new_list.to_dict()
+    }), 201
+
+
+@api_bp.route('/lists/<int:list_id>', methods=['PUT'])
+@login_required
+def update_list(list_id):
+    plist = PictogramList.query.get_or_404(list_id)
+    if plist.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+
+    plist.list_name = data.get('list_name', plist.list_name)
+    plist.is_public = data.get('is_public', plist.is_public)
+    payload = data.get('payload')
+    if payload is not None:
+        plist.payload = json.dumps(payload)
+
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': 'List updated successfully',
+        'list': plist.to_dict()
+    })
+
+@api_bp.route('/lists/<int:list_id>', methods=['DELETE'])
+@login_required
+def delete_list(list_id):
+    plist = PictogramList.query.get_or_404(list_id)
+    if plist.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+
+    db.session.delete(plist)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'List deleted successfully'})
+
 
 @api_bp.route('/folder/contents', methods=['GET'])
 def get_folder_contents():

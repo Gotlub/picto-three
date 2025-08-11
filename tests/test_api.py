@@ -1,6 +1,6 @@
 import json
 import pytest
-from app.models import User, Tree
+from app.models import User, Tree, PictogramList
 from app import db
 
 import re
@@ -155,3 +155,137 @@ def test_save_tree_with_duplicate_name_fails(client):
 
     # Logout
     logout(client)
+
+# --- Tests for PictogramList API Endpoints ---
+
+def test_save_list_unauthenticated(client):
+    """Check that an unauthenticated user gets a 401 error."""
+    response = client.post('/api/lists', json={})
+    assert response.status_code == 401 # Unauthorized
+
+def test_save_and_load_lists(client):
+    """Test saving a list and then loading it."""
+    # Register and login a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    user = User.query.filter_by(username='listuser').first()
+    login(client, 'listuser', 'password')
+
+    # 1. Save a private list
+    private_list_payload = [{"image_id": 1, "description": "Step 1"}]
+    response_save_private = client.post('/api/lists', json={
+        "list_name": "My Private List",
+        "is_public": False,
+        "payload": private_list_payload
+    })
+    assert response_save_private.status_code == 201
+    private_list_data = response_save_private.get_json()['list']
+    assert private_list_data['list_name'] == "My Private List"
+
+    # 2. Save a public list
+    public_list_payload = [{"image_id": 2, "description": "Public Step"}]
+    response_save_public = client.post('/api/lists', json={
+        "list_name": "My Public List",
+        "is_public": True,
+        "payload": public_list_payload
+    })
+    assert response_save_public.status_code == 201
+
+    # 3. Load lists while authenticated
+    response_load_auth = client.get('/api/lists')
+    assert response_load_auth.status_code == 200
+    loaded_data_auth = response_load_auth.get_json()
+
+    assert len(loaded_data_auth['user_lists']) == 1
+    assert loaded_data_auth['user_lists'][0]['list_name'] == "My Private List"
+
+    assert len(loaded_data_auth['public_lists']) == 1
+    assert loaded_data_auth['public_lists'][0]['list_name'] == "My Public List"
+
+    # 4. Logout and load lists unauthenticated
+    logout(client)
+    response_load_unauth = client.get('/api/lists')
+    assert response_load_unauth.status_code == 200
+    loaded_data_unauth = response_load_unauth.get_json()
+
+    assert len(loaded_data_unauth['user_lists']) == 0
+    assert len(loaded_data_unauth['public_lists']) == 1
+    assert loaded_data_unauth['public_lists'][0]['list_name'] == "My Public List"
+
+def test_update_list(client):
+    # Register and login a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    login(client, 'updateuser', 'password')
+
+    # Create an initial list
+    list_payload = [{"image_id": 1, "description": "Initial"}]
+    save_response = client.post('/api/lists', json={
+        "list_name": "Initial Name",
+        "is_public": False,
+        "payload": list_payload
+    })
+    list_id = save_response.get_json()['list']['id']
+
+    # Update the list
+    updated_payload = [{"image_id": 2, "description": "Updated"}]
+    update_response = client.put(f'/api/lists/{list_id}', json={
+        "list_name": "Updated Name",
+        "is_public": True,
+        "payload": updated_payload
+    })
+    assert update_response.status_code == 200
+    updated_data = update_response.get_json()['list']
+    assert updated_data['list_name'] == "Updated Name"
+    assert updated_data['is_public'] is True
+    assert json.loads(updated_data['payload'])[0]['description'] == "Updated"
+
+def test_delete_list(client):
+    # Register and login a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    login(client, 'deleteuser', 'password')
+
+    # Create a list
+    list_payload = [{"image_id": 1, "description": "To be deleted"}]
+    save_response = client.post('/api/lists', json={
+        "list_name": "To Delete",
+        "payload": list_payload
+    })
+    list_id = save_response.get_json()['list']['id']
+
+    # Delete the list
+    delete_response = client.delete(f'/api/lists/{list_id}')
+    assert delete_response.status_code == 200
+    assert delete_response.get_json()['status'] == 'success'
+
+    # Verify it's gone
+    assert PictogramList.query.get(list_id) is None
+
+def test_update_delete_unauthorized(client):
+    # Register two users
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+
+    # Owner logs in and creates a list
+    login(client, 'owner', 'password')
+    list_payload = [{"image_id": 1, "description": "Owned"}]
+    save_response = client.post('/api/lists', json={"list_name": "Owned List", "payload": list_payload})
+    list_id = save_response.get_json()['list']['id']
+    logout(client)
+
+    # Hacker logs in and tries to modify it
+    login(client, 'hacker', 'password')
+    update_response = client.put(f'/api/lists/{list_id}', json={"list_name": "Hacked"})
+    assert update_response.status_code == 403 # Forbidden
+
+    delete_response = client.delete(f'/api/lists/{list_id}')
+    assert delete_response.status_code == 403 # Forbidden
