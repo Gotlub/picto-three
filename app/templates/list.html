@@ -12,31 +12,32 @@
     <div class="row" style="height: 70%;">
         <!-- Left Sidebar: Load/Save Menu -->
         <div class="col-md-3 sidebar d-flex flex-column h-100">
-            <h4>{{ _('List Operations') }}</h4>
-            <div class="d-grid gap-2">
-                <button id="import-list-json-btn" class="btn btn-secondary">{{ _('Import from JSON') }}</button>
-                <button id="export-list-json-btn" class="btn btn-secondary">{{ _('Export to JSON') }}</button>
-            </div>
-            <hr>
-
+            <!-- Tree Source Section -->
             <h4>{{ _('Tree Source') }}</h4>
             <div class="d-grid gap-2">
                 <button id="import-tree-json-btn" class="btn btn-info">{{ _('Import Tree from JSON') }}</button>
             </div>
             <div class="load-tree-form d-flex flex-column mt-2">
-                <h5>{{ _('Load Tree from Database') }}</h5>
+                <h5 class="mt-2">{{ _('Load Tree from Database') }}</h5>
                 <input type="text" id="tree-search" class="form-control mb-2" placeholder="{{ _('Search trees...') }}">
-                <div id="tree-container" class="flex-grow-1" style="overflow-y: auto; max-height: 150px;">
+                <div id="tree-container" style="overflow-y: auto; max-height: 150px;">
                     <!-- Trees will be loaded here -->
                 </div>
                 <button id="load-tree-btn" class="btn btn-success w-100 mt-2">{{ _('Load Selected Tree') }}</button>
             </div>
-            <hr>
+
+            <hr class="my-4">
+
+            <!-- List Operations Section -->
+            <h4>{{ _('List Operations') }}</h4>
+            <div class="d-grid gap-2">
+                <button id="import-list-json-btn" class="btn btn-secondary">{{ _('Import List from JSON') }}</button>
+                <button id="export-list-json-btn" class="btn btn-secondary">{{ _('Export List to JSON') }}</button>
+            </div>
 
             {% if current_user.is_authenticated %}
-            <h4>{{ _('Database Operations') }}</h4>
-            <div class="save-list-form">
-                <h5>{{ _('Save List') }}</h5>
+            <div class="save-list-form mt-3">
+                <h5 class="mt-2">{{ _('Save List') }}</h5>
                 <div class="form-group mb-2">
                     <label for="list-name">{{ _('List Name') }}</label>
                     <input type="text" id="list-name" class="form-control" placeholder="{{ _('Enter list name') }}">
@@ -47,11 +48,10 @@
                 </div>
                 <button id="save-list-btn" class="btn btn-primary w-100">{{ _('Save List') }}</button>
             </div>
-            <hr>
             {% endif %}
 
-            <div class="load-list-form flex-grow-1 d-flex flex-column">
-                <h5>{{ _('Load List from Database') }}</h5>
+            <div class="load-list-form flex-grow-1 d-flex flex-column mt-3">
+                <h5 class="mt-2">{{ _('Load List from Database') }}</h5>
                 <input type="text" id="list-search" class="form-control mb-2" placeholder="{{ _('Search lists...') }}">
                 <div id="list-container" class="flex-grow-1" style="overflow-y: auto;">
                     <!-- Lists will be loaded here -->

@@ -1,11 +1,12 @@
 /* Styles for the chained list builder */
 .chained-list-container {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-wrap: nowrap; /* Prevent wrapping to a new line */
+    align-items: center; /* Align items vertically */
     gap: 10px;
-    min-height: 150px; /* Give it some initial height */
-    overflow-y: auto;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    padding-bottom: 15px; /* Add padding for the scrollbar */
 }
 
 .chained-list-item {
