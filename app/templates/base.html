@@ -34,6 +34,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.builder') }}">{{ _('Tree Builder') }}</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.list_page') }}">{{ _('List Builder') }}</a>
+                        </li>
                         {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.pictogram_bank') }}">Pictogram Bank</a>

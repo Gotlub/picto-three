@@ -9,9 +9,9 @@
 {% block content %}
 <div class="container-fluid vh-100 d-flex flex-column">
     <!-- Top panels row -->
-    <div class="row flex-grow-1" style="max-height: 70%;">
+    <div class="row" style="height: 70%;">
         <!-- Left Sidebar: Load/Save Menu -->
-        <div class="col-md-3 sidebar d-flex flex-column">
+        <div class="col-md-3 sidebar d-flex flex-column h-100">
             <h4>{{ _('List Operations') }}</h4>
             <div class="d-grid gap-2">
                 <button id="import-list-json-btn" class="btn btn-secondary">{{ _('Import from JSON') }}</button>
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Center Panel: Tree Visualization (Read-only) -->
-        <div class="col-md-5 d-flex flex-column">
+        <div class="col-md-5 d-flex flex-column h-100">
              <div class="d-flex justify-content-between align-items-center">
                 <h4>{{ _('Select from Tree') }}</h4>
                 <small class="text-muted">{{ _('Drag to copy to list') }}</small>
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Right Sidebar: Image Browser -->
-        <div class="col-md-4 sidebar d-flex flex-column">
+        <div class="col-md-4 sidebar d-flex flex-column h-100">
             <div class="d-flex justify-content-between align-items-center">
                 <h4>{{ _('Select from Images') }}</h4>
                  <small class="text-muted">{{ _('Drag to copy to list') }}</small>
@@ -79,8 +79,8 @@
     </div>
 
     <!-- Bottom panel row -->
-    <div class="row mt-3">
-        <div class="col-12">
+    <div class="row mt-2" style="height: 30%;">
+        <div class="col-12 d-flex flex-column h-100">
              <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>{{ _('Chained List Builder') }}</h4>
                 <div>
@@ -88,7 +88,7 @@
                     <button id="new-chain-btn" class="btn btn-secondary">{{ _('New Chain') }}</button>
                 </div>
             </div>
-            <div class="chained-list-container border p-3 rounded" id="chained-list-container">
+            <div class="chained-list-container border p-3 rounded flex-grow-1" id="chained-list-container" style="overflow-y: auto;">
                 <!-- Chained list items will be built here -->
             </div>
         </div>
