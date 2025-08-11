@@ -247,7 +247,7 @@ class ListBuilder {
         // General
         this.allImages = JSON.parse(document.getElementById('images-data').textContent);
 
-        // Left Panel
+        // Left Panel - List Section
         this.importBtn = document.getElementById('import-list-json-btn');
         this.exportBtn = document.getElementById('export-list-json-btn');
         this.saveBtn = document.getElementById('save-list-btn');
@@ -256,6 +256,13 @@ class ListBuilder {
         this.listSearchInput = document.getElementById('list-search');
         this.listContainer = document.getElementById('list-container');
         this.loadListBtn = document.getElementById('load-list-btn');
+
+        // Left Panel - Tree Section
+        this.importTreeBtn = document.getElementById('import-tree-json-btn');
+        this.treeContainer = document.getElementById('tree-container');
+        this.loadTreeBtn = document.getElementById('load-tree-btn');
+        this.treeSearchInput = document.getElementById('tree-search');
+
 
         // Center Panel
         this.treeDisplay = document.getElementById('tree-display');
@@ -286,7 +293,7 @@ class ListBuilder {
 
         this.initEventListeners();
         this.loadSavedLists();
-        this.loadSavedTreesForViewer();
+        this.loadSavedTrees();
     }
 
     createDropIndicator() {
@@ -296,12 +303,16 @@ class ListBuilder {
     }
 
     initEventListeners() {
-        // Left Panel
+        // Left Panel - List
         this.saveBtn?.addEventListener('click', () => this.saveList());
         this.loadListBtn?.addEventListener('click', () => this.loadSelectedList());
         this.importBtn?.addEventListener('click', () => this.importListFromJSON());
         this.exportBtn?.addEventListener('click', () => this.exportListToJSON());
 
+        // Left Panel - Tree
+        this.importTreeBtn?.addEventListener('click', () => this.importTreeFromJSON());
+        this.loadTreeBtn?.addEventListener('click', () => this.loadSelectedTree());
+        this.treeSearchInput?.addEventListener('input', () => this.filterTrees());
 
         // Bottom Panel
         this.deleteLinkBtn.addEventListener('click', () => this.deleteSelectedLink());
@@ -645,16 +656,91 @@ class ListBuilder {
 
 
     // --- Tree Viewer Loading (Center Panel) ---
-    async loadSavedTreesForViewer() {
+    async loadSavedTrees() {
         const response = await fetch('/api/trees/load');
         const data = await response.json();
-        const allTrees = (data.user_trees || []).concat(data.public_trees || []);
-        if (allTrees.length > 0) {
-            // For simplicity, just load the first available tree.
-            // A dropdown could be added here to select which tree to view.
-            const treeData = JSON.parse(allTrees[0].json_data);
+        this.publicTrees = data.public_trees || [];
+        this.userTrees = data.user_trees || [];
+        this.renderLoadableTrees();
+
+        // Automatically load the first tree if available
+        const firstTree = this.userTrees[0] || this.publicTrees[0];
+        if (firstTree) {
+            const treeData = JSON.parse(firstTree.json_data);
             this.rebuildTreeViewer(treeData);
         }
+    }
+
+    renderLoadableTrees() {
+        this.treeContainer.innerHTML = '';
+        this.activeTreeSelect = null;
+
+        const createSelectList = (trees, title) => {
+            if (trees.length > 0) {
+                const titleEl = document.createElement('h6');
+                titleEl.textContent = title;
+                this.treeContainer.appendChild(titleEl);
+
+                const select = document.createElement('select');
+                select.className = 'form-control mb-2 tree-select-list';
+                select.setAttribute('size', '5');
+                trees.forEach(tree => {
+                    const option = document.createElement('option');
+                    option.value = tree.id;
+                    option.textContent = tree.username ? `${tree.username} - ${tree.name}` : tree.name;
+                    option.dataset.treeData = tree.json_data;
+                    select.appendChild(option);
+                });
+                this.treeContainer.appendChild(select);
+            }
+        };
+
+        createSelectList(this.userTrees, 'My Private Trees');
+        createSelectList(this.publicTrees, 'Public Trees');
+    }
+
+    filterTrees() {
+        const searchTerm = this.treeSearchInput.value.toLowerCase();
+        const treeLists = this.treeContainer.querySelectorAll('.tree-select-list');
+
+        treeLists.forEach(select => {
+            Array.from(select.options).forEach(option => {
+                const optionText = option.textContent.toLowerCase();
+                option.style.display = optionText.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+
+    loadSelectedTree() {
+        const selectedOption = this.treeContainer.querySelector('option:checked');
+        if (!selectedOption) {
+            alert('Please select a tree to load.');
+            return;
+        }
+        const treeData = JSON.parse(selectedOption.dataset.treeData);
+        this.rebuildTreeViewer(treeData);
+    }
+
+    importTreeFromJSON() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const treeData = JSON.parse(event.target.result);
+                        this.rebuildTreeViewer(treeData);
+                    } catch (error) {
+                        alert('Error parsing JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
     }
 
     rebuildTreeViewer(treeData) {

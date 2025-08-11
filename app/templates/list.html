@@ -19,6 +19,20 @@
             </div>
             <hr>
 
+            <h4>{{ _('Tree Source') }}</h4>
+            <div class="d-grid gap-2">
+                <button id="import-tree-json-btn" class="btn btn-info">{{ _('Import Tree from JSON') }}</button>
+            </div>
+            <div class="load-tree-form d-flex flex-column mt-2">
+                <h5>{{ _('Load Tree from Database') }}</h5>
+                <input type="text" id="tree-search" class="form-control mb-2" placeholder="{{ _('Search trees...') }}">
+                <div id="tree-container" class="flex-grow-1" style="overflow-y: auto; max-height: 150px;">
+                    <!-- Trees will be loaded here -->
+                </div>
+                <button id="load-tree-btn" class="btn btn-success w-100 mt-2">{{ _('Load Selected Tree') }}</button>
+            </div>
+            <hr>
+
             {% if current_user.is_authenticated %}
             <h4>{{ _('Database Operations') }}</h4>
             <div class="save-list-form">
