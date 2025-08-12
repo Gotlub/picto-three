@@ -1,34 +1,23 @@
 /* Styles for the chained list builder */
-/* Aggressive debugging styles for the container - targeting class AND id */
-.chained-list-container,
-#chained-list-container {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important; /* Center items vertically */
-    gap: 10px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding-bottom: 15px !important;
-    border: 3px solid red !important; /* VISUAL DEBUG */
-    width: 100%;
-    min-height: 150px !important; /* VISUAL DEBUG - Ensure it has height */
-    box-sizing: border-box;
+.chained-list-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 15px;
 }
 
-/* Aggressive debugging styles for the items */
-.chained-list-container > .chained-list-item,
-#chained-list-container > .chained-list-item {
-    flex: 0 0 100px !important; /* Don't grow, don't shrink, start at 100px */
-    height: 120px;
-    border: 2px solid blue !important; /* VISUAL DEBUG */
-    background-color: #f0f0f0;
-
-    /* Existing styles below */
+.chained-list-item {
+    flex-shrink: 0;
     position: relative;
+    border: 1px solid #ccc;
     border-radius: 5px;
     padding: 5px;
     text-align: center;
+    width: 100px;
     cursor: grab;
 }
 
