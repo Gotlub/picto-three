@@ -417,6 +417,8 @@ class ListBuilder {
         this.chainedListItems.forEach(item => {
             this.chainedListContainer.appendChild(item.element);
         });
+        // Force the style via JS to override any conflicting styles
+        this.chainedListContainer.style.flexDirection = 'row';
     }
 
     // --- Reordering Logic for Chained List ---
