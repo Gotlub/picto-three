@@ -2,7 +2,7 @@ from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import UniqueConstraint
-from datetime import datetime
+from datetime import datetime, UTC
 
 @login.user_loader
 def load_user(id):
@@ -86,8 +86,8 @@ class Tree(db.Model):
     name = db.Column(db.String(64))
     is_public = db.Column(db.Boolean, default=False)
     json_data = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     user = db.relationship('User', backref=db.backref('trees', lazy=True))
 
@@ -117,8 +117,8 @@ class PictogramList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
     is_public = db.Column(db.Boolean, default=False, index=True)
     payload = db.Column(db.Text, nullable=False) # Storing as JSON text
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     user = db.relationship('User', backref=db.backref('pictogram_lists', lazy=True))
 

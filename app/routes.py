@@ -224,7 +224,9 @@ def save_list():
 @api_bp.route('/lists/<int:list_id>', methods=['PUT'])
 @login_required
 def update_list(list_id):
-    plist = PictogramList.query.get_or_404(list_id)
+    plist = db.session.get(PictogramList, list_id)
+    if plist is None:
+        return jsonify({'status': 'error', 'message': 'List not found'}), 404
     if plist.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
 
@@ -249,7 +251,9 @@ def update_list(list_id):
 @api_bp.route('/lists/<int:list_id>', methods=['DELETE'])
 @login_required
 def delete_list(list_id):
-    plist = PictogramList.query.get_or_404(list_id)
+    plist = db.session.get(PictogramList, list_id)
+    if plist is None:
+        return jsonify({'status': 'error', 'message': 'List not found'}), 404
     if plist.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
 
@@ -265,7 +269,7 @@ def get_folder_contents():
     if parent_id is None:
         return jsonify({'status': 'error', 'message': 'parent_id is required'}), 400
 
-    parent_folder = Folder.query.get(parent_id)
+    parent_folder = db.session.get(Folder, parent_id)
     if not parent_folder:
         return jsonify({'status': 'error', 'message': 'Folder not found'}), 404
 
@@ -301,7 +305,7 @@ def create_folder():
     parent_id = data.get('parent_id')
     name = data.get('name').strip()
 
-    parent_folder = Folder.query.get(parent_id)
+    parent_folder = db.session.get(Folder, parent_id)
     if not parent_folder or parent_folder.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': 'Parent folder not found or not owned by user'}), 404
 
@@ -338,7 +342,7 @@ def upload_image():
     if not folder_id:
         return jsonify({'status': 'error', 'message': 'No folder_id specified'}), 400
 
-    folder = Folder.query.get(folder_id)
+    folder = db.session.get(Folder, folder_id)
     if not folder or folder.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': 'Folder not found or not owned by user'}), 404
 
@@ -459,7 +463,7 @@ def delete_item():
     item_type = data.get('type')
 
     if item_type == 'folder':
-        folder = Folder.query.get(item_id)
+        folder = db.session.get(Folder, item_id)
         if not folder or folder.user_id != current_user.id:
             return jsonify({'status': 'error', 'message': 'Folder not found or not owned by user'}), 404
 
@@ -471,7 +475,7 @@ def delete_item():
         return jsonify({'status': 'success', 'message': 'Folder and all its contents deleted'})
 
     elif item_type == 'image':
-        image = Image.query.get(item_id)
+        image = db.session.get(Image, item_id)
         if not image or image.user_id != current_user.id:
             return jsonify({'status': 'error', 'message': 'Image not found or not owned by user'}), 404
 

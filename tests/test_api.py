@@ -52,7 +52,7 @@ def test_save_tree_authenticated(client):
     assert data['message'] == 'Tree saved successfully'
 
     # Verify the tree was saved to the database
-    tree = Tree.query.get(data['tree_id'])
+    tree = db.session.get(Tree, data['tree_id'])
     assert tree is not None
     assert tree.name == "My Test Tree"
     assert tree.is_public is True
@@ -263,7 +263,7 @@ def test_delete_list(client):
     assert delete_response.get_json()['status'] == 'success'
 
     # Verify it's gone
-    assert PictogramList.query.get(list_id) is None
+    assert db.session.get(PictogramList, list_id) is None
 
 def test_update_delete_unauthorized(client):
     # Register two users
