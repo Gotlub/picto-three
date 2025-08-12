@@ -2,7 +2,7 @@
 
 {% block styles %}
 {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/list.css', v='1.2') }}">
 {% endblock %}
 
 
@@ -140,5 +140,5 @@
     {{ all_images_json | safe }}
 </script>
 
-<script src="{{ url_for('static', filename='js/list.js') }}"></script>
+<script src="{{ url_for('static', filename='js/list.js', v='1.2') }}"></script>
 {% endblock %}
