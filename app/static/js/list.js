@@ -598,7 +598,7 @@ class ListBuilder {
     }
 
     loadSelectedList() {
-        const selectedOption = this.listContainer.querySelector('option:checked');
+        const selectedOption = this.listContainer.querySelector('option:selected');
         if (!selectedOption) {
             alert('Please select a list to load.');
             return;
@@ -727,7 +727,7 @@ class ListBuilder {
     }
 
     loadSelectedTree() {
-        const selectedOption = this.treeContainer.querySelector('option:checked');
+        const selectedOption = this.treeContainer.querySelector('option:selected');
         if (!selectedOption) {
             alert('Please select a tree to load.');
             return;
@@ -759,7 +759,6 @@ class ListBuilder {
     }
 
     rebuildTreeViewer(treeData) {
-        console.log("rebuildTreeViewer called. Number of images available:", this.allImages.length);
         this.treeRoot.children = []; // Clear existing
         const buildNode = (nodeData) => {
             const image = this.allImages.find(img => img.id === nodeData.id);
