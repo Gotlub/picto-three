@@ -732,20 +732,9 @@ class ListBuilder {
             alert('Please select a tree to load.');
             return;
         }
-        // The json_data from the API is a stringified JSON that might be double-encoded.
-        // Parsing it twice handles this.
-        try {
-            const treeData = JSON.parse(selectedOption.dataset.treeData);
-            // In case it's double-encoded
-            if (typeof treeData === 'string') {
-                 this.rebuildTreeViewer(JSON.parse(treeData));
-            } else {
-                 this.rebuildTreeViewer(treeData);
-            }
-        } catch (e) {
-            console.error("Failed to parse tree data:", e);
-            alert("Could not load tree. The data format is invalid.");
-        }
+        const treeData = JSON.parse(selectedOption.dataset.treeData);
+        console.log("From DB Load:", treeData);
+        this.rebuildTreeViewer(treeData);
     }
 
     importTreeFromJSON() {
@@ -759,6 +748,7 @@ class ListBuilder {
                 reader.onload = (event) => {
                     try {
                         const treeData = JSON.parse(event.target.result);
+                        console.log("From JSON Import:", treeData);
                         this.rebuildTreeViewer(treeData);
                     } catch (error) {
                         alert('Error parsing JSON file.');
