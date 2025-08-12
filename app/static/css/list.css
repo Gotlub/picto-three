@@ -1,23 +1,32 @@
 /* Styles for the chained list builder */
-.chained-list-container {
-    display: flex;
-    flex-direction: row;        /* Horizontal au lieu de column */
-    flex-wrap: nowrap; /* Prevent wrapping to a new line */
-    align-items: center; /* Align items vertically */
-    gap: 10px;
-    overflow-x: auto; /* Enable horizontal scrolling */
-    overflow-y: hidden; /* Hide vertical scrollbar */
-    padding-bottom: 15px; /* Add padding for the scrollbar */
+/* Aggressive debugging styles for the container */
+#chained-list-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important; /* Center items vertically */
+    gap: 10px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 15px !important;
+    border: 3px solid red !important; /* VISUAL DEBUG */
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 
-.chained-list-item {
-    flex-shrink: 0;             /* Éviter la compression */
+/* Aggressive debugging styles for the items */
+#chained-list-container > .chained-list-item {
+    flex: 0 0 100px !important; /* Don't grow, don't shrink, start at 100px */
+    height: 120px;
+    border: 2px solid blue !important; /* VISUAL DEBUG */
+    background-color: #f0f0f0;
+
+    /* Existing styles below */
     position: relative;
-    border: 1px solid #ccc;
     border-radius: 5px;
     padding: 5px;
     text-align: center;
-    width: 100px; /* Example width */
     cursor: grab;
 }
 
