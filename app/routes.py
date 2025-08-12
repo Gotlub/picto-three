@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify
+from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from app import db
 from app.forms import LoginForm, RegistrationForm
@@ -146,6 +146,15 @@ def list_page():
 def set_language(language=None):
     session['language'] = language
     return redirect(request.referrer)
+
+# This route will ensure that JS files are served with the correct MIME type.
+@bp.route('/static/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory(
+        os.path.join(bp.root_path, 'static', 'js'),
+        filename,
+        mimetype='application/javascript'
+    )
 
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():

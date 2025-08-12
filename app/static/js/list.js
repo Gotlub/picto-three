@@ -413,7 +413,6 @@ class ListBuilder {
     }
 
     renderChainedList() {
-        console.log("Attempting to render chained list into this container:", this.chainedListContainer);
         this.chainedListContainer.innerHTML = '';
         this.chainedListItems.forEach(item => {
             this.chainedListContainer.appendChild(item.element);
