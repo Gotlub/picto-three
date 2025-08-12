@@ -733,7 +733,6 @@ class ListBuilder {
             return;
         }
         const treeData = JSON.parse(selectedOption.dataset.treeData);
-        console.log("From DB Load:", treeData);
         this.rebuildTreeViewer(treeData);
     }
 
@@ -748,7 +747,6 @@ class ListBuilder {
                 reader.onload = (event) => {
                     try {
                         const treeData = JSON.parse(event.target.result);
-                        console.log("From JSON Import:", treeData);
                         this.rebuildTreeViewer(treeData);
                     } catch (error) {
                         alert('Error parsing JSON file.');
@@ -761,6 +759,7 @@ class ListBuilder {
     }
 
     rebuildTreeViewer(treeData) {
+        console.log("rebuildTreeViewer called. Number of images available:", this.allImages.length);
         this.treeRoot.children = []; // Clear existing
         const buildNode = (nodeData) => {
             const image = this.allImages.find(img => img.id === nodeData.id);
