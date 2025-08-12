@@ -598,7 +598,15 @@ class ListBuilder {
     }
 
     loadSelectedList() {
-        const selectedOption = this.listContainer.querySelector('option:selected');
+        let selectedOption = null;
+        const selectLists = this.listContainer.querySelectorAll('select');
+        for (const select of selectLists) {
+            if (select.selectedIndex > -1) {
+                selectedOption = select.options[select.selectedIndex];
+                break;
+            }
+        }
+
         if (!selectedOption) {
             alert('Please select a list to load.');
             return;
@@ -727,7 +735,15 @@ class ListBuilder {
     }
 
     loadSelectedTree() {
-        const selectedOption = this.treeContainer.querySelector('option:selected');
+        let selectedOption = null;
+        const selectLists = this.treeContainer.querySelectorAll('select.tree-select-list');
+        for (const select of selectLists) {
+            if (select.selectedIndex > -1) {
+                selectedOption = select.options[select.selectedIndex];
+                break;
+            }
+        }
+
         if (!selectedOption) {
             alert('Please select a tree to load.');
             return;
