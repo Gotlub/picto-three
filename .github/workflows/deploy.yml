@@ -43,21 +43,20 @@ jobs:
           
           # Le script à exécuter sur le serveur distant
           script: |
-            # Se déplacer dans le répertoire de l'application
-            cd /var/www/picto-three
-            
-            # Mettre à jour le code depuis le dépôt GitHub
-            git pull origin main
-            
-            # --- CORRECTION MAJEURE ---
-            # Exécuter pip en utilisant le chemin complet de l'environnement virtuel
-            # au lieu d'essayer d'activer le venv. C'est la méthode robuste.
-            /var/www/picto-three/venv/bin/pip install -r requirements.txt
-            
-            # Redémarrer le service applicatif avec sudo (configuré pour ne pas demander de mot de passe)
-            sudo systemctl restart picto-three.service
-            
-            # (Optionnel) Redémarrer Nginx si des configurations ont changé, bien que rarement nécessaire
-            # sudo systemctl restart nginx.service
+            # Aller dans le dossier de build
+              cd /home/deploy-github/app
+
+            # Mettre à jour le code
+              git fetch --all
+              git reset --hard origin/main
+
+            # Installer les dépendances dans le venv
+              /home/deploy-github/app/venv/bin/pip install -r requirements.txt
+
+            # Synchroniser le code vers /var/www/picto-three
+              sudo rsync -a --delete /home/deploy-github/app/ /var/www/picto-three/
+
+            # Redémarrer le service
+              sudo systemctl restart picto-three.service
 
     
