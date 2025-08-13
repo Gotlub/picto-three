@@ -179,10 +179,7 @@ class ReadOnlyNode {
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
         const imgElement = document.createElement('img');
-        if (this.image.id === 'root') {
-            imgElement.src = '/static/images/pictograms/public/bold/folder-bold.png';
-        }
-        else if (this.image.path) {
+        if (this.image.path) {
             imgElement.src = this.image.path.startsWith('/static') ? this.image.path : this.image.path.replace('app/', '');
         }
         imgElement.alt = this.image.name;
@@ -688,13 +685,18 @@ class ListBuilder {
         this.publicTrees = data.public_trees || [];
         this.userTrees = data.user_trees || [];
         this.renderLoadableTrees();
+
+        // Automatically load the first tree if available
+        const firstTree = this.userTrees[0] || this.publicTrees[0];
+        if (firstTree) {
+            const treeData = JSON.parse(firstTree.json_data);
+            this.rebuildTreeViewer(treeData);
+        }
     }
 
     renderLoadableTrees() {
         this.treeContainer.innerHTML = '';
         this.activeTreeSelect = null;
-
-        const selectLists = []; // Array to hold the select elements
 
         const createSelectList = (trees, title) => {
             if (trees.length > 0) {
@@ -713,24 +715,11 @@ class ListBuilder {
                     select.appendChild(option);
                 });
                 this.treeContainer.appendChild(select);
-                selectLists.push(select); // Add the created select to our array
             }
         };
 
         createSelectList(this.userTrees, 'My Private Trees');
         createSelectList(this.publicTrees, 'Public Trees');
-
-        // Add event listeners to each select list for mutual exclusion
-        selectLists.forEach(currentSelect => {
-            currentSelect.addEventListener('click', () => {
-                // When a select is clicked, deselect items in all other lists
-                selectLists.forEach(otherSelect => {
-                    if (otherSelect !== currentSelect) {
-                        otherSelect.selectedIndex = -1;
-                    }
-                });
-            });
-        });
     }
 
     filterTrees() {
@@ -786,9 +775,7 @@ class ListBuilder {
     }
 
     rebuildTreeViewer(treeData) {
-        // Re-initialize the root node completely to ensure a clean slate
-        this.treeRoot = new ReadOnlyNode({ id: 'root', name: 'Root' }, this);
-
+        this.treeRoot.children = []; // Clear existing
         const buildNode = (nodeData) => {
             const image = this.allImages.find(img => img.id === nodeData.id);
             if (!image) return null;
