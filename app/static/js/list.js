@@ -771,7 +771,9 @@ class ListBuilder {
     }
 
     rebuildTreeViewer(treeData) {
-        this.treeRoot.children = []; // Clear existing
+        // Re-initialize the root node completely to ensure a clean slate
+        this.treeRoot = new ReadOnlyNode({ id: 'root', name: 'Root' }, this);
+
         const buildNode = (nodeData) => {
             const image = this.allImages.find(img => img.id === nodeData.id);
             if (!image) return null;
