@@ -694,6 +694,8 @@ class ListBuilder {
         this.treeContainer.innerHTML = '';
         this.activeTreeSelect = null;
 
+        const selectLists = []; // Array to hold the select elements
+
         const createSelectList = (trees, title) => {
             if (trees.length > 0) {
                 const titleEl = document.createElement('h6');
@@ -711,11 +713,24 @@ class ListBuilder {
                     select.appendChild(option);
                 });
                 this.treeContainer.appendChild(select);
+                selectLists.push(select); // Add the created select to our array
             }
         };
 
         createSelectList(this.userTrees, 'My Private Trees');
         createSelectList(this.publicTrees, 'Public Trees');
+
+        // Add event listeners to each select list for mutual exclusion
+        selectLists.forEach(currentSelect => {
+            currentSelect.addEventListener('click', () => {
+                // When a select is clicked, deselect items in all other lists
+                selectLists.forEach(otherSelect => {
+                    if (otherSelect !== currentSelect) {
+                        otherSelect.selectedIndex = -1;
+                    }
+                });
+            });
+        });
     }
 
     filterTrees() {
