@@ -65,6 +65,7 @@ jobs:
 
             # Synchroniser le code vers /var/www/picto-three
               sudo rsync -a --delete /home/deploy-github/app/ /var/www/
+              sudo chown -R deploy:deploy /var/www/picto-three/
 
             # Redémarrer le service
               sudo systemctl restart picto-three.service
