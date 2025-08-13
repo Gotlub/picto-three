@@ -57,8 +57,10 @@ jobs:
 
               source venv/bin/activate
               pip install -r requirements.txt
+              pip install --upgrade pip
+              pip install gunicorn
               deactivate
-              /home/deploy-github/app/venv/bin/pip install -r requirements.txt
+              
 
             # Synchroniser le code vers /var/www/picto-three
               sudo rsync -a --delete /home/deploy-github/app/ /var/www/
