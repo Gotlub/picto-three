@@ -179,7 +179,10 @@ class ReadOnlyNode {
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
         const imgElement = document.createElement('img');
-        if (this.image.path) {
+        if (this.image.id === 'root') {
+            imgElement.src = '/static/images/pictograms/public/bold/folder-bold.png';
+        }
+        else if (this.image.path) {
             imgElement.src = this.image.path.startsWith('/static') ? this.image.path : this.image.path.replace('app/', '');
         }
         imgElement.alt = this.image.name;
