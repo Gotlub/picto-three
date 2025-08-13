@@ -685,13 +685,6 @@ class ListBuilder {
         this.publicTrees = data.public_trees || [];
         this.userTrees = data.user_trees || [];
         this.renderLoadableTrees();
-
-        // Automatically load the first tree if available
-        const firstTree = this.userTrees[0] || this.publicTrees[0];
-        if (firstTree) {
-            const treeData = JSON.parse(firstTree.json_data);
-            this.rebuildTreeViewer(treeData);
-        }
     }
 
     renderLoadableTrees() {
