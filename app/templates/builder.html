@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid h-100 d-flex flex-column">
+    <div class="row" style="flex: 1; min-height: 0;">
         <!-- Left Sidebar -->
-        <div class="col-md-2 sidebar">
+        <div class="col-md-2 sidebar d-flex flex-column h-100">
             <!-- File Operations Section -->
             <h4>{{ _('File Operations') }}</h4>
             <div class="d-grid gap-2">
@@ -14,45 +14,47 @@
             <hr>
 
             <!-- Database Operations Section -->
-            {% if current_user.is_authenticated %}
-                <h4>{{ _('Database Operations') }}</h4>
-                <div class="save-tree-form">
-                    <h5>{{ _('Save Tree') }}</h5>
-                    <div class="form-group mb-2">
-                        <label for="tree-name">{{ _('Tree Name') }}</label>
-                        <input type="text" id="tree-name" class="form-control" placeholder="{{ _('Enter tree name') }}">
+            <div class="flex-grow-1" style="overflow-y: auto;">
+                {% if current_user.is_authenticated %}
+                    <h4>{{ _('Database Operations') }}</h4>
+                    <div class="save-tree-form">
+                        <h5>{{ _('Save Tree') }}</h5>
+                        <div class="form-group mb-2">
+                            <label for="tree-name">{{ _('Tree Name') }}</label>
+                            <input type="text" id="tree-name" class="form-control" placeholder="{{ _('Enter tree name') }}">
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" id="tree-is-public" class="form-check-input">
+                            <label class="form-check-label" for="tree-is-public">{{ _('Make Public') }}</label>
+                        </div>
+                        <button id="save-tree-btn" class="btn btn-primary w-100">{{ _('Save Tree') }}</button>
                     </div>
-                    <div class="form-check mb-2">
-                        <input type="checkbox" id="tree-is-public" class="form-check-input">
-                        <label class="form-check-label" for="tree-is-public">{{ _('Make Public') }}</label>
-                    </div>
-                    <button id="save-tree-btn" class="btn btn-primary w-100">{{ _('Save Tree') }}</button>
+                    <hr>
+                {% endif %}
+                <div class="load-tree-form">
+                    <h5>{{ _('Load Tree from database') }}</h5>
+                    <input type="text" id="tree-search" class="form-control mb-2" placeholder="{{ _('Search trees...') }}">
+                    <div id="tree-list" class="mb-2" style="max-height: 200px; overflow-y: auto;"></div>
+                    <button id="load-tree-btn" class="btn btn-success w-100">{{ _('Load Tree') }}</button>
                 </div>
-                <hr>
-            {% endif %}
-            <div class="load-tree-form">
-                <h5>{{ _('Load Tree from database') }}</h5>
-                <input type="text" id="tree-search" class="form-control mb-2" placeholder="{{ _('Search trees...') }}">
-                <div id="tree-list" class="mb-2"></div>
-                <button id="load-tree-btn" class="btn btn-success w-100">{{ _('Load Tree') }}</button>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-7">
-            <div class="d-flex align-items-center mb-4">
+        <div class="col-md-7 d-flex flex-column h-100">
+            <div class="d-flex align-items-center mb-2">
                 <h2 class="mb-0">{{ _('Tree Builder') }}</h2>
             </div>
-            <div class="tree-display border p-3 rounded" id="tree-display" style="min-height: 80vh;">
+            <div class="tree-display border p-3 rounded flex-grow-1" id="tree-display" style="overflow-y: auto;">
                 <!-- Tree will be built here -->
             </div>
         </div>
 
         <!-- Right Sidebar -->
-        <div class="col-md-3 sidebar">
+        <div class="col-md-3 sidebar d-flex flex-column h-100">
             <!-- Description Section -->
             <h4>{{ _('Node Description') }}</h4>
-            <div classs="form-group mb-2">
+            <div class="form-group mb-2">
                 <textarea id="node-description" class="form-control" rows="3" placeholder="{{ _('Enter node description...') }}"></textarea>
             </div>
             <hr>
@@ -60,11 +62,11 @@
             <!-- Images Section -->
             <h4>{{ _('Images') }}</h4>
             <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
-            <div class="image-sidebar border p-3" id="image-sidebar-tree">
+            <div class="image-sidebar border p-3 flex-grow-1" id="image-sidebar-tree" style="overflow-y: auto;">
                 <!-- The dynamic image tree will be built here -->
             </div>
             <hr>
-            <div class="d-grid gap-2 mt-3">
+            <div class="d-grid gap-2 mt-2">
                 <button id="delete-btn" class="btn btn-danger">{{ _('Delete selected branch') }}</button>
                 <button id="new-tree-btn" class="btn btn-secondary">{{ _('New tree') }}</button>
             </div>
