@@ -49,8 +49,15 @@ jobs:
             # Mettre à jour le code
               git fetch --all
               git reset --hard origin/main
-
+            
             # Installer les dépendances dans le venv
+              if [ ! -d "venv" ]; then
+                python3 -m venv venv
+              fi
+
+              source venv/bin/activate
+              pip install -r requirements.txt
+              deactivate
               /home/deploy-github/app/venv/bin/pip install -r requirements.txt
 
             # Synchroniser le code vers /var/www/picto-three
