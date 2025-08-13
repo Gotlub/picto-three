@@ -1,0 +1,55 @@
+/* Styles for the chained list builder */
+.chained-list-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 15px;
+}
+
+.chained-list-item {
+    flex-shrink: 0;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    width: 100px;
+    cursor: grab;
+}
+
+.chained-list-item img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.chained-list-item.selected {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Drag and drop indicator */
+.drop-indicator {
+    width: 4px;
+    height: 100px; /* Match item height */
+    background-color: black;
+    align-self: center;
+}
+
+/* Dragging styles */
+.dragging {
+    opacity: 0.5;
+}
+
+/* Style for the read-only tree nodes to indicate they are draggable */
+#tree-display .node-content {
+    cursor: grab;
+}
+
+#image-sidebar-tree .node-content {
+     cursor: grab;
+}

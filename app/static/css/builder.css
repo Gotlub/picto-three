@@ -1,0 +1,128 @@
+.node-content.selected,
+.tree-display.root-selected {
+    border: 3px solid #007bff;
+    border-radius: 5px;
+}
+
+.children {
+    position: relative;
+    padding-left: 20px;
+    margin-left: 10px;
+}
+
+.children::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 1px;
+    height: 100%;
+    background-color: #ccc;
+}
+
+.node {
+    position: relative;
+}
+
+.node::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: -10px;
+    width: 10px;
+    height: 1px;
+    background-color: #ccc;
+}
+
+.node {
+    margin: 5px 0;
+}
+
+.node-content {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.node-content:hover {
+    background-color: #f0f0f0;
+}
+
+.node img {
+    height: 45px;
+    margin-right: 10px;
+}
+
+.image-sidebar img.grayscale {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.sidebar {
+    position: sticky;
+    top: 56px; /* Adjust based on navbar height */
+    height: calc(100vh - 56px); /* Full height minus navbar */
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.image-sidebar {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.image-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.image-item img {
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* Styles for the new image tree sidebar */
+#image-sidebar-tree {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.image-tree-node .node-content {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 2px 0;
+}
+
+.image-tree-node .node-content:hover {
+    background-color: #f0f0f0;
+}
+
+.image-tree-node img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.image-tree-node .children {
+    padding-left: 20px;
+    border-left: 1px dashed #ccc;
+    margin-left: 10px;
+}
+
+/* Drag and Drop Styles */
+.node.dragging {
+    opacity: 0.4;
+}
+
+.node-content.drag-over {
+    background-color: #d3d3d3; /* light gray */
+}
+
+/* Style for the T-connector of the selected node */
+.node.is-selected::before {
+    height: 3px;
+    background-color: #007bff;
+}

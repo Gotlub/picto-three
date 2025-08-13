@@ -1,0 +1,63 @@
+      
+# Nom du workflow qui apparaîtra dans l'onglet "Actions" de GitHub
+name: Déploiement en Production
+
+# Déclencheurs du workflow
+on:
+  # Se déclenche automatiquement à chaque push sur la branche 'main'
+  push:
+    branches: [ main ]
+  
+  # Permet de lancer ce workflow manuellement depuis l'interface GitHub
+  workflow_dispatch:
+
+# Définit les tâches (jobs) à exécuter
+jobs:
+  deploy:
+    # Le nom de la tâche qui apparaîtra sur GitHub
+    name: Déploiement sur le serveur
+    
+    # Le type de machine sur laquelle la tâche va s'exécuter (fournie par GitHub)
+    runs-on: ubuntu-latest
+
+    # Les étapes (steps) de la tâche
+    steps:
+      # 1. Récupération du code
+      # Utilise une action officielle pour récupérer le code de votre dépôt
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      # 2. Déploiement via SSH
+      # Utilise l'action populaire "SSH Action" pour se connecter et exécuter des commandes
+      - name: Déploiement sur le serveur via SSH
+        uses: appleboy/ssh-action@v1.0.3 # Utilisation d'une version stable
+        with:
+          # L'adresse IP ou le nom d'hôte de votre serveur
+          host: ${{ secrets.SSH_HOST }}
+          
+          # Le nom de l'utilisateur de déploiement
+          username: ${{ secrets.SSH_USERNAME }}
+          
+          # La clé SSH privée pour l'authentification
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+          # Le script à exécuter sur le serveur distant
+          script: |
+            # Se déplacer dans le répertoire de l'application
+            cd /var/www/picto-three
+            
+            # Mettre à jour le code depuis le dépôt GitHub
+            git pull origin main
+            
+            # --- CORRECTION MAJEURE ---
+            # Exécuter pip en utilisant le chemin complet de l'environnement virtuel
+            # au lieu d'essayer d'activer le venv. C'est la méthode robuste.
+            /var/www/picto-three/venv/bin/pip install -r requirements.txt
+            
+            # Redémarrer le service applicatif avec sudo (configuré pour ne pas demander de mot de passe)
+            sudo systemctl restart picto-three.service
+            
+            # (Optionnel) Redémarrer Nginx si des configurations ont changé, bien que rarement nécessaire
+            # sudo systemctl restart nginx.service
+
+    

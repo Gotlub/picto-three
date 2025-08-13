@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <div class="p-5 mb-4 bg-light rounded-3">
+                <div class="container-fluid py-5">
+                    <h1 class="display-5 fw-bold">{{ _('Welcome to Pictogram-Tree Builder') }}</h1>
+                    <p class="col-md-8 fs-4">{{ _('Create and share your own pictogram trees.') }}</p>
+                    {% if current_user.is_authenticated %}
+                        <p>{{ _('Hi, %(username)s!', username=current_user.username) }}</p>
+                    {% else %}
+                        <a class="btn btn-primary btn-lg" href="{{ url_for('main.login') }}" role="button">{{ _('Get Started') }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='images/homepage_tree.jpeg') }}" class="img-fluid rounded" alt="Tree image">
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Create') }}</h5>
+                    <p class="card-text">{{ _('Easily build your own pictogram trees with our intuitive drag-and-drop interface.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Share') }}</h5>
+                    <p class="card-text">{{ _('Share your creations with others by making them public.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Export') }}</h5>
+                    <p class="card-text">{{ _('Export your trees as JSON files to use them anywhere.') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

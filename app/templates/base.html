@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% if title %}{{ title }}{% else %}{{ _('Pictogram-Tree Builder') }}{% endif %}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/builder.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/tooltip.css') }}">
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            .content {
+                flex: 1;
+            }
+        </style>
+    </head>
+    <body class="d-flex flex-column">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">{{ _('Pictogram-Tree Builder') }}</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.builder') }}">{{ _('Tree Builder') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.list_page') }}">{{ _('List Builder') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.pictogram_bank') }}">Pictogram Bank</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ _('Language') }}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='en') }}">🇬🇧 English</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='fr') }}">🇫🇷 Français</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.set_language', language='es') }}">🇪🇸 Español</a></li>
+                            </ul>
+                        </li>
+                        {% if current_user.is_anonymous %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.login') }}">{{ _('Login') }}</a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.logout') }}">{{ _('Logout') }}</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container-fluid mt-4 content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/tooltip.js') }}"></script>
+
+        <footer class="footer mt-auto py-3 bg-dark text-white">
+            <div class="container text-center">
+                {% if current_user.is_authenticated %}
+                <span>Logged in as: {{ current_user.username }}</span>
+                {% else %}
+                <span>Pictogram-Tree Builder</span>
+                {% endif %}
+            </div>
+        </footer>
+    </body>
+</html>

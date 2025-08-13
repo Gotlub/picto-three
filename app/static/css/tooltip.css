@@ -1,0 +1,15 @@
+.image-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: none; /* Hidden by default */
+    pointer-events: none; /* Allows mouse events to pass through to elements below */
+}
+
+.image-tooltip img {
+    display: block;
+}
