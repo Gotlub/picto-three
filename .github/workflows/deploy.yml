@@ -51,6 +51,7 @@ jobs:
               git reset --hard origin/main
             
             # Installer les dépendances dans le venv
+              cd /home/deploy-github/app/picto-three
               if [ ! -d "venv" ]; then
                 python3 -m venv venv
               fi
