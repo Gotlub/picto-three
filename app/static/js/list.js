@@ -832,8 +832,10 @@ function updateContainerHeight() {
     const footer = document.querySelector('footer.footer');
     const mainContent = document.querySelector('main.content');
     const listPageContainer = document.getElementById('list-page-container');
+    // The second direct child row, which has the `mt-2` class causing the overflow.
+    const bottomRow = document.querySelector('#list-page-container > .row:nth-child(2)');
 
-    if (!header || !footer || !mainContent || !listPageContainer) {
+    if (!header || !footer || !mainContent || !listPageContainer || !bottomRow) {
         return;
     }
 
@@ -841,11 +843,14 @@ function updateContainerHeight() {
     const mainMarginTop = parseInt(mainContentStyles.marginTop, 10) || 0;
     const mainMarginBottom = parseInt(mainContentStyles.marginBottom, 10) || 0;
 
+    const bottomRowStyles = window.getComputedStyle(bottomRow);
+    const bottomRowMarginTop = parseInt(bottomRowStyles.marginTop, 10) || 0;
+
     const headerHeight = header.offsetHeight;
     const footerHeight = footer.offsetHeight;
 
-    // Ensure we have a positive height
-    const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom);
+    // Subtract the unaccounted-for margin from the total available height.
+    const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom - bottomRowMarginTop);
 
     listPageContainer.style.height = `${availableHeight}px`;
 }
