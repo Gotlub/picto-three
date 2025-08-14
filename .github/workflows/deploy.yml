@@ -44,7 +44,7 @@ jobs:
           # Le script à exécuter sur le serveur distant
           script: |
             # Aller dans le dossier de build
-              cd /home/deploy-github/app
+              cd /home/deploy-github/app/picto-three
 
             # Mettre à jour le code
               git fetch --all
