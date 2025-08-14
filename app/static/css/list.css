@@ -19,16 +19,12 @@
     text-align: center;
     width: 100px;
     cursor: grab;
-    height: var(--chained-list-inner-height, 130px); /* Use variable with a fallback */
-    display: flex;
-    flex-direction: column;
 }
 
 .chained-list-item img {
     max-width: 100%;
-    object-fit: contain; /* Scales the image down to fit, maintaining aspect ratio */
-    flex-grow: 1; /* Allows the image to take up available space in the flex container */
-    min-height: 0; /* Prevents flexbox overflow issues with tall images */
+    height: auto;
+    margin-bottom: 5px;
 }
 
 .chained-list-item.selected {

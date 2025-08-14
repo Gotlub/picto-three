@@ -494,23 +494,8 @@ class ListBuilder {
 
     getDragAfterElement(container, x) {
         const draggableElements = [...container.querySelectorAll('.chained-list-item:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = x - box.left - box.width / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return {
-                    offset: offset,
-                    element: child
-                };
-            } else {
-                return closest;
-            }
-        }, {
-            offset: Number.NEGATIVE_INFINITY
-        }).element?.closest('.chained-list-item')
-          ?.listBuilderItem; // How to get the class instance back?
-          // Let's find it in the array instead.
-          const afterEl =  [...container.querySelectorAll('.chained-list-item:not(.dragging)')].reduce((closest, child) => {
+
+        const afterEl = draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = x - box.left - box.width / 2;
             if (offset < 0 && offset > closest.offset) {
@@ -520,7 +505,9 @@ class ListBuilder {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
 
-        if (!afterEl) return null;
+        if (!afterEl) {
+            return null;
+        }
         return this.chainedListItems.find(item => item.element === afterEl);
     }
 
@@ -827,50 +814,6 @@ class ListBuilder {
     }
 }
 
-function updateContainerHeight() {
-    const header = document.querySelector('nav.navbar');
-    const footer = document.querySelector('footer.footer');
-    const mainContent = document.querySelector('main.content');
-    const listPageContainer = document.getElementById('list-page-container');
-    // The second direct child row, which has the `mt-2` class causing the overflow.
-    const bottomRow = document.querySelector('#list-page-container > .row:nth-child(2)');
-
-    if (!header || !footer || !mainContent || !listPageContainer || !bottomRow) {
-        return;
-    }
-
-    const mainContentStyles = window.getComputedStyle(mainContent);
-    const mainMarginTop = parseInt(mainContentStyles.marginTop, 10) || 0;
-    const mainMarginBottom = parseInt(mainContentStyles.marginBottom, 10) || 0;
-
-    const bottomRowStyles = window.getComputedStyle(bottomRow);
-    const bottomRowMarginTop = parseInt(bottomRowStyles.marginTop, 10) || 0;
-
-    const headerHeight = header.offsetHeight;
-    const footerHeight = footer.offsetHeight;
-
-    // Subtract the unaccounted-for margin from the total available height.
-    const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom - bottomRowMarginTop);
-
-    listPageContainer.style.height = `${availableHeight}px`;
-
-    // Now, calculate the inner height of the bottom container and set it as a CSS variable
-    const chainedListContainer = document.getElementById('chained-list-container');
-    if (chainedListContainer) {
-        // Use a timeout to ensure the browser has applied the new height and rendered the layout
-        setTimeout(() => {
-            const styles = window.getComputedStyle(chainedListContainer);
-            const paddingTop = parseInt(styles.paddingTop, 10) || 0;
-            const paddingBottom = parseInt(styles.paddingBottom, 10) || 0;
-            const innerHeight = chainedListContainer.clientHeight - paddingTop - paddingBottom;
-            document.documentElement.style.setProperty('--chained-list-inner-height', `${innerHeight}px`);
-        }, 0);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     new ListBuilder();
-    // Set height dynamically
-    updateContainerHeight();
-    window.addEventListener('resize', updateContainerHeight);
 });
