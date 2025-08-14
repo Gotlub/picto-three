@@ -19,6 +19,7 @@
     text-align: center;
     width: 100px;
     cursor: grab;
+    height: 100%;
 }
 
 .chained-list-item img {

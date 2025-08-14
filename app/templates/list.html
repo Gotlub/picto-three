@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/list.css', v='1.2') }}">
+{% endblock %}
 
 
 {% block content %}
-<div class="container-fluid vh-100 d-flex flex-column">
+<div id="list-page-container" class="container-fluid d-flex flex-column">
     <!-- Top panels row -->
     <div class="row" style="height: 70%;">
         <!-- Left Sidebar: Load/Save Menu -->
