@@ -224,10 +224,6 @@ class ChainedListItem {
         img.alt = this.data.name;
         itemElement.appendChild(img);
 
-        const name = document.createElement('p');
-        name.textContent = this.data.name;
-        itemElement.appendChild(name);
-
         // Events for selection and reordering
         itemElement.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -494,8 +490,23 @@ class ListBuilder {
 
     getDragAfterElement(container, x) {
         const draggableElements = [...container.querySelectorAll('.chained-list-item:not(.dragging)')];
-
-        const afterEl = draggableElements.reduce((closest, child) => {
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = x - box.left - box.width / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return {
+                    offset: offset,
+                    element: child
+                };
+            } else {
+                return closest;
+            }
+        }, {
+            offset: Number.NEGATIVE_INFINITY
+        }).element?.closest('.chained-list-item')
+          ?.listBuilderItem; // How to get the class instance back?
+          // Let's find it in the array instead.
+          const afterEl =  [...container.querySelectorAll('.chained-list-item:not(.dragging)')].reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = x - box.left - box.width / 2;
             if (offset < 0 && offset > closest.offset) {
@@ -505,9 +516,7 @@ class ListBuilder {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
 
-        if (!afterEl) {
-            return null;
-        }
+        if (!afterEl) return null;
         return this.chainedListItems.find(item => item.element === afterEl);
     }
 
@@ -814,6 +823,31 @@ class ListBuilder {
     }
 }
 
+function updateContainerHeight() {
+    const header = document.querySelector('nav.navbar');
+    const footer = document.querySelector('footer.footer');
+    const mainContent = document.querySelector('main.content');
+    const listPageContainer = document.getElementById('list-page-container');
+
+    if (!header || !footer || !mainContent || !listPageContainer) {
+        return;
+    }
+
+    const mainContentStyles = window.getComputedStyle(mainContent);
+    const mainMarginTop = parseInt(mainContentStyles.marginTop, 10) || 0;
+    const mainMarginBottom = parseInt(mainContentStyles.marginBottom, 10) || 0;
+
+    // The margin of the second row was a red herring, the main container margins are what matter.
+    const headerHeight = header.offsetHeight;
+    const footerHeight = footer.offsetHeight;
+
+    const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom);
+
+    listPageContainer.style.height = `${availableHeight}px`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     new ListBuilder();
+    updateContainerHeight();
+    window.addEventListener('resize', updateContainerHeight);
 });
