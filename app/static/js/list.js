@@ -853,6 +853,19 @@ function updateContainerHeight() {
     const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom - bottomRowMarginTop);
 
     listPageContainer.style.height = `${availableHeight}px`;
+
+    // Now, calculate the inner height of the bottom container and set it as a CSS variable
+    const chainedListContainer = document.getElementById('chained-list-container');
+    if (chainedListContainer) {
+        // Use a timeout to ensure the browser has applied the new height and rendered the layout
+        setTimeout(() => {
+            const styles = window.getComputedStyle(chainedListContainer);
+            const paddingTop = parseInt(styles.paddingTop, 10) || 0;
+            const paddingBottom = parseInt(styles.paddingBottom, 10) || 0;
+            const innerHeight = chainedListContainer.clientHeight - paddingTop - paddingBottom;
+            document.documentElement.style.setProperty('--chained-list-inner-height', `${innerHeight}px`);
+        }, 0);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
