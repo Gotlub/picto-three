@@ -3,6 +3,12 @@ import os
 import shutil
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
+import io
+from flask import send_file
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from PIL import Image as PILImage
 from app import db
 from app.forms import LoginForm, RegistrationForm
 from sqlalchemy.exc import IntegrityError
@@ -498,3 +504,104 @@ def delete_item():
         return jsonify({'status': 'success', 'message': 'Image deleted'})
 
     return jsonify({'status': 'error', 'message': 'Invalid item type'}), 400
+
+
+@api_bp.route('/export_pdf', methods=['POST'])
+def export_pdf():
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+
+    image_data = data.get('image_data', [])
+    max_size = data.get('image_size', 100)
+    layout_mode = data.get('layout_mode', 'chain')
+
+    if not image_data:
+        # Since this is an API endpoint, returning a JSON error is appropriate
+        return jsonify({'status': 'error', 'message': 'No images to export'}), 400
+
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    # Define margins
+    margin = 50
+    x = margin
+    y = height - margin
+    row_max_height = 0
+
+    for item in image_data:
+        image_path = item.get('path')
+        description = item.get('description', '')
+
+        if not image_path or not os.path.exists(image_path):
+            print(f"Image not found or path is null: {image_path}")
+            continue
+
+        try:
+            # Get original dimensions using Pillow
+            with PILImage.open(image_path) as img:
+                img_width, img_height = img.size
+
+            # Calculate scaled dimensions preserving aspect ratio
+            aspect = img_height / float(img_width) if img_width else 0
+            if img_width >= img_height:
+                scaled_width = max_size
+                scaled_height = max_size * aspect
+            else:
+                scaled_height = max_size
+                scaled_width = max_size / aspect if aspect else 0
+
+            # --- Layout Logic ---
+            if layout_mode == 'chain':
+                # Check for page break (image + description)
+                desc_height = 15 if description else 0
+                if y - scaled_height - desc_height < margin:
+                    c.showPage()
+                    y = height - margin
+
+                # Draw image (centered)
+                img_x = (width - scaled_width) / 2
+                y -= scaled_height
+                c.drawImage(ImageReader(image_path), img_x, y, width=scaled_width, height=scaled_height, mask='auto')
+
+                # Draw description (centered)
+                if description:
+                    y -= desc_height
+                    c.setFont("Helvetica", 10)
+                    c.drawCentredString(width / 2.0, y, description)
+
+                y -= 10 # Padding between items
+
+            elif layout_mode == 'grid':
+                # Check if image fits on the current line
+                if x + scaled_width > width - margin:
+                    x = margin # Reset to left margin
+                    y -= (row_max_height + 10) # Move down by height of previous row
+                    row_max_height = 0 # Reset row height
+
+                # Check if the new line fits on the page
+                if y - scaled_height < margin:
+                    c.showPage()
+                    x = margin
+                    y = height - margin
+                    row_max_height = 0
+
+                # Draw image
+                c.drawImage(ImageReader(image_path), x, y - scaled_height, width=scaled_width, height=scaled_height, mask='auto')
+                row_max_height = max(row_max_height, scaled_height) # Update max height for the current row
+                x += scaled_width + 10 # Move x for next image
+
+        except Exception as e:
+            print(f"Error processing image {image_path}: {e}")
+            continue
+
+    c.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name='pictogram_list.pdf',
+        mimetype='application/pdf'
+    )

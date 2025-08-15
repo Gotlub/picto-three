@@ -1,5 +1,7 @@
 import json
 import pytest
+import os
+from PIL import Image as PILImage
 from app.models import User, Tree, PictogramList
 from app import db
 
@@ -289,3 +291,66 @@ def test_update_delete_unauthorized(client):
 
     delete_response = client.delete(f'/api/lists/{list_id}')
     assert delete_response.status_code == 403 # Forbidden
+
+
+def create_dummy_image(path, size=(100, 100), color='red'):
+    """Helper function to create a dummy image file."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    img = PILImage.new('RGB', size, color=color)
+    img.save(path, 'PNG')
+
+def test_export_pdf(client):
+    """Test the PDF export functionality."""
+    # Create dummy images for the test
+    dummy_img1_path = 'app/static/images/test_img1.png'
+    dummy_img2_path = 'app/static/images/test_img2.png'
+    create_dummy_image(dummy_img1_path, color='blue')
+    create_dummy_image(dummy_img2_path, color='green')
+
+    image_data = [
+        {'path': dummy_img1_path, 'description': 'Blue Square'},
+        {'path': dummy_img2_path, 'description': 'Green Square'}
+    ]
+
+    # Test with valid data in 'chain' mode
+    payload_chain = {
+        'image_data': image_data,
+        'image_size': 120,
+        'layout_mode': 'chain'
+    }
+    response_chain = client.post('/api/export_pdf', json=payload_chain)
+    assert response_chain.status_code == 200
+    assert response_chain.mimetype == 'application/pdf'
+    assert response_chain.data.startswith(b'%PDF-')
+
+    # Test with valid data in 'grid' mode
+    payload_grid = {
+        'image_data': image_data,
+        'image_size': 80,
+        'layout_mode': 'grid'
+    }
+    response_grid = client.post('/api/export_pdf', json=payload_grid)
+    assert response_grid.status_code == 200
+    assert response_grid.mimetype == 'application/pdf'
+    assert response_grid.data.startswith(b'%PDF-')
+
+    # Test with no images
+    response_no_images = client.post('/api/export_pdf', json={'image_data': []})
+    assert response_no_images.status_code == 400
+    json_response = response_no_images.get_json()
+    assert json_response['status'] == 'error'
+    assert 'No images to export' in json_response['message']
+
+    # Test with missing image path
+    payload_missing_img = {
+        'image_data': [{'path': 'non/existent/path.png'}],
+        'image_size': 100,
+        'layout_mode': 'chain'
+    }
+    response_missing_img = client.post('/api/export_pdf', json=payload_missing_img)
+    assert response_missing_img.status_code == 200
+    assert response_missing_img.mimetype == 'application/pdf'
+
+    # Clean up dummy images
+    os.remove(dummy_img1_path)
+    os.remove(dummy_img2_path)

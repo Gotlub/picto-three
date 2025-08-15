@@ -293,6 +293,11 @@ class ListBuilder {
         this.draggedListItem = null; // What is being dragged within the list
         this.dropIndicator = this.createDropIndicator();
 
+        // PDF Export elements
+        this.exportPdfBtn = document.getElementById('export-pdf-btn');
+        this.pdfImageSizeSlider = document.getElementById('pdf-image-size');
+        this.pdfImageSizeValue = document.getElementById('pdf-image-size-value');
+
         this.initEventListeners();
         this.loadSavedLists();
         this.loadSavedTrees();
@@ -305,6 +310,14 @@ class ListBuilder {
     }
 
     initEventListeners() {
+        // PDF Export
+        this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
+        this.pdfImageSizeSlider?.addEventListener('input', () => {
+            if(this.pdfImageSizeValue) {
+                this.pdfImageSizeValue.textContent = this.pdfImageSizeSlider.value;
+            }
+        });
+
         // Left Panel - List
         this.saveBtn?.addEventListener('click', () => this.saveList());
         this.loadListBtn?.addEventListener('click', () => this.loadSelectedList());
@@ -832,6 +845,63 @@ class ListBuilder {
             childrenContainer.appendChild(child.element);
             this.renderTreeChildren(child);
         });
+    }
+
+    async exportToPdf() {
+        if (this.chainedListItems.length === 0) {
+            alert('The list is empty. Add images to the list before exporting.');
+            return;
+        }
+
+        const imageData = this.chainedListItems.map(item => ({
+            path: item.data.path,
+            description: item.data.description
+        }));
+
+        const imageSize = parseInt(this.pdfImageSizeSlider.value, 10);
+        const layoutMode = document.querySelector('input[name="pdf-layout-mode"]:checked').value;
+
+        const originalBtnText = this.exportPdfBtn.textContent;
+        this.exportPdfBtn.innerHTML = 'Generating...';
+        this.exportPdfBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/export_pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image_data: imageData,
+                    image_size: imageSize,
+                    layout_mode: layoutMode
+                })
+            });
+
+            if (!response.ok) {
+                const errorResult = await response.json().catch(() => null);
+                const errorMessage = errorResult ? errorResult.message : 'PDF generation failed on the server.';
+                throw new Error(errorMessage);
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'pictogram_list.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+        } catch (error) {
+            console.error('Error exporting to PDF:', error);
+            alert(`An error occurred: ${error.message}`);
+        } finally {
+            this.exportPdfBtn.innerHTML = originalBtnText;
+            this.exportPdfBtn.disabled = false;
+        }
     }
 }
 

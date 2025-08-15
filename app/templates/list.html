@@ -86,6 +86,44 @@
                     </div>
                 </div>
             </div>
+
+            <hr class="my-3">
+
+            <!-- PDF Export Section -->
+            <h5>{{ _('Export Operations') }}</h5>
+             <div class="accordion" id="exportAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingExportPdf">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExportPdf" aria-expanded="false" aria-controls="collapseExportPdf">
+                            {{ _('Export to PDF') }}
+                        </button>
+                    </h2>
+                    <div id="collapseExportPdf" class="accordion-collapse collapse" aria-labelledby="headingExportPdf" data-bs-parent="#exportAccordion">
+                        <div class="accordion-body">
+                            <div class="form-group mb-3">
+                                <label for="pdf-image-size" class="form-label form-label-sm">{{ _('Image Size') }}: <span id="pdf-image-size-value">100</span>px</label>
+                                <input type="range" class="form-range" min="50" max="200" value="100" id="pdf-image-size">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label form-label-sm">{{ _('Layout Mode') }}</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="pdf-layout-mode" id="pdf-layout-chain" value="chain" checked>
+                                    <label class="form-check-label" for="pdf-layout-chain">
+                                        {{ _('Chain Mode') }}
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="pdf-layout-mode" id="pdf-layout-grid" value="grid">
+                                    <label class="form-check-label" for="pdf-layout-grid">
+                                        {{ _('Grid Mode') }}
+                                    </label>
+                                </div>
+                            </div>
+                            <button id="export-pdf-btn" class="btn btn-sm btn-primary w-100">{{ _('Export') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Center Panel: Tree Visualization (Read-only) -->
