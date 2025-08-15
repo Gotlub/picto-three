@@ -378,6 +378,11 @@ class ListBuilder {
     updateSelectedLinkDescription() {
         if (this.selectedChainedItem) {
             this.selectedChainedItem.data.description = this.selectedLinkDescription.value;
+            // Update the p element in real-time
+            const descriptionElement = this.selectedChainedItem.element.querySelector('p');
+            if (descriptionElement) {
+                descriptionElement.textContent = this.selectedLinkDescription.value;
+            }
         }
     }
 
@@ -465,18 +470,26 @@ class ListBuilder {
         e.preventDefault();
         this.removeDropIndicator();
 
+        // Find the element we are dropping before
         const afterElement = this.getDragAfterElement(this.chainedListContainer, e.clientX);
-        const newIndex = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
 
-
-        if (this.draggedListItem) { // Reordering existing item
+        if (this.draggedListItem) { // Reordering an existing item
             this.draggedListItem.element.classList.remove('dragging');
             const oldIndex = this.chainedListItems.indexOf(this.draggedListItem);
+
+            // Remove the item from its old position
             this.chainedListItems.splice(oldIndex, 1);
-            this.chainedListItems.splice(newIndex > oldIndex ? newIndex -1 : newIndex, 0, this.draggedListItem);
+
+            // Find the new index in the modified list
+            const newIndex = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
+
+            // Insert the item at the new position
+            this.chainedListItems.splice(newIndex, 0, this.draggedListItem);
+
             this.draggedListItem = null;
 
-        } else if (this.draggedSource) { // Adding new item from source
+        } else if (this.draggedSource) { // Adding a new item from a source
+            const newIndex = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
             const newItemData = {
                 image_id: this.draggedSource.data.id,
                 name: this.draggedSource.data.name,
@@ -488,31 +501,22 @@ class ListBuilder {
             this.draggedSource = null;
         }
 
+        // Re-render the entire list to reflect the changes
         this.renderChainedList();
     }
 
 
     getDragAfterElement(container, x) {
         const draggableElements = [...container.querySelectorAll('.chained-list-item:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
+
+        const afterElementDOM = draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
+            // offset is the distance from the cursor to the center of the element.
+            // A negative offset means the cursor is to the left of the center.
             const offset = x - box.left - box.width / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return {
-                    offset: offset,
-                    element: child
-                };
-            } else {
-                return closest;
-            }
-        }, {
-            offset: Number.NEGATIVE_INFINITY
-        }).element?.closest('.chained-list-item')
-          ?.listBuilderItem; // How to get the class instance back?
-          // Let's find it in the array instead.
-          const afterEl =  [...container.querySelectorAll('.chained-list-item:not(.dragging)')].reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = x - box.left - box.width / 2;
+
+            // We are looking for the element with the smallest negative offset,
+            // which means it's the first element to the right of the cursor.
             if (offset < 0 && offset > closest.offset) {
                 return { offset: offset, element: child };
             } else {
@@ -520,8 +524,12 @@ class ListBuilder {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
 
-        if (!afterEl) return null;
-        return this.chainedListItems.find(item => item.element === afterEl);
+        if (afterElementDOM) {
+            // We have the DOM element, now find the corresponding ChainedListItem class instance
+            return this.chainedListItems.find(item => item.element === afterElementDOM);
+        } else {
+            return null; // Dropping at the end of the list
+        }
     }
 
 
