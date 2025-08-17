@@ -309,10 +309,10 @@ class TreeBuilder {
             const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
             const isClickInsideTree = this.treeDisplay.contains(e.target);
             const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
-            const isClickInsideNavbar = e.target.closest('.navbar');
+            const isClickInsideDropdown = e.target.closest('.dropdown');
 
-            // If the click is inside any of the builder's interactive areas or the navbar, do nothing.
-            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideNavbar) {
+            // If the click is inside any of the builder's interactive areas or a dropdown menu, do nothing.
+            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideDropdown) {
                 return;
             }
 
