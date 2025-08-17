@@ -304,21 +304,16 @@ class TreeBuilder {
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
 
-        document.addEventListener('click', (e) => {
-            const deleteBtn = document.getElementById('delete-btn');
-            const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
-            const isClickInsideTree = this.treeDisplay.contains(e.target);
-            const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
-            const isClickInsideDropdown = e.target.closest('.dropdown');
-
-            // If the click is inside any of the builder's interactive areas or a dropdown menu, do nothing.
-            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideDropdown) {
-                return;
-            }
-
-            // Otherwise, deselect any selected node.
-            this.deselectAllNodes();
-        });
+        // New, encapsulated click listener to deselect nodes when clicking on the container background
+        const builderContainer = document.getElementById('builder-container');
+        if (builderContainer) {
+            builderContainer.addEventListener('click', (e) => {
+                // Only deselect if the click is on the container itself, not its children (the sidebars or the tree display)
+                if (e.target.id === 'builder-container') {
+                    this.deselectAllNodes();
+                }
+            });
+        }
 
         const saveBtn = document.getElementById('save-tree-btn');
         if (saveBtn) {
@@ -366,6 +361,22 @@ class TreeBuilder {
         if (this.treeSearch) {
             this.treeSearch.addEventListener('input', () => this.filterTrees());
         }
+
+        // Add confirmation for navigation links
+        const navLinks = document.querySelectorAll('.navbar-nav a');
+        navLinks.forEach(link => {
+            if (!link.classList.contains('dropdown-toggle')) {
+                link.addEventListener('click', (event) => {
+                    // Only show confirmation if the link navigates away from the builder
+                    const linkUrl = new URL(link.href);
+                    if (linkUrl.pathname !== window.location.pathname && this.rootNode.children.length > 0) {
+                        if (!confirm('You have an unsaved tree. Are you sure you want to leave?')) {
+                            event.preventDefault();
+                        }
+                    }
+                });
+            }
+        });
 
         this.loadSavedTrees();
     }
