@@ -552,65 +552,45 @@ def export_pdf():
                 scaled_height = max_size
                 scaled_width = max_size / aspect if aspect else 0
 
-            # --- Centering Logic ---
-            # Calculate padding to center the image within the max_size square
-            x_offset = (max_size - scaled_width) / 2
-            y_offset = (max_size - scaled_height) / 2
-
             # --- Layout Logic ---
             if layout_mode == 'chain':
+                # Check for page break (image + description)
                 desc_height = 15 if description else 0
-                item_total_height = max_size + desc_height + 10 # 10 for padding
-
-                # Check for page break
-                if y - item_total_height < margin:
+                if y - scaled_height - desc_height < margin:
                     c.showPage()
                     y = height - margin
 
-                # Define the bounding box for the image
-                # Horizontally center the box on the page
-                box_x = (width - max_size) / 2
-                box_y = y - max_size
-
-                # Draw the image centered within the box
-                draw_x = box_x + x_offset
-                draw_y = box_y + y_offset
-                c.drawImage(ImageReader(image_path), draw_x, draw_y, width=scaled_width, height=scaled_height, mask='auto')
+                # Draw image (centered)
+                img_x = (width - scaled_width) / 2
+                y -= scaled_height
+                c.drawImage(ImageReader(image_path), img_x, y, width=scaled_width, height=scaled_height, mask='auto')
 
                 # Draw description (centered)
                 if description:
-                    desc_y = box_y - desc_height
+                    y -= desc_height
                     c.setFont("Helvetica", 10)
-                    c.drawCentredString(width / 2.0, desc_y, description)
+                    c.drawCentredString(width / 2.0, y, description)
 
-                # Move y down by the full item height for uniform spacing
-                y -= item_total_height
+                y -= 10 # Padding between items
 
             elif layout_mode == 'grid':
-                cell_size = max_size + 10 # Bounding box size + padding
-
                 # Check if image fits on the current line
-                if x + cell_size > width - margin:
+                if x + scaled_width > width - margin:
                     x = margin # Reset to left margin
-                    y -= cell_size # Move down by a full cell height
+                    y -= (row_max_height + 10) # Move down by height of previous row
+                    row_max_height = 0 # Reset row height
 
-                # Check if the new row fits on the page
-                if y - cell_size < margin:
+                # Check if the new line fits on the page
+                if y - scaled_height < margin:
                     c.showPage()
                     x = margin
                     y = height - margin
+                    row_max_height = 0
 
-                # Define the bounding box for the image
-                box_x = x
-                box_y = y - max_size
-
-                # Draw the image centered within the box
-                draw_x = box_x + x_offset
-                draw_y = box_y + y_offset
-                c.drawImage(ImageReader(image_path), draw_x, draw_y, width=scaled_width, height=scaled_height, mask='auto')
-
-                # Move x for next image
-                x += cell_size
+                # Draw image
+                c.drawImage(ImageReader(image_path), x, y - scaled_height, width=scaled_width, height=scaled_height, mask='auto')
+                row_max_height = max(row_max_height, scaled_height) # Update max height for the current row
+                x += scaled_width + 10 # Move x for next image
 
         except Exception as e:
             print(f"Error processing image {image_path}: {e}")

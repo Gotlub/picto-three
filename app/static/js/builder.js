@@ -309,11 +309,14 @@ class TreeBuilder {
             const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
             const isClickInsideTree = this.treeDisplay.contains(e.target);
             const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
+            const isClickInsideNavbar = e.target.closest('.navbar');
 
-            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription) {
+            // If the click is inside any of the builder's interactive areas or the navbar, do nothing.
+            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideNavbar) {
                 return;
             }
 
+            // Otherwise, deselect any selected node.
             this.deselectAllNodes();
         });
 
