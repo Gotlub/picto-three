@@ -159,32 +159,6 @@ class ReadOnlyNode {
         this.element.setAttribute('draggable', 'true');
         this.element.addEventListener('dragstart', (e) => {
             e.stopPropagation();
-
-            // Create a clone of the node for the drag image
-            const dragImage = this.element.cloneNode(true);
-
-            // Remove the children container from the clone, so they don't appear in the drag image
-            const childrenContainer = dragImage.querySelector('.children');
-            if (childrenContainer) {
-                childrenContainer.remove();
-            }
-
-            // To use an element as a drag image, it must be in the DOM.
-            // We append it to the body, but position it off-screen.
-            dragImage.style.position = 'absolute';
-            dragImage.style.top = '-9999px';
-            dragImage.style.width = `${this.element.offsetWidth}px`; // Ensure the drag image has the same width
-            document.body.appendChild(dragImage);
-
-            // Set the custom drag image (the cloned element without children)
-            // We use offsetX and offsetY to position the drag image correctly relative to the cursor
-            e.dataTransfer.setDragImage(dragImage, e.offsetX, e.offsetY);
-
-            // Clean up the cloned element from the DOM shortly after the drag has started.
-            setTimeout(() => {
-                document.body.removeChild(dragImage);
-            }, 0);
-
             this.listBuilder.handleSourceDragStart(e, {
                 type: 'tree-node',
                 data: { ...this.image,

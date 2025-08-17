@@ -120,6 +120,7 @@ def pictogram_bank():
 
 
 @bp.route('/list')
+@login_required
 def list_page():
     # This logic is similar to the builder, providing the necessary data for the UI components
     initial_folders = []
