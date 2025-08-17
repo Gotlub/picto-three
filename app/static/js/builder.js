@@ -367,22 +367,6 @@ class TreeBuilder {
             this.treeSearch.addEventListener('input', () => this.filterTrees());
         }
 
-        // Add confirmation for navigation links
-        const navLinks = document.querySelectorAll('.navbar-nav a');
-        navLinks.forEach(link => {
-            if (!link.classList.contains('dropdown-toggle')) {
-                link.addEventListener('click', (event) => {
-                    // Only show confirmation if the link navigates away from the builder
-                    const linkUrl = new URL(link.href);
-                    if (linkUrl.pathname !== window.location.pathname && this.rootNode.children.length > 0) {
-                        if (!confirm('You have an unsaved tree. Are you sure you want to leave?')) {
-                            event.preventDefault();
-                        }
-                    }
-                });
-            }
-        });
-
         this.loadSavedTrees();
     }
 
