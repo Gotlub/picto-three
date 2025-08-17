@@ -35,15 +35,16 @@ def register_and_login(client, username, password):
     # Login the user
     return login(client, username, password)
 
-def test_list_page_redirects_unauthenticated_user(client):
+def test_list_page_loads_for_unauthenticated_user(client):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/list' page is requested by an unauthenticated user
-    THEN check that the user is redirected to the '/login' page
+    THEN check that the page loads successfully
     """
     response = client.get('/list')
-    assert response.status_code == 302
-    assert '/login' in response.headers['Location']
+    assert response.status_code == 200
+    assert b'Chained List Builder' in response.data
+    assert b'Select from Tree' in response.data
 
 def test_list_page_loads_for_authenticated_user(client):
     """
@@ -57,13 +58,12 @@ def test_list_page_loads_for_authenticated_user(client):
     assert b'Chained List Builder' in response.data
     assert b'Select from Tree' in response.data
 
-def test_list_page_context_data(client):
+def test_list_page_context_data_for_unauthenticated_user(client):
     """
     GIVEN a Flask application
-    WHEN the '/list' page is loaded by an authenticated user
+    WHEN the '/list' page is loaded by an unauthenticated user
     THEN check that the initial data for the frontend is present
     """
-    register_and_login(client, 'testuser_context', 'password')
     response = client.get('/list')
     assert response.status_code == 200
 
@@ -73,16 +73,15 @@ def test_list_page_context_data(client):
     assert '<script id="images-data" type="application/json">' in response_data
 
     # Check that the content of the scripts looks like JSON
-    # This is a basic check to ensure the data is not empty
     import re
     tree_data_match = re.search(r'<script id="initial-tree-data"[^>]*>([\s\S]*?)</script>', response_data)
     images_data_match = re.search(r'<script id="images-data"[^>]*>([\s\S]*?)</script>', response_data)
 
     assert tree_data_match is not None
-    # A new user will have a root folder, so the list won't be empty.
-    # We just check that the data structure is a list.
+    # The data should be a list (even if empty)
     assert tree_data_match.group(1).strip().startswith('[')
 
     assert images_data_match is not None
-    assert '"id":' in images_data_match.group(1) # Should contain some image data
+    # The page should load all images for the list builder to use
+    assert '"id":' in images_data_match.group(1)
     assert '"name":' in images_data_match.group(1)
