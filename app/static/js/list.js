@@ -558,6 +558,17 @@ class ListBuilder {
             return;
         }
 
+        const existingList = this.userLists.find(list => list.list_name === listName);
+        let proceed = true;
+
+        if (existingList) {
+            proceed = confirm("Une liste avec ce nom existe déjà. Voulez-vous l'écraser ?");
+        }
+
+        if (!proceed) {
+            return; // Stop if the user cancels
+        }
+
         const payload = this.chainedListItems.map(item => ({
             image_id: item.data.image_id,
             description: item.data.description
@@ -578,7 +589,8 @@ class ListBuilder {
 
         const result = await response.json();
         if (result.status === 'success') {
-            alert('List saved successfully!');
+            const message = existingList ? 'Mis à jour' : 'Créé';
+            alert(message);
             this.loadSavedLists(); // Refresh the list
         } else {
             alert(`Error: ${result.message}`);

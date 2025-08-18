@@ -576,6 +576,18 @@ class TreeBuilder {
             return;
         }
 
+        // Check if a tree with the same name exists for the current user
+        const existingTree = this.userTrees.find(tree => tree.name === treeName);
+        let proceed = true;
+
+        if (existingTree) {
+            proceed = confirm("Un arbre avec ce nom existe déjà. Voulez-vous l'écraser ?");
+        }
+
+        if (!proceed) {
+            return; // Stop if the user cancels
+        }
+
         const response = await fetch('/api/tree/save', {
             method: 'POST',
             headers: {
@@ -590,7 +602,9 @@ class TreeBuilder {
 
         const result = await response.json();
         if (result.status === 'success') {
-            alert('Tree saved successfully!');
+            const message = existingTree ? 'Mis à jour' : 'Créé';
+            alert(message);
+
             // Clear the existing tree before reloading from save
             this.rootNode.children = [];
             // Reload the builder with the saved tree data
