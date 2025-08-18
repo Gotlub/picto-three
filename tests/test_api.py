@@ -61,44 +61,6 @@ def test_save_tree_authenticated(client):
     saved_json_data = json.loads(tree.json_data)
     assert 'roots' in saved_json_data
 
-def test_update_tree_by_saving_with_same_name(client):
-    # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
-    login(client, 'testuser', 'password')
-
-    # 1. Create the initial tree
-    initial_data = {"roots": [{"id": 1, "label": "Initial"}]}
-    response1 = client.post('/api/tree/save', json={
-        "name": "My Upsert Tree",
-        "is_public": False,
-        "json_data": initial_data
-    })
-    assert response1.status_code == 201
-    data1 = response1.get_json()
-    assert data1['message'] == 'Tree saved successfully'
-    tree_id = data1['tree_id']
-
-    # 2. "Save" it again with different data to trigger an update
-    updated_data = {"roots": [{"id": 2, "label": "Updated"}]}
-    response2 = client.post('/api/tree/save', json={
-        "name": "My Upsert Tree",
-        "is_public": True, # Also test updating metadata
-        "json_data": updated_data
-    })
-    assert response2.status_code == 200
-    data2 = response2.get_json()
-    assert data2['message'] == 'Tree updated successfully'
-    assert data2['tree_id'] == tree_id
-
-    # 3. Verify the tree in the database was updated
-    updated_tree = db.session.get(Tree, tree_id)
-    assert updated_tree is not None
-    assert updated_tree.is_public is True
-    saved_json = json.loads(updated_tree.json_data)
-    assert saved_json['roots'][0]['label'] == 'Updated'
-
 def test_save_tree_missing_data(client):
     # Register a user
     get_response = client.get('/register')
@@ -168,6 +130,50 @@ def test_load_trees_authenticated(client):
     assert "Other User Public Tree" in public_save_names
     assert "User's Public Tree" not in public_save_names
 
+def test_save_tree_conflict_and_force(client):
+    # Register and login a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    login(client, 'testuser', 'password')
+
+    # 1. Save the first tree
+    tree_data1 = {'roots': [{'id': 1, 'description': 'First version'}]}
+    response1 = client.post('/api/tree/save', json={
+        'name': 'My Conflict Test Tree',
+        'is_public': False,
+        'json_data': tree_data1
+    })
+    assert response1.status_code == 201
+    assert response1.json['status'] == 'success'
+    tree_id = response1.json['tree_id']
+
+    # 2. Attempt to save a second tree with the same name, expecting a conflict
+    tree_data2 = {'roots': [{'id': 2, 'description': 'Second version'}]}
+    response2 = client.post('/api/tree/save', json={
+        'name': 'My Conflict Test Tree',
+        'is_public': False,
+        'json_data': tree_data2
+    })
+    assert response2.status_code == 409
+    assert response2.json['status'] == 'conflict'
+
+    # 3. Save again, but with force=true
+    response3 = client.post('/api/tree/save', json={
+        'name': 'My Conflict Test Tree',
+        'is_public': True, # Also update metadata
+        'json_data': tree_data2,
+        'force': True
+    })
+    assert response3.status_code == 200
+    assert response3.json['status'] == 'success'
+    assert response3.json['message'] == 'Tree updated successfully'
+
+    # 4. Verify the tree was updated
+    updated_tree = db.session.get(Tree, tree_id)
+    assert updated_tree.is_public is True
+    saved_json = json.loads(updated_tree.json_data)
+    assert saved_json['roots'][0]['description'] == 'Second version'
 
 # --- Tests for PictogramList API Endpoints ---
 
@@ -225,55 +231,6 @@ def test_save_and_load_lists(client):
     # Should see both public lists
     assert len(loaded_data_unauth['user_saves']) == 0
     assert len(loaded_data_unauth['public_saves']) == 2
-
-def test_update_list_by_saving_with_same_name(client):
-    # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
-    login(client, 'listuser', 'password')
-
-    # 1. Create the initial list
-    initial_payload = [{"image_id": 1, "description": "Initial"}]
-    response1 = client.post('/api/lists', json={
-        "list_name": "My Upsert List",
-        "is_public": False,
-        "payload": initial_payload
-    })
-    assert response1.status_code == 201
-    data1 = response1.get_json()
-    assert data1['message'] == 'List saved successfully'
-    list_id = data1['list']['id']
-
-    # 2. "Save" it again with different data to trigger an update
-    updated_payload = [{"image_id": 2, "description": "Updated"}]
-    response2 = client.post('/api/lists', json={
-        "list_name": "My Upsert List",
-        "is_public": True, # Also test updating metadata
-        "payload": updated_payload
-    })
-    assert response2.status_code == 200
-    data2 = response2.get_json()
-    assert data2['message'] == 'List updated successfully'
-    assert data2['list']['id'] == list_id
-
-    # 3. Verify the list in the database was updated
-    updated_list = db.session.get(PictogramList, list_id)
-    assert updated_list is not None
-    assert updated_list.is_public is True
-    saved_payload = json.loads(updated_list.payload)
-    assert saved_payload[0]['description'] == 'Updated'
-
-    # 4. Load lists and verify it's in the correct category
-    response_load_auth = client.get('/api/lists')
-    assert response_load_auth.status_code == 200
-    loaded_data_auth = response_load_auth.get_json()
-
-    # The list is now public, but it's still owned by the user, so it should be in user_saves
-    assert len(loaded_data_auth['user_saves']) == 1
-    assert loaded_data_auth['user_saves'][0]['list_name'] == 'My Upsert List'
-    # There should be no public saves from other users
-    assert len(loaded_data_auth['public_saves']) == 0
 
 def test_update_list(client):
     # Register and login a user

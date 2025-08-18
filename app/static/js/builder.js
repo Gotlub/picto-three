@@ -561,19 +561,11 @@ class TreeBuilder {
         };
     }
 
-    async saveTree() {
+    async saveTree(force = false) {
         const treeName = document.getElementById('tree-name').value;
         if (!treeName) {
             alert('Please enter a name for the tree.');
             return;
-        }
-
-        // Check if a tree with the same name already exists for the user
-        const isExisting = this.userSaves.some(tree => tree.name === treeName);
-        if (isExisting) {
-            if (!confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
-                return; // User cancelled
-            }
         }
 
         const isPublic = document.getElementById('tree-is-public').checked;
@@ -584,31 +576,35 @@ class TreeBuilder {
             return;
         }
 
+        const payload = {
+            name: treeName,
+            is_public: isPublic,
+            json_data: jsonData,
+            force: force
+        };
+
         const response = await fetch('/api/tree/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                name: treeName,
-                is_public: isPublic,
-                json_data: jsonData,
-            }),
+            body: JSON.stringify(payload),
         });
 
+        if (response.status === 409) {
+            if (confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
+                this.saveTree(true); // Retry with force=true
+            }
+            return;
+        }
+
         const result = await response.json();
-        // Use response.ok to check for success status codes (200-299)
         if (response.ok && result.status === 'success') {
-            // Use the more specific message from the server
             alert(result.message);
-            // Clear the existing tree before reloading from save
             this.rootNode.children = [];
-            // Reload the builder with the saved tree data
             this.rebuildTreeFromJSON(result.tree_data);
-            // Refresh the list of saved trees
             this.loadSavedTrees();
         } else {
-            // Display specific error messages
             alert(`Error saving tree: ${result.message}`);
         }
     }
@@ -639,8 +635,8 @@ class TreeBuilder {
     async loadSavedTrees() {
         const response = await fetch('/api/trees/load');
         const data = await response.json();
-        this.publicSaves = data.public_saves || [];
-        this.userSaves = data.user_saves || [];
+        this.publicTrees = data.public_trees || [];
+        this.userTrees = data.user_trees || [];
         this.renderTreeList();
     }
 
@@ -680,13 +676,13 @@ class TreeBuilder {
             }
         };
 
-        createSelectList(this.userSaves, 'My Saves', 'user-tree-select');
-        createSelectList(this.publicSaves, 'Other Public Saves', 'public-tree-select');
+        createSelectList(this.userTrees, 'My Private Trees', 'user-tree-select');
+        createSelectList(this.publicTrees, 'Public Trees', 'public-tree-select');
 
         // Set the default active list if it exists
-        if (this.userSaves.length > 0) {
+        if (this.userTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
-        } else if (this.publicSaves.length > 0) {
+        } else if (this.publicTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('public-tree-select');
         }
     }
@@ -698,7 +694,7 @@ class TreeBuilder {
         }
 
         const treeId = parseInt(this.activeTreeSelect.value, 10);
-        const allTrees = (this.userSaves || []).concat(this.publicSaves || []);
+        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {

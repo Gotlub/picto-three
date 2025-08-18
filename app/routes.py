@@ -206,28 +206,26 @@ def save_list():
 
     list_name = data.get('list_name')
     is_public = data.get('is_public', False)
-    payload = data.get('payload')  # This is expected to be a list of dicts
+    payload = data.get('payload')
+    force = data.get('force', False)
 
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
 
-    payload_str = json.dumps(payload)
-
-    # UPSERT Logic
     existing_list = PictogramList.query.filter_by(user_id=current_user.id, list_name=list_name).first()
 
-    if existing_list:
-        # UPDATE
+    if existing_list and not force:
+        return jsonify({'status': 'conflict', 'message': 'A list with this name already exists.'}), 409
+
+    payload_str = json.dumps(payload)
+
+    if existing_list: # This implies force=True
         existing_list.payload = payload_str
         existing_list.is_public = is_public
-        db.session.commit()
-        return jsonify({
-            'status': 'success',
-            'message': 'List updated successfully',
-            'list': existing_list.to_dict()
-        }), 200
+        message = "List updated successfully"
+        status_code = 200
+        saved_list = existing_list
     else:
-        # INSERT
         new_list = PictogramList(
             user_id=current_user.id,
             list_name=list_name,
@@ -235,20 +233,17 @@ def save_list():
             payload=payload_str
         )
         db.session.add(new_list)
-        try:
-            db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-            return jsonify({
-                'status': 'error',
-                'message': 'A list with this name already exists for this user.'
-            }), 409
+        message = "List saved successfully"
+        status_code = 201
+        saved_list = new_list
 
-        return jsonify({
-            'status': 'success',
-            'message': 'List saved successfully',
-            'list': new_list.to_dict()
-        }), 201
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': message,
+        'list': saved_list.to_dict()
+    }), status_code
 
 
 @api_bp.route('/lists/<int:list_id>', methods=['PUT'])
@@ -419,16 +414,21 @@ def save_tree():
     tree_name = data.get('name')
     is_public = data.get('is_public', False)
     json_data = data.get('json_data')
-    json_data_str = json.dumps(json_data)
+    force = data.get('force', False) # New force parameter
 
     if not tree_name or not json_data:
         return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
+    # Check for existing tree
+    existing_tree = Tree.query.filter_by(user_id=current_user.id, name=tree_name).first()
+
+    if existing_tree and not force:
+        return jsonify({'status': 'conflict', 'message': 'A tree with this name already exists.'}), 409
 
     # Validate images if saving a public tree
     if is_public:
         if not json_data.get('roots'):
             return jsonify({'status': 'error', 'message': 'Cannot save an empty tree as public.'}), 400
-
         image_ids = get_image_ids_from_tree(json_data['roots'])
         if image_ids:
             private_images = Image.query.filter(Image.id.in_(image_ids), Image.is_public == False).all()
@@ -438,10 +438,9 @@ def save_tree():
                     'message': 'Public trees can only contain public images. Please remove private images before saving publicly.'
                 }), 400
 
-    # UPSERT logic
-    existing_tree = Tree.query.filter_by(user_id=current_user.id, name=tree_name).first()
+    json_data_str = json.dumps(json_data)
 
-    if existing_tree:
+    if existing_tree: # This implies force=True
         # UPDATE
         existing_tree.json_data = json_data_str
         existing_tree.is_public = is_public
@@ -457,22 +456,12 @@ def save_tree():
             json_data=json_data_str
         )
         db.session.add(new_tree)
+        db.session.flush() # Use flush to get the ID before commit
+        tree_id = new_tree.id
         message = "Tree saved successfully"
         status_code = 201
-        # The ID will be populated after the commit
-        db.session.flush()
-        tree_id = new_tree.id
 
-
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        # This might happen in a race condition, but the unique constraint protects the DB.
-        return jsonify({
-            'status': 'error',
-            'message': 'A tree with this name already exists for this user.'
-        }), 409
+    db.session.commit()
 
     return jsonify({
         'status': 'success',

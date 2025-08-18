@@ -547,21 +547,12 @@ class ListBuilder {
 
 
     // --- API Calls ---
-    async saveList() {
+    async saveList(force = false) {
         const listName = this.listNameInput.value;
         if (!listName) {
             alert('Please enter a name for the list.');
             return;
         }
-
-        // Check if a list with the same name already exists for the user
-        const isExisting = this.userSaves.some(list => list.list_name === listName);
-        if (isExisting) {
-            if (!confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
-                return; // User cancelled
-            }
-        }
-
         if (this.chainedListItems.length === 0) {
             alert('Cannot save an empty list.');
             return;
@@ -581,13 +572,21 @@ class ListBuilder {
             body: JSON.stringify({
                 list_name: listName,
                 is_public: isPublic,
-                payload: payload
+                payload: payload,
+                force: force
             })
         });
 
+        if (response.status === 409) {
+            if (confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
+                this.saveList(true); // Retry with force=true
+            }
+            return;
+        }
+
         const result = await response.json();
         if (response.ok && result.status === 'success') {
-            alert(result.message); // Use the specific message from the server
+            alert(result.message);
             this.loadSavedLists(); // Refresh the list
         } else {
             alert(`Error: ${result.message}`);
@@ -597,8 +596,8 @@ class ListBuilder {
     async loadSavedLists() {
         const response = await fetch('/api/lists');
         const data = await response.json();
-        this.publicSaves = data.public_saves || [];
-        this.userSaves = data.user_saves || [];
+        this.publicLists = data.public_lists || [];
+        this.userLists = data.user_lists || [];
         this.renderLoadableLists();
     }
 
@@ -626,8 +625,8 @@ class ListBuilder {
             }
         };
 
-        createSelectList(this.userSaves, 'My Saves');
-        createSelectList(this.publicSaves, 'Other Public Saves');
+        createSelectList(this.userLists, 'My Private Lists');
+        createSelectList(this.publicLists, 'Public Lists');
     }
 
     loadSelectedList() {
