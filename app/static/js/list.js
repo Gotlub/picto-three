@@ -555,7 +555,7 @@ class ListBuilder {
         }
 
         // Check if a list with the same name already exists for the user
-        const isExisting = this.userLists.some(list => list.list_name === listName);
+        const isExisting = this.userSaves.some(list => list.list_name === listName);
         if (isExisting) {
             if (!confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
                 return; // User cancelled
@@ -597,8 +597,8 @@ class ListBuilder {
     async loadSavedLists() {
         const response = await fetch('/api/lists');
         const data = await response.json();
-        this.publicLists = data.public_lists || [];
-        this.userLists = data.user_lists || [];
+        this.publicSaves = data.public_saves || [];
+        this.userSaves = data.user_saves || [];
         this.renderLoadableLists();
     }
 
@@ -626,8 +626,8 @@ class ListBuilder {
             }
         };
 
-        createSelectList(this.userLists, 'My Private Lists');
-        createSelectList(this.publicLists, 'Public Lists');
+        createSelectList(this.userSaves, 'My Saves');
+        createSelectList(this.publicSaves, 'Other Public Saves');
     }
 
     loadSelectedList() {

@@ -569,7 +569,7 @@ class TreeBuilder {
         }
 
         // Check if a tree with the same name already exists for the user
-        const isExisting = this.userTrees.some(tree => tree.name === treeName);
+        const isExisting = this.userSaves.some(tree => tree.name === treeName);
         if (isExisting) {
             if (!confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
                 return; // User cancelled
@@ -639,8 +639,8 @@ class TreeBuilder {
     async loadSavedTrees() {
         const response = await fetch('/api/trees/load');
         const data = await response.json();
-        this.publicTrees = data.public_trees || [];
-        this.userTrees = data.user_trees || [];
+        this.publicSaves = data.public_saves || [];
+        this.userSaves = data.user_saves || [];
         this.renderTreeList();
     }
 
@@ -680,13 +680,13 @@ class TreeBuilder {
             }
         };
 
-        createSelectList(this.userTrees, 'My Private Trees', 'user-tree-select');
-        createSelectList(this.publicTrees, 'Public Trees', 'public-tree-select');
+        createSelectList(this.userSaves, 'My Saves', 'user-tree-select');
+        createSelectList(this.publicSaves, 'Other Public Saves', 'public-tree-select');
 
         // Set the default active list if it exists
-        if (this.userTrees.length > 0) {
+        if (this.userSaves.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
-        } else if (this.publicTrees.length > 0) {
+        } else if (this.publicSaves.length > 0) {
             this.activeTreeSelect = document.getElementById('public-tree-select');
         }
     }
@@ -698,7 +698,7 @@ class TreeBuilder {
         }
 
         const treeId = parseInt(this.activeTreeSelect.value, 10);
-        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        const allTrees = (this.userSaves || []).concat(this.publicSaves || []);
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {

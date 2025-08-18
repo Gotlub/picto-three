@@ -164,35 +164,37 @@ def serve_js(filename):
 
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():
-    # Public trees are all trees with is_public = True, ordered by name
-    public_trees = Tree.query.filter_by(is_public=True).order_by(Tree.name).all()
-
-    user_trees = []
+    user_saves = []
+    # Query for public trees, excluding those owned by the current user if they are logged in
+    public_query = Tree.query.filter_by(is_public=True)
     if current_user.is_authenticated:
-        # Private trees are user-owned trees with is_public = False, ordered by name
-        user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).order_by(Tree.name).all()
+        public_query = public_query.filter(Tree.user_id != current_user.id)
+        # Get all trees (public and private) owned by the current user
+        user_saves = Tree.query.filter_by(user_id=current_user.id).order_by(Tree.name).all()
+
+    public_saves = public_query.order_by(Tree.name).all()
 
     return jsonify({
-        'public_trees': [tree.to_dict() for tree in public_trees],
-        'user_trees': [tree.to_dict() for tree in user_trees]
+        'public_saves': [tree.to_dict() for tree in public_saves],
+        'user_saves': [tree.to_dict() for tree in user_saves]
     })
 
 
 @api_bp.route('/lists', methods=['GET'])
 def load_lists():
-    # Public lists are all lists with is_public = True, ordered by name
-    public_lists = PictogramList.query.filter_by(is_public=True).order_by(PictogramList.list_name).all()
-
-    user_lists = []
+    user_saves = []
+    # Query for public lists, excluding those owned by the current user if they are logged in
+    public_query = PictogramList.query.filter_by(is_public=True)
     if current_user.is_authenticated:
-        # Private lists are user-owned lists with is_public = False, ordered by name
-        user_lists = PictogramList.query.filter_by(user_id=current_user.id, is_public=False).order_by(PictogramList.list_name).all()
+        public_query = public_query.filter(PictogramList.user_id != current_user.id)
+        # Get all lists (public and private) owned by the current user
+        user_saves = PictogramList.query.filter_by(user_id=current_user.id).order_by(PictogramList.list_name).all()
 
-    # In to_dict(), the payload is already a string, but if it were an object, we'd need to handle it.
-    # The current to_dict returns the payload as is, which is what we want.
+    public_saves = public_query.order_by(PictogramList.list_name).all()
+
     return jsonify({
-        'public_lists': [l.to_dict() for l in public_lists],
-        'user_lists': [l.to_dict() for l in user_lists]
+        'public_saves': [l.to_dict() for l in public_saves],
+        'user_saves': [l.to_dict() for l in user_saves]
     })
 
 @api_bp.route('/lists', methods=['POST'])

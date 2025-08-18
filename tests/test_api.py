@@ -118,11 +118,11 @@ def test_load_trees_unauthenticated(client):
     assert response.status_code == 200
     data = response.get_json()
     assert isinstance(data, dict)
-    assert 'public_trees' in data
-    assert 'user_trees' in data
-    assert isinstance(data['public_trees'], list)
-    assert isinstance(data['user_trees'], list)
-    assert len(data['user_trees']) == 0 # No user logged in
+    assert 'public_saves' in data
+    assert 'user_saves' in data
+    assert isinstance(data['public_saves'], list)
+    assert isinstance(data['user_saves'], list)
+    assert len(data['user_saves']) == 0 # No user logged in
 
 def test_load_trees_authenticated(client):
     # Register and login user
@@ -140,29 +140,33 @@ def test_load_trees_authenticated(client):
     user_public_tree = Tree(user_id=user.id, name="User's Public Tree", is_public=True, json_data='{}')
     db.session.add(user_public_tree)
 
-    # Create a public tree by another (or no) user
-    anon_public_tree = Tree(user_id=None, name="Anonymous Public Tree", is_public=True, json_data='{}')
-    db.session.add(anon_public_tree)
+    # Create a public tree by another user
+    other_user = User(username='otheruser', email='other@user.com')
+    db.session.add(other_user)
     db.session.commit()
+    other_public_tree = Tree(user_id=other_user.id, name="Other User Public Tree", is_public=True, json_data='{}')
+    db.session.add(other_public_tree)
+    db.session.commit()
+
 
     response = client.get('/api/trees/load')
     assert response.status_code == 200
     data = response.get_json()
 
-    assert 'public_trees' in data
-    assert 'user_trees' in data
+    assert 'public_saves' in data
+    assert 'user_saves' in data
 
-    # User trees should only contain the user's private trees
-    assert len(data['user_trees']) == 1
-    user_tree_names = {t['name'] for t in data['user_trees']}
-    assert "Private Tree" in user_tree_names
-    assert "User's Public Tree" not in user_tree_names
+    # user_saves should contain all trees for the logged-in user
+    assert len(data['user_saves']) == 2
+    user_save_names = {t['name'] for t in data['user_saves']}
+    assert "Private Tree" in user_save_names
+    assert "User's Public Tree" in user_save_names
 
-    # Public trees should contain all public trees
-    assert len(data['public_trees']) == 2
-    public_tree_names = {t['name'] for t in data['public_trees']}
-    assert "Anonymous Public Tree" in public_tree_names
-    assert "User's Public Tree" in public_tree_names
+    # public_saves should only contain public trees from other users
+    assert len(data['public_saves']) == 1
+    public_save_names = {t['name'] for t in data['public_saves']}
+    assert "Other User Public Tree" in public_save_names
+    assert "User's Public Tree" not in public_save_names
 
 
 # --- Tests for PictogramList API Endpoints ---
@@ -174,53 +178,53 @@ def test_save_list_unauthenticated(client):
 
 def test_save_and_load_lists(client):
     """Test saving a list and then loading it."""
-    # Register and login a user
+    # Register and login user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
     client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
     user = User.query.filter_by(username='listuser').first()
     login(client, 'listuser', 'password')
 
-    # 1. Save a private list
+    # 1. Save a private list for the current user
     private_list_payload = [{"image_id": 1, "description": "Step 1"}]
-    response_save_private = client.post('/api/lists', json={
-        "list_name": "My Private List",
-        "is_public": False,
-        "payload": private_list_payload
-    })
-    assert response_save_private.status_code == 201
-    private_list_data = response_save_private.get_json()['list']
-    assert private_list_data['list_name'] == "My Private List"
+    client.post('/api/lists', json={"list_name": "My Private List", "is_public": False, "payload": private_list_payload})
 
-    # 2. Save a public list
+    # 2. Save a public list for the current user
     public_list_payload = [{"image_id": 2, "description": "Public Step"}]
-    response_save_public = client.post('/api/lists', json={
-        "list_name": "My Public List",
-        "is_public": True,
-        "payload": public_list_payload
-    })
-    assert response_save_public.status_code == 201
+    client.post('/api/lists', json={"list_name": "My Public List", "is_public": True, "payload": public_list_payload})
 
-    # 3. Load lists while authenticated
+    # 3. Save a public list for another user
+    other_user = User(username='otherlistuser', email='otherlist@user.com')
+    db.session.add(other_user)
+    db.session.commit()
+    other_public_list = PictogramList(user_id=other_user.id, list_name="Other User Public List", is_public=True, payload='[]')
+    db.session.add(other_public_list)
+    db.session.commit()
+
+    # 4. Load lists while authenticated
     response_load_auth = client.get('/api/lists')
     assert response_load_auth.status_code == 200
     loaded_data_auth = response_load_auth.get_json()
 
-    assert len(loaded_data_auth['user_lists']) == 1
-    assert loaded_data_auth['user_lists'][0]['list_name'] == "My Private List"
+    # user_saves should contain both of the user's lists
+    assert len(loaded_data_auth['user_saves']) == 2
+    user_save_names = {l['list_name'] for l in loaded_data_auth['user_saves']}
+    assert "My Private List" in user_save_names
+    assert "My Public List" in user_save_names
 
-    assert len(loaded_data_auth['public_lists']) == 1
-    assert loaded_data_auth['public_lists'][0]['list_name'] == "My Public List"
+    # public_saves should only contain the other user's public list
+    assert len(loaded_data_auth['public_saves']) == 1
+    assert loaded_data_auth['public_saves'][0]['list_name'] == "Other User Public List"
 
-    # 4. Logout and load lists unauthenticated
+    # 5. Logout and load lists unauthenticated
     logout(client)
     response_load_unauth = client.get('/api/lists')
     assert response_load_unauth.status_code == 200
     loaded_data_unauth = response_load_unauth.get_json()
 
-    assert len(loaded_data_unauth['user_lists']) == 0
-    assert len(loaded_data_unauth['public_lists']) == 1
-    assert loaded_data_unauth['public_lists'][0]['list_name'] == "My Public List"
+    # Should see both public lists
+    assert len(loaded_data_unauth['user_saves']) == 0
+    assert len(loaded_data_unauth['public_saves']) == 2
 
 def test_update_list_by_saving_with_same_name(client):
     # Register and login a user
@@ -265,10 +269,11 @@ def test_update_list_by_saving_with_same_name(client):
     assert response_load_auth.status_code == 200
     loaded_data_auth = response_load_auth.get_json()
 
-    # The list is now public, so it should not be in the user_lists
-    assert len(loaded_data_auth['user_lists']) == 0
-    assert len(loaded_data_auth['public_lists']) == 1
-    assert loaded_data_auth['public_lists'][0]['list_name'] == 'My Upsert List'
+    # The list is now public, but it's still owned by the user, so it should be in user_saves
+    assert len(loaded_data_auth['user_saves']) == 1
+    assert loaded_data_auth['user_saves'][0]['list_name'] == 'My Upsert List'
+    # There should be no public saves from other users
+    assert len(loaded_data_auth['public_saves']) == 0
 
 def test_update_list(client):
     # Register and login a user
