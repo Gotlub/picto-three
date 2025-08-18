@@ -122,6 +122,10 @@ class PictogramList(db.Model):
 
     user = db.relationship('User', backref=db.backref('pictogram_lists', lazy=True))
 
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'list_name', name='_user_id_list_name_uc'),
+    )
+
     def to_dict(self):
         return {
             'id': self.id,

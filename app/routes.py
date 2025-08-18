@@ -204,36 +204,49 @@ def save_list():
 
     list_name = data.get('list_name')
     is_public = data.get('is_public', False)
-    payload = data.get('payload') # This is expected to be a list of dicts
+    payload = data.get('payload')  # This is expected to be a list of dicts
 
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
 
-    # The payload from the client is JSON, but we store it as a string in the DB.
     payload_str = json.dumps(payload)
 
-    new_list = PictogramList(
-        user_id=current_user.id,
-        list_name=list_name,
-        is_public=is_public,
-        payload=payload_str
-    )
-    db.session.add(new_list)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({
-            'status': 'error',
-            'message': 'A list with this name may already exist or another integrity issue occurred.'
-        }), 400
+    # UPSERT Logic
+    existing_list = PictogramList.query.filter_by(user_id=current_user.id, list_name=list_name).first()
 
-    # The to_dict method will handle the payload serialization for the response
-    return jsonify({
-        'status': 'success',
-        'message': 'List saved successfully',
-        'list': new_list.to_dict()
-    }), 201
+    if existing_list:
+        # UPDATE
+        existing_list.payload = payload_str
+        existing_list.is_public = is_public
+        db.session.commit()
+        return jsonify({
+            'status': 'success',
+            'message': 'List updated successfully',
+            'list': existing_list.to_dict()
+        }), 200
+    else:
+        # INSERT
+        new_list = PictogramList(
+            user_id=current_user.id,
+            list_name=list_name,
+            is_public=is_public,
+            payload=payload_str
+        )
+        db.session.add(new_list)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return jsonify({
+                'status': 'error',
+                'message': 'A list with this name already exists for this user.'
+            }), 409
+
+        return jsonify({
+            'status': 'success',
+            'message': 'List saved successfully',
+            'list': new_list.to_dict()
+        }), 201
 
 
 @api_bp.route('/lists/<int:list_id>', methods=['PUT'])
@@ -404,6 +417,7 @@ def save_tree():
     tree_name = data.get('name')
     is_public = data.get('is_public', False)
     json_data = data.get('json_data')
+    json_data_str = json.dumps(json_data)
 
     if not tree_name or not json_data:
         return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
@@ -422,28 +436,48 @@ def save_tree():
                     'message': 'Public trees can only contain public images. Please remove private images before saving publicly.'
                 }), 400
 
-    tree = Tree(
-        user_id=current_user.id,
-        name=tree_name,
-        is_public=is_public,
-        json_data=json.dumps(json_data)
-    )
-    db.session.add(tree)
+    # UPSERT logic
+    existing_tree = Tree.query.filter_by(user_id=current_user.id, name=tree_name).first()
+
+    if existing_tree:
+        # UPDATE
+        existing_tree.json_data = json_data_str
+        existing_tree.is_public = is_public
+        message = "Tree updated successfully"
+        status_code = 200
+        tree_id = existing_tree.id
+    else:
+        # INSERT
+        new_tree = Tree(
+            user_id=current_user.id,
+            name=tree_name,
+            is_public=is_public,
+            json_data=json_data_str
+        )
+        db.session.add(new_tree)
+        message = "Tree saved successfully"
+        status_code = 201
+        # The ID will be populated after the commit
+        db.session.flush()
+        tree_id = new_tree.id
+
+
     try:
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
+        # This might happen in a race condition, but the unique constraint protects the DB.
         return jsonify({
             'status': 'error',
-            'message': 'A tree with this name already exists. Please choose a different name.'
-        }), 400
+            'message': 'A tree with this name already exists for this user.'
+        }), 409
 
     return jsonify({
         'status': 'success',
-        'message': 'Tree saved successfully',
-        'tree_id': tree.id,
+        'message': message,
+        'tree_id': tree_id,
         'tree_data': json_data
-    })
+    }), status_code
 
 def delete_folder_recursive(folder):
     # Recursively delete children folders
