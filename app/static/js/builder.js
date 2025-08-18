@@ -193,7 +193,7 @@ class ImageTree {
 // --- End of new Image Tree for Right Sidebar ---
 
 
-class Node {
+class BuilderNode {
     constructor(image, builder) {
         this.image = image;
         this.builder = builder;
@@ -287,7 +287,7 @@ class TreeBuilder {
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
-        this.rootNode = new Node({ id: 'root', name: 'Root', path: '/static/images/pictograms/public/bold/folder-open-bold.png' }, this);
+        this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/pictograms/public/bold/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
 
@@ -371,7 +371,7 @@ class TreeBuilder {
     }
 
     handleImageClick(image) {
-        const newNode = new Node(image, this);
+        const newNode = new BuilderNode(image, this);
         const parentNode = this.selectedNode || this.rootNode;
         parentNode.addChild(newNode);
         this.selectNode(newNode); // Select the new node
@@ -708,7 +708,7 @@ class TreeBuilder {
                 console.error('Image not found for id:', nodeData.id);
                 return null;
             }
-            const newNode = new Node(image, this);
+            const newNode = new BuilderNode(image, this);
             if (nodeData.hasOwnProperty('description')) {
                 newNode.description = nodeData.description;
             }
