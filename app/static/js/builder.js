@@ -177,15 +177,15 @@ class ImageTree {
     init() {
         this.container.innerHTML = '';
         this.initialData.forEach(data => {
-            const node = new ImageTreeFolderNode(data, this);
-            this.rootNodes.push(node);
-            this.container.appendChild(node.element);
+            const theNode = new ImageTreeFolderNode(data, this);
+            this.rootNodes.push(theNode);
+            this.container.appendChild(theNode.element);
         });
     }
 
     filter(term) {
         const visibleNodes = new Set();
-        this.rootNodes.forEach(node => node.filter(term.toLowerCase(), visibleNodes));
+        this.rootNodes.forEach(theNode => theNode.filter(term.toLowerCase(), visibleNodes));
     }
 }
 
@@ -203,9 +203,9 @@ class BuilderNode {
         this.element = this.createElement(builder);
     }
 
-    addChild(node) {
-        node.parent = this;
-        this.children.push(node);
+    addChild(theNode) {
+        theNode.parent = this;
+        this.children.push(theNode);
     }
 
     createElement(builder) {
@@ -384,18 +384,18 @@ class TreeBuilder {
         );
     }
 
-    handleDragStart(e, node) {
-        if (node.image.id === 'root') {
+    handleDragStart(e, theNode) {
+        if (theNode.image.id === 'root') {
             e.preventDefault();
             return;
         }
-        this.draggedNode = node;
+        this.draggedNode = theNode;
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', node.image.id); // Required for Firefox
+        e.dataTransfer.setData('text/plain', theNode.image.id); // Required for Firefox
 
         setTimeout(() => {
-            if (node.element) {
-                node.element.classList.add('dragging');
+            if (theNode.element) {
+                theNode.element.classList.add('dragging');
             }
         }, 0);
     }
@@ -447,9 +447,9 @@ class TreeBuilder {
         });
     }
 
-    selectNode(node) {
+    selectNode(theNode) {
         this.deselectAllNodes();
-        this.selectedNode = node;
+        this.selectedNode = theNode;
 
         const applyHighlight = (n) => {
             if (n.element) {
@@ -519,13 +519,13 @@ class TreeBuilder {
         }
     }
 
-    renderChildren(node) {
-        const childrenContainer = node.element.querySelector('.children');
+    renderChildren(theNode) {
+        const childrenContainer = theNode.element.querySelector('.children');
         if (!childrenContainer) return;
 
         childrenContainer.innerHTML = '';
 
-        node.children.forEach(child => {
+        theNode.children.forEach(child => {
             if (child.element) {
                 childrenContainer.appendChild(child.element);
                 // The children of the child are already rendered within its element,
@@ -539,13 +539,13 @@ class TreeBuilder {
     }
 
     getTreeAsJSON() {
-        const buildNode = (node) => {
+        const buildNode = (theNode) => {
             const nodeData = {
-                id: node.image.id,
-                description: node.description,
+                id: theNode.image.id,
+                description: theNode.description,
                 children: []
             };
-            node.children.forEach(child => {
+            theNode.children.forEach(child => {
                 nodeData.children.push(buildNode(child));
             });
             return nodeData;
@@ -775,5 +775,9 @@ class TreeBuilder {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const dropdownEl = document.getElementById('navbarDropdown');
+    if (dropdownEl) {
+        new bootstrap.Dropdown(dropdownEl);
+    }
     new TreeBuilder();
 });
