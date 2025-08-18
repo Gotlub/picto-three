@@ -553,6 +553,15 @@ class ListBuilder {
             alert('Please enter a name for the list.');
             return;
         }
+
+        // Check if a list with the same name already exists for the user
+        const isExisting = this.userLists.some(list => list.list_name === listName);
+        if (isExisting) {
+            if (!confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
+                return; // User cancelled
+            }
+        }
+
         if (this.chainedListItems.length === 0) {
             alert('Cannot save an empty list.');
             return;
@@ -577,8 +586,8 @@ class ListBuilder {
         });
 
         const result = await response.json();
-        if (result.status === 'success') {
-            alert('List saved successfully!');
+        if (response.ok && result.status === 'success') {
+            alert(result.message); // Use the specific message from the server
             this.loadSavedLists(); // Refresh the list
         } else {
             alert(`Error: ${result.message}`);

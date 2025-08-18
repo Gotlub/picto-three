@@ -568,6 +568,14 @@ class TreeBuilder {
             return;
         }
 
+        // Check if a tree with the same name already exists for the user
+        const isExisting = this.userTrees.some(tree => tree.name === treeName);
+        if (isExisting) {
+            if (!confirm("A save with this name already exists. Your old save will be replaced by the current one. Continue?")) {
+                return; // User cancelled
+            }
+        }
+
         const isPublic = document.getElementById('tree-is-public').checked;
         const jsonData = this.getTreeAsJSON();
 
@@ -589,8 +597,10 @@ class TreeBuilder {
         });
 
         const result = await response.json();
-        if (result.status === 'success') {
-            alert('Tree saved successfully!');
+        // Use response.ok to check for success status codes (200-299)
+        if (response.ok && result.status === 'success') {
+            // Use the more specific message from the server
+            alert(result.message);
             // Clear the existing tree before reloading from save
             this.rootNode.children = [];
             // Reload the builder with the saved tree data
