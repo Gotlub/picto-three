@@ -204,35 +204,40 @@ def save_list():
 
     list_name = data.get('list_name')
     is_public = data.get('is_public', False)
-    payload = data.get('payload') # This is expected to be a list of dicts
+    payload = data.get('payload')
 
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
 
-    # The payload from the client is JSON, but we store it as a string in the DB.
     payload_str = json.dumps(payload)
 
-    new_list = PictogramList(
-        user_id=current_user.id,
-        list_name=list_name,
-        is_public=is_public,
-        payload=payload_str
-    )
-    db.session.add(new_list)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({
-            'status': 'error',
-            'message': 'A list with this name may already exist or another integrity issue occurred.'
-        }), 400
+    # Check if a list with the same name already exists for this user
+    existing_list = PictogramList.query.filter_by(user_id=current_user.id, list_name=list_name).first()
 
-    # The to_dict method will handle the payload serialization for the response
+    if existing_list:
+        # If it exists, update it
+        existing_list.is_public = is_public
+        existing_list.payload = payload_str
+        message = 'List updated successfully'
+        saved_list = existing_list
+    else:
+        # If it does not exist, create a new one
+        new_list = PictogramList(
+            user_id=current_user.id,
+            list_name=list_name,
+            is_public=is_public,
+            payload=payload_str
+        )
+        db.session.add(new_list)
+        message = 'List saved successfully'
+        saved_list = new_list
+
+    db.session.commit()
+
     return jsonify({
         'status': 'success',
-        'message': 'List saved successfully',
-        'list': new_list.to_dict()
+        'message': message,
+        'list': saved_list.to_dict()
     }), 201
 
 
@@ -422,25 +427,30 @@ def save_tree():
                     'message': 'Public trees can only contain public images. Please remove private images before saving publicly.'
                 }), 400
 
-    tree = Tree(
-        user_id=current_user.id,
-        name=tree_name,
-        is_public=is_public,
-        json_data=json.dumps(json_data)
-    )
-    db.session.add(tree)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({
-            'status': 'error',
-            'message': 'A tree with this name already exists. Please choose a different name.'
-        }), 400
+    # Check if a tree with the same name already exists for this user
+    tree = Tree.query.filter_by(user_id=current_user.id, name=tree_name).first()
+
+    if tree:
+        # If it exists, update it
+        tree.is_public = is_public
+        tree.json_data = json.dumps(json_data)
+        message = 'Tree updated successfully'
+    else:
+        # If it does not exist, create a new one
+        tree = Tree(
+            user_id=current_user.id,
+            name=tree_name,
+            is_public=is_public,
+            json_data=json.dumps(json_data)
+        )
+        db.session.add(tree)
+        message = 'Tree saved successfully'
+
+    db.session.commit()
 
     return jsonify({
         'status': 'success',
-        'message': 'Tree saved successfully',
+        'message': message,
         'tree_id': tree.id,
         'tree_data': json_data
     })

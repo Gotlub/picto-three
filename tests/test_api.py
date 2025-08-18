@@ -126,7 +126,7 @@ def test_load_trees_authenticated(client):
     assert "Anonymous Public Tree" in public_tree_names
     assert "User's Public Tree" in public_tree_names
 
-def test_save_tree_with_duplicate_name_fails(client):
+def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
@@ -134,7 +134,7 @@ def test_save_tree_with_duplicate_name_fails(client):
     login(client, 'testuser', 'password')
 
     # Save the first tree
-    tree_data1 = {'roots': [{'id': 1, 'children': []}]}
+    tree_data1 = {'roots': [{'id': 1, 'description': 'First version', 'children': []}]}
     response1 = client.post('/api/tree/save', json={
         'name': 'My Duplicate Test Tree',
         'is_public': False,
@@ -142,18 +142,28 @@ def test_save_tree_with_duplicate_name_fails(client):
     })
     assert response1.status_code == 200
     assert response1.json['status'] == 'success'
+    assert response1.json['message'] == 'Tree saved successfully'
+    tree_id = response1.json['tree_id']
 
-    # Attempt to save a second tree with the same name
-    tree_data2 = {'roots': [{'id': 2, 'children': []}]}
+    # Attempt to save a second tree with the same name (update)
+    tree_data2 = {'roots': [{'id': 2, 'description': 'Second version', 'children': []}]}
     response2 = client.post('/api/tree/save', json={
         'name': 'My Duplicate Test Tree',
-        'is_public': False,
+        'is_public': True, # Also testing update of is_public
         'json_data': tree_data2
     })
-    assert response2.status_code == 400
+    assert response2.status_code == 200
     data = response2.get_json()
-    assert data['status'] == 'error'
-    assert 'A tree with this name already exists' in data['message']
+    assert data['status'] == 'success'
+    assert data['message'] == 'Tree updated successfully'
+    assert data['tree_id'] == tree_id # Should be the same tree
+
+    # Verify the tree was updated in the database
+    updated_tree = db.session.get(Tree, tree_id)
+    assert updated_tree is not None
+    assert updated_tree.is_public is True
+    saved_json_data = json.loads(updated_tree.json_data)
+    assert saved_json_data['roots'][0]['description'] == 'Second version'
 
     # Logout
     logout(client)
@@ -354,3 +364,41 @@ def test_export_pdf(client):
     # Clean up dummy images
     os.remove(dummy_img1_path)
     os.remove(dummy_img2_path)
+
+def test_save_list_with_duplicate_name_updates(client):
+    # Register and login a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    login(client, 'listupdateuser', 'password')
+
+    # Create an initial list
+    list_payload1 = [{"image_id": 1, "description": "Initial"}]
+    save_response1 = client.post('/api/lists', json={
+        "list_name": "My Duplicate List",
+        "is_public": False,
+        "payload": list_payload1
+    })
+    assert save_response1.status_code == 201
+    list_id = save_response1.get_json()['list']['id']
+
+    # Update the list by saving with the same name
+    list_payload2 = [{"image_id": 2, "description": "Updated"}]
+    save_response2 = client.post('/api/lists', json={
+        "list_name": "My Duplicate List",
+        "is_public": True,
+        "payload": list_payload2
+    })
+    assert save_response2.status_code == 201
+    updated_data = save_response2.get_json()
+    assert updated_data['list']['id'] == list_id
+    assert updated_data['list']['list_name'] == "My Duplicate List"
+    assert updated_data['list']['is_public'] is True
+    assert json.loads(updated_data['list']['payload'])[0]['description'] == "Updated"
+
+    # Verify in DB
+    updated_list = db.session.get(PictogramList, list_id)
+    assert updated_list.is_public is True
+    assert json.loads(updated_list.payload)[0]['description'] == "Updated"
+
+    logout(client)

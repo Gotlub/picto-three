@@ -562,7 +562,7 @@ class ListBuilder {
         let proceed = true;
 
         if (existingList) {
-            proceed = confirm("Une liste avec ce nom existe déjà. Voulez-vous l'écraser ?");
+            proceed = confirm("A list with this name already exists. Do you want to overwrite it?");
         }
 
         if (!proceed) {
@@ -589,7 +589,7 @@ class ListBuilder {
 
         const result = await response.json();
         if (result.status === 'success') {
-            const message = existingList ? 'Mis à jour' : 'Créé';
+            const message = existingList ? 'Updated' : 'Created';
             alert(message);
             this.loadSavedLists(); // Refresh the list
         } else {

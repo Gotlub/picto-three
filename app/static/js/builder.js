@@ -581,7 +581,7 @@ class TreeBuilder {
         let proceed = true;
 
         if (existingTree) {
-            proceed = confirm("Un arbre avec ce nom existe déjà. Voulez-vous l'écraser ?");
+            proceed = confirm("A tree with this name already exists. Do you want to overwrite it?");
         }
 
         if (!proceed) {
@@ -602,7 +602,7 @@ class TreeBuilder {
 
         const result = await response.json();
         if (result.status === 'success') {
-            const message = existingTree ? 'Mis à jour' : 'Créé';
+            const message = existingTree ? 'Updated' : 'Created';
             alert(message);
 
             // Clear the existing tree before reloading from save
