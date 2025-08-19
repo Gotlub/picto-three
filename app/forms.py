@@ -34,3 +34,7 @@ class ChangePasswordForm(FlaskForm):
     new_password2 = PasswordField(
         _l('Repeat New Password'), validators=[DataRequired(), EqualTo('new_password')])
     submit_change_password = SubmitField(_l('Change Password'))
+
+class DeleteAccountForm(FlaskForm):
+    username_confirm = StringField(_l('Username'), validators=[DataRequired()])
+    submit_delete_account = SubmitField(_l('Delete My Account'))

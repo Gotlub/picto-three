@@ -47,7 +47,8 @@
                 <p>{{ _('Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently lost.') }}</p>
                 <p><strong>{{ _('To confirm, please type your username below:') }} {{ current_user.username }}</strong></p>
                 <form id="deleteAccountForm" action="{{ url_for('main.delete_account') }}" method="post">
-                    <input type="text" id="username_confirm" name="username_confirm" class="form-control" placeholder="{{ _('Your username') }}">
+                    {{ delete_account_form.hidden_tag() }}
+                    {{ delete_account_form.username_confirm(class="form-control", placeholder=_('Your username'), id="username_confirm") }}
                 </form>
             </div>
             <div class="modal-footer">
