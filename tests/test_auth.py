@@ -1,6 +1,9 @@
 from app.models import User
 from app import db
 import re
+import pytest
+from app import utils
+from app.utils import generate_confirmation_token, generate_password_reset_token
 
 def get_csrf_token(html):
     # Utilise une regex pour extraire le CSRF token depuis l'input caché du formulaire
@@ -37,7 +40,7 @@ def test_register(client):
     }, follow_redirects=True)
     
     assert response.status_code == 200
-    assert b'Congratulations, you are now a registered user!' in response.data
+    assert 'Un email de confirmation a été envoyé à votre adresse e-mail.' in response.data.decode('utf-8')
     user = User.query.filter_by(username='testuser').first()
     assert user is not None
     assert user.email == 'test@example.com'
@@ -98,7 +101,7 @@ def test_password_strength_and_account_deletion(client):
         'password2': 'password'
     }, follow_redirects=True)
 
-    assert b'Congratulations, you are now a registered user!' not in response.data
+    assert 'Un email de confirmation a été envoyé à votre adresse e-mail.' not in response.data.decode('utf-8')
     assert b'Password must' in response.data
     user = User.query.filter_by(username='weakpassworduser').first()
     assert user is None
@@ -115,7 +118,7 @@ def test_password_strength_and_account_deletion(client):
         'password2': 'StrongPassword123'
     }, follow_redirects=True)
 
-    assert b'Congratulations, you are now a registered user!' in response.data
+    assert 'Un email de confirmation a été envoyé à votre adresse e-mail.' in response.data.decode('utf-8')
     user = User.query.filter_by(username='strongpassworduser').first()
     assert user is not None
 
@@ -139,3 +142,99 @@ def test_password_strength_and_account_deletion(client):
         assert b'Your account has been successfully deleted.' in delete_response.data
         deleted_user = User.query.filter_by(username='strongpassworduser').first()
         assert deleted_user is None
+
+def test_registration_sends_confirmation_email(client, monkeypatch):
+    sent_emails = []
+    def mock_send_email(to, subject, template, **kwargs):
+        sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
+
+    monkeypatch.setattr('app.routes.send_email', mock_send_email)
+
+    get_response = client.get('/register')
+    html = get_response.data.decode()
+    csrf_token = get_csrf_token(html)
+
+    client.post('/register', data={
+        'username': 'confirmuser',
+        'csrf_token': csrf_token,
+        'email': 'confirm@example.com',
+        'password': 'Password123',
+        'password2': 'Password123'
+    }, follow_redirects=True)
+
+    user = User.query.filter_by(username='confirmuser').first()
+    assert user is not None
+    assert not user.confirmed
+    assert len(sent_emails) == 1
+    assert sent_emails[0]['to'] == 'confirm@example.com'
+    assert 'Confirmez votre compte' in sent_emails[0]['subject']
+
+def test_email_confirmation(client):
+    # Register user first (without mocking email)
+    get_response = client.get('/register')
+    html = get_response.data.decode()
+    csrf_token = get_csrf_token(html)
+    client.post('/register', data={
+        'username': 'confirmuser2',
+        'csrf_token': csrf_token,
+        'email': 'confirm2@example.com',
+        'password': 'Password123',
+        'password2': 'Password123'
+    })
+    user = User.query.filter_by(email='confirm2@example.com').first()
+    assert user is not None
+    assert not user.confirmed
+
+    # Generate a token and confirm
+    token = generate_confirmation_token(user.email)
+    response = client.get(f'/confirm/{token}', follow_redirects=True)
+
+    assert 'Votre compte a été confirmé avec succès !' in response.data.decode('utf-8')
+    db.session.refresh(user)
+    assert user.confirmed
+
+def test_password_reset_flow(client, monkeypatch):
+    # 1. Register a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={
+        'username': 'resetuser',
+        'csrf_token': csrf_token,
+        'email': 'reset@example.com',
+        'password': 'OldPassword123',
+        'password2': 'OldPassword123'
+    })
+    user = User.query.filter_by(email='reset@example.com').first()
+    assert user is not None
+
+    # 2. Request a password reset
+    sent_emails = []
+    def mock_send_email(to, subject, template, **kwargs):
+        sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
+    monkeypatch.setattr('app.routes.send_email', mock_send_email)
+
+    get_response = client.get('/forgot_password')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/forgot_password', data={
+        'email': 'reset@example.com',
+        'csrf_token': csrf_token
+    }, follow_redirects=True)
+
+    assert len(sent_emails) == 1
+    assert 'Réinitialisation de votre mot de passe' in sent_emails[0]['subject']
+
+    # 3. Use the token to reset the password
+    token = generate_password_reset_token(user.email)
+    get_response = client.get(f'/reset/{token}')
+    csrf_token = get_csrf_token(get_response.data.decode())
+
+    response = client.post(f'/reset/{token}', data={
+        'password': 'NewPassword123',
+        'password2': 'NewPassword123',
+        'csrf_token': csrf_token
+    }, follow_redirects=True)
+
+    assert 'Votre mot de passe a été réinitialisé avec succès.' in response.data.decode('utf-8')
+    db.session.refresh(user)
+    assert user.check_password('NewPassword123')
+    assert not user.check_password('OldPassword123')

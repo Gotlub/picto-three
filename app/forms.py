@@ -53,3 +53,13 @@ class ChangePasswordForm(FlaskForm):
 class DeleteAccountForm(FlaskForm):
     username_confirm = StringField(_l('Username'), validators=[DataRequired()])
     submit_delete_account = SubmitField(_l('Delete My Account'))
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    submit = SubmitField(_l('Request Password Reset'))
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(_l('Password'), validators=[DataRequired(), password_strength_validator])
+    password2 = PasswordField(
+        _l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField(_l('Reset Password'))

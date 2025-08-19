@@ -5,11 +5,15 @@ from config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from flask_babel import Babel, _
+from flask_mail import Mail
+from flask_bootstrap import Bootstrap
 
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
 login.login_view = 'main.login'
+mail = Mail()
+bootstrap = Bootstrap()
 
 @login.unauthorized_handler
 def unauthorized():
@@ -31,7 +35,9 @@ def create_app( config_override = None):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+    mail.init_app(app)
     babel.init_app(app, locale_selector=get_locale)
+    bootstrap.init_app(app)
 
     from app.routes import bp as main_bp, api_bp
     app.register_blueprint(main_bp)

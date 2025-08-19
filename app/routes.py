@@ -10,10 +10,12 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from PIL import Image as PILImage
 from app import db
-from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm
+from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree, Folder, PictogramList
+from app.utils import send_email, generate_confirmation_token, confirm_token, generate_password_reset_token, confirm_password_reset_token
+from datetime import datetime, UTC
 
 bp = Blueprint('main', __name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -36,6 +38,42 @@ def login():
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('main.index'))
     return render_template('login.html', title='Sign In', form=form)
+
+@bp.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            token = generate_password_reset_token(user.email)
+            reset_url = url_for('main.reset_with_token_route', token=token, _external=True)
+            send_email(user.email, 'Réinitialisation de votre mot de passe', 'emails/reset_password.html', reset_url=reset_url)
+            flash('Un email avec les instructions pour réinitialiser votre mot de passe a été envoyé.', 'info')
+        else:
+            flash('Aucun compte trouvé avec cette adresse e-mail.', 'warning')
+        return redirect(url_for('main.login'))
+    return render_template('forgot_password.html', title='Mot de passe oublié', form=form)
+
+@bp.route('/reset/<token>', methods=['GET', 'POST'])
+def reset_with_token_route(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    email = confirm_password_reset_token(token)
+    if not email:
+        flash('Le lien de réinitialisation est invalide ou a expiré.', 'danger')
+        return redirect(url_for('main.login'))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=email).first_or_404()
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Votre mot de passe a été réinitialisé avec succès.', 'success')
+        return redirect(url_for('main.login'))
+
+    return render_template('reset_password_form.html', form=form)
 
 @bp.route('/logout')
 def logout():
@@ -126,7 +164,11 @@ def register():
         db.session.add(root_folder)
         db.session.commit()
 
-        flash('Congratulations, you are now a registered user!', 'success')
+        token = generate_confirmation_token(user.email)
+        confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
+        send_email(user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
+
+        flash('Un email de confirmation a été envoyé à votre adresse e-mail.', 'success')
         return redirect(url_for('main.login'))
     elif form.errors:
         flash('Registration failed. Please check the errors below.', 'danger')
@@ -134,6 +176,23 @@ def register():
             for error in errors:
                 flash(f"Error in {getattr(form, field).label.text}: {error}", 'danger')
     return render_template('register.html', title='Register', form=form)
+
+@bp.route('/confirm/<token>')
+def confirm_email_route(token):
+    email = confirm_token(token)
+    if not email:
+        flash('Le lien de confirmation est invalide ou a expiré.', 'danger')
+        return redirect(url_for('main.login'))
+
+    user = User.query.filter_by(email=email).first_or_404()
+    if user.confirmed:
+        flash('Compte déjà confirmé. Veuillez vous connecter.', 'success')
+    else:
+        user.confirmed = True
+        user.confirmed_on = datetime.now(UTC)
+        db.session.commit()
+        flash('Votre compte a été confirmé avec succès !', 'success')
+    return redirect(url_for('main.login'))
 
 @bp.route('/builder')
 def builder():

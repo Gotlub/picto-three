@@ -9,3 +9,6 @@ Flask-Babel
 python-magic
 reportlab
 Pillow
+Flask-Mail
+itsdangerous
+Flask-Bootstrap
