@@ -22,6 +22,9 @@ def login(client, username, password):
         csrf_token=csrf_token
     ), follow_redirects=True)
 
+def logout(client):
+    return client.get('/logout', follow_redirects=True)
+
 # Helper function to create a test user
 def create_user(client, username='testuser', password='Password123'):
     get_response = client.get('/register')
@@ -252,3 +255,55 @@ def test_delete_root_folder_fails(client):
     delete_response = client.delete('/api/item/delete', json={'id': root_folder.id, 'type': 'folder'})
     assert delete_response.status_code == 400
     assert 'Cannot delete root folder' in delete_response.get_json()['message']
+
+# --- PUT /api/image/update/<id> ---
+
+def test_update_image_details_success(client, app):
+    """Test successfully updating an image's description and public status."""
+    user = create_user(client, 'testuser_pictogram', 'Password123')
+    login(client, 'testuser_pictogram', 'Password123')
+
+    with app.app_context():
+        root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+        image = Image(name='test_image.png', path='/fake/path', user_id=user.id, folder_id=root_folder.id, is_public=False, description="Original")
+        db.session.add(image)
+        db.session.commit()
+        image_id = image.id
+
+    # Update description and make public
+    update_data = {'description': 'New Description', 'is_public': True}
+    response = client.put(f'/api/image/update/{image_id}', json=update_data)
+    assert response.status_code == 200
+    json_data = response.get_json()
+    assert json_data['status'] == 'success'
+    assert json_data['image']['description'] == 'New Description'
+    assert json_data['image']['is_public'] is True
+    assert json_data['image']['user_id'] == user.id # Should be preserved
+
+    # Verify in DB
+    with app.app_context():
+        updated_image = db.session.get(Image, image_id)
+        assert updated_image.description == 'New Description'
+        assert updated_image.is_public is True
+        assert updated_image.user_id == user.id
+
+def test_update_image_details_unauthorized(client, app):
+    """Test that a user cannot update an image they do not own."""
+    user1 = create_user(client, 'owner_user', 'Password123')
+    user2 = create_user(client, 'hacker_user', 'Password123')
+    login(client, 'owner_user', 'Password123')
+
+    with app.app_context():
+        root_folder1 = Folder.query.filter_by(user_id=user1.id, parent_id=None).first()
+        image = Image(name='owned_image.png', path='/fake/path', user_id=user1.id, folder_id=root_folder1.id)
+        db.session.add(image)
+        db.session.commit()
+        image_id = image.id
+
+    logout(client)
+    login(client, 'hacker_user', 'Password123')
+
+    update_data = {'description': 'Hacked Description'}
+    response = client.put(f'/api/image/update/{image_id}', json=update_data)
+    assert response.status_code == 403
+    assert 'You can only edit your own images' in response.get_json()['message']

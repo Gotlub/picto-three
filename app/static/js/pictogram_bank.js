@@ -102,6 +102,13 @@ class PictogramBank {
         this.selectedNode = null;
         this.rootSelected = false;
 
+        // Elements for editing image details
+        this.editSection = document.getElementById('edit-image-section');
+        this.editDescriptionInput = document.getElementById('edit-image-description');
+        this.editPublicCheckbox = document.getElementById('edit-image-public');
+        this.saveDetailsBtn = document.getElementById('save-image-details-btn');
+        this.editHr = document.getElementById('edit-image-hr');
+
         this.initEventListeners();
         this.renderTree();
     }
@@ -112,6 +119,8 @@ class PictogramBank {
         document.getElementById('delete-btn').addEventListener('click', () => this.deleteSelected());
         document.getElementById('root-btn').addEventListener('click', () => this.selectRoot());
         document.getElementById('export-image-btn').addEventListener('click', () => this.exportImage());
+        this.saveDetailsBtn.addEventListener('click', () => this.saveImageDetails());
+
 
         this.display.addEventListener('click', (e) => {
             if (e.target === this.display) {
@@ -127,9 +136,19 @@ class PictogramBank {
             this.selectedNode.element.querySelector('.node-content').classList.add('selected');
         }
 
-        document.getElementById('delete-btn').disabled = this.selectedNode.data.parent_id === null; // Cannot delete root
+        document.getElementById('delete-btn').disabled = !this.selectedNode || this.selectedNode.data.parent_id === null;
         const exportBtn = document.getElementById('export-image-btn');
         exportBtn.disabled = !(this.selectedNode instanceof ImageNode);
+
+        if (this.selectedNode instanceof ImageNode) {
+            this.editSection.style.display = 'block';
+            this.editHr.style.display = 'block';
+            this.editDescriptionInput.value = this.selectedNode.data.description || '';
+            this.editPublicCheckbox.checked = this.selectedNode.data.is_public;
+        } else {
+            this.editSection.style.display = 'none';
+            this.editHr.style.display = 'none';
+        }
     }
 
     deselectAllNodes() {
@@ -140,6 +159,8 @@ class PictogramBank {
         this.rootSelected = false;
         document.getElementById('delete-btn').disabled = true;
         document.getElementById('export-image-btn').disabled = true;
+        this.editSection.style.display = 'none';
+        this.editHr.style.display = 'none';
     }
 
     selectRoot() {
@@ -147,6 +168,33 @@ class PictogramBank {
         this.rootSelected = true;
         this.rootNode.element.querySelector('.node-content').classList.add('selected');
         this.selectedNode = this.rootNode;
+    }
+
+    async saveImageDetails() {
+        if (!this.selectedNode || !(this.selectedNode instanceof ImageNode)) {
+            alert('Please select an image to edit.');
+            return;
+        }
+
+        const imageId = this.selectedNode.data.id;
+        const description = this.editDescriptionInput.value;
+        const isPublic = this.editPublicCheckbox.checked;
+
+        const response = await fetch(`/api/image/update/${imageId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description, is_public: isPublic }),
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            // Update the data in the node so the UI is consistent
+            this.selectedNode.data.description = description;
+            this.selectedNode.data.is_public = isPublic;
+            alert('Image details updated successfully.');
+        } else {
+            alert(`Error updating image details: ${result.message}`);
+        }
     }
 
     countItems(node) {
