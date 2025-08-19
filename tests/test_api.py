@@ -2,7 +2,7 @@ import json
 import pytest
 import os
 from PIL import Image as PILImage
-from app.models import User, Tree, PictogramList
+from app.models import User, Tree, PictogramList, Image
 from app import db
 
 import re
@@ -22,6 +22,13 @@ def login(client, username, password):
 
 def logout(client):
     return client.get('/logout', follow_redirects=True)
+
+def create_image(id, user_id=None, name='Test Image'):
+    """Helper function to create an image in the database."""
+    # is_public is derived from user_id for these tests
+    image = Image(id=id, name=name, path=f'/fake/path/{id}', user_id=user_id, is_public=user_id is None)
+    db.session.add(image)
+    return image
 
 def test_save_tree_unauthenticated(client):
     response = client.post('/api/tree/save', json={})
@@ -168,7 +175,95 @@ def test_save_tree_with_duplicate_name_updates(client):
     # Logout
     logout(client)
 
+def test_save_public_tree_with_private_image_fails(client):
+    # Register and login user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    user = User.query.filter_by(username='testuser').first()
+    login(client, 'testuser', 'Password123')
+
+    # Create a private image owned by the user
+    private_image = create_image(id=100, user_id=user.id)
+    db.session.commit()
+
+    tree_data = {
+        "name": "Public Tree with Private Image",
+        "is_public": True,
+        "json_data": { "roots": [{ "id": private_image.id, "children": [] }] }
+    }
+    response = client.post('/api/tree/save', json=tree_data)
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['status'] == 'error'
+    assert 'Public trees can only contain public' in data['message']
+
+def test_save_public_tree_with_public_image_succeeds(client):
+    # Register and login user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser2', 'email': 'test2@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    login(client, 'testuser2', 'Password123')
+
+    # Create a public image (user_id is None)
+    public_image = create_image(id=101, user_id=None)
+    db.session.commit()
+
+    tree_data = {
+        "name": "Public Tree with Public Image",
+        "is_public": True,
+        "json_data": { "roots": [{ "id": public_image.id, "children": [] }] }
+    }
+    response = client.post('/api/tree/save', json=tree_data)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['status'] == 'success'
+
 # --- Tests for PictogramList API Endpoints ---
+
+def test_save_public_list_with_private_image_fails(client):
+    # Register and login user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser3', 'email': 'test3@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    user = User.query.filter_by(username='testuser3').first()
+    login(client, 'testuser3', 'Password123')
+
+    # Create a private image owned by the user
+    private_image = create_image(id=102, user_id=user.id)
+    db.session.commit()
+
+    list_data = {
+        "list_name": "Public List with Private Image",
+        "is_public": True,
+        "payload": [{ "image_id": private_image.id, "description": "private" }]
+    }
+    response = client.post('/api/lists', json=list_data)
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['status'] == 'error'
+    assert 'Public lists can only contain public' in data['message']
+
+def test_save_public_list_with_public_image_succeeds(client):
+    # Register and login user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'testuser4', 'email': 'test4@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    login(client, 'testuser4', 'Password123')
+
+    # Create a public image (user_id is None)
+    public_image = create_image(id=103, user_id=None)
+    db.session.commit()
+
+    list_data = {
+        "list_name": "Public List with Public Image",
+        "is_public": True,
+        "payload": [{ "image_id": public_image.id, "description": "public" }]
+    }
+    response = client.post('/api/lists', json=list_data)
+    assert response.status_code == 201
+    data = response.get_json()
+    assert data['status'] == 'success'
 
 def test_save_list_unauthenticated(client):
     """Check that an unauthenticated user gets a 401 error."""

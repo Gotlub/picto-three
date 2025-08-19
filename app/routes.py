@@ -268,6 +268,21 @@ def save_list():
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
 
+    # Validate images if saving a public list
+    if is_public:
+        if not payload:
+            return jsonify({'status': 'error', 'message': 'Cannot save an empty list as public.'}), 400
+
+        image_ids = {item['image_id'] for item in payload if 'image_id' in item}
+        if image_ids:
+            # Find any images in the list that have a non-null user_id
+            private_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
+            if private_images:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Public lists can only contain public (non-user-owned) images. Please remove any private images.'
+                }), 400
+
     payload_str = json.dumps(payload)
 
     # Check if a list with the same name already exists for this user
@@ -479,11 +494,12 @@ def save_tree():
 
         image_ids = get_image_ids_from_tree(json_data['roots'])
         if image_ids:
-            private_images = Image.query.filter(Image.id.in_(image_ids), Image.is_public == False).all()
+            # Find any images in the list that have a non-null user_id
+            private_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
             if private_images:
                 return jsonify({
                     'status': 'error',
-                    'message': 'Public trees can only contain public images. Please remove private images before saving publicly.'
+                    'message': 'Public trees can only contain public (non-user-owned) images. Please remove any private images.'
                 }), 400
 
     # Check if a tree with the same name already exists for this user
