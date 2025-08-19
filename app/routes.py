@@ -10,7 +10,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from PIL import Image as PILImage
 from app import db
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, ChangePasswordForm
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree, Folder, PictogramList
@@ -41,6 +41,59 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+@bp.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    change_password_form = ChangePasswordForm()
+    return render_template('account.html', title='Account Management',
+                           change_password_form=change_password_form)
+
+@bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        user = current_user
+        if user.check_password(form.current_password.data):
+            user.set_password(form.new_password.data)
+            db.session.commit()
+            flash('Your password has been changed successfully.', 'success')
+        else:
+            flash('Invalid current password.', 'danger')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error in {getattr(form, field).label.text}: {error}", 'danger')
+    return redirect(url_for('main.account'))
+
+@bp.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    username_confirm = request.form.get('username_confirm')
+    if username_confirm == current_user.username:
+        user = current_user
+        # 1. Delete all trees of the user
+        Tree.query.filter_by(user_id=user.id).delete()
+        # 2. Delete all lists of the user
+        PictogramList.query.filter_by(user_id=user.id).delete()
+        # 3. Delete all images belonging to the user
+        Image.query.filter_by(user_id=user.id).delete()
+        # 4. Delete the user's pictogram directory
+        user_pictogram_folder = os.path.join('app', 'static', 'images', 'pictograms', user.username)
+        if os.path.exists(user_pictogram_folder):
+            shutil.rmtree(user_pictogram_folder)
+        # 5. Delete all folders of the user
+        Folder.query.filter_by(user_id=user.id).delete()
+        # 6. Delete the user account
+        db.session.delete(user)
+        db.session.commit()
+        logout_user()
+        flash('Your account has been successfully deleted.', 'success')
+        return redirect(url_for('main.index'))
+    else:
+        flash('Invalid username confirmation. Account deletion cancelled.', 'danger')
+        return redirect(url_for('main.account'))
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
