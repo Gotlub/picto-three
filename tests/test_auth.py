@@ -23,8 +23,8 @@ def test_register(client):
         'username': 'testuser',
         'csrf_token': csrf_token,
         'email': 'test@example.com',
-        'password': 'password',
-        'password2': 'password'
+        'password': 'Password123',
+        'password2': 'Password123'
     }, follow_redirects=True)
     
     assert response.status_code == 200
@@ -49,8 +49,8 @@ def test_login_logout(client):
         'username': 'testuser',
         'csrf_token': csrf_token,
         'email': 'test@example.com',
-        'password': 'password',
-        'password2': 'password'
+        'password': 'Password123',
+        'password2': 'Password123'
     })
 
     # Login
@@ -58,7 +58,7 @@ def test_login_logout(client):
         response = client.post('/login', data={
             'username': 'testuser',
             'csrf_token': csrf_token,
-            'password': 'password'
+            'password': 'Password123'
         }, follow_redirects=True)
         assert response.status_code == 200
         assert b'Hi, testuser!' in response.data

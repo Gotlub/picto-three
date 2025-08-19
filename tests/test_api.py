@@ -31,9 +31,9 @@ def test_save_tree_authenticated(client):
     # Register a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
     # Login
-    login(client, 'testuser', 'password')
+    login(client, 'testuser', 'Password123')
 
     tree_data = {
         "name": "My Test Tree",
@@ -65,9 +65,9 @@ def test_save_tree_missing_data(client):
     # Register a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
     # Login
-    login(client, 'testuser', 'password')
+    login(client, 'testuser', 'Password123')
 
     response = client.post('/api/tree/save', json={'name': 'My Test Tree'})
     assert response.status_code == 400
@@ -90,9 +90,9 @@ def test_load_trees_authenticated(client):
     # Register and login user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
     user = User.query.filter_by(username='testuser').first()
-    login(client, 'testuser', 'password')
+    login(client, 'testuser', 'Password123')
 
     # Create a private tree for the user
     private_tree = Tree(user_id=user.id, name="Private Tree", is_public=False, json_data='{}')
@@ -130,8 +130,8 @@ def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
-    login(client, 'testuser', 'password')
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    login(client, 'testuser', 'Password123')
 
     # Save the first tree
     tree_data1 = {'roots': [{'id': 1, 'description': 'First version', 'children': []}]}
@@ -180,9 +180,9 @@ def test_save_and_load_lists(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
     user = User.query.filter_by(username='listuser').first()
-    login(client, 'listuser', 'password')
+    login(client, 'listuser', 'Password123')
 
     # 1. Save a private list
     private_list_payload = [{"image_id": 1, "description": "Step 1"}]
@@ -229,8 +229,8 @@ def test_update_list(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
-    login(client, 'updateuser', 'password')
+    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    login(client, 'updateuser', 'Password123')
 
     # Create an initial list
     list_payload = [{"image_id": 1, "description": "Initial"}]
@@ -258,8 +258,8 @@ def test_delete_list(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
-    login(client, 'deleteuser', 'password')
+    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    login(client, 'deleteuser', 'Password123')
 
     # Create a list
     list_payload = [{"image_id": 1, "description": "To be deleted"}]
@@ -281,21 +281,21 @@ def test_update_delete_unauthorized(client):
     # Register two users
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
 
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
 
     # Owner logs in and creates a list
-    login(client, 'owner', 'password')
+    login(client, 'owner', 'Password123')
     list_payload = [{"image_id": 1, "description": "Owned"}]
     save_response = client.post('/api/lists', json={"list_name": "Owned List", "payload": list_payload})
     list_id = save_response.get_json()['list']['id']
     logout(client)
 
     # Hacker logs in and tries to modify it
-    login(client, 'hacker', 'password')
+    login(client, 'hacker', 'Password123')
     update_response = client.put(f'/api/lists/{list_id}', json={"list_name": "Hacked"})
     assert update_response.status_code == 403 # Forbidden
 
@@ -369,8 +369,8 @@ def test_save_list_with_duplicate_name_updates(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'password', 'password2': 'password', 'csrf_token': csrf_token})
-    login(client, 'listupdateuser', 'password')
+    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    login(client, 'listupdateuser', 'Password123')
 
     # Create an initial list
     list_payload1 = [{"image_id": 1, "description": "Initial"}]
