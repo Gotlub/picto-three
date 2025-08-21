@@ -63,3 +63,7 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField(_l('Reset Password'))
+
+class ResendConfirmationForm(FlaskForm):
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    submit = SubmitField(_l('Resend Confirmation Email'))

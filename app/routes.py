@@ -4,19 +4,19 @@ import shutil
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import io
+from markupsafe import Markup
 from flask import send_file
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from PIL import Image as PILImage
 from app import db
-from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm
+from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm, ResendConfirmationForm
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree, Folder, PictogramList
 from app.utils import send_email, generate_confirmation_token, confirm_token, generate_password_reset_token, confirm_password_reset_token
 from datetime import datetime, UTC
-from app.decorators import check_confirmed
 
 bp = Blueprint('main', __name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -36,6 +36,11 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('main.login'))
+
+        if not user.confirmed:
+            flash(Markup('Votre compte n\'est pas confirmé. Veuillez vérifier vos e-mails. <a href="{}">Renvoyer l\'e-mail de confirmation ?</a>'.format(url_for('main.resend_confirmation_request'))), 'warning')
+            return redirect(url_for('main.login'))
+
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('main.index'))
     return render_template('login.html', title='Sign In', form=form)
@@ -83,7 +88,6 @@ def logout():
 
 @bp.route('/account', methods=['GET', 'POST'])
 @login_required
-@check_confirmed
 def account():
     change_password_form = ChangePasswordForm()
     delete_account_form = DeleteAccountForm()
@@ -93,7 +97,6 @@ def account():
 
 @bp.route('/change_password', methods=['POST'])
 @login_required
-@check_confirmed
 def change_password():
     form = ChangePasswordForm()
     if form.validate_on_submit():
@@ -112,7 +115,6 @@ def change_password():
 
 @bp.route('/delete_account', methods=['POST'])
 @login_required
-@check_confirmed
 def delete_account():
     form = DeleteAccountForm()
     if form.validate_on_submit():
@@ -198,27 +200,28 @@ def confirm_email_route(token):
         flash('Votre compte a été confirmé avec succès !', 'success')
     return redirect(url_for('main.login'))
 
-@bp.route('/unconfirmed')
-@login_required
-def unconfirmed():
-    if current_user.confirmed:
+@bp.route('/resend_confirmation_request', methods=['GET', 'POST'])
+def resend_confirmation_request():
+    if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    return render_template('unconfirmed.html')
-
-@bp.route('/resend_confirmation')
-@login_required
-def resend_confirmation():
-    if current_user.confirmed:
-        return redirect(url_for('main.index'))
-    token = generate_confirmation_token(current_user.email)
-    confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
-    send_email(current_user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
-    flash('Un nouvel email de confirmation a été envoyé.', 'success')
-    return redirect(url_for('main.unconfirmed'))
+    form = ResendConfirmationForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            if user.confirmed:
+                flash('Ce compte est déjà confirmé. Veuillez vous connecter.', 'success')
+                return redirect(url_for('main.login'))
+            else:
+                token = generate_confirmation_token(user.email)
+                confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
+                send_email(user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
+                flash('Un nouvel email de confirmation a été envoyé.', 'success')
+                return redirect(url_for('main.login'))
+        else:
+            flash('Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire.', 'warning')
+    return render_template('resend_confirmation_request.html', form=form)
 
 @bp.route('/builder')
-@login_required
-@check_confirmed
 def builder():
     initial_folders = []
 
@@ -251,7 +254,6 @@ def builder():
 
 @bp.route('/pictogram-bank')
 @login_required
-@check_confirmed
 def pictogram_bank():
     root_folder = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
     if not root_folder:
@@ -263,8 +265,6 @@ def pictogram_bank():
 
 
 @bp.route('/list')
-@login_required
-@check_confirmed
 def list_page():
     # This logic is similar to the builder, providing the necessary data for the UI components
     initial_folders = []
@@ -342,7 +342,6 @@ def load_lists():
 
 @api_bp.route('/lists', methods=['POST'])
 @login_required
-@check_confirmed
 def save_list():
     data = request.get_json()
     if not data:
@@ -389,7 +388,6 @@ def save_list():
 
 @api_bp.route('/lists/<int:list_id>', methods=['PUT'])
 @login_required
-@check_confirmed
 def update_list(list_id):
     plist = db.session.get(PictogramList, list_id)
     if plist is None:
@@ -417,7 +415,6 @@ def update_list(list_id):
 
 @api_bp.route('/lists/<int:list_id>', methods=['DELETE'])
 @login_required
-@check_confirmed
 def delete_list(list_id):
     plist = db.session.get(PictogramList, list_id)
     if plist is None:
@@ -465,7 +462,6 @@ def get_pictograms():
 
 @api_bp.route('/folder/create', methods=['POST'])
 @login_required
-@check_confirmed
 def create_folder():
     data = request.get_json()
     if not data or 'name' not in data or 'parent_id' not in data or not data.get('name').strip():
@@ -499,7 +495,6 @@ def create_folder():
 
 @api_bp.route('/image/upload', methods=['POST'])
 @login_required
-@check_confirmed
 def upload_image():
     if 'file' not in request.files:
         return jsonify({'status': 'error', 'message': 'No file part'}), 400
@@ -551,7 +546,6 @@ def get_image_ids_from_tree(nodes):
 
 @api_bp.route('/tree/save', methods=['POST'])
 @login_required
-@check_confirmed
 def save_tree():
     data = request.get_json()
     if not data:
@@ -630,7 +624,6 @@ def delete_folder_recursive(folder):
 
 @api_bp.route('/item/delete', methods=['DELETE'])
 @login_required
-@check_confirmed
 def delete_item():
     data = request.get_json()
     if not data or 'id' not in data or 'type' not in data:

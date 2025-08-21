@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    <h1>Renvoyer l'e-mail de confirmation</h1>
+    <p>Veuillez saisir l'adresse e-mail de votre compte. Si un compte correspondant est trouvé et n'est pas encore confirmé, nous vous enverrons un nouvel e-mail de confirmation.</p>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endblock %}
