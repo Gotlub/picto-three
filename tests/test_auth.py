@@ -1,23 +1,9 @@
 from app.models import User
 from app import db
-import re
 import pytest
 from app import utils
 from app.utils import generate_confirmation_token, generate_password_reset_token
-
-def get_csrf_token(html):
-    # Utilise une regex pour extraire le CSRF token depuis l'input caché du formulaire
-    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
-    return match.group(1) if match else None
-
-def login(client, username, password):
-    get_response = client.get('/login')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    return client.post('/login', data=dict(
-        username=username,
-        password=password,
-        csrf_token=csrf_token
-    ), follow_redirects=True)
+from tests.conftest import get_csrf_token, login, confirm_user
 
 def test_app_config(app):
     assert app.config["TESTING"] is True
@@ -128,6 +114,9 @@ def test_password_strength_and_account_deletion(client):
         login_response = login(client, 'strongpassworduser', 'StrongPassword123')
         assert b'Logout' in login_response.data
 
+        # Confirm the user
+        confirm_user(client, 'strong@example.com')
+
         # Get CSRF token from a form on a protected page (e.g., account page)
         account_page_response = client.get('/account')
         delete_csrf_token = get_csrf_token(account_page_response.data.decode())
@@ -186,8 +175,7 @@ def test_email_confirmation(client):
     assert not user.confirmed
 
     # Generate a token and confirm
-    token = generate_confirmation_token(user.email)
-    response = client.get(f'/confirm/{token}', follow_redirects=True)
+    response = confirm_user(client, user.email)
 
     assert 'Votre compte a été confirmé avec succès !' in response.data.decode('utf-8')
     db.session.refresh(user)
@@ -238,3 +226,53 @@ def test_password_reset_flow(client, monkeypatch):
     db.session.refresh(user)
     assert user.check_password('NewPassword123')
     assert not user.check_password('OldPassword123')
+
+def test_unconfirmed_user_is_redirected(client):
+    # 1. Register a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={
+        'username': 'unconfirmeduser',
+        'csrf_token': csrf_token,
+        'email': 'unconfirmed@example.com',
+        'password': 'Password123',
+        'password2': 'Password123'
+    })
+    user = User.query.filter_by(email='unconfirmed@example.com').first()
+    assert user is not None
+    assert not user.confirmed
+
+    # 2. Log the user in
+    login(client, 'unconfirmeduser', 'Password123')
+
+    # 3. Try to access a protected page
+    response = client.get('/account', follow_redirects=True)
+    assert '<h1>Veuillez confirmer votre compte</h1>' in response.data.decode('utf-8')
+    assert response.request.path == '/unconfirmed'
+
+def test_resend_confirmation_email(client, monkeypatch):
+    # 1. Register and log in an unconfirmed user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={
+        'username': 'resenduser',
+        'csrf_token': csrf_token,
+        'email': 'resend@example.com',
+        'password': 'Password123',
+        'password2': 'Password123'
+    })
+    login(client, 'resenduser', 'Password123')
+
+    # 2. Mock email sending and trigger resend
+    sent_emails = []
+    def mock_send_email(to, subject, template, **kwargs):
+        sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
+    monkeypatch.setattr('app.routes.send_email', mock_send_email)
+
+    response = client.get('/resend_confirmation', follow_redirects=True)
+
+    # 3. Verify email was sent and user was redirected
+    assert len(sent_emails) == 1
+    assert sent_emails[0]['to'] == 'resend@example.com'
+    assert 'Un nouvel email de confirmation a été envoyé.' in response.data.decode('utf-8')
+    assert response.request.path == '/unconfirmed'

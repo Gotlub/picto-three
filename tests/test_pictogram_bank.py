@@ -6,34 +6,7 @@ from io import BytesIO
 import pytest
 from app.models import User, Folder, Image
 from app import db
-
-# Helper function to extract CSRF token
-def get_csrf_token(html):
-    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
-    return match.group(1) if match else None
-
-# Helper function for user login
-def login(client, username, password):
-    get_response = client.get('/login')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    return client.post('/login', data=dict(
-        username=username,
-        password=password,
-        csrf_token=csrf_token
-    ), follow_redirects=True)
-
-# Helper function to create a test user
-def create_user(client, username='testuser', password='Password123'):
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data=dict(
-        username=username,
-        email=f'{username}@test.com',
-        password=password,
-        password2=password,
-        csrf_token=csrf_token
-    ), follow_redirects=True)
-    return User.query.filter_by(username=username).first()
+from tests.conftest import get_csrf_token, login, create_user, confirm_user
 
 @pytest.fixture(autouse=True)
 def cleanup_files():
@@ -61,8 +34,9 @@ def test_pictogram_bank_unauthenticated(client):
 
 def test_pictogram_bank_authenticated(client):
     """Test that an authenticated user can access the pictogram bank."""
-    create_user(client, 'testuser_pictogram', 'Password123')
+    user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     response = client.get('/pictogram-bank')
     assert response.status_code == 200
     assert b'My Pictograms' in response.data
@@ -82,6 +56,7 @@ def test_get_pictograms_authenticated(client):
     """Test that an authenticated user can fetch their pictogram structure."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
 
     response = client.get('/api/pictograms')
     assert response.status_code == 200
@@ -96,6 +71,7 @@ def test_create_folder_success(client):
     """Test successful folder creation."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
 
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
     assert root_folder is not None
@@ -119,8 +95,9 @@ def test_create_folder_success(client):
 
 def test_create_folder_invalid_parent(client):
     """Test creating a folder with an invalid parent ID."""
-    create_user(client, 'testuser_pictogram', 'Password123')
+    user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
 
     response = client.post('/api/folder/create', json={
         'name': 'New Folder',
@@ -134,6 +111,7 @@ def test_create_folder_missing_name(client):
     """Test creating a folder with no name."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     response = client.post('/api/folder/create', json={
@@ -150,6 +128,7 @@ def test_upload_image_success(client):
     """Test successful image upload."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     data = {
@@ -172,6 +151,7 @@ def test_upload_image_no_file(client):
     """Test uploading with no file part."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     response = client.post('/api/image/upload', data={'folder_id': root_folder.id}, content_type='multipart/form-data')
@@ -179,8 +159,9 @@ def test_upload_image_no_file(client):
 
 def test_upload_image_to_invalid_folder(client):
     """Test uploading an image to a non-existent folder."""
-    create_user(client, 'testuser_pictogram', 'Password123')
+    user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
 
     data = {
         'folder_id': 999,
@@ -195,6 +176,7 @@ def test_delete_image_success(client):
     """Test successful deletion of an image."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     # First, upload an image
@@ -217,6 +199,7 @@ def test_delete_folder_success(client):
     """Test successful deletion of a folder and its contents."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     # Create a subfolder
@@ -247,6 +230,7 @@ def test_delete_root_folder_fails(client):
     """Test that deleting the root folder is not allowed."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     login(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     delete_response = client.delete('/api/item/delete', json={'id': root_folder.id, 'type': 'folder'})
