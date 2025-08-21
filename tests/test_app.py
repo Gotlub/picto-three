@@ -9,6 +9,7 @@ def test_login_page(client):
     response = client.get('/login')
     assert response.status_code == 200
     assert b'Sign In' in response.data
+    assert b'Forgot Your Password?' in response.data
 
 def test_register_page(client):
     response = client.get('/register')
