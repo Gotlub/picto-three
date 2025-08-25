@@ -112,6 +112,7 @@ class PictogramBank {
         document.getElementById('delete-btn').addEventListener('click', () => this.deleteSelected());
         document.getElementById('root-btn').addEventListener('click', () => this.selectRoot());
         document.getElementById('export-image-btn').addEventListener('click', () => this.exportImage());
+        document.getElementById('save-image-changes-btn').addEventListener('click', () => this.saveImageChanges());
 
         this.display.addEventListener('click', (e) => {
             if (e.target === this.display) {
@@ -128,8 +129,19 @@ class PictogramBank {
         }
 
         document.getElementById('delete-btn').disabled = this.selectedNode.data.parent_id === null; // Cannot delete root
+
         const exportBtn = document.getElementById('export-image-btn');
-        exportBtn.disabled = !(this.selectedNode instanceof ImageNode);
+        const editSection = document.getElementById('edit-image-section');
+
+        if (this.selectedNode instanceof ImageNode) {
+            exportBtn.disabled = false;
+            editSection.style.display = 'block';
+            document.getElementById('edit-image-description').value = this.selectedNode.data.description || '';
+            document.getElementById('edit-image-public').checked = this.selectedNode.data.is_public;
+        } else {
+            exportBtn.disabled = true;
+            editSection.style.display = 'none';
+        }
     }
 
     deselectAllNodes() {
@@ -140,6 +152,7 @@ class PictogramBank {
         this.rootSelected = false;
         document.getElementById('delete-btn').disabled = true;
         document.getElementById('export-image-btn').disabled = true;
+        document.getElementById('edit-image-section').style.display = 'none';
     }
 
     selectRoot() {
@@ -294,6 +307,36 @@ class PictogramBank {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    async saveImageChanges() {
+        if (!this.selectedNode || !(this.selectedNode instanceof ImageNode)) {
+            alert('Please select an image to save.');
+            return;
+        }
+
+        const imageId = this.selectedNode.data.id;
+        const description = document.getElementById('edit-image-description').value;
+        const isPublic = document.getElementById('edit-image-public').checked;
+
+        const response = await fetch(`/api/image/${imageId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                description: description,
+                is_public: isPublic,
+            }),
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            // Update the local data so the UI is in sync
+            this.selectedNode.data.description = result.image.description;
+            this.selectedNode.data.is_public = result.image.is_public;
+            alert('Image updated successfully!');
+        } else {
+            alert(`Error updating image: ${result.message}`);
+        }
     }
 
     addNodeToTree(newNode, parentId) {

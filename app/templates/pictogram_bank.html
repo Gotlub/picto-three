@@ -38,6 +38,23 @@
             <button id="upload-image-btn" class="btn btn-secondary mt-2">{{ _('Upload') }}</button>
             <hr>
 
+            <!-- Edit Image Section (hidden by default) -->
+            <div id="edit-image-section" style="display: none;">
+                <h4>{{ _('Edit Selected Image') }}</h4>
+                <div class="mb-3">
+                    <label for="edit-image-description" class="form-label">{{ _('Description') }}</label>
+                    <input type="text" id="edit-image-description" class="form-control">
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="edit-image-public">
+                    <label class="form-check-label" for="edit-image-public">
+                        {{ _('Make image public') }}
+                    </label>
+                </div>
+                <button id="save-image-changes-btn" class="btn btn-success">{{ _('Save Changes') }}</button>
+            </div>
+            <hr>
+
             <!-- Export Image Section -->
             <h4>{{ _('Export Image') }}</h4>
             <button id="export-image-btn" class="btn btn-success" disabled>{{ _('Download Selected Image') }}</button>

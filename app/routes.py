@@ -564,6 +564,41 @@ def upload_image():
 
     return jsonify({'status': 'error', 'message': 'File upload failed'}), 500
 
+
+@api_bp.route('/image/<int:image_id>', methods=['PUT'])
+@login_required
+def update_image_details(image_id):
+    """
+    Update an image's details, such as its description and public status.
+    """
+    image = db.session.get(Image, image_id)
+    if not image:
+        return jsonify({'status': 'error', 'message': 'Image not found'}), 404
+
+    # Security check: Only the owner of the image can edit it.
+    if image.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': 'Unauthorized to edit this image'}), 403
+
+    data = request.get_json()
+    if data is None:
+        return jsonify({'status': 'error', 'message': 'Invalid JSON data'}), 400
+
+    # Update fields if they are present in the request payload
+    if 'description' in data:
+        image.description = data['description']
+
+    if 'is_public' in data:
+        image.is_public = bool(data['is_public'])
+
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Image updated successfully',
+        'image': image.to_dict()
+    })
+
+
 def get_image_ids_from_tree(nodes):
     """Recursively extracts all image IDs from a tree structure."""
     image_ids = set()

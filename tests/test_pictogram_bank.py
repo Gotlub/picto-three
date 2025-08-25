@@ -237,3 +237,73 @@ def test_delete_root_folder_fails(client):
     delete_response = client.delete('/api/item/delete', json={'id': root_folder.id, 'type': 'folder'})
     assert delete_response.status_code == 400
     assert 'Cannot delete root folder' in delete_response.get_json()['message']
+
+# --- PUT /api/image/<id> ---
+
+def test_update_image_details_success(client):
+    """Test that a user can update their own image's details."""
+    user = create_user(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_pictogram', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    # Upload an image to get an ID
+    data = {'folder_id': root_folder.id, 'file': (BytesIO(b"content"), 'image_to_update.jpg')}
+    upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
+    image_id = upload_response.get_json()['image']['id']
+
+    # Now, update its details
+    update_payload = {
+        'description': 'A new description',
+        'is_public': True
+    }
+    update_response = client.put(f'/api/image/{image_id}', json=update_payload)
+
+    assert update_response.status_code == 200
+    json_data = update_response.get_json()
+    assert json_data['status'] == 'success'
+    assert json_data['image']['description'] == 'A new description'
+    assert json_data['image']['is_public'] is True
+
+    # Verify in the database
+    updated_image = db.session.get(Image, image_id)
+    assert updated_image.description == 'A new description'
+    assert updated_image.is_public is True
+
+def test_update_image_details_unauthorized(client):
+    """Test that a user cannot update another user's image."""
+    # Create owner and hacker
+    owner = create_user(client, 'owner', 'Password123', 'owner@test.com')
+    confirm_user(client, owner.email)
+    hacker = create_user(client, 'hacker', 'Password123', 'hacker@test.com')
+    confirm_user(client, hacker.email)
+
+    # Owner logs in and uploads an image
+    login(client, 'owner', 'Password123')
+    root_folder_owner = Folder.query.filter_by(user_id=owner.id).first()
+    data = {'folder_id': root_folder_owner.id, 'file': (BytesIO(b"content"), 'owned_image.jpg')}
+    upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
+    image_id = upload_response.get_json()['image']['id']
+    client.get('/logout') # Logout owner
+
+    # Hacker logs in and attempts to update the image
+    login(client, 'hacker', 'Password123')
+    update_payload = {'description': 'hacked'}
+    update_response = client.put(f'/api/image/{image_id}', json=update_payload)
+
+    assert update_response.status_code == 403
+
+def test_update_image_details_not_found(client):
+    """Test updating a non-existent image."""
+    user = create_user(client, 'testuser_pictogram', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_pictogram', 'Password123')
+
+    update_response = client.put('/api/image/99999', json={'description': 'test'})
+    assert update_response.status_code == 404
+
+def test_update_image_details_unauthenticated(client):
+    """Test that an unauthenticated user cannot update an image."""
+    # No login
+    update_response = client.put('/api/image/1', json={'description': 'test'})
+    assert update_response.status_code == 401
