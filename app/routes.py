@@ -13,6 +13,7 @@ from PIL import Image as PILImage
 from app import db
 from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm, ResendConfirmationForm
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree, Folder, PictogramList
 from app.utils import send_email, generate_confirmation_token, confirm_token, generate_password_reset_token, confirm_password_reset_token
@@ -239,17 +240,23 @@ def builder():
     # The initial data for the right sidebar tree
     initial_tree_data_json = json.dumps(initial_folders)
 
-    # We still need all images for the left panel's "load tree" functionality for now.
-    # This could be refactored later.
-    all_images = Image.query.all()
-    images_json = json.dumps([image.to_dict() for image in all_images])
+    # Load only images that are public or owned by the current user.
+    conditions = [
+        Image.user_id == None,  # Global public images
+        Image.is_public == True   # User-owned but public images
+    ]
+    if current_user.is_authenticated:
+        conditions.append(Image.user_id == current_user.id)
+
+    visible_images = Image.query.filter(or_(*conditions)).all()
+    images_json = json.dumps([image.to_dict() for image in visible_images])
 
 
     return render_template(
         'builder.html',
         title='Tree Builder',
         initial_tree_data_json=initial_tree_data_json,
-        images_json=images_json # Still needed for existing logic
+        images_json=images_json
     )
 
 @bp.route('/pictogram-bank')
@@ -282,9 +289,16 @@ def list_page():
 
     initial_tree_data_json = json.dumps(initial_folders)
 
-    # The list builder needs all images to reconstruct lists from saved data (which only has IDs)
-    all_images = Image.query.all()
-    all_images_json = json.dumps([image.to_dict() for image in all_images])
+    # Load only images that are public or owned by the current user.
+    conditions = [
+        Image.user_id == None,  # Global public images
+        Image.is_public == True   # User-owned but public images
+    ]
+    if current_user.is_authenticated:
+        conditions.append(Image.user_id == current_user.id)
+
+    visible_images = Image.query.filter(or_(*conditions)).all()
+    all_images_json = json.dumps([image.to_dict() for image in visible_images])
 
     return render_template(
         'list.html',
@@ -353,6 +367,23 @@ def save_list():
 
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
+
+    # Validate images if saving a public list
+    if is_public:
+        image_ids = set()
+        if isinstance(payload, list):
+            for item in payload:
+                if isinstance(item, dict) and 'image_id' in item:
+                    image_ids.add(item['image_id'])
+
+        if image_ids:
+            # Public lists cannot contain any user-owned images (user_id is not NULL)
+            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id != None).all()
+            if user_owned_images:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Les listes publiques ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.'
+                }), 400
 
     payload_str = json.dumps(payload)
 
@@ -565,11 +596,12 @@ def save_tree():
 
         image_ids = get_image_ids_from_tree(json_data['roots'])
         if image_ids:
-            private_images = Image.query.filter(Image.id.in_(image_ids), Image.is_public == False).all()
-            if private_images:
+            # Public trees cannot contain any user-owned images (user_id is not NULL)
+            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id != None).all()
+            if user_owned_images:
                 return jsonify({
                     'status': 'error',
-                    'message': 'Public trees can only contain public images. Please remove private images before saving publicly.'
+                    'message': 'Les arbres publics ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.'
                 }), 400
 
     # Check if a tree with the same name already exists for this user
