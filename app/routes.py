@@ -11,6 +11,7 @@ from reportlab.lib.utils import ImageReader
 from PIL import Image as PILImage
 from app import db
 from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Image, Tree, Folder, PictogramList
@@ -153,9 +154,12 @@ def builder():
     # The initial data for the right sidebar tree
     initial_tree_data_json = json.dumps(initial_folders)
 
-    # We still need all images for the left panel's "load tree" functionality for now.
-    # This could be refactored later.
-    all_images = Image.query.all()
+    # Load only the images the user is allowed to see.
+    # This includes: globally public images, user-public images, and the user's own images.
+    q = or_(Image.user_id.is_(None), Image.is_public == True)
+    if current_user.is_authenticated:
+        q = or_(q, Image.user_id == current_user.id)
+    all_images = Image.query.filter(q).all()
     images_json = json.dumps([image.to_dict() for image in all_images])
 
 
@@ -196,8 +200,11 @@ def list_page():
 
     initial_tree_data_json = json.dumps(initial_folders)
 
-    # The list builder needs all images to reconstruct lists from saved data (which only has IDs)
-    all_images = Image.query.all()
+    # Load only the images the user is allowed to see for list reconstruction.
+    q = or_(Image.user_id.is_(None), Image.is_public == True)
+    if current_user.is_authenticated:
+        q = or_(q, Image.user_id == current_user.id)
+    all_images = Image.query.filter(q).all()
     all_images_json = json.dumps([image.to_dict() for image in all_images])
 
     return render_template(
