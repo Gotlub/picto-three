@@ -1,13 +1,20 @@
 import os
+from pathlib import Path
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = Path(__file__).parent.resolve()
 
-import os
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+
+    # Define the path for the database file in a 'data' subdirectory
+    # and ensure the directory exists.
+    data_dir = basedir / "data"
+    data_dir.mkdir(exist_ok=True)
+    db_path = data_dir / "app.db"
+
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+        f'sqlite:///{db_path}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LANGUAGES = ['en', 'fr', 'es']
 

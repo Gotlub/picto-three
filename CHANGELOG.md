@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Add github workflows
 
+### Changed
+- Externalized the database to a `data/` directory to improve security and deployment pipeline.
+
 ### Added
 - Initial project structure and documentation for agent-driven development.
 - Configuration files: `README.md`, `AGENTS.md`, `GEMINI.md`, `TESTING.md`, `TODO.md`, `CHANGELOG.md`.
