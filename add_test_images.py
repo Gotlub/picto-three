@@ -1,6 +1,7 @@
 # This script will be used to add test images to the database.
 import os
 import sys
+from pathlib import Path
 
 # Add the app directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
@@ -20,11 +21,11 @@ def main():
 
         print("Scanning for pictograms and adding them to the database...")
 
-        # The root of pictograms in the source code
-        source_pictograms_path = os.path.join('app', 'static', 'images', 'pictograms')
+        # The root of pictograms is now read from the app config
+        source_pictograms_path = Path(app.config['PICTOGRAMS_PATH'])
 
         # The root from which we start scanning
-        scan_root = os.path.join(source_pictograms_path, 'public')
+        scan_root = source_pictograms_path / 'public'
 
         # Dictionary to store the relationship between physical path and folder id
         path_to_folder_id = {}
