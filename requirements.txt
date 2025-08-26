@@ -12,3 +12,4 @@ Pillow
 Flask-Mail
 itsdangerous
 Flask-Bootstrap
+gunicorn
