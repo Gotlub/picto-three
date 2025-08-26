@@ -42,32 +42,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           
           # Le script à exécuter sur le serveur distant
-          script: |
-            # Aller dans le dossier de build
-              cd /home/deploy-github/app/picto-three
-
-            # Mettre à jour le code
-              git fetch --all
-              git reset --hard origin/main
-            
-            # Installer les dépendances dans le venv
-              cd /home/deploy-github/app/picto-three
-              if [ ! -d "venv" ]; then
-                python3 -m venv venv
-              fi
-
-              source venv/bin/activate
-              pip install -r requirements.txt
-              pip install --upgrade pip
-              pip install gunicorn
-              deactivate
-              
-
-            # Synchroniser le code vers /var/www/picto-three
-              sudo rsync -a --delete /home/deploy-github/app/picto-three/ /var/www/picto-three
-              sudo chown -R deploy:deploy /var/www/picto-three/
-
-            # Redémarrer le service
-              sudo systemctl restart picto-three.service
+          script: /home/deploy-github/deploy.sh
 
     
