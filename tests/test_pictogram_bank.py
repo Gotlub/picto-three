@@ -1,24 +1,12 @@
 import os
 import shutil
 from io import BytesIO
-
+from pathlib import Path
 import pytest
 from app.models import Folder, Image
 from app import db
 from tests.conftest import create_user, login, confirm_user
 
-@pytest.fixture(autouse=True)
-def cleanup_files():
-    """Ensure the user's test directory is cleaned up before and after tests."""
-    user_path = os.path.join('app', 'static', 'images', 'pictograms', 'testuser_pictogram')
-    if os.path.exists(user_path):
-        shutil.rmtree(user_path)
-
-    yield # This is where the test runs
-
-    # Run after the test
-    if os.path.exists(user_path):
-        shutil.rmtree(user_path)
 
 # -----------------------------------------------------------------------------
 # Tests for the main /pictogram-bank page
@@ -65,7 +53,7 @@ def test_get_pictograms_authenticated(client):
 
 # --- POST /api/folder/create ---
 
-def test_create_folder_success(client):
+def test_create_folder_success(client, app):
     """Test successful folder creation."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     confirm_user(client, user.email)
@@ -89,7 +77,8 @@ def test_create_folder_success(client):
     assert new_folder is not None
     assert new_folder.name == 'New Folder'
     # Verify physical directory was created
-    assert os.path.exists(new_folder.path)
+    physical_path = Path(app.config['PICTOGRAMS_PATH']) / new_folder.path
+    assert physical_path.exists()
 
 def test_create_folder_invalid_parent(client):
     """Test creating a folder with an invalid parent ID."""
@@ -122,7 +111,7 @@ def test_create_folder_missing_name(client):
 
 # --- POST /api/image/upload ---
 
-def test_upload_image_success(client):
+def test_upload_image_success(client, app):
     """Test successful image upload."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     confirm_user(client, user.email)
@@ -143,7 +132,8 @@ def test_upload_image_success(client):
     # Verify image in DB and file system
     image = db.session.get(Image, json_data['image']['id'])
     assert image is not None
-    assert os.path.exists(image.path)
+    physical_path = Path(app.config['PICTOGRAMS_PATH']) / image.path
+    assert physical_path.exists()
 
 def test_upload_image_no_file(client):
     """Test uploading with no file part."""
@@ -170,7 +160,7 @@ def test_upload_image_to_invalid_folder(client):
 
 # --- DELETE /api/item/delete ---
 
-def test_delete_image_success(client):
+def test_delete_image_success(client, app):
     """Test successful deletion of an image."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     confirm_user(client, user.email)
@@ -182,8 +172,8 @@ def test_delete_image_success(client):
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
     image = db.session.get(Image, image_id)
-    image_path = image.path
-    assert os.path.exists(image_path)
+    physical_path = Path(app.config['PICTOGRAMS_PATH']) / image.path
+    assert physical_path.exists()
 
     # Now, delete it
     delete_response = client.delete('/api/item/delete', json={'id': image_id, 'type': 'image'})
@@ -192,9 +182,9 @@ def test_delete_image_success(client):
 
     # Verify it's gone from DB and filesystem
     assert db.session.get(Image, image_id) is None
-    assert not os.path.exists(image_path)
+    assert not physical_path.exists()
 
-def test_delete_folder_success(client):
+def test_delete_folder_success(client, app):
     """Test successful deletion of a folder and its contents."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
     confirm_user(client, user.email)
@@ -205,16 +195,16 @@ def test_delete_folder_success(client):
     create_response = client.post('/api/folder/create', json={'name': 'Subfolder', 'parent_id': root_folder.id})
     subfolder_id = create_response.get_json()['folder']['id']
     subfolder = db.session.get(Folder, subfolder_id)
-    subfolder_path = subfolder.path
-    assert os.path.exists(subfolder_path)
+    subfolder_path = Path(app.config['PICTOGRAMS_PATH']) / subfolder.path
+    assert subfolder_path.exists()
 
     # Upload an image into the subfolder
     data = {'folder_id': subfolder_id, 'file': (BytesIO(b"content"), 'image_in_sub.jpg')}
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
     image = db.session.get(Image, image_id)
-    image_path = image.path
-    assert os.path.exists(image_path)
+    image_path = Path(app.config['PICTOGRAMS_PATH']) / image.path
+    assert image_path.exists()
 
     # Now, delete the subfolder
     delete_response = client.delete('/api/item/delete', json={'id': subfolder_id, 'type': 'folder'})
@@ -224,8 +214,8 @@ def test_delete_folder_success(client):
     # Verify folder and image are gone
     assert db.session.get(Folder, subfolder_id) is None
     assert db.session.get(Image, image_id) is None
-    assert not os.path.exists(subfolder_path)
-    assert not os.path.exists(image_path)
+    assert not subfolder_path.exists()
+    assert not image_path.exists()
 
 def test_delete_root_folder_fails(client):
     """Test that deleting the root folder is not allowed."""

@@ -34,7 +34,7 @@ class FolderNode extends BaseNode {
         contentElement.classList.add('node-content');
 
         const icon = document.createElement('img');
-        icon.src = '/static/images/pictograms/public/bold/folder-bold.png'; // As requested
+        icon.src = '/pictograms/public/bold/folder-bold.png'; // As requested
         contentElement.appendChild(icon);
 
         const nameElement = document.createElement('span');
@@ -62,9 +62,8 @@ class ImageNode extends BaseNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        const newSrc = this.data.path.slice(4);
-        console.log(`Original path: ${this.data.path}, New src: ${newSrc}`);
-        imgElement.src = newSrc;
+        // The path from the backend is now relative, so we build the URL for the new endpoint.
+        imgElement.src = `/pictograms/${this.data.path}`;
         imgElement.alt = this.data.name;
 
         // Add tooltip events
@@ -299,11 +298,15 @@ class PictogramBank {
             return;
         }
 
-        const imagePath = this.selectedNode.data.path.slice(4);
-        console.log(`Exporting image with path: ${imagePath}`);
+        const relativePath = this.selectedNode.data.path;
+        const imageUrl = `/pictograms/${relativePath}`;
+        console.log(`Exporting image with URL: ${imageUrl}`);
+
         const link = document.createElement('a');
-        link.href = imagePath;
-        link.download = imagePath;
+        link.href = imageUrl;
+        // The download attribute suggests a filename to the browser.
+        // We can extract the filename from the relative path.
+        link.download = relativePath.split('/').pop();
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

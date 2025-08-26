@@ -20,23 +20,26 @@ def main():
 
         print("Scanning for pictograms and adding them to the database...")
 
-        pictograms_path = os.path.join('app', 'static', 'images', 'pictograms', 'public')
+        # The root of pictograms in the source code
+        source_pictograms_path = os.path.join('app', 'static', 'images', 'pictograms')
 
-        # Dictionary to store the relationship between path and folder id
+        # The root from which we start scanning
+        scan_root = os.path.join(source_pictograms_path, 'public')
+
+        # Dictionary to store the relationship between physical path and folder id
         path_to_folder_id = {}
 
         # First pass: create all folders
-        for root, dirs, _ in os.walk(pictograms_path):
-            parent_path = os.path.dirname(root)
-            parent_id = path_to_folder_id.get(parent_path)
+        for root, dirs, _ in os.walk(scan_root):
+            parent_physical_path = os.path.dirname(root)
+            parent_id = path_to_folder_id.get(parent_physical_path)
 
-            folder_name = os.path.basename(root)
-            if root == pictograms_path:
-                folder_name = 'public'
+            # The path stored in the DB must be relative to the *pictograms* root folder
+            relative_path = os.path.relpath(root, source_pictograms_path)
 
             folder = Folder(
-                name=folder_name,
-                path=root.replace('\\', '/'),
+                name=os.path.basename(root),
+                path=relative_path.replace('\\', '/'),
                 user_id=None,
                 parent_id=parent_id
             )
@@ -48,7 +51,7 @@ def main():
 
         # Second pass: create all images
         images_added = 0
-        for root, _, files in os.walk(pictograms_path):
+        for root, _, files in os.walk(scan_root):
             folder_id = path_to_folder_id.get(root)
             if not folder_id:
                 print(f"Warning: Could not find folder ID for path {root}")
@@ -56,12 +59,13 @@ def main():
 
             for file in files:
                 if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                    image_path = os.path.join(root, file).replace('\\', '/')
+                    # The path stored in the DB must be relative to the *pictograms* root folder
+                    relative_path = os.path.relpath(os.path.join(root, file), source_pictograms_path)
                     name = file
                     description = f"Public pictogram: {name}"
 
                     image = Image(
-                        path=image_path,
+                        path=relative_path.replace('\\', '/'),
                         name=name,
                         description=description,
                         is_public=True,

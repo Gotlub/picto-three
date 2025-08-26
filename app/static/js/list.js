@@ -38,7 +38,7 @@ class ImageTreeFolderNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const icon = document.createElement('img');
-        icon.src = '/static/images/pictograms/public/bold/folder-bold.png';
+        icon.src = '/pictograms/public/bold/folder-bold.png';
         this.icon = icon;
         contentElement.appendChild(icon);
 
@@ -64,13 +64,13 @@ class ImageTreeFolderNode extends ImageTreeNode {
     toggle() {
         this.expanded = !this.expanded;
         if (this.expanded) {
-            this.icon.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
+            this.icon.src = '/pictograms/public/bold/folder-open-bold.png';
             this.childrenContainer.style.display = '';
             if (!this.childrenLoaded) {
                 this.loadChildren();
             }
         } else {
-            this.icon.src = '/static/images/pictograms/public/bold/folder-bold.png';
+            this.icon.src = '/pictograms/public/bold/folder-bold.png';
             this.childrenContainer.style.display = 'none';
         }
     }
@@ -105,7 +105,8 @@ class ImageTreeImageNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        imgElement.src = this.data.path.replace('app/static', '/static');
+        // The path from the backend is now relative, so we build the URL for the new endpoint.
+        imgElement.src = `/pictograms/${this.data.path}`;
         imgElement.alt = this.data.name;
 
         contentElement.appendChild(imgElement);
@@ -180,10 +181,14 @@ class ReadOnlyNode {
         contentElement.classList.add('node-content');
         const imgElement = document.createElement('img');
         if (this.image.id === 'root') {
-            imgElement.src = '/static/images/pictograms/public/bold/folder-bold.png';
-        }
-        else if (this.image.path) {
-            imgElement.src = this.image.path.startsWith('/static') ? this.image.path : this.image.path.replace('app/', '');
+            imgElement.src = '/pictograms/public/bold/folder-bold.png';
+        } else if (this.image.path) {
+            // Path can be a new relative path or an old absolute one during transition
+            if (this.image.path.startsWith('/')) {
+                imgElement.src = this.image.path; // It's already a full URL
+            } else {
+                imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
+            }
         }
         imgElement.alt = this.image.name;
         contentElement.appendChild(imgElement);
@@ -220,7 +225,8 @@ class ChainedListItem {
         itemElement.setAttribute('draggable', 'true');
 
         const img = document.createElement('img');
-        img.src = this.data.path.replace('app/static', '/static');
+        // The path from the backend is now relative, so we build the URL for the new endpoint.
+        img.src = `/pictograms/${this.data.path}`;
         img.alt = this.data.name;
         itemElement.appendChild(img);
 

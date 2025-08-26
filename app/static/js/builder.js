@@ -30,7 +30,7 @@ class ImageTreeFolderNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const icon = document.createElement('img');
-        icon.src = '/static/images/pictograms/public/bold/folder-bold.png';
+        icon.src = '/pictograms/public/bold/folder-bold.png';
         this.icon = icon;
         contentElement.appendChild(icon);
 
@@ -53,13 +53,13 @@ class ImageTreeFolderNode extends ImageTreeNode {
     toggle() {
         this.expanded = !this.expanded;
         if (this.expanded) {
-            this.icon.src = '/static/images/pictograms/public/bold/folder-open-bold.png';
+            this.icon.src = '/pictograms/public/bold/folder-open-bold.png';
             this.childrenContainer.style.display = '';
             if (!this.childrenLoaded) {
                 this.loadChildren();
             }
         } else {
-            this.icon.src = '/static/images/pictograms/public/bold/folder-bold.png';
+            this.icon.src = '/pictograms/public/bold/folder-bold.png';
             this.childrenContainer.style.display = 'none';
         }
     }
@@ -126,7 +126,9 @@ class ImageTreeImageNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        imgElement.src = this.data.path.replace('app/static', '/static');
+        // The path from the backend is now relative to the pictograms folder,
+        // so we build the URL for the new pictogram-serving endpoint.
+        imgElement.src = `/pictograms/${this.data.path}`;
         imgElement.alt = this.data.name;
 
         // Add tooltip events
@@ -218,8 +220,13 @@ class BuilderNode {
 
         const imgElement = document.createElement('img');
         if (this.image.path) {
-            const path = this.image.path.startsWith('/static') ? this.image.path : this.image.path.replace('app/', '');
-            imgElement.src = path;
+            // Path can be a new relative path (e.g., 'public/foo.png')
+            // or an absolute URL for the root node icon (e.g., '/pictograms/public/...')
+            if (this.image.path.startsWith('/')) {
+                imgElement.src = this.image.path; // It's already a full URL
+            } else {
+                imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
+            }
         }
         imgElement.alt = this.image.name;
 
@@ -287,7 +294,7 @@ class TreeBuilder {
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
-        this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/pictograms/public/bold/folder-open-bold.png' }, this);
+        this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/pictograms/public/bold/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
 

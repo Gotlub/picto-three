@@ -1,14 +1,23 @@
 import pytest
 from app import create_app, db
 import re
+from pathlib import Path
+import shutil
 from app.utils import generate_confirmation_token
 from app.models import User
 
 @pytest.fixture
 def app():
+    # A temporary directory for test-generated pictograms
+    test_pictos_path = Path(__file__).parent / 'test_pictos'
+    if test_pictos_path.exists():
+        shutil.rmtree(test_pictos_path)
+    test_pictos_path.mkdir()
+
     app = create_app({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db"
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
+        "PICTOGRAMS_PATH": str(test_pictos_path) # Override the pictogram path for tests
     })
 
     with app.app_context():
@@ -16,13 +25,16 @@ def app():
         yield app
         db.drop_all()
 
+    # Cleanup the test pictograms directory
+    shutil.rmtree(test_pictos_path)
+
 from app.models import Image
 
 @pytest.fixture
 def client(app):
     with app.app_context():
         # Add a test image
-        image = Image(name='acorn-bold', path='app/static/images/pictograms/bold/acorn-bold.png', is_public=True)
+        image = Image(name='acorn-bold', path='public/bold/acorn-bold.png', is_public=True)
         db.session.add(image)
         db.session.commit()
     return app.test_client()

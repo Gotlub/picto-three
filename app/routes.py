@@ -1,7 +1,8 @@
 import json
 import os
 import shutil
-from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify, send_from_directory
+from pathlib import Path
+from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 import io
 from markupsafe import Markup
@@ -128,8 +129,8 @@ def delete_account():
             # 3. Delete all images belonging to the user
             Image.query.filter_by(user_id=user.id).delete()
             # 4. Delete the user's pictogram directory
-            user_pictogram_folder = os.path.join('app', 'static', 'images', 'pictograms', user.username)
-            if os.path.exists(user_pictogram_folder):
+            user_pictogram_folder = Path(current_app.config['PICTOGRAMS_PATH']) / user.username
+            if user_pictogram_folder.exists():
                 shutil.rmtree(user_pictogram_folder)
             # 5. Delete all folders of the user
             Folder.query.filter_by(user_id=user.id).delete()
@@ -158,15 +159,19 @@ def register():
         db.session.commit()
 
         # Create user's personal pictogram directory
-        user_path = os.path.join('app', 'static', 'images', 'pictograms', user.username)
-        os.makedirs(user_path, exist_ok=True)
+        # The physical path is based on the PICTOGRAMS_PATH config
+        user_physical_path = Path(current_app.config['PICTOGRAMS_PATH']) / user.username
+        user_physical_path.mkdir(exist_ok=True)
+
+        # The path stored in DB is relative to PICTOGRAMS_PATH
+        user_relative_path = user.username
 
         # Create root folder for the user
         root_folder = Folder(
             name=user.username,
             user_id=user.id,
             parent_id=None,
-            path=user_path.replace('\\', '/')
+            path=user_relative_path
         )
         db.session.add(root_folder)
         db.session.commit()
@@ -320,6 +325,13 @@ def serve_js(filename):
         filename,
         mimetype='application/javascript'
     )
+
+@bp.route('/pictograms/<path:filepath>')
+def serve_pictogram(filepath):
+    """Serves a pictogram from the external data directory."""
+    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
+    # send_from_directory is security-conscious and will prevent path traversal attacks.
+    return send_from_directory(pictograms_path, filepath)
 
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():
@@ -505,19 +517,26 @@ def create_folder():
     if not parent_folder or parent_folder.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': 'Parent folder not found or not owned by user'}), 404
 
+    # The parent path from DB is relative. Combine it with the base path for physical operations.
+    base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+    parent_physical_path = base_path / parent_folder.path
+
     # Create physical directory
-    new_path = os.path.join(parent_folder.path, name)
+    new_physical_path = parent_physical_path / name
     try:
-        os.makedirs(new_path, exist_ok=True)
+        new_physical_path.mkdir(exist_ok=True)
     except OSError as e:
         return jsonify({'status': 'error', 'message': f'Could not create directory: {e}'}), 500
+
+    # The new path for the DB is also relative.
+    new_relative_path = Path(parent_folder.path) / name
 
     # Create folder in DB
     new_folder = Folder(
         name=name,
         user_id=current_user.id,
         parent_id=parent_id,
-        path=new_path.replace('\\', '/')
+        path=str(new_relative_path).replace('\\', '/')
     )
     db.session.add(new_folder)
     db.session.commit()
@@ -544,15 +563,21 @@ def upload_image():
 
     if file:
         filename = secure_filename(file.filename)
-        file_path = os.path.join(folder.path, filename)
+
+        # The folder path from DB is relative. Combine it with the base path for physical operations.
+        base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+        physical_path = base_path / folder.path / filename
+
+        # The new path for the DB is also relative.
+        relative_path = Path(folder.path) / filename
 
         # Check for file type/extension here if needed
 
-        file.save(file_path)
+        file.save(physical_path)
 
         new_image = Image(
             name=filename,
-            path=file_path.replace('\\', '/'),
+            path=str(relative_path).replace('\\', '/'),
             user_id=current_user.id,
             folder_id=folder.id,
             description="" # Or get from form
@@ -668,6 +693,9 @@ def save_tree():
     })
 
 def delete_folder_recursive(folder):
+    # The path from DB is relative. Combine it with the base path for physical operations.
+    base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+
     # Recursively delete children folders
     for sub_folder in folder.children:
         delete_folder_recursive(sub_folder)
@@ -675,16 +703,19 @@ def delete_folder_recursive(folder):
     # Delete images in the folder
     for image in folder.images:
         try:
-            os.remove(image.path)
+            physical_path = base_path / image.path
+            physical_path.unlink(missing_ok=True)
         except OSError as e:
-            print(f"Error deleting file {image.path}: {e}") # Or use proper logging
+            print(f"Error deleting file {physical_path}: {e}") # Or use proper logging
         db.session.delete(image)
 
     # Delete the folder directory itself
     try:
-        shutil.rmtree(folder.path)
+        physical_path = base_path / folder.path
+        if physical_path.exists():
+            shutil.rmtree(physical_path)
     except OSError as e:
-        print(f"Error deleting directory {folder.path}: {e}")
+        print(f"Error deleting directory {physical_path}: {e}")
 
     # Delete the folder from DB
     db.session.delete(folder)
@@ -717,7 +748,9 @@ def delete_item():
             return jsonify({'status': 'error', 'message': 'Image not found or not owned by user'}), 404
 
         try:
-            os.remove(image.path)
+            base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+            physical_path = base_path / image.path
+            physical_path.unlink(missing_ok=True)
         except OSError as e:
             return jsonify({'status': 'error', 'message': f'Could not delete file: {e}'}), 500
 
@@ -753,16 +786,29 @@ def export_pdf():
     row_max_height = 0
 
     for item in image_data:
-        image_path = item.get('path')
+        image_path_relative = item.get('path')
         description = item.get('description', '')
 
-        if not image_path or not os.path.exists(image_path):
-            print(f"Image not found or path is null: {image_path}")
+        if not image_path_relative:
+            print(f"Image path is null")
             continue
+
+        # The path from the client is relative to the pictograms folder
+        base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+        image_path_absolute = base_path / image_path_relative
+
+        if not image_path_absolute.exists():
+            # Let's also check the legacy path for built-in images (e.g. folder icons)
+            # This is a fallback for images that are not in the external pictograms folder.
+            legacy_path = Path(current_app.root_path) / 'static' / image_path_relative
+            if not legacy_path.exists():
+                print(f"Image not found in primary or legacy path: {image_path_absolute}")
+                continue
+            image_path_absolute = legacy_path
 
         try:
             # Get original dimensions using Pillow
-            with PILImage.open(image_path) as img:
+            with PILImage.open(image_path_absolute) as img:
                 img_width, img_height = img.size
 
             # Calculate scaled dimensions preserving aspect ratio
@@ -785,7 +831,7 @@ def export_pdf():
                 # Draw image (centered)
                 img_x = (width - scaled_width) / 2
                 y -= scaled_height
-                c.drawImage(ImageReader(image_path), img_x, y, width=scaled_width, height=scaled_height, mask='auto')
+                c.drawImage(ImageReader(image_path_absolute), img_x, y, width=scaled_width, height=scaled_height, mask='auto')
 
                 # Draw description (centered)
                 if description:
@@ -810,7 +856,7 @@ def export_pdf():
                     row_max_height = 0
 
                 # Draw image
-                c.drawImage(ImageReader(image_path), x, y - scaled_height, width=scaled_width, height=scaled_height, mask='auto')
+                c.drawImage(ImageReader(image_path_absolute), x, y - scaled_height, width=scaled_width, height=scaled_height, mask='auto')
                 row_max_height = max(row_max_height, scaled_height) # Update max height for the current row
                 x += scaled_width + 10 # Move x for next image
 
