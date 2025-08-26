@@ -40,6 +40,8 @@ jobs:
           
           # La clé SSH privée pour l'authentification
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          envs: GIT_SSH_KEY=${{ secrets.DEPLOY_KEY }}
           
           # Le script à exécuter sur le serveur distant
           script: sudo  /home/deploy-github/deploy.sh
