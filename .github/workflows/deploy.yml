@@ -42,6 +42,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           
           # Le script à exécuter sur le serveur distant
-          script: /home/deploy-github/deploy.sh
+          script: sudo  /home/deploy-github/deploy.sh
 
     
