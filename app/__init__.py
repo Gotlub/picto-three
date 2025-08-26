@@ -1,4 +1,5 @@
 from flask import Flask, request, current_app, session, jsonify, redirect, url_for
+from pathlib import Path
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
@@ -29,6 +30,17 @@ def create_app( config_override = None):
     app.config.from_object(config_class)
     if config_override:
         app.config.update(config_override)
+
+    # Ensure the instance folder exists for sqlite
+    if app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite'):
+        # In a Posix system, the path is absolute, so it starts with a '/'
+        # and the replace will result in a path like '/path/to/db'
+        # In Windows, the path is 'C:/path/to/db', so it does not start with '/'
+        # and the replace will result in a path like 'C:/path/to/db'
+        db_uri = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+        db_path = Path(db_uri)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+
     csrf = CSRFProtect(app)
     from app.routes import api_bp
     csrf.exempt(api_bp)

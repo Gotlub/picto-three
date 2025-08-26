@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add github workflows
 
 ### Changed
-- Externalized the database to a `data/` directory to improve security and deployment pipeline.
+- Externalized the database to a sibling `data/` directory (`../data/`) to fully separate data from application code, improving deployment and security.
 
 ### Added
 - Initial project structure and documentation for agent-driven development.

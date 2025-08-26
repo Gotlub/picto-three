@@ -1,16 +1,16 @@
 import os
 from pathlib import Path
 
+# The base directory of the application
 basedir = Path(__file__).parent.resolve()
 
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
 
-    # Define the path for the database file in a 'data' subdirectory
-    # and ensure the directory exists.
-    data_dir = basedir / "data"
-    data_dir.mkdir(exist_ok=True)
+    # The database is located in a 'data' directory SIBLING to the app directory
+    # e.g. /var/www/data/app.db
+    data_dir = basedir.parent / "data"
     db_path = data_dir / "app.db"
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \

@@ -139,6 +139,3 @@ cython_debug/
 *.iml
 workspace.xml
 shelf/
-
-# Project-specific ignores
-/data/
