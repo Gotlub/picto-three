@@ -93,6 +93,28 @@ class ImageTreeFolderNode extends ImageTreeNode {
             this.childrenContainer.appendChild(childNode.element);
         });
     }
+
+    filter(term, visibleNodes) {
+        const nameMatch = this.data.name.toLowerCase().includes(term);
+        let childrenMatch = false;
+
+        this.children.forEach(child => {
+            if (child.filter(term, visibleNodes)) {
+                childrenMatch = true;
+            }
+        });
+
+        if (nameMatch || childrenMatch) {
+            this.element.style.display = '';
+            visibleNodes.add(this);
+            if (childrenMatch && !this.expanded) {
+                 this.toggle();
+            }
+        } else {
+            this.element.style.display = 'none';
+        }
+        return nameMatch || childrenMatch;
+    }
 }
 
 class ImageTreeImageNode extends ImageTreeNode {
@@ -122,6 +144,17 @@ class ImageTreeImageNode extends ImageTreeNode {
 
         return nodeElement;
     }
+
+    filter(term, visibleNodes) {
+        const nameMatch = this.data.name.toLowerCase().includes(term);
+        if (nameMatch) {
+            this.element.style.display = '';
+            visibleNodes.add(this);
+        } else {
+            this.element.style.display = 'none';
+        }
+        return nameMatch;
+    }
 }
 
 class ImageTree {
@@ -141,6 +174,11 @@ class ImageTree {
             this.rootNodes.push(node);
             this.container.appendChild(node.element);
         });
+    }
+
+    filter(term) {
+        const visibleNodes = new Set();
+        this.rootNodes.forEach(node => node.filter(term.toLowerCase(), visibleNodes));
     }
 }
 
@@ -272,6 +310,9 @@ class ListBuilder {
         this.loadTreeBtn = document.getElementById('load-tree-btn');
         this.treeSearchInput = document.getElementById('tree-search');
 
+        // Right Panel - Image Search
+        this.imageSearchInput = document.getElementById('image-search');
+
 
         // Center Panel
         this.treeDisplay = document.getElementById('tree-display');
@@ -334,6 +375,9 @@ class ListBuilder {
         this.importTreeBtn?.addEventListener('click', () => this.importTreeFromJSON());
         this.loadTreeBtn?.addEventListener('click', () => this.loadSelectedTree());
         this.treeSearchInput?.addEventListener('input', () => this.filterTrees());
+
+        // Right Panel - Image Search
+        this.imageSearchInput?.addEventListener('input', () => this.filterImages());
 
         // Right Panel - Description Editor
         this.selectedLinkDescription?.addEventListener('input', () => this.updateSelectedLinkDescription());
@@ -658,24 +702,28 @@ class ListBuilder {
     }
 
     rebuildListFromData(listData) {
+        this.chainedListItems = []; // Clear existing list
         const payload = JSON.parse(listData.payload);
+
         this.chainedListItems = payload.map(itemData => {
-            const imageInfo = this.allImages.find(img => img.id === itemData.image_id);
+            let imageInfo = this.allImages.find(img => img.id === itemData.image_id);
             if (!imageInfo) {
-                // Handle missing image case
-                return new ChainedListItem({
-                    image_id: itemData.image_id,
-                    name: "Deleted Image",
-                    path: "/static/images/placeholder.png", // A placeholder image
-                    description: itemData.description
-                }, this);
+                console.warn(`Image with ID ${itemData.image_id} is not accessible. Using a placeholder.`);
+                imageInfo = {
+                    id: itemData.image_id,
+                    name: 'Image inaccessible',
+                    path: 'public/bold/prohibit-bold.png',
+                };
             }
-            return new ChainedListItem({
+            // Combine found/placeholder info with description from payload
+            const finalData = {
                 ...imageInfo,
-                image_id: imageInfo.id,
+                image_id: imageInfo.id, // Ensure image_id is consistent
                 description: itemData.description
-            }, this);
+            };
+            return new ChainedListItem(finalData, this);
         });
+
         this.renderChainedList();
     }
 
@@ -784,6 +832,11 @@ class ListBuilder {
         });
     }
 
+    filterImages() {
+        const searchTerm = this.imageSearchInput.value;
+        this.imageTree.filter(searchTerm);
+    }
+
     loadSelectedTree() {
         let selectedOption = null;
         const selectLists = this.treeContainer.querySelectorAll('select.tree-select-list');
@@ -829,9 +882,20 @@ class ListBuilder {
         this.treeRoot = new ReadOnlyNode({ id: 'root', name: 'Root' }, this);
 
         const buildNode = (nodeData) => {
-            const image = this.allImages.find(img => img.id === nodeData.id);
-            if (!image) return null;
-            const newNode = new ReadOnlyNode({ ...image, description: nodeData.description }, this);
+            let image = this.allImages.find(img => img.id === nodeData.id);
+            if (!image) {
+                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+                image = {
+                    id: nodeData.id,
+                    name: 'Image inaccessible',
+                    path: 'public/bold/prohibit-bold.png',
+                    description: 'This image is private or has been deleted.'
+                };
+            }
+            // Give precedence to the description from the imported file
+            const nodeImg = { ...image, description: nodeData.description };
+            const newNode = new ReadOnlyNode(nodeImg, this);
+
             if (nodeData.children) {
                 nodeData.children.forEach(childData => {
                     const childNode = buildNode(childData);

@@ -721,18 +721,26 @@ class TreeBuilder {
     }
 
     rebuildTreeFromJSON(treeData) {
+        this.rootNode.children = []; // Clear existing tree before importing
         this.selectedNode = this.rootNode; // Select root by default
 
         const buildNode = (nodeData) => {
-            const image = this.images.find(img => img.id === nodeData.id);
+            let image = this.images.find(img => img.id === nodeData.id);
             if (!image) {
-                console.error('Image not found for id:', nodeData.id);
-                return null;
+                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+                image = {
+                    id: nodeData.id,
+                    name: 'Image inaccessible',
+                    path: 'public/bold/prohibit-bold.png',
+                    description: 'This image is private or has been deleted.'
+                };
             }
+
             const newNode = new BuilderNode(image, this);
             if (nodeData.hasOwnProperty('description')) {
                 newNode.description = nodeData.description;
             }
+
             if (nodeData.children) {
                 nodeData.children.forEach(childData => {
                     const childNode = buildNode(childData);
