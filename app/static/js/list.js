@@ -38,7 +38,7 @@ class ImageTreeFolderNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const icon = document.createElement('img');
-        icon.src = '/pictograms/public/bold/folder-bold.png';
+        icon.src = '/static/images/folder-bold.png';
         this.icon = icon;
         contentElement.appendChild(icon);
 
@@ -64,13 +64,13 @@ class ImageTreeFolderNode extends ImageTreeNode {
     toggle() {
         this.expanded = !this.expanded;
         if (this.expanded) {
-            this.icon.src = '/pictograms/public/bold/folder-open-bold.png';
+            this.icon.src = '/static/images/folder-open-bold.png';
             this.childrenContainer.style.display = '';
             if (!this.childrenLoaded) {
                 this.loadChildren();
             }
         } else {
-            this.icon.src = '/pictograms/public/bold/folder-bold.png';
+            this.icon.src = '/static/images/folder-bold.png';
             this.childrenContainer.style.display = 'none';
         }
     }
@@ -219,7 +219,7 @@ class ReadOnlyNode {
         contentElement.classList.add('node-content');
         const imgElement = document.createElement('img');
         if (this.image.id === 'root') {
-            imgElement.src = '/pictograms/public/bold/folder-bold.png';
+            imgElement.src = '/static/images/folder-bold.png';
         } else if (this.image.path) {
             // Path can be a new relative path or an old absolute one during transition
             if (this.image.path.startsWith('/')) {

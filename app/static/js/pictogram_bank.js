@@ -34,7 +34,7 @@ class FolderNode extends BaseNode {
         contentElement.classList.add('node-content');
 
         const icon = document.createElement('img');
-        icon.src = '/pictograms/public/bold/folder-bold.png'; // As requested
+        icon.src = '/static/images/folder-bold.png'; // As requested
         contentElement.appendChild(icon);
 
         const nameElement = document.createElement('span');
