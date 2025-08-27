@@ -712,7 +712,7 @@ class ListBuilder {
                 imageInfo = {
                     id: itemData.image_id,
                     name: 'Image inaccessible',
-                    path: 'public/bold/prohibit-bold.png',
+                    path: '/static/images/prohibit-bold.png',
                 };
             }
             // Combine found/placeholder info with description from payload
@@ -888,7 +888,7 @@ class ListBuilder {
                 image = {
                     id: nodeData.id,
                     name: 'Image inaccessible',
-                    path: 'public/bold/prohibit-bold.png',
+                    path: '/static/images/prohibit-bold.png',
                     description: 'This image is private or has been deleted.'
                 };
             }
