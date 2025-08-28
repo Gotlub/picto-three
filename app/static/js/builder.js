@@ -394,17 +394,21 @@ class TreeBuilder {
 
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
+                // --- DESTRUCTION ET NETTOYAGE ---
+                if (this.treantChart) {
+                    this.treantChart.destroy();
+                }
+                document.getElementById('tree-visualizer-container').innerHTML = '';
+
                 // Reset zoom and pan state each time the modal is opened
                 this.scale = 1;
                 this.panning = false;
                 this.pointX = 0;
                 this.pointY = 0;
                 this.start = { x: 0, y: 0 };
+
+                // Recréer l'arbre
                 this.drawTreeVisualization();
-            });
-            this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
-                // Clear the container to prevent issues on re-opening
-                document.getElementById('tree-visualizer-container').innerHTML = '';
             });
         }
 
@@ -429,6 +433,13 @@ class TreeBuilder {
                 treeContainer.style.height = `${treeContainer.scrollHeight}px`;
                 treeContainer.style.overflow = 'visible';
 
+                // NOUVEAU: Gérer le zoom/pan lors de l'export
+                const treantInnerContainer = treeContainer.querySelector('.Treant');
+                const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
+                if (treantInnerContainer) {
+                    treantInnerContainer.style.transform = 'none';
+                }
+
                 // 3. Capturer l'élément maintenant agrandi
                 html2canvas(treeContainer, {
                     allowTaint: true,
@@ -442,6 +453,9 @@ class TreeBuilder {
                     treeContainer.style.width = originalStyle.width;
                     treeContainer.style.height = originalStyle.height;
                     treeContainer.style.overflow = originalStyle.overflow;
+                    if (treantInnerContainer) {
+                        treantInnerContainer.style.transform = originalTransform;
+                    }
 
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
@@ -465,6 +479,9 @@ class TreeBuilder {
                     treeContainer.style.width = originalStyle.width;
                     treeContainer.style.height = originalStyle.height;
                     treeContainer.style.overflow = originalStyle.overflow;
+                    if (treantInnerContainer) {
+                        treantInnerContainer.style.transform = originalTransform;
+                    }
                     console.error("Erreur lors de la capture PDF :", err);
                 });
             });
