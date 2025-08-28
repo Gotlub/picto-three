@@ -291,9 +291,6 @@ class TreeBuilder {
         this.leftSidebar = document.querySelector('.col-md-2.sidebar');
         this.rightSidebar = document.querySelector('.col-md-3.sidebar');
         this.treeList = document.getElementById('tree-list');
-        this.visualizeTreeBtn = document.getElementById('visualize-tree-btn');
-        this.treeVisualizerModal = document.getElementById('tree-visualizer-modal');
-        this.exportPdfBtn = document.getElementById('export-pdf-btn');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
@@ -301,18 +298,19 @@ class TreeBuilder {
         this.selectedNode = null;
         this.draggedNode = null;
 
+        // --- VISUALIZATION ---
+        this.visualizeTreeBtn = document.getElementById('visualize-tree-btn');
+        this.treeVisualizerModal = document.getElementById('tree-visualizer-modal');
+        this.exportPdfBtn = document.getElementById('export-pdf-btn');
+        this.treantChart = null;
+
         // Zoom & Pan state variables
         this.scale = 1;
         this.panning = false;
         this.pointX = 0;
         this.pointY = 0;
         this.start = { x: 0, y: 0 };
-
-        // Create bound versions of event handlers
-        this.boundHandleWheelZoom = this.handleWheelZoom.bind(this);
-        this.boundHandleMouseDown = this.handleMouseDown.bind(this);
-        this.boundHandleMouseUp = this.handleMouseUp.bind(this);
-        this.boundHandleMouseMove = this.handleMouseMove.bind(this);
+        // --- END VISUALIZATION ---
 
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
@@ -327,6 +325,13 @@ class TreeBuilder {
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
 
+        this.addEventListeners();
+        this.loadSavedTrees();
+        this.updateVisualizeButtonState();
+        this.restoreStateFromSession();
+    }
+
+    addEventListeners() {
         document.addEventListener('click', (e) => {
             const deleteBtn = document.getElementById('delete-btn');
             const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
@@ -334,43 +339,29 @@ class TreeBuilder {
             const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
             const isClickInsideDropdown = e.target.closest('.dropdown');
 
-            // If the click is inside any of the builder's interactive areas or a dropdown menu, do nothing.
             if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideDropdown) {
                 return;
             }
-
-            // Otherwise, deselect any selected node.
             this.deselectAllNodes();
         });
 
+        // Other listeners...
         const saveBtn = document.getElementById('save-tree-btn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => this.saveTree());
-        }
+        if (saveBtn) saveBtn.addEventListener('click', () => this.saveTree());
 
         const importBtn = document.getElementById('import-json-btn');
-        if (importBtn) {
-            importBtn.addEventListener('click', () => this.importTreeFromJSON());
-        }
+        if (importBtn) importBtn.addEventListener('click', () => this.importTreeFromJSON());
 
         const exportBtn = document.getElementById('export-json-btn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportTreeToJSON());
-        }
+        if (exportBtn) exportBtn.addEventListener('click', () => this.exportTreeToJSON());
 
         const loadBtn = document.getElementById('load-tree-btn');
-        if (loadBtn) {
-            loadBtn.addEventListener('click', () => this.loadTree());
-        }
+        if (loadBtn) loadBtn.addEventListener('click', () => this.loadTree());
 
-        if (this.imageSearch) {
-            this.imageSearch.addEventListener('input', () => this.filterImages());
-        }
+        if (this.imageSearch) this.imageSearch.addEventListener('input', () => this.filterImages());
 
         const deleteBtn = document.getElementById('delete-btn');
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
-        }
+        if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
 
         const newTreeBtn = document.getElementById('new-tree-btn');
         if (newTreeBtn) {
@@ -385,154 +376,125 @@ class TreeBuilder {
             });
         }
 
-        this.treeSearch = document.getElementById('tree-search');
-        if (this.treeSearch) {
-            this.treeSearch.addEventListener('input', () => this.filterTrees());
-        }
+        if (this.treeSearch) this.treeSearch.addEventListener('input', () => this.filterTrees());
 
+        // Visualization Listeners
         if (this.visualizeTreeBtn) {
             this.visualizeTreeBtn.addEventListener('click', () => {
-                // The actual drawing is triggered by the modal's 'shown' event
+                // The modal is opened, but the tree is now drawn by a separate script
+                // included in the modal's HTML, or the page is reloaded on close.
+                // For this strategy, we first need to draw the tree.
+                this.initVisualization();
                 const modal = new bootstrap.Modal(this.treeVisualizerModal);
                 modal.show();
             });
         }
 
         if (this.treeVisualizerModal) {
-            this.treeVisualizerModal.addEventListener('shown.bs.modal', this.initVisualization.bind(this));
-        }
-
-        this.loadSavedTrees();
-        this.updateVisualizeButtonState();
-
-        if (this.exportPdfBtn) {
-            this.exportPdfBtn.addEventListener('click', () => {
-                const treeContainer = document.getElementById('tree-visualizer-container');
-
-                // Sauvegarde des styles originaux
-                const originalStyle = {
-                    width: treeContainer.style.width,
-                    height: treeContainer.style.height,
-                    overflow: treeContainer.style.overflow
-                };
-
-                // 1. Mesurer et 2. Agrandir le conteneur à la taille de son contenu
-                treeContainer.style.width = `${treeContainer.scrollWidth}px`;
-                treeContainer.style.height = `${treeContainer.scrollHeight}px`;
-                treeContainer.style.overflow = 'visible';
-
-                // NOUVEAU: Gérer le zoom/pan lors de l'export
-                const treantInnerContainer = treeContainer.querySelector('.Treant');
-                const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
-                if (treantInnerContainer) {
-                    treantInnerContainer.style.transform = 'none';
+            // RELOAD STRATEGY: Save state and reload when modal is closed.
+            this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
+                if (this.rootNode.children.length > 0) {
+                    const treeData = this.getTreeAsJSON();
+                    sessionStorage.setItem('treeBuilderState', JSON.stringify(treeData));
                 }
-
-                // 3. Capturer l'élément maintenant agrandi
-                html2canvas(treeContainer, {
-                    allowTaint: true,
-                    useCORS: true,
-                    width: treeContainer.scrollWidth,
-                    height: treeContainer.scrollHeight,
-                    scale: 2 // Augmente la résolution de la capture
-                }).then(canvas => {
-
-                    // 4. Restaurer les styles originaux dès que la capture est faite
-                    treeContainer.style.width = originalStyle.width;
-                    treeContainer.style.height = originalStyle.height;
-                    treeContainer.style.overflow = originalStyle.overflow;
-                    if (treantInnerContainer) {
-                        treantInnerContainer.style.transform = originalTransform;
-                    }
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-
-                    // --- NOUVELLE LOGIQUE PDF ADAPTATIF ---
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
-
-                    const pdf = new jsPDF({
-                        orientation: canvasWidth > canvasHeight ? 'l' : 'p',
-                        unit: 'pt',
-                        format: [canvasWidth, canvasHeight]
-                    });
-
-                    pdf.addImage(imgData, 'PNG', 0, 0, canvasWidth, canvasHeight);
-                    pdf.save('custom-size-tree-export.pdf');
-                    // --- FIN DE LA NOUVELLE LOGIQUE ---
-
-                }).catch(err => {
-                    // En cas d'erreur, s'assurer de restaurer aussi les styles
-                    treeContainer.style.width = originalStyle.width;
-                    treeContainer.style.height = originalStyle.height;
-                    treeContainer.style.overflow = originalStyle.overflow;
-                    if (treantInnerContainer) {
-                        treantInnerContainer.style.transform = originalTransform;
-                    }
-                    console.error("Erreur lors de la capture PDF :", err);
-                });
+                // A small delay can prevent race conditions with the reload
+                setTimeout(() => {
+                    window.location.reload();
+                }, 100);
             });
         }
+
+        if (this.exportPdfBtn) {
+            this.exportPdfBtn.addEventListener('click', () => this.exportVisualizationToPdf());
+        }
+    }
+
+    restoreStateFromSession() {
+        const savedState = sessionStorage.getItem('treeBuilderState');
+        if (savedState) {
+            try {
+                console.log("Restoring tree from session storage...");
+                const treeData = JSON.parse(savedState);
+                this.rebuildTreeFromJSON(treeData);
+                sessionStorage.removeItem('treeBuilderState');
+            } catch (e) {
+                console.error("Failed to parse or restore tree state from session storage.", e);
+                sessionStorage.removeItem('treeBuilderState');
+            }
+        }
+    }
+
+    // --- VISUALIZATION METHODS ---
+
+    initVisualization() {
+        this.scale = 1;
+        this.panning = false;
+        this.pointX = 0;
+        this.pointY = 0;
+        this.start = { x: 0, y: 0 };
+
+        const treantTree = this.getTreeForVisualization();
+        if (!treantTree) return;
+
+        const chart_config = {
+            chart: {
+                container: "#tree-visualizer-container",
+                connectors: { type: "step" },
+                node: { collapsable: true, HTMLclass: 'treant-node' },
+                scrollbar: "fancy"
+            },
+            nodeStructure: treantTree
+        };
+
+        this.treantChart = new Treant(chart_config, null, $);
+        this.initPanAndZoom();
     }
 
     initPanAndZoom() {
         const treeContainer = document.getElementById('tree-visualizer-container');
         if (!treeContainer) return;
 
-        // Add event listeners using the pre-bound handlers
-        treeContainer.addEventListener('wheel', this.boundHandleWheelZoom);
-        treeContainer.addEventListener('mousedown', this.boundHandleMouseDown);
-        window.addEventListener('mouseup', this.boundHandleMouseUp);
-        window.addEventListener('mousemove', this.boundHandleMouseMove);
+        const setTransform = () => {
+            const treantInnerContainer = treeContainer.querySelector('.Treant');
+            if (treantInnerContainer) {
+                treantInnerContainer.style.transformOrigin = '0 0';
+                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
+            }
+        };
 
-        // Set initial cursor
-        treeContainer.style.cursor = 'grab';
-    }
+        const handleWheelZoom = (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.1 : -0.1;
+                this.scale = Math.min(Math.max(0.5, this.scale + delta), 4);
+                setTransform();
+            }
+        };
 
-    // --- Named Event Handlers for Zoom/Pan ---
-
-    handleWheelZoom(e) {
-        if (e.ctrlKey) {
+        const handleMouseDown = (e) => {
             e.preventDefault();
-            const delta = e.deltaY < 0 ? 0.1 : -0.1;
-            this.scale = Math.min(Math.max(0.5, this.scale + delta), 4);
-            this.setTransform();
-        }
-    }
+            this.panning = true;
+            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
+            treeContainer.style.cursor = 'grabbing';
+        };
 
-    handleMouseDown(e) {
-        e.preventDefault();
-        this.panning = true;
-        this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
-        document.getElementById('tree-visualizer-container').style.cursor = 'grabbing';
-    }
+        const handleMouseUp = () => {
+            this.panning = false;
+            treeContainer.style.cursor = 'grab';
+        };
 
-    handleMouseUp() {
-        this.panning = false;
-        document.getElementById('tree-visualizer-container').style.cursor = 'grab';
-    }
+        const handleMouseMove = (e) => {
+            if (!this.panning) return;
+            this.pointX = (e.clientX - this.start.x);
+            this.pointY = (e.clientY - this.start.y);
+            setTransform();
+        };
 
-    handleMouseMove(e) {
-        if (!this.panning) return;
-        this.pointX = (e.clientX - this.start.x);
-        this.pointY = (e.clientY - this.start.y);
-        this.setTransform();
-    }
-
-    setTransform() {
-        const treeContainer = document.getElementById('tree-visualizer-container');
-        const treantInnerContainer = treeContainer.querySelector('.Treant');
-        if (treantInnerContainer) {
-            treantInnerContainer.style.transformOrigin = '0 0';
-            treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-        }
-    }
-
-    updateVisualizeButtonState() {
-        if (this.visualizeTreeBtn) {
-            this.visualizeTreeBtn.disabled = this.rootNode.children.length === 0;
-        }
+        treeContainer.addEventListener('wheel', handleWheelZoom);
+        treeContainer.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('mousemove', handleMouseMove);
+        treeContainer.style.cursor = 'grab';
     }
 
     getTreeForVisualization() {
@@ -542,9 +504,6 @@ class TreeBuilder {
                 image: builderNode.image.path.startsWith('/') ? builderNode.image.path : `/pictograms/${builderNode.image.path}`,
                 children: []
             };
-
-            // To include the description in the node, we can use innerHTML
-            // The 'name' from the text property will be the title attribute of the container div
             const description = builderNode.description || builderNode.image.name;
             treantNode.innerHTML = `
                 <div class="node-content-wrapper">
@@ -552,90 +511,77 @@ class TreeBuilder {
                     <p class="node-name">${description}</p>
                 </div>
             `;
-
-
             builderNode.children.forEach(child => {
                 treantNode.children.push(buildTreantNode(child));
             });
-
             return treantNode;
         };
-
-        const nodeStructure = {
-            children: this.rootNode.children.map(buildTreantNode)
-        };
-
-        // If there is more than one root branch, create an invisible pseudo-node to be the common parent.
+        const nodeStructure = { children: this.rootNode.children.map(buildTreantNode) };
         if (nodeStructure.children.length > 1) {
-            return {
-                pseudo: true,
-                children: nodeStructure.children
-            };
+            return { pseudo: true, children: nodeStructure.children };
         }
-
         return nodeStructure.children[0];
     }
 
-    initVisualization() {
-        // --- STRATÉGIE "CLONER ET REMPLACER" ---
-        const modalBody = document.querySelector('#tree-visualizer-modal .modal-body');
-        const oldContainer = document.getElementById('tree-visualizer-container');
+    exportVisualizationToPdf() {
+        const treeContainer = document.getElementById('tree-visualizer-container');
+        const treantInnerContainer = treeContainer.querySelector('.Treant');
 
-        // Créer un nouveau conteneur vierge
-        const newContainer = document.createElement('div');
-        newContainer.id = 'tree-visualizer-container';
-        newContainer.style.width = '100%';
-        newContainer.style.height = '70vh';
-
-        // Remplacer l'ancien conteneur par le nouveau
-        if (oldContainer && oldContainer.parentNode) {
-            oldContainer.parentNode.replaceChild(newContainer, oldContainer);
-        } else if (modalBody) {
-            modalBody.appendChild(newContainer);
-        }
-        // --- FIN DE LA STRATÉGIE ---
-
-        // Reset state
-        this.scale = 1;
-        this.panning = false;
-        this.pointX = 0;
-        this.pointY = 0;
-        this.start = { x: 0, y: 0 };
-
-        const treantTree = this.getTreeForVisualization();
-
-        if (!treantTree) {
-            console.error("Cannot visualize an empty tree.");
-            return;
-        }
-
-        const chart_config = {
-            chart: {
-                container: "#tree-visualizer-container",
-                connectors: {
-                    type: "step"
-                },
-                node: {
-                    collapsable: true,
-                    HTMLclass: 'treant-node' // Add a class for styling
-                },
-                scrollbar: "fancy" // Enable fancy scrollbar
-            },
-            nodeStructure: treantTree
+        const originalStyle = {
+            width: treeContainer.style.width,
+            height: treeContainer.style.height,
+            overflow: treeContainer.style.overflow,
+            transform: treantInnerContainer ? treantInnerContainer.style.transform : 'none'
         };
 
-        this.treantChart = new Treant(chart_config, null, $);
+        treeContainer.style.width = `${treeContainer.scrollWidth}px`;
+        treeContainer.style.height = `${treeContainer.scrollHeight}px`;
+        treeContainer.style.overflow = 'visible';
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transform = 'none';
+        }
 
-        // Apply initial transform and add listeners
-        this.setTransform();
-        this.initPanAndZoom();
+        html2canvas(treeContainer, {
+            allowTaint: true,
+            useCORS: true,
+            width: treeContainer.scrollWidth,
+            height: treeContainer.scrollHeight,
+            scale: 2
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const pdf = new jsPDF({
+                orientation: canvasWidth > canvasHeight ? 'l' : 'p',
+                unit: 'pt',
+                format: [canvasWidth, canvasHeight]
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, canvasWidth, canvasHeight);
+            pdf.save('full-tree-export.pdf');
+        }).finally(() => {
+            treeContainer.style.width = originalStyle.width;
+            treeContainer.style.height = originalStyle.height;
+            treeContainer.style.overflow = originalStyle.overflow;
+            if (treantInnerContainer) {
+                treantInnerContainer.style.transform = originalStyle.transform;
+            }
+        });
     }
+
+    updateVisualizeButtonState() {
+        if (this.visualizeTreeBtn) {
+            this.visualizeTreeBtn.disabled = this.rootNode.children.length === 0;
+        }
+    }
+
+    // --- END VISUALIZATION METHODS ---
 
     handleImageClick(image) {
         const newNode = new BuilderNode(image, this);
         const parentNode = this.selectedNode || this.rootNode;
         parentNode.addChild(newNode);
-        this.selectNode(newNode); // Select the new node
+        this.selectNode(newNode);
         this.renderTree();
     }
 
@@ -652,7 +598,7 @@ class TreeBuilder {
         }
         this.draggedNode = theNode;
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', theNode.image.id); // Required for Firefox
+        e.dataTransfer.setData('text/plain', theNode.image.id);
 
         setTimeout(() => {
             if (theNode.element) {
@@ -790,11 +736,6 @@ class TreeBuilder {
         theNode.children.forEach(child => {
             if (child.element) {
                 childrenContainer.appendChild(child.element);
-                // The children of the child are already rendered within its element,
-                // so no need to recurse here. The structure is built once.
-                // We just need to append the elements correctly.
-                // Wait, my understanding is wrong. The children elements need to be populated.
-                // The `renderChildren` needs to be recursive.
                 this.renderChildren(child);
             }
         });
@@ -838,7 +779,6 @@ class TreeBuilder {
             return;
         }
 
-        // Check if a tree with the same name exists for the current user
         const existingTree = this.userTrees.find(tree => tree.name === treeName);
         let proceed = true;
 
@@ -847,7 +787,7 @@ class TreeBuilder {
         }
 
         if (!proceed) {
-            return; // Stop if the user cancels
+            return;
         }
 
         const response = await fetch('/api/tree/save', {
@@ -867,14 +807,10 @@ class TreeBuilder {
             const message = existingTree ? 'Updated' : 'Created';
             alert(message);
 
-            // Clear the existing tree before reloading from save
             this.rootNode.children = [];
-            // Reload the builder with the saved tree data
             this.rebuildTreeFromJSON(result.tree_data);
-            // Refresh the list of saved trees
             this.loadSavedTrees();
         } else {
-            // Display specific error messages
             alert(`Error saving tree: ${result.message}`);
         }
     }
@@ -913,7 +849,7 @@ class TreeBuilder {
     renderTreeList() {
         if (!this.treeList) return;
         this.treeList.innerHTML = '';
-        this.activeTreeSelect = null; // To keep track of the currently active select element
+        this.activeTreeSelect = null;
 
         const createSelectList = (trees, title, id) => {
             if (trees.length > 0) {
@@ -928,7 +864,6 @@ class TreeBuilder {
                     const option = document.createElement('option');
                     option.value = tree.id;
 
-                    // For private trees, just show the tree name. For public, show author.
                     if (id === 'user-tree-select') {
                         option.textContent = tree.name;
                     } else {
@@ -937,7 +872,6 @@ class TreeBuilder {
                     select.appendChild(option);
                 });
 
-                // When a user clicks on a select list, it becomes the active one
                 select.addEventListener('focus', () => {
                     this.activeTreeSelect = select;
                 });
@@ -949,7 +883,6 @@ class TreeBuilder {
         createSelectList(this.userTrees, 'My Private Trees', 'user-tree-select');
         createSelectList(this.publicTrees, 'Public Trees', 'public-tree-select');
 
-        // Set the default active list if it exists
         if (this.userTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
         } else if (this.publicTrees.length > 0) {
@@ -976,8 +909,8 @@ class TreeBuilder {
     }
 
     rebuildTreeFromJSON(treeData) {
-        this.rootNode.children = []; // Clear existing tree before importing
-        this.selectedNode = this.rootNode; // Select root by default
+        this.rootNode.children = [];
+        this.selectedNode = this.rootNode;
 
         const buildNode = (nodeData) => {
             let image = this.images.find(img => img.id === nodeData.id);
@@ -1030,7 +963,7 @@ class TreeBuilder {
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
         downloadAnchorNode.setAttribute("download", "tree.json");
-        document.body.appendChild(downloadAnchorNode); // required for firefox
+        document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     }
