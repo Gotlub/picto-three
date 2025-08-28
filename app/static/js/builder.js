@@ -301,6 +301,13 @@ class TreeBuilder {
         this.selectedNode = null;
         this.draggedNode = null;
 
+        // Zoom & Pan state variables
+        this.scale = 1;
+        this.panning = false;
+        this.pointX = 0;
+        this.pointY = 0;
+        this.start = { x: 0, y: 0 };
+
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
             this.nodeDescriptionTextarea.addEventListener('input', () => {
@@ -387,6 +394,12 @@ class TreeBuilder {
 
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
+                // Reset zoom and pan state each time the modal is opened
+                this.scale = 1;
+                this.panning = false;
+                this.pointX = 0;
+                this.pointY = 0;
+                this.start = { x: 0, y: 0 };
                 this.drawTreeVisualization();
             });
             this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
@@ -397,6 +410,8 @@ class TreeBuilder {
 
         this.loadSavedTrees();
         this.updateVisualizeButtonState();
+
+        this.initPanAndZoom();
 
         if (this.exportPdfBtn) {
             this.exportPdfBtn.addEventListener('click', () => {
@@ -431,14 +446,19 @@ class TreeBuilder {
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
 
-                    const orientation = canvas.width > canvas.height ? 'l' : 'p';
-                    const pdf = new jsPDF(orientation, 'mm', 'a4');
+                    // --- NOUVELLE LOGIQUE PDF ADAPTATIF ---
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
 
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    const pdf = new jsPDF({
+                        orientation: canvasWidth > canvasHeight ? 'l' : 'p',
+                        unit: 'pt',
+                        format: [canvasWidth, canvasHeight]
+                    });
 
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                    pdf.save('full-tree-export.pdf');
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvasWidth, canvasHeight);
+                    pdf.save('custom-size-tree-export.pdf');
+                    // --- FIN DE LA NOUVELLE LOGIQUE ---
 
                 }).catch(err => {
                     // En cas d'erreur, s'assurer de restaurer aussi les styles
@@ -449,6 +469,52 @@ class TreeBuilder {
                 });
             });
         }
+    }
+
+    initPanAndZoom() {
+        const treeContainer = document.getElementById('tree-visualizer-container');
+        if (!treeContainer) return;
+
+        // The target for the transform is the inner div created by Treant, not the scroll container
+        const setTransform = () => {
+            const treantInnerContainer = treeContainer.querySelector('.Treant');
+            if (treantInnerContainer) {
+                treantInnerContainer.style.transformOrigin = '0 0';
+                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
+            }
+        };
+
+        treeContainer.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.1 : -0.1;
+                const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
+                this.scale = newScale;
+                setTransform();
+            }
+        });
+
+        treeContainer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            this.panning = true;
+            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
+            treeContainer.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            this.panning = false;
+            treeContainer.style.cursor = 'grab';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!this.panning) return;
+            this.pointX = (e.clientX - this.start.x);
+            this.pointY = (e.clientY - this.start.y);
+            setTransform();
+        });
+
+        // Set initial cursor
+        treeContainer.style.cursor = 'grab';
     }
 
     updateVisualizeButtonState() {
@@ -526,6 +592,13 @@ class TreeBuilder {
             this.treantChart.destroy();
         }
         this.treantChart = new Treant(chart_config, null, $);
+
+        // Apply initial transform after the chart is drawn
+        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transformOrigin = '0 0';
+            treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
+        }
     }
 
     handleImageClick(image) {
