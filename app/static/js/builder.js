@@ -400,7 +400,6 @@ class TreeBuilder {
 
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', this.initVisualization.bind(this));
-            this.treeVisualizerModal.addEventListener('hidden.bs.modal', this.cleanupVisualization.bind(this));
         }
 
         this.loadSavedTrees();
@@ -491,29 +490,6 @@ class TreeBuilder {
         treeContainer.style.cursor = 'grab';
     }
 
-    cleanupVisualization() {
-        const treeContainer = document.getElementById('tree-visualizer-container');
-        if (!treeContainer) return;
-
-        // 1. Remove event listeners
-        treeContainer.removeEventListener('wheel', this.boundHandleWheelZoom);
-        treeContainer.removeEventListener('mousedown', this.boundHandleMouseDown);
-        window.removeEventListener('mouseup', this.boundHandleMouseUp);
-        window.removeEventListener('mousemove', this.boundHandleMouseMove);
-
-        // 2. Destroy Treant instance
-        if (this.treantChart) {
-            this.treantChart.destroy();
-            this.treantChart = null;
-        }
-
-        // 3. Clear DOM and styles
-        treeContainer.innerHTML = '';
-        treeContainer.style.transform = '';
-        treeContainer.style.transformOrigin = '';
-        treeContainer.style.cursor = '';
-    }
-
     // --- Named Event Handlers for Zoom/Pan ---
 
     handleWheelZoom(e) {
@@ -601,6 +577,24 @@ class TreeBuilder {
     }
 
     initVisualization() {
+        // --- STRATÉGIE "CLONER ET REMPLACER" ---
+        const modalBody = document.querySelector('#tree-visualizer-modal .modal-body');
+        const oldContainer = document.getElementById('tree-visualizer-container');
+
+        // Créer un nouveau conteneur vierge
+        const newContainer = document.createElement('div');
+        newContainer.id = 'tree-visualizer-container';
+        newContainer.style.width = '100%';
+        newContainer.style.height = '70vh';
+
+        // Remplacer l'ancien conteneur par le nouveau
+        if (oldContainer && oldContainer.parentNode) {
+            oldContainer.parentNode.replaceChild(newContainer, oldContainer);
+        } else if (modalBody) {
+            modalBody.appendChild(newContainer);
+        }
+        // --- FIN DE LA STRATÉGIE ---
+
         // Reset state
         this.scale = 1;
         this.panning = false;
