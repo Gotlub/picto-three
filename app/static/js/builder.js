@@ -308,6 +308,12 @@ class TreeBuilder {
         this.pointY = 0;
         this.start = { x: 0, y: 0 };
 
+        // Create bound versions of event handlers
+        this.boundHandleWheelZoom = this.handleWheelZoom.bind(this);
+        this.boundHandleMouseDown = this.handleMouseDown.bind(this);
+        this.boundHandleMouseUp = this.handleMouseUp.bind(this);
+        this.boundHandleMouseMove = this.handleMouseMove.bind(this);
+
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
             this.nodeDescriptionTextarea.addEventListener('input', () => {
@@ -393,29 +399,12 @@ class TreeBuilder {
         }
 
         if (this.treeVisualizerModal) {
-            this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
-                // --- DESTRUCTION ET NETTOYAGE ---
-                if (this.treantChart) {
-                    this.treantChart.destroy();
-                }
-                document.getElementById('tree-visualizer-container').innerHTML = '';
-
-                // Reset zoom and pan state each time the modal is opened
-                this.scale = 1;
-                this.panning = false;
-                this.pointX = 0;
-                this.pointY = 0;
-                this.start = { x: 0, y: 0 };
-
-                // Recréer l'arbre
-                this.drawTreeVisualization();
-            });
+            this.treeVisualizerModal.addEventListener('shown.bs.modal', this.initVisualization.bind(this));
+            this.treeVisualizerModal.addEventListener('hidden.bs.modal', this.cleanupVisualization.bind(this));
         }
 
         this.loadSavedTrees();
         this.updateVisualizeButtonState();
-
-        this.initPanAndZoom();
 
         if (this.exportPdfBtn) {
             this.exportPdfBtn.addEventListener('click', () => {
@@ -492,46 +481,76 @@ class TreeBuilder {
         const treeContainer = document.getElementById('tree-visualizer-container');
         if (!treeContainer) return;
 
-        // The target for the transform is the inner div created by Treant, not the scroll container
-        const setTransform = () => {
-            const treantInnerContainer = treeContainer.querySelector('.Treant');
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transformOrigin = '0 0';
-                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-            }
-        };
-
-        treeContainer.addEventListener('wheel', (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
-                this.scale = newScale;
-                setTransform();
-            }
-        });
-
-        treeContainer.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            this.panning = true;
-            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
-            treeContainer.style.cursor = 'grabbing';
-        });
-
-        window.addEventListener('mouseup', () => {
-            this.panning = false;
-            treeContainer.style.cursor = 'grab';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!this.panning) return;
-            this.pointX = (e.clientX - this.start.x);
-            this.pointY = (e.clientY - this.start.y);
-            setTransform();
-        });
+        // Add event listeners using the pre-bound handlers
+        treeContainer.addEventListener('wheel', this.boundHandleWheelZoom);
+        treeContainer.addEventListener('mousedown', this.boundHandleMouseDown);
+        window.addEventListener('mouseup', this.boundHandleMouseUp);
+        window.addEventListener('mousemove', this.boundHandleMouseMove);
 
         // Set initial cursor
         treeContainer.style.cursor = 'grab';
+    }
+
+    cleanupVisualization() {
+        const treeContainer = document.getElementById('tree-visualizer-container');
+        if (!treeContainer) return;
+
+        // 1. Remove event listeners
+        treeContainer.removeEventListener('wheel', this.boundHandleWheelZoom);
+        treeContainer.removeEventListener('mousedown', this.boundHandleMouseDown);
+        window.removeEventListener('mouseup', this.boundHandleMouseUp);
+        window.removeEventListener('mousemove', this.boundHandleMouseMove);
+
+        // 2. Destroy Treant instance
+        if (this.treantChart) {
+            this.treantChart.destroy();
+            this.treantChart = null;
+        }
+
+        // 3. Clear DOM and styles
+        treeContainer.innerHTML = '';
+        treeContainer.style.transform = '';
+        treeContainer.style.transformOrigin = '';
+        treeContainer.style.cursor = '';
+    }
+
+    // --- Named Event Handlers for Zoom/Pan ---
+
+    handleWheelZoom(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const delta = e.deltaY < 0 ? 0.1 : -0.1;
+            this.scale = Math.min(Math.max(0.5, this.scale + delta), 4);
+            this.setTransform();
+        }
+    }
+
+    handleMouseDown(e) {
+        e.preventDefault();
+        this.panning = true;
+        this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
+        document.getElementById('tree-visualizer-container').style.cursor = 'grabbing';
+    }
+
+    handleMouseUp() {
+        this.panning = false;
+        document.getElementById('tree-visualizer-container').style.cursor = 'grab';
+    }
+
+    handleMouseMove(e) {
+        if (!this.panning) return;
+        this.pointX = (e.clientX - this.start.x);
+        this.pointY = (e.clientY - this.start.y);
+        this.setTransform();
+    }
+
+    setTransform() {
+        const treeContainer = document.getElementById('tree-visualizer-container');
+        const treantInnerContainer = treeContainer.querySelector('.Treant');
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transformOrigin = '0 0';
+            treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
+        }
     }
 
     updateVisualizeButtonState() {
@@ -581,7 +600,14 @@ class TreeBuilder {
         return nodeStructure.children[0];
     }
 
-    drawTreeVisualization() {
+    initVisualization() {
+        // Reset state
+        this.scale = 1;
+        this.panning = false;
+        this.pointX = 0;
+        this.pointY = 0;
+        this.start = { x: 0, y: 0 };
+
         const treantTree = this.getTreeForVisualization();
 
         if (!treantTree) {
@@ -604,18 +630,11 @@ class TreeBuilder {
             nodeStructure: treantTree
         };
 
-        // Destroy previous chart instance if it exists, to avoid errors on re-draw
-        if (this.treantChart) {
-            this.treantChart.destroy();
-        }
         this.treantChart = new Treant(chart_config, null, $);
 
-        // Apply initial transform after the chart is drawn
-        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
-        if (treantInnerContainer) {
-            treantInnerContainer.style.transformOrigin = '0 0';
-            treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-        }
+        // Apply initial transform and add listeners
+        this.setTransform();
+        this.initPanAndZoom();
     }
 
     handleImageClick(image) {
