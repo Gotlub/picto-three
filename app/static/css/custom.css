@@ -8,3 +8,65 @@ body {
     top: 0;
     z-index: 1020;
 }
+
+/* Treant.js Visualization Styles */
+#tree-visualizer-container {
+    overflow: auto;
+    width: 100%;
+    height: 70vh;
+}
+
+.treant-node {
+    padding: 5px;
+    border-radius: 8px;
+    border: 2px solid #b0b0b0;
+    background-color: #f7f7f7;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.treant-node .node-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+}
+
+.treant-node img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    border: 2px solid #ddd;
+}
+
+.treant-node .node-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    padding: 0 5px;
+}
+
+/* Style for the pseudo-nodes used for multiple roots */
+.pseudo {
+    display: none !important;
+}
+
+/* Collapsable switch styling from the example */
+.treant-node .collapse-switch {
+    width: 100%;
+    height: 10px;
+    border: none;
+    border-bottom: 1px solid #b0b0b0;
+    cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #f7f7f7;
+    z-index: 1;
+}
+
+.treant-node.collapsed .collapse-switch {
+    background-color: #dcdcdc;
+}

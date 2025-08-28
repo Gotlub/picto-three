@@ -291,6 +291,8 @@ class TreeBuilder {
         this.leftSidebar = document.querySelector('.col-md-2.sidebar');
         this.rightSidebar = document.querySelector('.col-md-3.sidebar');
         this.treeList = document.getElementById('tree-list');
+        this.visualizeTreeBtn = document.getElementById('visualize-tree-btn');
+        this.treeVisualizerModal = document.getElementById('tree-visualizer-modal');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
@@ -374,7 +376,103 @@ class TreeBuilder {
             this.treeSearch.addEventListener('input', () => this.filterTrees());
         }
 
+        if (this.visualizeTreeBtn) {
+            this.visualizeTreeBtn.addEventListener('click', () => {
+                // The actual drawing is triggered by the modal's 'shown' event
+                const modal = new bootstrap.Modal(this.treeVisualizerModal);
+                modal.show();
+            });
+        }
+
+        if (this.treeVisualizerModal) {
+            this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
+                this.drawTreeVisualization();
+            });
+            this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
+                // Clear the container to prevent issues on re-opening
+                document.getElementById('tree-visualizer-container').innerHTML = '';
+            });
+        }
+
         this.loadSavedTrees();
+        this.updateVisualizeButtonState();
+    }
+
+    updateVisualizeButtonState() {
+        if (this.visualizeTreeBtn) {
+            this.visualizeTreeBtn.disabled = this.rootNode.children.length === 0;
+        }
+    }
+
+    getTreeForVisualization() {
+        const buildTreantNode = (builderNode) => {
+            const treantNode = {
+                text: { name: builderNode.image.name },
+                image: builderNode.image.path.startsWith('/') ? builderNode.image.path : `/pictograms/${builderNode.image.path}`,
+                children: []
+            };
+
+            // To include the description in the node, we can use innerHTML
+            // The 'name' from the text property will be the title attribute of the container div
+            const description = builderNode.description || builderNode.image.name;
+            treantNode.innerHTML = `
+                <div class="node-content-wrapper">
+                    <img src="${treantNode.image}" />
+                    <p class="node-name">${description}</p>
+                </div>
+            `;
+
+
+            builderNode.children.forEach(child => {
+                treantNode.children.push(buildTreantNode(child));
+            });
+
+            return treantNode;
+        };
+
+        const nodeStructure = {
+            children: this.rootNode.children.map(buildTreantNode)
+        };
+
+        // If there is more than one root branch, create an invisible pseudo-node to be the common parent.
+        if (nodeStructure.children.length > 1) {
+            return {
+                pseudo: true,
+                children: nodeStructure.children
+            };
+        }
+
+        return nodeStructure.children[0];
+    }
+
+    drawTreeVisualization() {
+        const treantTree = this.getTreeForVisualization();
+
+        if (!treantTree) {
+            console.error("Cannot visualize an empty tree.");
+            return;
+        }
+
+        const chart_config = {
+            chart: {
+                container: "#tree-visualizer-container",
+                connectors: {
+                    type: "step"
+                },
+                node: {
+                    collapsable: true,
+                    HTMLclass: 'treant-node' // Add a class for styling
+                },
+                scrollbar: "fancy" // Enable fancy scrollbar
+            },
+            nodeStructure: treantTree
+        };
+
+        // Destroy previous chart instance if it exists, to avoid errors on re-draw
+        if (this.treantChart) {
+            this.treantChart.destroy();
+        }
+        this.treantChart = new Treant(chart_config, null, $);
     }
 
     handleImageClick(image) {
@@ -524,6 +622,7 @@ class TreeBuilder {
             this.treeDisplay.appendChild(this.rootNode.element);
             this.renderChildren(this.rootNode);
         }
+        this.updateVisualizeButtonState();
     }
 
     renderChildren(theNode) {
