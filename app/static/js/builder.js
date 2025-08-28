@@ -401,33 +401,51 @@ class TreeBuilder {
         if (this.exportPdfBtn) {
             this.exportPdfBtn.addEventListener('click', () => {
                 const treeContainer = document.getElementById('tree-visualizer-container');
-                const { jsPDF } = window.jspdf;
 
+                // Sauvegarde des styles originaux
+                const originalStyle = {
+                    width: treeContainer.style.width,
+                    height: treeContainer.style.height,
+                    overflow: treeContainer.style.overflow
+                };
+
+                // 1. Mesurer et 2. Agrandir le conteneur à la taille de son contenu
+                treeContainer.style.width = `${treeContainer.scrollWidth}px`;
+                treeContainer.style.height = `${treeContainer.scrollHeight}px`;
+                treeContainer.style.overflow = 'visible';
+
+                // 3. Capturer l'élément maintenant agrandi
                 html2canvas(treeContainer, {
-                    scrollX: -treeContainer.scrollLeft,
-                    scrollY: -treeContainer.scrollTop,
+                    allowTaint: true,
+                    useCORS: true,
                     width: treeContainer.scrollWidth,
-                    height: treeContainer.scrollHeight
+                    height: treeContainer.scrollHeight,
+                    scale: 2 // Augmente la résolution de la capture
                 }).then(canvas => {
+
+                    // 4. Restaurer les styles originaux dès que la capture est faite
+                    treeContainer.style.width = originalStyle.width;
+                    treeContainer.style.height = originalStyle.height;
+                    treeContainer.style.overflow = originalStyle.overflow;
+
                     const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgWidth = 210; // A4 width in mm
-                    const pageHeight = 295; // A4 height in mm
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
+                    const { jsPDF } = window.jspdf;
 
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+                    const orientation = canvas.width > canvas.height ? 'l' : 'p';
+                    const pdf = new jsPDF(orientation, 'mm', 'a4');
 
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-                    pdf.save('tree-export.pdf');
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.save('full-tree-export.pdf');
+
+                }).catch(err => {
+                    // En cas d'erreur, s'assurer de restaurer aussi les styles
+                    treeContainer.style.width = originalStyle.width;
+                    treeContainer.style.height = originalStyle.height;
+                    treeContainer.style.overflow = originalStyle.overflow;
+                    console.error("Erreur lors de la capture PDF :", err);
                 });
             });
         }
