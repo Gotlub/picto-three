@@ -59,6 +59,124 @@
             </div>
             <div class="modal-body">
                 <div id="tree-visualizer-container" style="width: 100%; height: 70vh;"></div>
+                <script>
+                    document.getElementById('tree-visualizer-modal').addEventListener('shown.bs.modal', () => {
+                        const treeContainer = document.getElementById('tree-visualizer-container');
+                        const treeDataString = sessionStorage.getItem('treeToVisualize');
+                        if (!treeDataString) return;
+
+                        // Clear previous content in case of race conditions
+                        treeContainer.innerHTML = '';
+
+                        const treeData = JSON.parse(treeDataString);
+                        const allImages = JSON.parse(document.getElementById('images-data').textContent);
+
+                        const buildTreantNode = (nodeData) => {
+                            const image = allImages.find(img => img.id === nodeData.id) || {id: nodeData.id, name: 'Inaccessible', path: '/static/images/prohibit-bold.png'};
+                            const treantNode = {
+                                text: { name: image.name },
+                                image: image.path.startsWith('/') ? image.path : `/pictograms/${image.path}`,
+                                children: []
+                            };
+                            const description = nodeData.description || image.name;
+                            treantNode.innerHTML = `<div class="node-content-wrapper"><img src="${treantNode.image}" /><p class="node-name">${description}</p></div>`;
+
+                            if (nodeData.children) {
+                                nodeData.children.forEach(childData => {
+                                    treantNode.children.push(buildTreantNode(childData));
+                                });
+                            }
+                            return treantNode;
+                        };
+
+                        const nodeStructure = { children: treeData.roots.map(buildTreantNode) };
+                        let finalStructure = nodeStructure.children.length > 1 ? { pseudo: true, children: nodeStructure.children } : nodeStructure.children[0];
+
+                        if (finalStructure) {
+                            const chart_config = {
+                                chart: {
+                                    container: "#tree-visualizer-container",
+                                    connectors: { type: "step" },
+                                    node: { collapsable: true, HTMLclass: 'treant-node' },
+                                    scrollbar: "fancy"
+                                },
+                                nodeStructure: finalStructure
+                            };
+                            new Treant(chart_config);
+
+                            // --- RE-ADD ZOOM/PAN AND PDF EXPORT LOGIC ---
+                            let scale = 1, panning = false, pointX = 0, pointY = 0, start = { x: 0, y: 0 };
+                            const treantInnerContainer = treeContainer.querySelector('.Treant');
+
+                            const setTransform = () => {
+                                if (treantInnerContainer) {
+                                    treantInnerContainer.style.transformOrigin = '0 0';
+                                    treantInnerContainer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+                                }
+                            };
+
+                            treeContainer.addEventListener('wheel', e => {
+                                if (e.ctrlKey) {
+                                    e.preventDefault();
+                                    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+                                    scale = Math.min(Math.max(0.5, scale + delta), 4);
+                                    setTransform();
+                                }
+                            });
+
+                            treeContainer.addEventListener('mousedown', e => {
+                                e.preventDefault();
+                                panning = true;
+                                start = { x: e.clientX - pointX, y: e.clientY - pointY };
+                                treeContainer.style.cursor = 'grabbing';
+                            });
+
+                            window.addEventListener('mouseup', () => {
+                                panning = false;
+                                treeContainer.style.cursor = 'grab';
+                            });
+
+                            window.addEventListener('mousemove', e => {
+                                if (!panning) return;
+                                pointX = (e.clientX - start.x);
+                                pointY = (e.clientY - start.y);
+                                setTransform();
+                            });
+                            treeContainer.style.cursor = 'grab';
+
+                            document.getElementById('export-pdf-btn').addEventListener('click', () => {
+                                const originalStyle = {
+                                    width: treeContainer.style.width,
+                                    height: treeContainer.style.height,
+                                    overflow: treeContainer.style.overflow,
+                                    transform: treantInnerContainer ? treantInnerContainer.style.transform : 'none'
+                                };
+                                treeContainer.style.width = `${treeContainer.scrollWidth}px`;
+                                treeContainer.style.height = `${treeContainer.scrollHeight}px`;
+                                treeContainer.style.overflow = 'visible';
+                                if (treantInnerContainer) {
+                                    treantInnerContainer.style.transform = 'none';
+                                }
+
+                                html2canvas(treeContainer, { allowTaint: true, useCORS: true, width: treeContainer.scrollWidth, height: treeContainer.scrollHeight, scale: 2 })
+                                    .then(canvas => {
+                                        const imgData = canvas.toDataURL('image/png');
+                                        const { jsPDF } = window.jspdf;
+                                        const pdf = new jsPDF({ orientation: canvas.width > canvas.height ? 'l' : 'p', unit: 'pt', format: [canvas.width, canvas.height] });
+                                        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                                        pdf.save('full-tree-export.pdf');
+                                    }).finally(() => {
+                                        treeContainer.style.width = originalStyle.width;
+                                        treeContainer.style.height = originalStyle.height;
+                                        treeContainer.style.overflow = originalStyle.overflow;
+                                        if (treantInnerContainer) {
+                                            treantInnerContainer.style.transform = originalStyle.transform;
+                                        }
+                                    });
+                            });
+                        }
+                    });
+                </script>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>

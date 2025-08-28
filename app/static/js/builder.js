@@ -220,24 +220,16 @@ class BuilderNode {
 
         const imgElement = document.createElement('img');
         if (this.image.path) {
-            // Path can be a new relative path (e.g., 'public/foo.png')
-            // or an absolute URL for the root node icon (e.g., '/pictograms/public/...')
             if (this.image.path.startsWith('/')) {
-                imgElement.src = this.image.path; // It's already a full URL
+                imgElement.src = this.image.path;
             } else {
-                imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
+                imgElement.src = `/pictograms/${this.image.path}`;
             }
         }
         imgElement.alt = this.image.name;
 
-
-        // Add tooltip events
-        imgElement.addEventListener('mouseover', (e) => {
-            tooltip.show(e, imgElement.src);
-        });
-        imgElement.addEventListener('mouseout', (e) => {
-            tooltip.hide(e);
-        });
+        imgElement.addEventListener('mouseover', (e) => tooltip.show(e, imgElement.src));
+        imgElement.addEventListener('mouseout', (e) => tooltip.hide(e));
 
         contentElement.appendChild(imgElement);
 
@@ -256,29 +248,19 @@ class BuilderNode {
             builder.selectNode(this);
         });
 
-        // Drag and Drop event listeners
-        nodeElement.addEventListener('dragstart', (e) => {
-            e.stopPropagation();
-            builder.handleDragStart(e, this);
-        });
+        nodeElement.addEventListener('dragstart', (e) => builder.handleDragStart(e, this));
         nodeElement.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.stopPropagation();
             builder.handleDragOver(e, this);
         });
-        nodeElement.addEventListener('dragleave', (e) => {
-            e.stopPropagation();
-            builder.handleDragLeave(e, this);
-        });
+        nodeElement.addEventListener('dragleave', (e) => builder.handleDragLeave(e, this));
         nodeElement.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
             builder.handleDrop(e, this);
         });
-        nodeElement.addEventListener('dragend', (e) => {
-            e.stopPropagation();
-            builder.handleDragEnd(e, this);
-        });
+        nodeElement.addEventListener('dragend', (e) => builder.handleDragEnd(e, this));
 
         return nodeElement;
     }
@@ -288,29 +270,12 @@ class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
-        this.leftSidebar = document.querySelector('.col-md-2.sidebar');
-        this.rightSidebar = document.querySelector('.col-md-3.sidebar');
-        this.treeList = document.getElementById('tree-list');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
         this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
-
-        // --- VISUALIZATION ---
-        this.visualizeTreeBtn = document.getElementById('visualize-tree-btn');
-        this.treeVisualizerModal = document.getElementById('tree-visualizer-modal');
-        this.exportPdfBtn = document.getElementById('export-pdf-btn');
-        this.treantChart = null;
-
-        // Zoom & Pan state variables
-        this.scale = 1;
-        this.panning = false;
-        this.pointX = 0;
-        this.pointY = 0;
-        this.start = { x: 0, y: 0 };
-        // --- END VISUALIZATION ---
 
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
@@ -321,7 +286,6 @@ class TreeBuilder {
             });
         }
 
-        // New Image Tree initialization
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
 
@@ -333,79 +297,56 @@ class TreeBuilder {
 
     addEventListeners() {
         document.addEventListener('click', (e) => {
-            const deleteBtn = document.getElementById('delete-btn');
-            const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
             const isClickInsideTree = this.treeDisplay.contains(e.target);
-            const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
-            const isClickInsideDropdown = e.target.closest('.dropdown');
-
-            if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideDropdown) {
-                return;
+            if (!isClickInsideTree && !e.target.closest('.sidebar')) {
+                this.deselectAllNodes();
             }
-            this.deselectAllNodes();
         });
 
-        // Other listeners...
-        const saveBtn = document.getElementById('save-tree-btn');
-        if (saveBtn) saveBtn.addEventListener('click', () => this.saveTree());
-
-        const importBtn = document.getElementById('import-json-btn');
-        if (importBtn) importBtn.addEventListener('click', () => this.importTreeFromJSON());
-
-        const exportBtn = document.getElementById('export-json-btn');
-        if (exportBtn) exportBtn.addEventListener('click', () => this.exportTreeToJSON());
-
-        const loadBtn = document.getElementById('load-tree-btn');
-        if (loadBtn) loadBtn.addEventListener('click', () => this.loadTree());
-
-        if (this.imageSearch) this.imageSearch.addEventListener('input', () => this.filterImages());
-
-        const deleteBtn = document.getElementById('delete-btn');
-        if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteSelectedNode());
+        document.getElementById('save-tree-btn')?.addEventListener('click', () => this.saveTree());
+        document.getElementById('import-json-btn')?.addEventListener('click', () => this.importTreeFromJSON());
+        document.getElementById('export-json-btn')?.addEventListener('click', () => this.exportTreeToJSON());
+        document.getElementById('load-tree-btn')?.addEventListener('click', () => this.loadTree());
+        document.getElementById('image-search')?.addEventListener('input', () => this.filterImages());
+        document.getElementById('delete-btn')?.addEventListener('click', () => this.deleteSelectedNode());
 
         const newTreeBtn = document.getElementById('new-tree-btn');
         if (newTreeBtn) {
-            newTreeBtn.addEventListener('click', (e) => {
-                if (this.rootNode.children.length > 0) {
-                    if (confirm('You have an unsaved tree. Are you sure you want to leave?')) {
-                        window.location.href = '/builder';
-                    }
-                } else {
+            newTreeBtn.addEventListener('click', () => {
+                if (this.rootNode.children.length > 0 && confirm('You have an unsaved tree. Are you sure you want to leave?')) {
+                    window.location.href = '/builder';
+                } else if (this.rootNode.children.length === 0) {
                     window.location.href = '/builder';
                 }
             });
         }
 
-        if (this.treeSearch) this.treeSearch.addEventListener('input', () => this.filterTrees());
+        document.getElementById('tree-search')?.addEventListener('input', () => this.filterTrees());
 
-        // Visualization Listeners
-        if (this.visualizeTreeBtn) {
-            this.visualizeTreeBtn.addEventListener('click', () => {
-                // The modal is opened, but the tree is now drawn by a separate script
-                // included in the modal's HTML, or the page is reloaded on close.
-                // For this strategy, we first need to draw the tree.
-                this.initVisualization();
-                const modal = new bootstrap.Modal(this.treeVisualizerModal);
+        // --- FINAL RELOAD STRATEGY ---
+        const visualizeBtn = document.getElementById('visualize-tree-btn');
+        const treeVisualizerModal = document.getElementById('tree-visualizer-modal');
+
+        if (visualizeBtn && treeVisualizerModal) {
+            visualizeBtn.addEventListener('click', () => {
+                // The tree drawing is now handled by a separate script in the modal
+                // Or rather, the modal will be populated by a script that runs on its own
+                // For now, just showing the modal is enough before the reload logic.
+                // But we need to pass the data.
+                const treeData = this.getTreeAsJSON();
+                sessionStorage.setItem('treeToVisualize', JSON.stringify(treeData));
+                const modal = new bootstrap.Modal(treeVisualizerModal);
                 modal.show();
             });
-        }
 
-        if (this.treeVisualizerModal) {
-            // RELOAD STRATEGY: Save state and reload when modal is closed.
-            this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
+            treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
+                // When the modal is closed, save the main tree's state and reload the page.
                 if (this.rootNode.children.length > 0) {
                     const treeData = this.getTreeAsJSON();
                     sessionStorage.setItem('treeBuilderState', JSON.stringify(treeData));
                 }
-                // A small delay can prevent race conditions with the reload
-                setTimeout(() => {
-                    window.location.reload();
-                }, 100);
+                window.location.reload();
             });
-        }
-
-        if (this.exportPdfBtn) {
-            this.exportPdfBtn.addEventListener('click', () => this.exportVisualizationToPdf());
         }
     }
 
@@ -413,169 +354,22 @@ class TreeBuilder {
         const savedState = sessionStorage.getItem('treeBuilderState');
         if (savedState) {
             try {
-                console.log("Restoring tree from session storage...");
                 const treeData = JSON.parse(savedState);
                 this.rebuildTreeFromJSON(treeData);
-                sessionStorage.removeItem('treeBuilderState');
             } catch (e) {
                 console.error("Failed to parse or restore tree state from session storage.", e);
+            } finally {
                 sessionStorage.removeItem('treeBuilderState');
             }
         }
-    }
-
-    // --- VISUALIZATION METHODS ---
-
-    initVisualization() {
-        this.scale = 1;
-        this.panning = false;
-        this.pointX = 0;
-        this.pointY = 0;
-        this.start = { x: 0, y: 0 };
-
-        const treantTree = this.getTreeForVisualization();
-        if (!treantTree) return;
-
-        const chart_config = {
-            chart: {
-                container: "#tree-visualizer-container",
-                connectors: { type: "step" },
-                node: { collapsable: true, HTMLclass: 'treant-node' },
-                scrollbar: "fancy"
-            },
-            nodeStructure: treantTree
-        };
-
-        this.treantChart = new Treant(chart_config, null, $);
-        this.initPanAndZoom();
-    }
-
-    initPanAndZoom() {
-        const treeContainer = document.getElementById('tree-visualizer-container');
-        if (!treeContainer) return;
-
-        const setTransform = () => {
-            const treantInnerContainer = treeContainer.querySelector('.Treant');
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transformOrigin = '0 0';
-                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-            }
-        };
-
-        const handleWheelZoom = (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                this.scale = Math.min(Math.max(0.5, this.scale + delta), 4);
-                setTransform();
-            }
-        };
-
-        const handleMouseDown = (e) => {
-            e.preventDefault();
-            this.panning = true;
-            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
-            treeContainer.style.cursor = 'grabbing';
-        };
-
-        const handleMouseUp = () => {
-            this.panning = false;
-            treeContainer.style.cursor = 'grab';
-        };
-
-        const handleMouseMove = (e) => {
-            if (!this.panning) return;
-            this.pointX = (e.clientX - this.start.x);
-            this.pointY = (e.clientY - this.start.y);
-            setTransform();
-        };
-
-        treeContainer.addEventListener('wheel', handleWheelZoom);
-        treeContainer.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mouseup', handleMouseUp);
-        window.addEventListener('mousemove', handleMouseMove);
-        treeContainer.style.cursor = 'grab';
-    }
-
-    getTreeForVisualization() {
-        const buildTreantNode = (builderNode) => {
-            const treantNode = {
-                text: { name: builderNode.image.name },
-                image: builderNode.image.path.startsWith('/') ? builderNode.image.path : `/pictograms/${builderNode.image.path}`,
-                children: []
-            };
-            const description = builderNode.description || builderNode.image.name;
-            treantNode.innerHTML = `
-                <div class="node-content-wrapper">
-                    <img src="${treantNode.image}" />
-                    <p class="node-name">${description}</p>
-                </div>
-            `;
-            builderNode.children.forEach(child => {
-                treantNode.children.push(buildTreantNode(child));
-            });
-            return treantNode;
-        };
-        const nodeStructure = { children: this.rootNode.children.map(buildTreantNode) };
-        if (nodeStructure.children.length > 1) {
-            return { pseudo: true, children: nodeStructure.children };
-        }
-        return nodeStructure.children[0];
-    }
-
-    exportVisualizationToPdf() {
-        const treeContainer = document.getElementById('tree-visualizer-container');
-        const treantInnerContainer = treeContainer.querySelector('.Treant');
-
-        const originalStyle = {
-            width: treeContainer.style.width,
-            height: treeContainer.style.height,
-            overflow: treeContainer.style.overflow,
-            transform: treantInnerContainer ? treantInnerContainer.style.transform : 'none'
-        };
-
-        treeContainer.style.width = `${treeContainer.scrollWidth}px`;
-        treeContainer.style.height = `${treeContainer.scrollHeight}px`;
-        treeContainer.style.overflow = 'visible';
-        if (treantInnerContainer) {
-            treantInnerContainer.style.transform = 'none';
-        }
-
-        html2canvas(treeContainer, {
-            allowTaint: true,
-            useCORS: true,
-            width: treeContainer.scrollWidth,
-            height: treeContainer.scrollHeight,
-            scale: 2
-        }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const canvasWidth = canvas.width;
-            const canvasHeight = canvas.height;
-            const pdf = new jsPDF({
-                orientation: canvasWidth > canvasHeight ? 'l' : 'p',
-                unit: 'pt',
-                format: [canvasWidth, canvasHeight]
-            });
-            pdf.addImage(imgData, 'PNG', 0, 0, canvasWidth, canvasHeight);
-            pdf.save('full-tree-export.pdf');
-        }).finally(() => {
-            treeContainer.style.width = originalStyle.width;
-            treeContainer.style.height = originalStyle.height;
-            treeContainer.style.overflow = originalStyle.overflow;
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transform = originalStyle.transform;
-            }
-        });
     }
 
     updateVisualizeButtonState() {
-        if (this.visualizeTreeBtn) {
-            this.visualizeTreeBtn.disabled = this.rootNode.children.length === 0;
+        const visualizeBtn = document.getElementById('visualize-tree-btn');
+        if (visualizeBtn) {
+            visualizeBtn.disabled = this.rootNode.children.length === 0;
         }
     }
-
-    // --- END VISUALIZATION METHODS ---
 
     handleImageClick(image) {
         const newNode = new BuilderNode(image, this);
@@ -687,14 +481,8 @@ class TreeBuilder {
     }
 
     deselectAllNodes() {
-        const selectedElements = this.treeDisplay.querySelectorAll('.node-content.selected');
-        selectedElements.forEach(el => {
-            el.classList.remove('selected');
-        });
-        const selectedNodes = this.treeDisplay.querySelectorAll('.node.is-selected');
-        selectedNodes.forEach(el => {
-            el.classList.remove('is-selected');
-        });
+        this.treeDisplay.querySelectorAll('.node-content.selected').forEach(el => el.classList.remove('selected'));
+        this.treeDisplay.querySelectorAll('.node.is-selected').forEach(el => el.classList.remove('is-selected'));
         this.selectedNode = null;
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.value = '';
@@ -792,9 +580,7 @@ class TreeBuilder {
 
         const response = await fetch('/api/tree/save', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: treeName,
                 is_public: isPublic,
@@ -806,7 +592,6 @@ class TreeBuilder {
         if (result.status === 'success') {
             const message = existingTree ? 'Updated' : 'Created';
             alert(message);
-
             this.rootNode.children = [];
             this.rebuildTreeFromJSON(result.tree_data);
             this.loadSavedTrees();
@@ -822,19 +607,10 @@ class TreeBuilder {
 
     filterTrees() {
         const searchTerm = this.treeSearch.value.toLowerCase();
-        const treeLists = document.querySelectorAll('.tree-select-list');
-
-        treeLists.forEach(select => {
-            const options = select.options;
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                const optionText = option.textContent.toLowerCase();
-                if (optionText.includes(searchTerm)) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
-                }
-            }
+        document.querySelectorAll('.tree-select-list').forEach(select => {
+            Array.from(select.options).forEach(option => {
+                option.style.display = option.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
+            });
         });
     }
 
@@ -847,15 +623,16 @@ class TreeBuilder {
     }
 
     renderTreeList() {
-        if (!this.treeList) return;
-        this.treeList.innerHTML = '';
+        const treeList = document.getElementById('tree-list');
+        if (!treeList) return;
+        treeList.innerHTML = '';
         this.activeTreeSelect = null;
 
         const createSelectList = (trees, title, id) => {
             if (trees.length > 0) {
                 const titleEl = document.createElement('h6');
                 titleEl.textContent = title;
-                this.treeList.appendChild(titleEl);
+                treeList.appendChild(titleEl);
 
                 const select = document.createElement('select');
                 select.id = id;
@@ -863,20 +640,12 @@ class TreeBuilder {
                 trees.forEach(tree => {
                     const option = document.createElement('option');
                     option.value = tree.id;
-
-                    if (id === 'user-tree-select') {
-                        option.textContent = tree.name;
-                    } else {
-                        option.textContent = tree.username ? `${tree.username} - ${tree.name}` : tree.name;
-                    }
+                    option.textContent = (id === 'user-tree-select' || !tree.username) ? tree.name : `${tree.username} - ${tree.name}`;
                     select.appendChild(option);
                 });
 
-                select.addEventListener('focus', () => {
-                    this.activeTreeSelect = select;
-                });
-
-                this.treeList.appendChild(select);
+                select.addEventListener('focus', () => { this.activeTreeSelect = select; });
+                treeList.appendChild(select);
             }
         };
 
@@ -901,8 +670,7 @@ class TreeBuilder {
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {
-            const treeData = JSON.parse(treeToLoad.json_data);
-            this.rebuildTreeFromJSON(treeData);
+            this.rebuildTreeFromJSON(JSON.parse(treeToLoad.json_data));
         } else {
             alert('Could not find the selected tree.');
         }
@@ -915,26 +683,19 @@ class TreeBuilder {
         const buildNode = (nodeData) => {
             let image = this.images.find(img => img.id === nodeData.id);
             if (!image) {
+                image = { id: nodeData.id, name: 'Image inaccessible', path: '/static/images/prohibit-bold.png', description: 'This image is private or has been deleted.' };
                 console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
-                image = {
-                    id: nodeData.id,
-                    name: 'Image inaccessible',
-                    path: '/static/images/prohibit-bold.png',
-                    description: 'This image is private or has been deleted.'
-                };
             }
 
             const newNode = new BuilderNode(image, this);
-            if (nodeData.hasOwnProperty('description')) {
+            if (nodeData.description) {
                 newNode.description = nodeData.description;
             }
 
             if (nodeData.children) {
                 nodeData.children.forEach(childData => {
                     const childNode = buildNode(childData);
-                    if (childNode) {
-                        newNode.addChild(childNode);
-                    }
+                    if (childNode) newNode.addChild(childNode);
                 });
             }
             return newNode;
@@ -943,9 +704,7 @@ class TreeBuilder {
         if (treeData.roots) {
             treeData.roots.forEach(rootData => {
                 const rootNode = buildNode(rootData);
-                if (rootNode) {
-                    this.rootNode.addChild(rootNode);
-                }
+                if (rootNode) this.rootNode.addChild(rootNode);
             });
         }
 
@@ -978,8 +737,7 @@ class TreeBuilder {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
-                        const treeData = JSON.parse(event.target.result);
-                        this.rebuildTreeFromJSON(treeData);
+                        this.rebuildTreeFromJSON(JSON.parse(event.target.result));
                     } catch (error) {
                         alert('Error parsing JSON file.');
                     }
@@ -992,9 +750,5 @@ class TreeBuilder {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const dropdownEl = document.getElementById('navbarDropdown');
-    if (dropdownEl) {
-        new bootstrap.Dropdown(dropdownEl);
-    }
     new TreeBuilder();
 });
