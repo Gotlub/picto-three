@@ -1,0 +1,23 @@
+/* Styles for the tree visualizer modal */
+#visualize-modal .modal-dialog {
+    max-width: 90%;
+}
+
+/* Styles for the Treant.js chart */
+.custom-node {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    text-align: center;
+}
+
+.custom-node img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.custom-node .node-description {
+    margin-top: 5px;
+    font-size: 12px;
+}

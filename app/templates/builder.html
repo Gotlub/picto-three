@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/Treant.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tree-visualizer.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -40,8 +45,9 @@
 
         <!-- Main Content -->
         <div class="col-md-7">
-            <div class="d-flex align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">{{ _('Tree Builder') }}</h2>
+                <button id="visualize-tree-btn" class="btn btn-primary" disabled>{{ _('Visualize Tree') }}</button>
             </div>
             <div class="tree-display border p-3 rounded" id="tree-display" style="min-height: 80vh;">
                 <!-- Tree will be built here -->
@@ -79,4 +85,25 @@
     {{ images_json | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/builder.js') }}"></script>
+
+<!-- Modal for Tree Visualization -->
+<div class="modal fade" id="visualize-modal" tabindex="-1" aria-labelledby="visualize-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="visualize-modal-label">{{ _('Tree Visualization') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="tree-visualizer" style="width: 100%; height: 600px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/raphael.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/Treant.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tree-visualizer.js') }}"></script>
 {% endblock %}

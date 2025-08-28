@@ -808,5 +808,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dropdownEl) {
         new bootstrap.Dropdown(dropdownEl);
     }
-    new TreeBuilder();
+    window.treeBuilder = new TreeBuilder();
 });
