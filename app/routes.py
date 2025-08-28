@@ -227,9 +227,19 @@ def resend_confirmation_request():
             flash('Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire.', 'warning')
     return render_template('resend_confirmation_request.html', form=form)
 
-@bp.route('/builder')
+@bp.route('/builder', methods=['GET', 'POST'])
 def builder():
     initial_folders = []
+    tree_data_from_post = None
+
+    if request.method == 'POST':
+        tree_data_str = request.form.get('tree_data')
+        if tree_data_str:
+            try:
+                tree_data_from_post = json.loads(tree_data_str)
+            except json.JSONDecodeError:
+                flash('Invalid tree data received.', 'danger')
+                tree_data_from_post = None
 
     # Get public root folder
     public_root = Folder.query.filter_by(user_id=None, parent_id=None).first()
@@ -261,7 +271,8 @@ def builder():
         'builder.html',
         title='Tree Builder',
         initial_tree_data_json=initial_tree_data_json,
-        images_json=images_json
+        images_json=images_json,
+        tree_data_from_post=tree_data_from_post
     )
 
 @bp.route('/pictogram-bank')
