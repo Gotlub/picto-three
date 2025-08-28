@@ -295,6 +295,7 @@ class TreeBuilder {
         this.treeVisualizerModal = document.getElementById('tree-visualizer-modal');
         this.exportPdfBtn = document.getElementById('export-pdf-btn');
         this.closeVisualizeBtn = document.getElementById('close-visualizer-btn');
+        this.closeVisualizeXBtn = document.getElementById('close-visualizer-x-btn');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
@@ -414,25 +415,11 @@ class TreeBuilder {
         }
 
         if (this.closeVisualizeBtn) {
-            this.closeVisualizeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
+            this.closeVisualizeBtn.addEventListener('click', this.reloadBuilderWithCurrentTree.bind(this));
+        }
 
-                const treeData = this.getTreeAsJSON();
-                const treeDataString = JSON.stringify(treeData);
-
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/builder';
-
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'tree_data';
-                input.value = treeDataString;
-
-                form.appendChild(input);
-                document.body.appendChild(form);
-                form.submit();
-            });
+        if (this.closeVisualizeXBtn) {
+            this.closeVisualizeXBtn.addEventListener('click', this.reloadBuilderWithCurrentTree.bind(this));
         }
 
         this.loadSavedTrees();
@@ -614,6 +601,33 @@ class TreeBuilder {
         }
 
         return nodeStructure.children[0];
+    }
+
+    reloadBuilderWithCurrentTree(event) {
+        event.preventDefault();
+
+        const treeData = this.getTreeAsJSON();
+        const treeDataString = JSON.stringify(treeData);
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/builder';
+
+        const treeInput = document.createElement('input');
+        treeInput.type = 'hidden';
+        treeInput.name = 'tree_data';
+        treeInput.value = treeDataString;
+
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken;
+
+        form.appendChild(treeInput);
+        form.appendChild(csrfInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 
     drawTreeVisualization() {
