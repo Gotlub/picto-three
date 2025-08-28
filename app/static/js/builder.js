@@ -404,8 +404,8 @@ class TreeBuilder {
                 const { jsPDF } = window.jspdf;
 
                 html2canvas(treeContainer, {
-                    scrollX: 0,
-                    scrollY: -window.scrollY, // Ensure it captures from the top
+                    scrollX: -treeContainer.scrollLeft,
+                    scrollY: -treeContainer.scrollTop,
                     width: treeContainer.scrollWidth,
                     height: treeContainer.scrollHeight
                 }).then(canvas => {
