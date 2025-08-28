@@ -293,6 +293,7 @@ class TreeBuilder {
         this.treeList = document.getElementById('tree-list');
         this.visualizeTreeBtn = document.getElementById('visualize-tree-btn');
         this.treeVisualizerModal = document.getElementById('tree-visualizer-modal');
+        this.exportPdfBtn = document.getElementById('export-pdf-btn');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
@@ -396,6 +397,40 @@ class TreeBuilder {
 
         this.loadSavedTrees();
         this.updateVisualizeButtonState();
+
+        if (this.exportPdfBtn) {
+            this.exportPdfBtn.addEventListener('click', () => {
+                const treeContainer = document.getElementById('tree-visualizer-container');
+                const { jsPDF } = window.jspdf;
+
+                html2canvas(treeContainer, {
+                    scrollX: 0,
+                    scrollY: -window.scrollY, // Ensure it captures from the top
+                    width: treeContainer.scrollWidth,
+                    height: treeContainer.scrollHeight
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 295; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+
+                    pdf.save('tree-export.pdf');
+                });
+            });
+        }
     }
 
     updateVisualizeButtonState() {
