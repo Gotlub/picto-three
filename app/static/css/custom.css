@@ -12,16 +12,16 @@ body {
 /* Treant.js Visualization Styles */
 #tree-visualizer-container {
     position: relative;
-    overflow: hidden; /* Changed from 'auto' to 'hidden' */
+    overflow: auto; /* Use native browser scrollbars */
     width: 100%;
     height: 70vh;
 }
 
-/* This will be the direct container for the Treant chart. */
 #tree-simple {
     width: 100%;
     height: 100%;
 }
+
 
 .treant-node {
     padding: 5px;
