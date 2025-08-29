@@ -394,13 +394,16 @@ class TreeBuilder {
             });
         }
 
+        this.ps = null; // PerfectScrollbar instance
+
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
                 // --- DESTRUCTION ET NETTOYAGE ---
                 if (this.treantChart) {
                     this.treantChart.destroy();
                 }
-                document.getElementById('tree-visualizer-container').innerHTML = '';
+                // We must restore the inner div for Treant
+                document.getElementById('tree-visualizer-container').innerHTML = '<div id="tree-simple" style="width: 100%; height: 100%;"></div>';
 
                 // Reset zoom and pan state each time the modal is opened
                 this.scale = 1;
@@ -411,6 +414,18 @@ class TreeBuilder {
 
                 // Recréer l'arbre
                 this.drawTreeVisualization();
+
+                // Initialize PerfectScrollbar
+                const container = document.getElementById('tree-visualizer-container');
+                this.ps = new PerfectScrollbar(container);
+            });
+
+            this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
+                // Destroy PerfectScrollbar instance when modal is hidden
+                if (this.ps) {
+                    this.ps.destroy();
+                    this.ps = null;
+                }
             });
         }
 
@@ -456,7 +471,7 @@ class TreeBuilder {
                 treeContainer.style.overflow = 'visible';
 
                 // NOUVEAU: Gérer le zoom/pan lors de l'export
-                const treantInnerContainer = treeContainer.querySelector('.Treant');
+                const treantInnerContainer = document.querySelector('#tree-simple .Treant');
                 const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
                 if (treantInnerContainer) {
                     treantInnerContainer.style.transform = 'none';
@@ -516,10 +531,13 @@ class TreeBuilder {
 
         // The target for the transform is the inner div created by Treant, not the scroll container
         const setTransform = () => {
-            const treantInnerContainer = treeContainer.querySelector('.Treant');
+            const treantInnerContainer = document.querySelector('#tree-simple .Treant');
             if (treantInnerContainer) {
                 treantInnerContainer.style.transformOrigin = '0 0';
                 treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
+            }
+            if (this.ps) {
+                this.ps.update();
             }
         };
 
@@ -640,15 +658,15 @@ class TreeBuilder {
 
         const chart_config = {
             chart: {
-                container: "#tree-visualizer-container",
+                container: "#tree-simple", // Changed from #tree-visualizer-container
                 connectors: {
                     type: "step"
                 },
                 node: {
                     collapsable: true,
                     HTMLclass: 'treant-node' // Add a class for styling
-                },
-                scrollbar: "fancy" // Enable fancy scrollbar
+                }
+                // scrollbar: "fancy" // We will use perfect-scrollbar instead
             },
             nodeStructure: treantTree
         };
@@ -660,7 +678,7 @@ class TreeBuilder {
         this.treantChart = new Treant(chart_config, null, $);
 
         // Apply initial transform after the chart is drawn
-        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
+        const treantInnerContainer = document.querySelector('#tree-simple .Treant');
         if (treantInnerContainer) {
             treantInnerContainer.style.transformOrigin = '0 0';
             treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;

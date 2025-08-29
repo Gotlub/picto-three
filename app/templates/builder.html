@@ -73,7 +73,9 @@
                 <button type="button" id="close-visualizer-x-btn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="tree-visualizer-container" style="width: 100%; height: 70vh;"></div>
+                <div id="tree-visualizer-container" style="position: relative; width: 100%; height: 70vh; overflow: hidden;">
+                    <div id="tree-simple" style="width: 100%; height: 100%;"></div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="close-visualizer-btn" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
