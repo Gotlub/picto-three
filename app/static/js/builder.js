@@ -284,6 +284,29 @@ class BuilderNode {
     }
 }
 
+// Variable globale pour le zoom, initialisée à 1.0
+let currentZoom = 1.0;
+
+// Objet de configuration de BASE, avec les dimensions pour un zoom de 100%
+// Cet objet ne doit JAMAIS être modifié après sa déclaration.
+const baseConfig = {
+    chart: {
+        container: "#tree-container",
+        connectors: {
+            type: "step"
+        },
+        node: {
+            collapsable: false,
+            // Dimensions pour zoom = 1.0
+            width: 180,
+            height: 100,
+        },
+        siblingSeparation: 30,
+        levelSeparation: 60,
+    },
+    nodeStructure: null, // This will be set by renderTree
+};
+
 class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
@@ -302,13 +325,6 @@ class TreeBuilder {
         this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
-
-        // Zoom & Pan state variables
-        this.scale = 1;
-        this.panning = false;
-        this.pointX = 0;
-        this.pointY = 0;
-        this.start = { x: 0, y: 0 };
 
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
@@ -388,7 +404,6 @@ class TreeBuilder {
 
         if (this.visualizeTreeBtn) {
             this.visualizeTreeBtn.addEventListener('click', () => {
-                // The actual drawing is triggered by the modal's 'shown' event
                 const modal = new bootstrap.Modal(this.treeVisualizerModal);
                 modal.show();
             });
@@ -396,21 +411,7 @@ class TreeBuilder {
 
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
-                // --- DESTRUCTION ET NETTOYAGE ---
-                if (this.treantChart) {
-                    this.treantChart.destroy();
-                }
-                document.getElementById('tree-visualizer-container').innerHTML = '';
-
-                // Reset zoom and pan state each time the modal is opened
-                this.scale = 1;
-                this.panning = false;
-                this.pointX = 0;
-                this.pointY = 0;
-                this.start = { x: 0, y: 0 };
-
-                // Recréer l'arbre
-                this.drawTreeVisualization();
+                this.renderTree(1.0);
             });
         }
 
@@ -424,8 +425,6 @@ class TreeBuilder {
 
         this.loadSavedTrees();
         this.updateVisualizeButtonState();
-
-        this.initPanAndZoom();
 
         const treeDataFromPostElement = document.getElementById('tree-data-from-post');
         if (treeDataFromPostElement && treeDataFromPostElement.textContent) {
@@ -441,7 +440,7 @@ class TreeBuilder {
 
         if (this.exportPdfBtn) {
             this.exportPdfBtn.addEventListener('click', () => {
-                const treeContainer = document.getElementById('tree-visualizer-container');
+                const treeContainer = document.getElementById('tree-container');
 
                 // Sauvegarde des styles originaux
                 const originalStyle = {
@@ -508,52 +507,43 @@ class TreeBuilder {
                 });
             });
         }
+
+        $('#visualizer-viewport').on('wheel', (event) => {
+            if (event.ctrlKey) {
+                event.preventDefault();
+
+                if (event.originalEvent.deltaY < 0) {
+                    // Zoom in
+                    currentZoom += 0.1;
+                } else {
+                    // Zoom out
+                    currentZoom = Math.max(0.2, currentZoom - 0.1); // Empêche de devenir trop petit
+                }
+                this.renderTree(currentZoom);
+            }
+        });
     }
 
-    initPanAndZoom() {
-        const treeContainer = document.getElementById('tree-visualizer-container');
-        if (!treeContainer) return;
+    renderTree(zoomLevel) {
+        // 1. CRÉER une nouvelle configuration en copiant la base
+        // La copie profonde est ESSENTIELLE pour ne pas polluer l'original
+        let dynamicConfig = JSON.parse(JSON.stringify(baseConfig));
 
-        // The target for the transform is the inner div created by Treant, not the scroll container
-        const setTransform = () => {
-            const treantInnerContainer = treeContainer.querySelector('.Treant');
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transformOrigin = '0 0';
-                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-            }
-        };
+        // 2. APPLIQUER le zoom aux dimensions dans l'objet de config
+        dynamicConfig.chart.node.width = baseConfig.chart.node.width * zoomLevel;
+        dynamicConfig.chart.node.height = baseConfig.chart.node.height * zoomLevel;
+        dynamicConfig.chart.siblingSeparation = baseConfig.chart.siblingSeparation * zoomLevel;
+        dynamicConfig.chart.levelSeparation = baseConfig.chart.levelSeparation * zoomLevel;
 
-        treeContainer.addEventListener('wheel', (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
-                this.scale = newScale;
-                setTransform();
-            }
-        });
+        // 3. INCLURE les données de l'arbre dans la configuration
+        dynamicConfig.nodeStructure = this.getTreeForVisualization();
 
-        treeContainer.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            this.panning = true;
-            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
-            treeContainer.style.cursor = 'grabbing';
-        });
+        // 4. NETTOYER l'ancien arbre (CRUCIAL)
+        $('#tree-container').empty();
 
-        window.addEventListener('mouseup', () => {
-            this.panning = false;
-            treeContainer.style.cursor = 'grab';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!this.panning) return;
-            this.pointX = (e.clientX - this.start.x);
-            this.pointY = (e.clientY - this.start.y);
-            setTransform();
-        });
-
-        // Set initial cursor
-        treeContainer.style.cursor = 'grab';
+        // 5. CRÉER la nouvelle instance de l'arbre
+        // Toute la magie du positionnement et du dessin est gérée ici par la librairie.
+        new Treant(dynamicConfig);
     }
 
     updateVisualizeButtonState() {
@@ -630,49 +620,12 @@ class TreeBuilder {
         form.submit();
     }
 
-    drawTreeVisualization() {
-        const treantTree = this.getTreeForVisualization();
-
-        if (!treantTree) {
-            console.error("Cannot visualize an empty tree.");
-            return;
-        }
-
-        const chart_config = {
-            chart: {
-                container: "#tree-visualizer-container",
-                connectors: {
-                    type: "step"
-                },
-                node: {
-                    collapsable: true,
-                    HTMLclass: 'treant-node' // Add a class for styling
-                },
-                scrollbar: "fancy" // Enable fancy scrollbar
-            },
-            nodeStructure: treantTree
-        };
-
-        // Destroy previous chart instance if it exists, to avoid errors on re-draw
-        if (this.treantChart) {
-            this.treantChart.destroy();
-        }
-        this.treantChart = new Treant(chart_config, null, $);
-
-        // Apply initial transform after the chart is drawn
-        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
-        if (treantInnerContainer) {
-            treantInnerContainer.style.transformOrigin = '0 0';
-            treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-        }
-    }
-
     handleImageClick(image) {
         const newNode = new BuilderNode(image, this);
         const parentNode = this.selectedNode || this.rootNode;
         parentNode.addChild(newNode);
         this.selectNode(newNode); // Select the new node
-        this.renderTree();
+        this.renderTreeDisplay();
     }
 
     isDescendant(potentialDescendant, potentialAncestor) {
@@ -731,7 +684,7 @@ class TreeBuilder {
         }
 
         targetNode.addChild(draggedNode);
-        this.renderTree();
+        this.renderTreeDisplay();
     }
 
     handleDragEnd(e) {
@@ -803,12 +756,12 @@ class TreeBuilder {
             if (parent) {
                 parent.children = parent.children.filter(child => child !== this.selectedNode);
                 this.selectedNode = null;
-                this.renderTree();
+                this.renderTreeDisplay();
             }
         }
     }
 
-    renderTree() {
+    renderTreeDisplay() {
         this.treeDisplay.innerHTML = '';
         if (this.rootNode && this.rootNode.element) {
             this.treeDisplay.appendChild(this.rootNode.element);
@@ -1066,7 +1019,7 @@ class TreeBuilder {
             });
         }
 
-        this.renderTree();
+        this.renderTreeDisplay();
     }
 
     exportTreeToJSON() {
