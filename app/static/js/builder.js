@@ -1004,8 +1004,22 @@ class TreeBuilder {
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {
-            const treeData = JSON.parse(treeToLoad.json_data);
-            this.rebuildTreeFromJSON(treeData);
+            const importedData = JSON.parse(treeToLoad.json_data);
+            const importMode = document.querySelector('input[name="import_mode"]:checked').value;
+
+            if (importMode === 'replace') {
+                this.rebuildTreeFromJSON(importedData);
+            } else { // 'add'
+                const currentTreeData = this.getTreeAsJSON();
+
+                if (currentTreeData.roots.length > 0 && importedData.roots && importedData.roots.length > 0) {
+                    const mergedRoots = currentTreeData.roots.concat(importedData.roots);
+                    const mergedTreeData = { roots: mergedRoots };
+                    this.rebuildTreeFromJSON(mergedTreeData);
+                } else {
+                    this.rebuildTreeFromJSON(importedData);
+                }
+            }
         } else {
             alert('Could not find the selected tree.');
         }
@@ -1081,8 +1095,22 @@ class TreeBuilder {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
-                        const treeData = JSON.parse(event.target.result);
-                        this.rebuildTreeFromJSON(treeData);
+                        const importedData = JSON.parse(event.target.result);
+                        const importMode = document.querySelector('input[name="import_mode"]:checked').value;
+
+                        if (importMode === 'replace') {
+                            this.rebuildTreeFromJSON(importedData);
+                        } else { // 'add'
+                            const currentTreeData = this.getTreeAsJSON();
+
+                            if (currentTreeData.roots.length > 0 && importedData.roots && importedData.roots.length > 0) {
+                                const mergedRoots = currentTreeData.roots.concat(importedData.roots);
+                                const mergedTreeData = { roots: mergedRoots };
+                                this.rebuildTreeFromJSON(mergedTreeData);
+                            } else {
+                                this.rebuildTreeFromJSON(importedData);
+                            }
+                        }
                     } catch (error) {
                         alert('Error parsing JSON file.');
                     }
