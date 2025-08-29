@@ -11,17 +11,14 @@ body {
 
 /* Treant.js Visualization Styles */
 #tree-visualizer-container {
-    position: relative;
     overflow: auto; /* Use native browser scrollbars */
     width: 100%;
     height: 70vh;
 }
 
 #tree-simple {
-    width: 100%;
-    height: 100%;
+    /* This container is now sized by Treant.js, so we don't need fixed dimensions */
 }
-
 
 .treant-node {
     padding: 5px;

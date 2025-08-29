@@ -303,6 +303,13 @@ class TreeBuilder {
         this.selectedNode = null;
         this.draggedNode = null;
 
+        // Zoom & Pan state variables
+        this.scale = 1;
+        this.panning = false;
+        this.pointX = 0;
+        this.pointY = 0;
+        this.start = { x: 0, y: 0 };
+
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
             this.nodeDescriptionTextarea.addEventListener('input', () => {
@@ -379,56 +386,62 @@ class TreeBuilder {
             this.treeSearch.addEventListener('input', () => this.filterTrees());
         }
 
+        this.currentZoom = 1.0;
+        this.baseTreantConfig = {
+            chart: {
+                container: "#tree-simple",
+                connectors: {
+                    type: "step"
+                },
+                node: {
+                    collapsable: true,
+                    HTMLclass: 'treant-node'
+                }
+            },
+            nodeStructure: null // This will be filled dynamically
+        };
+
         if (this.visualizeTreeBtn) {
             this.visualizeTreeBtn.addEventListener('click', () => {
-                // The actual drawing is triggered by the modal's 'shown' event
                 const modal = new bootstrap.Modal(this.treeVisualizerModal);
                 modal.show();
             });
         }
 
-        this.scale = 1;
-        this.initialTreantWidth = 0;
-        this.initialTreantHeight = 0;
-
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
-                if (this.treantChart) {
-                    this.treantChart.destroy();
-                }
-                document.getElementById('tree-visualizer-container').innerHTML = '<div id="tree-simple" style="width: 100%; height: 100%;"></div>';
+                document.getElementById('tree-visualizer-container').innerHTML = '<div id="tree-simple"></div>';
 
-                this.scale = 1;
-                this.initialTreantWidth = 0;
-                this.initialTreantHeight = 0;
-                this.drawTreeVisualization();
+                this.currentZoom = 1.0;
+                this.renderTree(this.currentZoom);
 
                 const container = document.getElementById('tree-visualizer-container');
-
-                container.addEventListener('wheel', (e) => {
+                const wheelCallback = (e) => {
                     if (e.ctrlKey) {
                         e.preventDefault();
                         e.stopPropagation();
 
-                        const treantInnerContainer = document.querySelector('#tree-simple .Treant');
-                        const treeSimpleContainer = document.getElementById('tree-simple');
-                        if (!treantInnerContainer || !treeSimpleContainer) return;
-
-                        if (this.initialTreantWidth === 0) {
-                            this.initialTreantWidth = treantInnerContainer.offsetWidth;
-                            this.initialTreantHeight = treantInnerContainer.offsetHeight;
-                        }
-
                         const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                        const newScale = Math.min(Math.max(0.2, this.scale + delta), 3);
-                        this.scale = newScale;
-
-                        treantInnerContainer.style.transformOrigin = 'top left';
-                        treantInnerContainer.style.transform = `scale(${this.scale})`;
-                        treeSimpleContainer.style.width = `${this.initialTreantWidth * this.scale}px`;
-                        treeSimpleContainer.style.height = `${this.initialTreantHeight * this.scale}px`;
+                        this.currentZoom = Math.min(Math.max(0.5, this.currentZoom + delta), 2.5);
+                        this.renderTree(this.currentZoom);
                     }
-                });
+                };
+                container.addEventListener('wheel', wheelCallback);
+
+                // Store the callback to be able to remove it later
+                this.treeVisualizerModal._wheelCallback = wheelCallback;
+            });
+
+            this.treeVisualizerModal.addEventListener('hidden.bs.modal', () => {
+                // Clean up the dynamic styles and event listeners
+                const dynamicStyles = document.getElementById('treant-dynamic-styles');
+                if (dynamicStyles) {
+                    dynamicStyles.remove();
+                }
+                const container = document.getElementById('tree-visualizer-container');
+                if (container && this.treeVisualizerModal._wheelCallback) {
+                    container.removeEventListener('wheel', this.treeVisualizerModal._wheelCallback);
+                }
             });
         }
 
@@ -442,6 +455,8 @@ class TreeBuilder {
 
         this.loadSavedTrees();
         this.updateVisualizeButtonState();
+
+        this.initPanAndZoom();
 
         const treeDataFromPostElement = document.getElementById('tree-data-from-post');
         if (treeDataFromPostElement && treeDataFromPostElement.textContent) {
@@ -526,6 +541,52 @@ class TreeBuilder {
         }
     }
 
+    initPanAndZoom() {
+        const treeContainer = document.getElementById('tree-visualizer-container');
+        if (!treeContainer) return;
+
+        // The target for the transform is the inner div created by Treant, not the scroll container
+        const setTransform = () => {
+            const treantInnerContainer = treeContainer.querySelector('.Treant');
+            if (treantInnerContainer) {
+                treantInnerContainer.style.transformOrigin = '0 0';
+                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
+            }
+        };
+
+        treeContainer.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.1 : -0.1;
+                const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
+                this.scale = newScale;
+                setTransform();
+            }
+        });
+
+        treeContainer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            this.panning = true;
+            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
+            treeContainer.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            this.panning = false;
+            treeContainer.style.cursor = 'grab';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!this.panning) return;
+            this.pointX = (e.clientX - this.start.x);
+            this.pointY = (e.clientY - this.start.y);
+            setTransform();
+        });
+
+        // Set initial cursor
+        treeContainer.style.cursor = 'grab';
+    }
+
     updateVisualizeButtonState() {
         if (this.visualizeTreeBtn) {
             this.visualizeTreeBtn.disabled = this.rootNode.children.length === 0;
@@ -600,35 +661,55 @@ class TreeBuilder {
         form.submit();
     }
 
-    drawTreeVisualization() {
-        const treantTree = this.getTreeForVisualization();
+    updateDynamicStyles(zoomLevel) {
+        let styleEl = document.getElementById('treant-dynamic-styles');
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'treant-dynamic-styles';
+            document.head.appendChild(styleEl);
+        }
 
-        if (!treantTree) {
+        const imageSize = 50 * zoomLevel;
+        const fontSize = 13 * zoomLevel;
+        const nodePadding = 5 * zoomLevel;
+        const imageMargin = 8 * zoomLevel;
+
+        styleEl.textContent = `
+            .treant-node {
+                padding: ${nodePadding}px;
+            }
+            .treant-node img {
+                width: ${imageSize}px;
+                height: ${imageSize}px;
+                margin-bottom: ${imageMargin}px;
+            }
+            .treant-node .node-name {
+                font-size: ${fontSize}px;
+            }
+        `;
+    }
+
+    renderTree(zoomLevel) {
+        this.updateDynamicStyles(zoomLevel);
+
+        const nodeStructure = this.getTreeForVisualization();
+        if (!nodeStructure) {
             console.error("Cannot visualize an empty tree.");
             return;
         }
 
-        const chart_config = {
-            chart: {
-                container: "#tree-simple",
-                connectors: {
-                    type: "step"
-                },
-                node: {
-                    collapsable: true,
-                    HTMLclass: 'treant-node' // Add a class for styling
-                }
-            },
-            nodeStructure: treantTree
-        };
+        const dynamicConfig = JSON.parse(JSON.stringify(this.baseTreantConfig));
 
-        // Destroy previous chart instance if it exists, to avoid errors on re-draw
-        if (this.treantChart) {
-            this.treantChart.destroy();
+        dynamicConfig.chart.levelSeparation = 30 * zoomLevel;
+        dynamicConfig.chart.siblingSeparation = 30 * zoomLevel;
+        dynamicConfig.chart.subTeeSeparation = 30 * zoomLevel;
+        dynamicConfig.nodeStructure = nodeStructure;
+
+        const container = document.getElementById('tree-simple');
+        if (container) {
+            container.innerHTML = '';
+            new Treant(dynamicConfig);
         }
-        this.treantChart = new Treant(chart_config, null, $);
-
-        // The transform is now handled by the new zoom listener and perfect-scrollbar
     }
 
     handleImageClick(image) {
