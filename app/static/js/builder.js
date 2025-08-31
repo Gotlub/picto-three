@@ -284,6 +284,23 @@ class BuilderNode {
     }
 }
 
+function imageToDataUrl(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Important for external images
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
 class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
@@ -440,73 +457,7 @@ class TreeBuilder {
         }
 
         if (this.exportPdfBtn) {
-            this.exportPdfBtn.addEventListener('click', () => {
-                const treeContainer = document.getElementById('tree-visualizer-container');
-
-                // Sauvegarde des styles originaux
-                const originalStyle = {
-                    width: treeContainer.style.width,
-                    height: treeContainer.style.height,
-                    overflow: treeContainer.style.overflow
-                };
-
-                // 1. Mesurer et 2. Agrandir le conteneur à la taille de son contenu
-                treeContainer.style.width = `${treeContainer.scrollWidth}px`;
-                treeContainer.style.height = `${treeContainer.scrollHeight}px`;
-                treeContainer.style.overflow = 'visible';
-
-                // NOUVEAU: Gérer le zoom/pan lors de l'export
-                const treantInnerContainer = treeContainer.querySelector('.Treant');
-                const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
-                if (treantInnerContainer) {
-                    treantInnerContainer.style.transform = 'none';
-                }
-
-                // 3. Capturer l'élément maintenant agrandi
-                html2canvas(treeContainer, {
-                    allowTaint: true,
-                    useCORS: true,
-                    width: treeContainer.scrollWidth,
-                    height: treeContainer.scrollHeight,
-                    scale: 2 // Augmente la résolution de la capture
-                }).then(canvas => {
-
-                    // 4. Restaurer les styles originaux dès que la capture est faite
-                    treeContainer.style.width = originalStyle.width;
-                    treeContainer.style.height = originalStyle.height;
-                    treeContainer.style.overflow = originalStyle.overflow;
-                    if (treantInnerContainer) {
-                        treantInnerContainer.style.transform = originalTransform;
-                    }
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-
-                    // --- NOUVELLE LOGIQUE PDF ADAPTATIF ---
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
-
-                    const pdf = new jsPDF({
-                        orientation: canvasWidth > canvasHeight ? 'l' : 'p',
-                        unit: 'pt',
-                        format: [canvasWidth, canvasHeight]
-                    });
-
-                    pdf.addImage(imgData, 'PNG', 0, 0, canvasWidth, canvasHeight);
-                    pdf.save('custom-size-tree-export.pdf');
-                    // --- FIN DE LA NOUVELLE LOGIQUE ---
-
-                }).catch(err => {
-                    // En cas d'erreur, s'assurer de restaurer aussi les styles
-                    treeContainer.style.width = originalStyle.width;
-                    treeContainer.style.height = originalStyle.height;
-                    treeContainer.style.overflow = originalStyle.overflow;
-                    if (treantInnerContainer) {
-                        treantInnerContainer.style.transform = originalTransform;
-                    }
-                    console.error("Erreur lors de la capture PDF :", err);
-                });
-            });
+            this.exportPdfBtn.addEventListener('click', () => this.exportPdfVectoriel());
         }
     }
 
@@ -554,6 +505,106 @@ class TreeBuilder {
 
         // Set initial cursor
         treeContainer.style.cursor = 'grab';
+    }
+
+    async exportPdfVectoriel() {
+        const { jsPDF } = window.jspdf;
+        // The user mentioned '#tree-simple', which is a class inside the Treant container.
+        const treeContainer = document.querySelector("#tree-visualizer-container .tree-simple");
+
+        if (!treeContainer) {
+            console.error("Tree container (.tree-simple) not found. Export cannot proceed.");
+            alert("Could not find the tree content to export.");
+            return;
+        }
+
+        // Reset zoom/pan for accurate coordinate capture. This is important.
+        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
+        const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transform = 'none';
+        }
+
+        const treantSvg = treeContainer.querySelector("svg");
+        const htmlNodes = treeContainer.querySelectorAll(".node");
+
+        const finalSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const containerWidth = treeContainer.scrollWidth;
+        const containerHeight = treeContainer.scrollHeight;
+
+        finalSvg.setAttribute('width', containerWidth);
+        finalSvg.setAttribute('height', containerHeight);
+        finalSvg.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
+
+        const connectors = treantSvg.querySelectorAll('path');
+        connectors.forEach(connector => {
+            finalSvg.appendChild(connector.cloneNode(true));
+        });
+
+        for (const node of htmlNodes) {
+            if (node.classList.contains('pseudo')) continue;
+
+            const x = parseInt(node.style.left, 10);
+            const y = parseInt(node.style.top, 10);
+            const width = node.offsetWidth;
+            const height = node.offsetHeight;
+
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.setAttribute('transform', `translate(${x}, ${y})`);
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', '#fff');
+            rect.setAttribute('stroke', '#ccc');
+            group.appendChild(rect);
+
+            const imgElement = node.querySelector('img');
+            if (imgElement) {
+                const dataUrl = await imageToDataUrl(imgElement.src);
+                const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                image.setAttribute('href', dataUrl);
+                image.setAttribute('width', '50');
+                image.setAttribute('height', '50');
+                image.setAttribute('x', (width - 50) / 2);
+                image.setAttribute('y', 10);
+                group.appendChild(image);
+            }
+
+            const textElement = node.querySelector('.node-name');
+            if (textElement) {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.textContent = textElement.textContent;
+                text.setAttribute('x', width / 2);
+                text.setAttribute('y', 80);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#000');
+                group.appendChild(text);
+            }
+
+            finalSvg.appendChild(group);
+        }
+
+        // Restore styles after capture
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transform = originalTransform;
+        }
+
+        const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt',
+            format: [containerWidth, containerHeight]
+        });
+
+        await pdf.svg(finalSvg, {
+            x: 0,
+            y: 0,
+            width: containerWidth,
+            height: containerHeight
+        });
+
+        pdf.save('tree-vectoriel.pdf');
     }
 
     updateVisualizeButtonState() {
