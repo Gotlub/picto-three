@@ -284,26 +284,6 @@ class BuilderNode {
     }
 }
 
-function waitForElement(selector, timeout = 5000) {
-    return new Promise((resolve, reject) => {
-        const intervalTime = 100;
-        let elapsedTime = 0;
-        const interval = setInterval(() => {
-            const element = document.querySelector(selector);
-            if (element) {
-                clearInterval(interval);
-                resolve(element);
-            } else {
-                elapsedTime += intervalTime;
-                if (elapsedTime >= timeout) {
-                    clearInterval(interval);
-                    reject(new Error(`Element ${selector} not found within ${timeout}ms`));
-                }
-            }
-        }, intervalTime);
-    });
-}
-
 function imageToDataUrl(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -529,102 +509,101 @@ class TreeBuilder {
 
     async exportPdfVectoriel() {
         const { jsPDF } = window.jspdf;
+        const treeContainer = document.querySelector("#tree-container");
 
-        try {
-            const treeContainer = await waitForElement("#tree-visualizer-container .tree-simple", 5000);
-
-            // Reset zoom/pan for accurate coordinate capture. This is important.
-            const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
-            const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transform = 'none';
-            }
-
-            const treantSvg = treeContainer.querySelector("svg");
-            const htmlNodes = treeContainer.querySelectorAll(".node");
-
-            const finalSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            const containerWidth = treeContainer.scrollWidth;
-            const containerHeight = treeContainer.scrollHeight;
-
-            finalSvg.setAttribute('width', containerWidth);
-            finalSvg.setAttribute('height', containerHeight);
-            finalSvg.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
-
-            const connectors = treantSvg.querySelectorAll('path');
-            connectors.forEach(connector => {
-                finalSvg.appendChild(connector.cloneNode(true));
-            });
-
-            for (const node of htmlNodes) {
-                if (node.classList.contains('pseudo')) continue;
-
-                const x = parseInt(node.style.left, 10);
-                const y = parseInt(node.style.top, 10);
-                const width = node.offsetWidth;
-                const height = node.offsetHeight;
-
-                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                group.setAttribute('transform', `translate(${x}, ${y})`);
-
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('width', width);
-                rect.setAttribute('height', height);
-                rect.setAttribute('fill', '#fff');
-                rect.setAttribute('stroke', '#ccc');
-                group.appendChild(rect);
-
-                const imgElement = node.querySelector('img');
-                if (imgElement) {
-                    const dataUrl = await imageToDataUrl(imgElement.src);
-                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-                    image.setAttribute('href', dataUrl);
-                    image.setAttribute('width', '50');
-                    image.setAttribute('height', '50');
-                    image.setAttribute('x', (width - 50) / 2);
-                    image.setAttribute('y', 10);
-                    group.appendChild(image);
-                }
-
-                const textElement = node.querySelector('.node-name');
-                if (textElement) {
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.textContent = textElement.textContent;
-                    text.setAttribute('x', width / 2);
-                    text.setAttribute('y', 80);
-                    text.setAttribute('text-anchor', 'middle');
-                    text.setAttribute('font-size', '12');
-                    text.setAttribute('fill', '#000');
-                    group.appendChild(text);
-                }
-
-                finalSvg.appendChild(group);
-            }
-
-            // Restore styles after capture
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transform = originalTransform;
-            }
-
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'pt',
-                format: [containerWidth, containerHeight]
-            });
-
-            await pdf.svg(finalSvg, {
-                x: 0,
-                y: 0,
-                width: containerWidth,
-                height: containerHeight
-            });
-
-            pdf.save('tree-vectoriel.pdf');
-
-        } catch (err) {
-            console.error("Export PDF error:", err);
-            alert("Could not find the tree content to export. The tree might be taking too long to render or an error occurred.");
+        if (!treeContainer) {
+            console.error("Tree container #tree-container not found. Export cannot proceed.");
+            alert("Could not find the tree content to export.");
+            return;
         }
+
+        // Reset zoom/pan for accurate coordinate capture.
+        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
+        const originalTransform = treantInnerContainer ? treantInnerContainer.style.transform : 'none';
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transform = 'none';
+        }
+
+        const treantSvg = treeContainer.querySelector("svg");
+        const htmlNodes = treeContainer.querySelectorAll(".node");
+
+        const finalSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const containerWidth = treeContainer.scrollWidth;
+        const containerHeight = treeContainer.scrollHeight;
+
+        finalSvg.setAttribute('width', containerWidth);
+        finalSvg.setAttribute('height', containerHeight);
+        finalSvg.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
+
+        const connectors = treantSvg.querySelectorAll('path');
+        connectors.forEach(connector => {
+            finalSvg.appendChild(connector.cloneNode(true));
+        });
+
+        for (const node of htmlNodes) {
+            if (node.classList.contains('pseudo')) continue;
+
+            const x = parseInt(node.style.left, 10);
+            const y = parseInt(node.style.top, 10);
+            const width = node.offsetWidth;
+            const height = node.offsetHeight;
+
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.setAttribute('transform', `translate(${x}, ${y})`);
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', '#fff');
+            rect.setAttribute('stroke', '#ccc');
+            group.appendChild(rect);
+
+            const imgElement = node.querySelector('img');
+            if (imgElement) {
+                const dataUrl = await imageToDataUrl(imgElement.src);
+                const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                image.setAttribute('href', dataUrl);
+                image.setAttribute('width', '50');
+                image.setAttribute('height', '50');
+                image.setAttribute('x', (width - 50) / 2);
+                image.setAttribute('y', 10);
+                group.appendChild(image);
+            }
+
+            const textElement = node.querySelector('.node-name');
+            if (textElement) {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.textContent = textElement.textContent;
+                text.setAttribute('x', width / 2);
+                text.setAttribute('y', 80);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#000');
+                group.appendChild(text);
+            }
+
+            finalSvg.appendChild(group);
+        }
+
+        // Restore styles after capture
+        if (treantInnerContainer) {
+            treantInnerContainer.style.transform = originalTransform;
+        }
+
+        const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt',
+            format: [containerWidth, containerHeight]
+        });
+
+        await pdf.svg(finalSvg, {
+            x: 0,
+            y: 0,
+            width: containerWidth,
+            height: containerHeight
+        });
+
+        pdf.save('tree-vectoriel.pdf');
     }
 
     updateVisualizeButtonState() {
