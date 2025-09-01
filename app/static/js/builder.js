@@ -196,44 +196,48 @@ class ImageTree {
 
 
 // ==============================================================================
-// FONCTION DE REDIMENSIONNEMENT MANUEL (VERSION FINALE)
+// NOUVELLE FONCTION DE REDIMENSIONNEMENT ET CENTRAGE
 // ==============================================================================
 
 /**
- * Calcule la taille réelle occupée par les noeuds de l'arbre et redimensionne
- * le conteneur ".Treant" pour qu'il s'adapte parfaitement.
+ * Calcule les limites exactes de l'arbre (y compris les coordonnées négatives),
+ * puis redimensionne ET repositionne le conteneur pour un cadrage parfait.
  */
-function resizeContainerToFitTree() {
-    // On cible le conteneur du contenu identifié par son nom de classe
+function resizeAndCenterTreeContainer() {
     const contentContainer = document.querySelector(".Treant");
-    if (!contentContainer) {
-        console.error("Conteneur '.Treant' introuvable.");
-        return;
-    }
+    if (!contentContainer) return;
 
     const nodes = contentContainer.querySelectorAll('.treant-node');
     if (nodes.length === 0) return;
 
-    let maxRight = 0;
-    let maxBottom = 0;
+    let minX = Infinity, minY = Infinity, maxX = 0, maxY = 0;
 
-    // 1. On trouve les coordonnées les plus extrêmes occupées par les noeuds
+    // 1. Trouver les véritables limites (le "bounding box") de l'arbre
     nodes.forEach(node => {
-        const nodeRight = node.offsetLeft + node.offsetWidth;
-        const nodeBottom = node.offsetTop + node.offsetHeight;
+        const nodeLeft = node.offsetLeft;
+        const nodeTop = node.offsetTop;
+        const nodeRight = nodeLeft + node.offsetWidth;
+        const nodeBottom = nodeTop + node.offsetHeight;
 
-        if (nodeRight > maxRight) {
-            maxRight = nodeRight;
-        }
-        if (nodeBottom > maxBottom) {
-            maxBottom = nodeBottom;
-        }
+        if (nodeLeft < minX) minX = nodeLeft;
+        if (nodeTop < minY) minY = nodeTop;
+        if (nodeRight > maxX) maxX = nodeRight;
+        if (nodeBottom > maxY) maxY = nodeBottom;
     });
 
-    // 2. On applique ces dimensions au conteneur du contenu
+    // 2. Calculer la largeur, la hauteur et le décalage nécessaires
+    const treeWidth = maxX - minX;
+    const treeHeight = maxY - minY;
+
+    // Le décalage est l'opposé des coordonnées minimales pour tout ramener à zéro
+    const offsetX = -minX;
+    const offsetY = -minY;
     const padding = 30; // Marge de confort
-    contentContainer.style.width = (maxRight + padding) + 'px';
-    contentContainer.style.height = (maxBottom + padding) + 'px';
+
+    // 3. Appliquer la TAILLE ET la POSITION au conteneur
+    contentContainer.style.width = (treeWidth + padding) + 'px';
+    contentContainer.style.height = (treeHeight + padding) + 'px';
+    contentContainer.style.transform = `translate(${offsetX + (padding / 2)}px, ${offsetY + (padding / 2)}px)`;
 }
 
 
@@ -547,7 +551,7 @@ class TreeBuilder {
         treeContainer.addEventListener('scroll', () => {
             clearTimeout(scrollTimeout);
             // On attend la fin du scroll pour lancer le redimensionnement
-            scrollTimeout = setTimeout(resizeContainerToFitTree, 150);
+            scrollTimeout = setTimeout(resizeAndCenterTreeContainer, 150);
         });
     }
 
@@ -656,7 +660,7 @@ class TreeBuilder {
 
         // On s'assure d'appeler cette logique après l'initialisation de Treant.
         // Un délai est une sécurité pour s'assurer que Treant a bien dessiné l'arbre.
-        setTimeout(resizeContainerToFitTree, 500);
+        setTimeout(resizeAndCenterTreeContainer, 500);
 
         // Apply initial transform after the chart is drawn
         const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
