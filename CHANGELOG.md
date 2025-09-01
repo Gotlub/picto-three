@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Externalized the database to a sibling `data/` directory (`../data/`) to fully separate data from application code, improving deployment and security.
 
+### Fixed
+- Removed duplicate scrollbars in the tree visualization modal by disabling `perfect-scrollbar` and relying on native browser scrollbars.
+
 ### Added
 - Initial project structure and documentation for agent-driven development.
 - Configuration files: `README.md`, `AGENTS.md`, `GEMINI.md`, `TESTING.md`, `TODO.md`, `CHANGELOG.md`.

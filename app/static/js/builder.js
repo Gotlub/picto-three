@@ -593,7 +593,7 @@ class TreeBuilder {
                     collapsable: true,
                     HTMLclass: 'treant-node' // Add a class for styling
                 },
-                scrollbar: "fancy" // Enable fancy scrollbar
+                scrollbar: "native" // Use native scrollbar
             },
             nodeStructure: treantTree
         };
