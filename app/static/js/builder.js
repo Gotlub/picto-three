@@ -439,21 +439,20 @@ class TreeBuilder {
             }
         }
 
-        if (this.exportPdfBtn) {
-            $('#export-pdf-vectoriel').on('click', async function () {
-                const btn = $(this);
-                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Exporting...');
+        // Use event delegation for the export button, as it's in a modal
+        $(document).on('click', '#export-pdf-vectoriel', async function () {
+            const btn = $(this);
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Exporting...');
 
-                try {
-                    await exportToVectorPdf();
-                } catch (error) {
-                    console.error("Erreur lors de l'export PDF:", error);
-                    alert("L'export PDF a échoué. Cause : " + error.message);
-                } finally {
-                    btn.prop('disabled', false).html('Export to PDF');
-                }
-            });
-        }
+            try {
+                await exportToVectorPdf();
+            } catch (error) {
+                console.error("Erreur lors de l'export PDF:", error);
+                alert("L'export PDF a échoué. Cause : " + error.message);
+            } finally {
+                btn.prop('disabled', false).html('Export to PDF');
+            }
+        });
     }
 
     initPanAndZoom() {
