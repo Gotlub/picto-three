@@ -10,10 +10,20 @@ body {
 }
 
 /* Treant.js Visualization Styles */
-#tree-visualizer-container {
-    overflow: auto;
+#visualizer-viewport {
     width: 100%;
-    height: 70vh;
+    height: 70vh; /* Consistent with previous modal height */
+    overflow: hidden; /* Crucial for panning and zooming effect */
+    position: relative;
+    cursor: grab;
+    background-color: #f8f9fa;
+}
+
+#tree-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0; /* Sets the zoom origin to the top-left corner */
 }
 
 .treant-node {
