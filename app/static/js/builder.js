@@ -303,13 +303,6 @@ class TreeBuilder {
         this.selectedNode = null;
         this.draggedNode = null;
 
-        // Zoom & Pan state variables
-        this.scale = 1;
-        this.panning = false;
-        this.pointX = 0;
-        this.pointY = 0;
-        this.start = { x: 0, y: 0 };
-
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
             this.nodeDescriptionTextarea.addEventListener('input', () => {
@@ -400,14 +393,10 @@ class TreeBuilder {
                 if (this.treantChart) {
                     this.treantChart.destroy();
                 }
-                document.getElementById('tree-visualizer-container').innerHTML = '';
-
-                // Reset zoom and pan state each time the modal is opened
-                this.scale = 1;
-                this.panning = false;
-                this.pointX = 0;
-                this.pointY = 0;
-                this.start = { x: 0, y: 0 };
+                const canvas = document.getElementById('tree-canvas');
+                if(canvas) {
+                    canvas.innerHTML = '';
+                }
 
                 // Recréer l'arbre
                 this.drawTreeVisualization();
@@ -425,7 +414,14 @@ class TreeBuilder {
         this.loadSavedTrees();
         this.updateVisualizeButtonState();
 
-        this.initPanAndZoom();
+        const viewportContainer = document.querySelector('#tree-visualizer-container');
+        if (viewportContainer) {
+            let scrollTimeout;
+            viewportContainer.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(resizeAndCenterTree, 150);
+            });
+        }
 
         const treeDataFromPostElement = document.getElementById('tree-data-from-post');
         if (treeDataFromPostElement && treeDataFromPostElement.textContent) {
@@ -455,51 +451,6 @@ class TreeBuilder {
         });
     }
 
-    initPanAndZoom() {
-        const treeContainer = document.getElementById('tree-visualizer-container');
-        if (!treeContainer) return;
-
-        // The target for the transform is the inner div created by Treant, not the scroll container
-        const setTransform = () => {
-            const treantInnerContainer = treeContainer.querySelector('.Treant');
-            if (treantInnerContainer) {
-                treantInnerContainer.style.transformOrigin = '0 0';
-                treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-            }
-        };
-
-        treeContainer.addEventListener('wheel', (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
-                this.scale = newScale;
-                setTransform();
-            }
-        });
-
-        treeContainer.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            this.panning = true;
-            this.start = { x: e.clientX - this.pointX, y: e.clientY - this.pointY };
-            treeContainer.style.cursor = 'grabbing';
-        });
-
-        window.addEventListener('mouseup', () => {
-            this.panning = false;
-            treeContainer.style.cursor = 'grab';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!this.panning) return;
-            this.pointX = (e.clientX - this.start.x);
-            this.pointY = (e.clientY - this.start.y);
-            setTransform();
-        });
-
-        // Set initial cursor
-        treeContainer.style.cursor = 'grab';
-    }
 
     updateVisualizeButtonState() {
         if (this.visualizeTreeBtn) {
@@ -585,15 +536,16 @@ class TreeBuilder {
 
         const chart_config = {
             chart: {
-                container: "#tree-visualizer-container",
+                container: "#tree-canvas", // <-- Cible le nouveau div
                 connectors: {
                     type: "step"
                 },
                 node: {
                     collapsable: true,
-                    HTMLclass: 'treant-node' // Add a class for styling
+                    HTMLclass: 'treant-node'
                 },
-                scrollbar: "fancy" // Enable fancy scrollbar
+                scrollbar: "fancy",
+                nodeDragDrop: false
             },
             nodeStructure: treantTree
         };
@@ -604,12 +556,7 @@ class TreeBuilder {
         }
         this.treantChart = new Treant(chart_config, null, $);
 
-        // Apply initial transform after the chart is drawn
-        const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
-        if (treantInnerContainer) {
-            treantInnerContainer.style.transformOrigin = '0 0';
-            treantInnerContainer.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
-        }
+        setTimeout(resizeAndCenterTree, 500);
     }
 
     handleImageClick(image) {
@@ -1164,6 +1111,43 @@ async function exportToVectorPdf() {
     });
 
     pdf.save('picto-tree-vectoriel.pdf');
+}
+
+function resizeAndCenterTree() {
+    // Le conteneur parent qui sera transformé
+    const canvas = document.getElementById("tree-canvas");
+    // Le conteneur interne créé par Treant, qui contient le contenu réel
+    const treantContainer = canvas.querySelector(".Treant");
+
+    if (!canvas || !treantContainer) return;
+
+    const nodes = treantContainer.querySelectorAll('.treant-node');
+    if (nodes.length === 0) return;
+
+    let minX = Infinity, minY = Infinity, maxX = 0, maxY = 0;
+
+    nodes.forEach(node => {
+        const nodeLeft = node.offsetLeft;
+        const nodeTop = node.offsetTop;
+        const nodeRight = nodeLeft + node.offsetWidth;
+        const nodeBottom = nodeTop + node.offsetHeight;
+
+        if (nodeLeft < minX) minX = nodeLeft;
+        if (nodeTop < minY) minY = nodeTop;
+        if (nodeRight > maxX) maxX = nodeRight;
+        if (nodeBottom > maxY) maxY = nodeBottom;
+    });
+
+    const treeWidth = maxX - minX;
+    const treeHeight = maxY - minY;
+    const offsetX = -minX;
+    const offsetY = -minY;
+    const padding = 30;
+
+    // On applique TAILLE ET POSITION au 'cadre mobile' (#tree-canvas)
+    canvas.style.width = (treeWidth + padding) + 'px';
+    canvas.style.height = (treeHeight + padding) + 'px';
+    canvas.style.transform = `translate(${offsetX + (padding / 2)}px, ${offsetY + (padding / 2)}px)`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
