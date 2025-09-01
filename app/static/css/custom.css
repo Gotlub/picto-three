@@ -10,11 +10,30 @@ body {
 }
 
 /* Treant.js Visualization Styles */
-#tree-visualizer-container {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
+
+/* Custom styles for the tree visualizer modal to make it larger */
+#tree-visualizer-modal .modal-dialog {
+    max-width: 90vw;
+    width: 90vw;
     height: 90vh;
+    margin: auto; /* Center the modal */
+}
+
+#tree-visualizer-modal .modal-content {
+    height: 100%;
+}
+
+#tree-visualizer-modal .modal-body {
+    /* 112px is an estimation for header and footer height */
+    height: calc(100% - 112px);
+    padding: 0; /* Remove padding to give more space */
+}
+
+#tree-visualizer-container {
+    overflow: hidden; /* For perfect-scrollbar */
+    position: relative; /* For perfect-scrollbar */
+    width: 100%;
+    height: 100%; /* Fill the modal body */
 }
 
 .treant-node {
