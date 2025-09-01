@@ -3,6 +3,7 @@ import os
 import shutil
 from pathlib import Path
 from flask import render_template, flash, redirect, url_for, Blueprint, request, session, jsonify, send_from_directory, current_app
+from flask_babel import _
 from werkzeug.utils import secure_filename
 import io
 from markupsafe import Markup
@@ -36,11 +37,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash(_('Invalid username or password'))
             return redirect(url_for('main.login'))
 
         if not user.confirmed:
-            flash(Markup('Votre compte n\'est pas confirmé. Veuillez vérifier vos e-mails. <a href="{}">Renvoyer l\'e-mail de confirmation ?</a>'.format(url_for('main.resend_confirmation_request'))), 'warning')
+            flash(Markup(_('Votre compte n\'est pas confirmé. Veuillez vérifier vos e-mails. <a href="%(url)s">Renvoyer l\'e-mail de confirmation ?</a>', url=url_for('main.resend_confirmation_request'))), 'warning')
             return redirect(url_for('main.login'))
 
         login_user(user, remember=form.remember_me.data)
@@ -58,9 +59,9 @@ def forgot_password():
             token = generate_password_reset_token(user.email)
             reset_url = url_for('main.reset_with_token_route', token=token, _external=True)
             send_email(user.email, 'Réinitialisation de votre mot de passe', 'emails/reset_password.html', reset_url=reset_url)
-            flash('Un email avec les instructions pour réinitialiser votre mot de passe a été envoyé.', 'info')
+            flash(_('Un email avec les instructions pour réinitialiser votre mot de passe a été envoyé.'), 'info')
         else:
-            flash('Aucun compte trouvé avec cette adresse e-mail.', 'warning')
+            flash(_('Aucun compte trouvé avec cette adresse e-mail.'), 'warning')
         return redirect(url_for('main.login'))
     return render_template('forgot_password.html', title='Mot de passe oublié', form=form)
 
@@ -70,7 +71,7 @@ def reset_with_token_route(token):
         return redirect(url_for('main.index'))
     email = confirm_password_reset_token(token)
     if not email:
-        flash('Le lien de réinitialisation est invalide ou a expiré.', 'danger')
+        flash(_('Le lien de réinitialisation est invalide ou a expiré.'), 'danger')
         return redirect(url_for('main.login'))
 
     form = ResetPasswordForm()
@@ -78,7 +79,7 @@ def reset_with_token_route(token):
         user = User.query.filter_by(email=email).first_or_404()
         user.set_password(form.password.data)
         db.session.commit()
-        flash('Votre mot de passe a été réinitialisé avec succès.', 'success')
+        flash(_('Votre mot de passe a été réinitialisé avec succès.'), 'success')
         return redirect(url_for('main.login'))
 
     return render_template('reset_password_form.html', form=form)
@@ -106,13 +107,13 @@ def change_password():
         if user.check_password(form.current_password.data):
             user.set_password(form.new_password.data)
             db.session.commit()
-            flash('Your password has been changed successfully.', 'success')
+            flash(_('Your password has been changed successfully.'), 'success')
         else:
-            flash('Invalid current password.', 'danger')
+            flash(_('Invalid current password.'), 'danger')
     else:
         for field, errors in form.errors.items():
             for error in errors:
-                flash(f"Error in {getattr(form, field).label.text}: {error}", 'danger')
+                flash(_('Error in %(field)s: %(error)s', field=getattr(form, field).label.text, error=error), 'danger')
     return redirect(url_for('main.account'))
 
 @bp.route('/delete_account', methods=['POST'])
@@ -138,13 +139,13 @@ def delete_account():
             db.session.delete(user)
             db.session.commit()
             logout_user()
-            flash('Your account has been successfully deleted.', 'success')
+            flash(_('Your account has been successfully deleted.'), 'success')
             return redirect(url_for('main.index'))
         else:
-            flash('Invalid username confirmation. Account deletion cancelled.', 'danger')
+            flash(_('Invalid username confirmation. Account deletion cancelled.'), 'danger')
             return redirect(url_for('main.account'))
     else:
-        flash('Invalid form submission.', 'danger')
+        flash(_('Invalid form submission.'), 'danger')
         return redirect(url_for('main.account'))
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -180,30 +181,30 @@ def register():
         confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
         send_email(user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
 
-        flash('Un email de confirmation a été envoyé à votre adresse e-mail.', 'success')
+        flash(_('Un email de confirmation a été envoyé à votre adresse e-mail.'), 'success')
         return redirect(url_for('main.login'))
     elif form.errors:
-        flash('Registration failed. Please check the errors below.', 'danger')
+        flash(_('Registration failed. Please check the errors below.'), 'danger')
         for field, errors in form.errors.items():
             for error in errors:
-                flash(f"Error in {getattr(form, field).label.text}: {error}", 'danger')
+                flash(_('Error in %(field)s: %(error)s', field=getattr(form, field).label.text, error=error), 'danger')
     return render_template('register.html', title='Register', form=form)
 
 @bp.route('/confirm/<token>')
 def confirm_email_route(token):
     email = confirm_token(token)
     if not email:
-        flash('Le lien de confirmation est invalide ou a expiré.', 'danger')
+        flash(_('Le lien de confirmation est invalide ou a expiré.'), 'danger')
         return redirect(url_for('main.login'))
 
     user = User.query.filter_by(email=email).first_or_404()
     if user.confirmed:
-        flash('Compte déjà confirmé. Veuillez vous connecter.', 'success')
+        flash(_('Compte déjà confirmé. Veuillez vous connecter.'), 'success')
     else:
         user.confirmed = True
         user.confirmed_on = datetime.now(UTC)
         db.session.commit()
-        flash('Votre compte a été confirmé avec succès !', 'success')
+        flash(_('Votre compte a été confirmé avec succès !'), 'success')
     return redirect(url_for('main.login'))
 
 @bp.route('/resend_confirmation_request', methods=['GET', 'POST'])
@@ -215,16 +216,16 @@ def resend_confirmation_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             if user.confirmed:
-                flash('Ce compte est déjà confirmé. Veuillez vous connecter.', 'success')
+                flash(_('Ce compte est déjà confirmé. Veuillez vous connecter.'), 'success')
                 return redirect(url_for('main.login'))
             else:
                 token = generate_confirmation_token(user.email)
                 confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
                 send_email(user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
-                flash('Un nouvel email de confirmation a été envoyé.', 'success')
+                flash(_('Un nouvel email de confirmation a été envoyé.'), 'success')
                 return redirect(url_for('main.login'))
         else:
-            flash('Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire.', 'warning')
+            flash(_('Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire.'), 'warning')
     return render_template('resend_confirmation_request.html', form=form)
 
 @bp.route('/builder', methods=['GET', 'POST'])
@@ -238,7 +239,7 @@ def builder():
             try:
                 tree_data_from_post = json.loads(tree_data_str)
             except json.JSONDecodeError:
-                flash('Invalid tree data received.', 'danger')
+                flash(_('Invalid tree data received.'), 'danger')
                 tree_data_from_post = None
 
     # Get public root folder
@@ -382,14 +383,14 @@ def load_lists():
 def save_list():
     data = request.get_json()
     if not data:
-        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     list_name = data.get('list_name')
     is_public = data.get('is_public', False)
     payload = data.get('payload')
 
     if not list_name or payload is None:
-        return jsonify({'status': 'error', 'message': 'Missing required fields: list_name and payload are required.'}), 400
+        return jsonify({'status': 'error', 'message': _('Missing required fields: list_name and payload are required.')}), 400
 
     # Validate images if saving a public list
     if is_public:
@@ -405,7 +406,7 @@ def save_list():
             if user_owned_images:
                 return jsonify({
                     'status': 'error',
-                    'message': 'Les listes publiques ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.'
+                    'message': _('Les listes publiques ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.')
                 }), 400
 
     payload_str = json.dumps(payload)
@@ -417,7 +418,7 @@ def save_list():
         # If it exists, update it
         existing_list.is_public = is_public
         existing_list.payload = payload_str
-        message = 'List updated successfully'
+        message = _('List updated successfully')
         saved_list = existing_list
     else:
         # If it does not exist, create a new one
@@ -428,7 +429,7 @@ def save_list():
             payload=payload_str
         )
         db.session.add(new_list)
-        message = 'List saved successfully'
+        message = _('List saved successfully')
         saved_list = new_list
 
     db.session.commit()
@@ -445,13 +446,13 @@ def save_list():
 def update_list(list_id):
     plist = db.session.get(PictogramList, list_id)
     if plist is None:
-        return jsonify({'status': 'error', 'message': 'List not found'}), 404
+        return jsonify({'status': 'error', 'message': _('List not found')}), 404
     if plist.user_id != current_user.id:
-        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
 
     data = request.get_json()
     if not data:
-        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     plist.list_name = data.get('list_name', plist.list_name)
     plist.is_public = data.get('is_public', plist.is_public)
@@ -463,7 +464,7 @@ def update_list(list_id):
 
     return jsonify({
         'status': 'success',
-        'message': 'List updated successfully',
+        'message': _('List updated successfully'),
         'list': plist.to_dict()
     })
 
@@ -472,30 +473,30 @@ def update_list(list_id):
 def delete_list(list_id):
     plist = db.session.get(PictogramList, list_id)
     if plist is None:
-        return jsonify({'status': 'error', 'message': 'List not found'}), 404
+        return jsonify({'status': 'error', 'message': _('List not found')}), 404
     if plist.user_id != current_user.id:
-        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
 
     db.session.delete(plist)
     db.session.commit()
 
-    return jsonify({'status': 'success', 'message': 'List deleted successfully'})
+    return jsonify({'status': 'success', 'message': _('List deleted successfully')})
 
 
 @api_bp.route('/folder/contents', methods=['GET'])
 def get_folder_contents():
     parent_id = request.args.get('parent_id', type=int)
     if parent_id is None:
-        return jsonify({'status': 'error', 'message': 'parent_id is required'}), 400
+        return jsonify({'status': 'error', 'message': _('parent_id is required')}), 400
 
     parent_folder = db.session.get(Folder, parent_id)
     if not parent_folder:
-        return jsonify({'status': 'error', 'message': 'Folder not found'}), 404
+        return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
 
     # Security check: If the folder is not public, user must be logged in and own it
     if parent_folder.user_id is not None:
         if not current_user.is_authenticated or parent_folder.user_id != current_user.id:
-            return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
 
     child_folders = [folder.to_dict() for folder in parent_folder.children.order_by(Folder.name).all()]
     child_images = [image.to_dict() for image in parent_folder.images.order_by(Image.name).all()]
@@ -510,7 +511,7 @@ def get_folder_contents():
 def get_pictograms():
     root_folder = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
     if not root_folder:
-        return jsonify({'error': 'Root folder not found'}), 404
+        return jsonify({'error': _('Root folder not found')}), 404
 
     return jsonify(root_folder.to_dict(include_children=True))
 
@@ -519,14 +520,14 @@ def get_pictograms():
 def create_folder():
     data = request.get_json()
     if not data or 'name' not in data or 'parent_id' not in data or not data.get('name').strip():
-        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     parent_id = data.get('parent_id')
     name = data.get('name').strip()
 
     parent_folder = db.session.get(Folder, parent_id)
     if not parent_folder or parent_folder.user_id != current_user.id:
-        return jsonify({'status': 'error', 'message': 'Parent folder not found or not owned by user'}), 404
+        return jsonify({'status': 'error', 'message': _('Parent folder not found or not owned by user')}), 404
 
     # The parent path from DB is relative. Combine it with the base path for physical operations.
     base_path = Path(current_app.config['PICTOGRAMS_PATH'])
@@ -537,7 +538,7 @@ def create_folder():
     try:
         new_physical_path.mkdir(exist_ok=True)
     except OSError as e:
-        return jsonify({'status': 'error', 'message': f'Could not create directory: {e}'}), 500
+        return jsonify({'status': 'error', 'message': _('Could not create directory: %(error)s', error=e)}), 500
 
     # The new path for the DB is also relative.
     new_relative_path = Path(parent_folder.path) / name
@@ -558,19 +559,19 @@ def create_folder():
 @login_required
 def upload_image():
     if 'file' not in request.files:
-        return jsonify({'status': 'error', 'message': 'No file part'}), 400
+        return jsonify({'status': 'error', 'message': _('No file part')}), 400
 
     file = request.files['file']
     if file.filename == '':
-        return jsonify({'status': 'error', 'message': 'No selected file'}), 400
+        return jsonify({'status': 'error', 'message': _('No selected file')}), 400
 
     folder_id = request.form.get('folder_id')
     if not folder_id:
-        return jsonify({'status': 'error', 'message': 'No folder_id specified'}), 400
+        return jsonify({'status': 'error', 'message': _('No folder_id specified')}), 400
 
     folder = db.session.get(Folder, folder_id)
     if not folder or folder.user_id != current_user.id:
-        return jsonify({'status': 'error', 'message': 'Folder not found or not owned by user'}), 404
+        return jsonify({'status': 'error', 'message': _('Folder not found or not owned by user')}), 404
 
     if file:
         filename = secure_filename(file.filename)
@@ -598,7 +599,7 @@ def upload_image():
 
         return jsonify({'status': 'success', 'image': new_image.to_dict()})
 
-    return jsonify({'status': 'error', 'message': 'File upload failed'}), 500
+    return jsonify({'status': 'error', 'message': _('File upload failed')}), 500
 
 
 @api_bp.route('/image/<int:image_id>', methods=['PUT'])
@@ -609,15 +610,15 @@ def update_image_details(image_id):
     """
     image = db.session.get(Image, image_id)
     if not image:
-        return jsonify({'status': 'error', 'message': 'Image not found'}), 404
+        return jsonify({'status': 'error', 'message': _('Image not found')}), 404
 
     # Security check: Only the owner of the image can edit it.
     if image.user_id != current_user.id:
-        return jsonify({'status': 'error', 'message': 'Unauthorized to edit this image'}), 403
+        return jsonify({'status': 'error', 'message': _('Unauthorized to edit this image')}), 403
 
     data = request.get_json()
     if data is None:
-        return jsonify({'status': 'error', 'message': 'Invalid JSON data'}), 400
+        return jsonify({'status': 'error', 'message': _('Invalid JSON data')}), 400
 
     # Update fields if they are present in the request payload
     if 'description' in data:
@@ -630,7 +631,7 @@ def update_image_details(image_id):
 
     return jsonify({
         'status': 'success',
-        'message': 'Image updated successfully',
+        'message': _('Image updated successfully'),
         'image': image.to_dict()
     })
 
@@ -651,19 +652,19 @@ def get_image_ids_from_tree(nodes):
 def save_tree():
     data = request.get_json()
     if not data:
-        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     tree_name = data.get('name')
     is_public = data.get('is_public', False)
     json_data = data.get('json_data')
 
     if not tree_name or not json_data:
-        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+        return jsonify({'status': 'error', 'message': _('Missing required fields')}), 400
 
     # Validate images if saving a public tree
     if is_public:
         if not json_data.get('roots'):
-            return jsonify({'status': 'error', 'message': 'Cannot save an empty tree as public.'}), 400
+            return jsonify({'status': 'error', 'message': _('Cannot save an empty tree as public.')}), 400
 
         image_ids = get_image_ids_from_tree(json_data['roots'])
         if image_ids:
@@ -672,7 +673,7 @@ def save_tree():
             if user_owned_images:
                 return jsonify({
                     'status': 'error',
-                    'message': 'Les arbres publics ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.'
+                    'message': _('Les arbres publics ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.')
                 }), 400
 
     # Check if a tree with the same name already exists for this user
@@ -682,7 +683,7 @@ def save_tree():
         # If it exists, update it
         tree.is_public = is_public
         tree.json_data = json.dumps(json_data)
-        message = 'Tree updated successfully'
+        message = _('Tree updated successfully')
     else:
         # If it does not exist, create a new one
         tree = Tree(
@@ -692,7 +693,7 @@ def save_tree():
             json_data=json.dumps(json_data)
         )
         db.session.add(tree)
-        message = 'Tree saved successfully'
+        message = _('Tree saved successfully')
 
     db.session.commit()
 
@@ -736,7 +737,7 @@ def delete_folder_recursive(folder):
 def delete_item():
     data = request.get_json()
     if not data or 'id' not in data or 'type' not in data:
-        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     item_id = data.get('id')
     item_type = data.get('type')
@@ -744,32 +745,32 @@ def delete_item():
     if item_type == 'folder':
         folder = db.session.get(Folder, item_id)
         if not folder or folder.user_id != current_user.id:
-            return jsonify({'status': 'error', 'message': 'Folder not found or not owned by user'}), 404
+            return jsonify({'status': 'error', 'message': _('Folder not found or not owned by user')}), 404
 
         if folder.parent_id is None:
-             return jsonify({'status': 'error', 'message': 'Cannot delete root folder'}), 400
+             return jsonify({'status': 'error', 'message': _('Cannot delete root folder')}), 400
 
         delete_folder_recursive(folder)
         db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Folder and all its contents deleted'})
+        return jsonify({'status': 'success', 'message': _('Folder and all its contents deleted')})
 
     elif item_type == 'image':
         image = db.session.get(Image, item_id)
         if not image or image.user_id != current_user.id:
-            return jsonify({'status': 'error', 'message': 'Image not found or not owned by user'}), 404
+            return jsonify({'status': 'error', 'message': _('Image not found or not owned by user')}), 404
 
         try:
             base_path = Path(current_app.config['PICTOGRAMS_PATH'])
             physical_path = base_path / image.path
             physical_path.unlink(missing_ok=True)
         except OSError as e:
-            return jsonify({'status': 'error', 'message': f'Could not delete file: {e}'}), 500
+            return jsonify({'status': 'error', 'message': _('Could not delete file: %(error)s', error=e)}), 500
 
         db.session.delete(image)
         db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Image deleted'})
+        return jsonify({'status': 'success', 'message': _('Image deleted')})
 
-    return jsonify({'status': 'error', 'message': 'Invalid item type'}), 400
+    return jsonify({'status': 'error', 'message': _('Invalid item type')}), 400
 
 
 @api_bp.route('/export_pdf', methods=['POST'])
@@ -784,7 +785,7 @@ def export_pdf():
 
     if not image_data:
         # Since this is an API endpoint, returning a JSON error is appropriate
-        return jsonify({'status': 'error', 'message': 'No images to export'}), 400
+        return jsonify({'status': 'error', 'message': _('No images to export')}), 400
 
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)

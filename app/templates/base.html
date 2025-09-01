@@ -25,7 +25,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url_for('main.index') }}">{{ _('Pictogram-Tree Builder') }}</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
@@ -41,7 +41,7 @@
                         </li>
                         {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.pictogram_bank') }}">Pictogram Bank</a>
+                            <a class="nav-link" href="{{ url_for('main.pictogram_bank') }}">{{ _('Pictogram Bank') }}</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -90,9 +90,9 @@
         <footer class="footer mt-auto py-3 bg-dark text-white">
             <div class="container text-center">
                 {% if current_user.is_authenticated %}
-                <span>Logged in as: {{ current_user.username }}</span>
+                <span>{{ _('Logged in as: %(username)s', username=current_user.username) }}</span>
                 {% else %}
-                <span>Pictogram-Tree Builder</span>
+                <span>{{ _('Pictogram-Tree Builder') }}</span>
                 {% endif %}
             </div>
         </footer>

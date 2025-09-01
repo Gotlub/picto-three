@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
 from flask_wtf.csrf import CSRFProtect
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_babel import Babel, _
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
@@ -62,6 +62,13 @@ def create_app( config_override = None):
     return app
 
 def get_locale():
+    # 1. Priorité à l'utilisateur connecté et ayant défini une langue
+    if current_user.is_authenticated and hasattr(current_user, 'locale') and current_user.locale:
+        return current_user.locale
+
+    # 2. Sinon, on regarde si la langue a été mise en session (pour les visiteurs)
     if 'language' in session and session['language'] in current_app.config['LANGUAGES']:
         return session['language']
+
+    # 3. En dernier recours, on négocie avec le navigateur du visiteur
     return request.accept_languages.best_match(current_app.config['LANGUAGES'])
