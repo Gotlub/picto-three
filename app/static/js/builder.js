@@ -302,6 +302,7 @@ class TreeBuilder {
         this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
+        this.ps = null;
 
         // Zoom & Pan state variables
         this.scale = 1;
@@ -475,6 +476,11 @@ class TreeBuilder {
                 const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
                 this.scale = newScale;
                 setTransform();
+
+                // Manually update the perfect-scrollbar instance after zooming
+                if (this.ps) {
+                    this.ps.update();
+                }
             }
         });
 
@@ -603,6 +609,7 @@ class TreeBuilder {
             this.treantChart.destroy();
         }
         this.treantChart = new Treant(chart_config, null, $);
+        this.ps = $('#tree-visualizer-container').data('perfect-scrollbar');
 
         // Apply initial transform after the chart is drawn
         const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
