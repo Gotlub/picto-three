@@ -11,7 +11,8 @@ body {
 
 /* Treant.js Visualization Styles */
 #tree-visualizer-container {
-    overflow: auto;
+    overflow: hidden;
+    position: relative;
     width: 100%;
     height: 70vh;
 }
