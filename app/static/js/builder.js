@@ -302,6 +302,7 @@ class TreeBuilder {
         this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
         this.selectedNode = null;
         this.draggedNode = null;
+        this.currentTreeScale = 1.0;
 
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
@@ -388,89 +389,32 @@ class TreeBuilder {
         }
 
         if (this.treeVisualizerModal) {
+            // Reset zoom when the modal is shown
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
-                // --- DESTRUCTION ET NETTOYAGE ---
                 if (this.treantChart) {
                     this.treantChart.destroy();
                 }
-                // Ensure the container is clean before drawing
                 const treeContainer = document.getElementById('tree-container');
-                if(treeContainer) {
+                if (treeContainer) {
                     treeContainer.innerHTML = '';
                 }
-
-                // Recréer l'arbre
                 this.drawTreeVisualization();
 
-                // --- START of new ZOOM/PAN implementation ---
-                const viewport = document.getElementById('visualizer-viewport');
-                const canvas = document.getElementById('tree-canvas');
+                // Reset zoom scale
+                this.currentTreeScale = 1.0;
+                this.applyTreeZoom(this.currentTreeScale);
+            });
 
-                // Variables for transformation state
-                let scale = 1;
-                let panX = 0;
-                let panY = 0;
-                let isPanning = false;
-                let startX, startY;
+            // Handle zoom via wheel event
+            this.treeVisualizerModal.addEventListener('wheel', (event) => {
+                if (!event.target.closest('.modal-body')) return;
 
-                // Central function to apply CSS transform
-                function updateTransform() {
-                    if (canvas) {
-                        canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-                    }
-                }
+                event.preventDefault();
+                const zoomIntensity = 0.1;
+                const delta = event.deltaY > 0 ? -zoomIntensity : zoomIntensity;
 
-                // --- ZOOM HANDLING (wheel) ---
-                if (viewport) {
-                    viewport.addEventListener('wheel', function(event) {
-                        event.preventDefault(); // Prevent page scrolling
-
-                        const zoomIntensity = 0.1;
-                        const delta = event.deltaY > 0 ? -zoomIntensity : zoomIntensity;
-                        const newScale = Math.max(0.2, Math.min(5, scale + delta));
-
-                        const rect = viewport.getBoundingClientRect();
-                        const mouseX = event.clientX - rect.left;
-                        const mouseY = event.clientY - rect.top;
-
-                        panX = mouseX - (mouseX - panX) * (newScale / scale);
-                        panY = mouseY - (mouseY - panY) * (newScale / scale);
-
-                        scale = newScale;
-                        updateTransform();
-                    });
-                }
-
-                // --- PANNING HANDLING (click and drag) ---
-                if (viewport) {
-                    viewport.addEventListener('mousedown', function(event) {
-                        isPanning = true;
-                        startX = event.clientX - panX;
-                        startY = event.clientY - panY;
-                        viewport.style.cursor = 'grabbing';
-                    });
-
-                    viewport.addEventListener('mousemove', function(event) {
-                        if (!isPanning) return;
-                        panX = event.clientX - startX;
-                        panY = event.clientY - startY;
-                        updateTransform();
-                    });
-
-                    const stopPanning = () => {
-                        isPanning = false;
-                        if (viewport) {
-                            viewport.style.cursor = 'grab';
-                        }
-                    };
-
-                    viewport.addEventListener('mouseup', stopPanning);
-                    viewport.addEventListener('mouseleave', stopPanning);
-                }
-
-                // Apply initial transform
-                updateTransform();
-                // --- END of new ZOOM/PAN implementation ---
+                this.currentTreeScale = Math.max(0.2, Math.min(3, this.currentTreeScale + delta));
+                this.applyTreeZoom(this.currentTreeScale);
             });
         }
 
@@ -598,14 +542,19 @@ class TreeBuilder {
         const chart_config = {
             chart: {
                 container: "#tree-container",
+                rootOrientation: "NORTH",
                 connectors: {
-                    type: "step"
+                    type: "step",
+                    style: {
+                        "stroke-width": 2,
+                        "stroke": "#ccc"
+                    }
                 },
                 node: {
                     collapsable: true,
-                    HTMLclass: 'treant-node' // Add a class for styling
+                    HTMLclass: 'treant-node'
                 },
-                scrollbar: "fancy" // Enable fancy scrollbar
+                nodeDragDrop: false
             },
             nodeStructure: treantTree
         };
@@ -615,6 +564,24 @@ class TreeBuilder {
             this.treantChart.destroy();
         }
         this.treantChart = new Treant(chart_config, null, $);
+    }
+
+    applyTreeZoom(scale) {
+        const treeContainer = document.querySelector("#tree-container");
+        if (!treeContainer) return;
+
+        const nodes = treeContainer.querySelectorAll('.node');
+        const svg = treeContainer.querySelector('svg');
+
+        // Apply the transform to all nodes
+        nodes.forEach(node => {
+            node.style.transform = `scale(${scale})`;
+        });
+
+        // Apply the same transform to the SVG container for connectors
+        if (svg) {
+            svg.style.transform = `scale(${scale})`;
+        }
     }
 
     handleImageClick(image) {
