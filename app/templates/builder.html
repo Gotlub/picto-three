@@ -77,7 +77,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="close-visualizer-btn" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
-                <button type="button" id="export-pdf-btn" class="btn btn-primary">{{ _('Export to PDF') }}</button>
+                <button type="button" id="export-pdf-vectoriel" class="btn btn-primary">{{ _('Export to PDF') }}</button>
             </div>
         </div>
     </div>
@@ -123,7 +123,8 @@
 
 <!-- PDF Export and Treant.js dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="{{ url_for('static', filename='js/lib/svg2pdf.umd.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='vendor/raphael.js') }}"></script>
 <script src="{{ url_for('static', filename='vendor/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='vendor/jquery.mousewheel.js') }}"></script>
