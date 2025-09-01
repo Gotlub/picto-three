@@ -195,6 +195,45 @@ class ImageTree {
 // --- End of new Image Tree for Right Sidebar ---
 
 
+// ==============================================================================
+// FONCTION DE REDIMENSIONNEMENT MANUEL
+// ==============================================================================
+
+/**
+ * Calcule la taille réelle occupée par les noeuds de l'arbre et redimensionne
+ * le conteneur pour qu'il s'adapte parfaitement.
+ */
+function resizeContainerToFitTree() {
+    const treeContainer = document.querySelector("#tree-visualizer-container .Treant");
+    if (!treeContainer) return;
+
+    const nodes = treeContainer.querySelectorAll('.treant-node');
+    if (nodes.length === 0) return;
+
+    let maxRight = 0;
+    let maxBottom = 0;
+
+    // 1. On trouve les coordonnées les plus extrêmes occupées par les noeuds
+    nodes.forEach(node => {
+        const nodeRight = node.offsetLeft + node.offsetWidth;
+        const nodeBottom = node.offsetTop + node.offsetHeight;
+
+        if (nodeRight > maxRight) {
+            maxRight = nodeRight;
+        }
+        if (nodeBottom > maxBottom) {
+            maxBottom = nodeBottom;
+        }
+    });
+
+    // 2. On applique ces dimensions au conteneur de l'arbre
+    // On ajoute une petite marge pour le confort
+    const padding = 20;
+    treeContainer.style.width = (maxRight + padding) + 'px';
+    treeContainer.style.height = (maxBottom + padding) + 'px';
+}
+
+
 class BuilderNode {
     constructor(image, builder) {
         this.image = image;
@@ -499,6 +538,15 @@ class TreeBuilder {
 
         // Set initial cursor
         treeContainer.style.cursor = 'grab';
+
+        // On garde l'écouteur de scroll, mais on remplace l'appel à .update()
+        // par un appel à notre nouvelle fonction.
+        let scrollTimeout;
+        treeContainer.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            // On attend la fin du scroll pour lancer le redimensionnement
+            scrollTimeout = setTimeout(resizeContainerToFitTree, 150);
+        });
     }
 
     updateVisualizeButtonState() {
@@ -603,6 +651,9 @@ class TreeBuilder {
             this.treantChart.destroy();
         }
         this.treantChart = new Treant(chart_config, null, $);
+
+        // On appelle notre fonction juste après le rendu initial (avec un petit délai pour être sûr)
+        setTimeout(resizeContainerToFitTree, 100);
 
         // Apply initial transform after the chart is drawn
         const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
