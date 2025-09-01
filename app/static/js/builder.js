@@ -397,6 +397,12 @@ class TreeBuilder {
 
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
+                // Destroy the old scrollbar instance before creating a new one
+                if (this.ps) {
+                    this.ps.destroy();
+                    this.ps = null;
+                }
+
                 // --- DESTRUCTION ET NETTOYAGE ---
                 if (this.treantChart) {
                     this.treantChart.destroy();
@@ -477,7 +483,6 @@ class TreeBuilder {
                 this.scale = newScale;
                 setTransform();
 
-                // Manually update the perfect-scrollbar instance after zooming
                 if (this.ps) {
                     this.ps.update();
                 }
@@ -599,7 +604,7 @@ class TreeBuilder {
                     collapsable: true,
                     HTMLclass: 'treant-node' // Add a class for styling
                 },
-                scrollbar: "fancy" // Enable fancy scrollbar
+                scrollbar: "None" // Disable internal scrollbar, we will manage it manually
             },
             nodeStructure: treantTree
         };
@@ -609,7 +614,7 @@ class TreeBuilder {
             this.treantChart.destroy();
         }
         this.treantChart = new Treant(chart_config, null, $);
-        this.ps = $('#tree-visualizer-container').data('perfect-scrollbar');
+        this.ps = new PerfectScrollbar('#tree-visualizer-container');
 
         // Apply initial transform after the chart is drawn
         const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
