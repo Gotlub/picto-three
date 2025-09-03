@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-01 21:03+0000\n"
+"POT-Creation-Date: 2025-09-03 23:23+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -25,27 +25,25 @@ msgstr "Nombre de usuario o contraseña inválidos"
 #: app/routes.py:44
 #, python-format
 msgid ""
-"Votre compte n'est pas confirmé. Veuillez vérifier vos e-mails. <a "
-"href=\"%(url)s\">Renvoyer l'e-mail de confirmation ?</a>"
+"Your account is not confirmed. Please check your emails. <a "
+"href=\"%(url)s\">Resend confirmation email?</a>"
 msgstr "Tu cuenta no está confirmada. Por favor, revisa tus correos electrónicos. <a href=\"%(url)s\">¿Reenviar el correo de confirmación?</a>"
 
 #: app/routes.py:62
-msgid ""
-"Un email avec les instructions pour réinitialiser votre mot de passe a "
-"été envoyé."
-msgstr "Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña."
+msgid "An email with instructions to reset your password has been sent."
+msgstr "Se ha enviado un correo electrónico con instrucciones para restablecer su contraseña."
 
 #: app/routes.py:64
-msgid "Aucun compte trouvé avec cette adresse e-mail."
-msgstr "No se encontró ninguna cuenta con esta dirección de correo electrónico."
+msgid "No account found with that email address."
+msgstr "No se ha encontrado ninguna cuenta con esa dirección de correo electrónico."
 
 #: app/routes.py:74
-msgid "Le lien de réinitialisation est invalide ou a expiré."
-msgstr "El enlace de restablecimiento no es válido o ha caducado."
+msgid "The reset link is invalid or has expired."
+msgstr "El enlace para restablecer la contraseña no es válido o ha caducado."
 
 #: app/routes.py:82
-msgid "Votre mot de passe a été réinitialisé avec succès."
-msgstr "Tu contraseña ha sido restablecida con éxito."
+msgid "Your password has been reset successfully."
+msgstr "Su contraseña ha sido restablecida correctamente."
 
 #: app/routes.py:110
 msgid "Your password has been changed successfully."
@@ -73,183 +71,189 @@ msgid "Invalid form submission."
 msgstr "Envío de formulario no válido."
 
 #: app/routes.py:184
-msgid "Un email de confirmation a été envoyé à votre adresse e-mail."
-msgstr "Se ha enviado un correo de confirmación a tu dirección de correo electrónico."
+msgid "A confirmation email has been sent to your email address."
+msgstr "Se ha enviado un correo electrónico de confirmación a su dirección de correo electrónico."
 
 #: app/routes.py:187
 msgid "Registration failed. Please check the errors below."
 msgstr "El registro falló. Por favor, comprueba los errores a continuación."
 
 #: app/routes.py:197
-msgid "Le lien de confirmation est invalide ou a expiré."
+msgid "The confirmation link is invalid or has expired."
 msgstr "El enlace de confirmación no es válido o ha caducado."
 
 #: app/routes.py:202
-msgid "Compte déjà confirmé. Veuillez vous connecter."
-msgstr "La cuenta ya está confirmada. Por favor, inicia sesión."
+msgid "Account already confirmed. Please login."
+msgstr "La cuenta ya está confirmada. Por favor, inicie sesión."
 
 #: app/routes.py:207
-msgid "Votre compte a été confirmé avec succès !"
+msgid "Your account has been confirmed successfully!"
 msgstr "¡Tu cuenta ha sido confirmada con éxito!"
 
 #: app/routes.py:219
-msgid "Ce compte est déjà confirmé. Veuillez vous connecter."
-msgstr "Esta cuenta ya está confirmada. Por favor, inicia sesión."
+msgid "This account is already confirmed. Please login."
+msgstr "Esta cuenta ya está confirmada. Por favor, inicie sesión."
 
 #: app/routes.py:225
-msgid "Un nouvel email de confirmation a été envoyé."
-msgstr "Se ha enviado un nuevo correo de confirmación."
+msgid "A new confirmation email has been sent."
+msgstr "Se ha enviado un nuevo correo electrónico de confirmación."
 
 #: app/routes.py:228
-msgid "Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire."
-msgstr "No se encontró ninguna cuenta con esta dirección de correo electrónico. Por favor, regístrate."
+msgid "No account found with that email address. Please register."
+msgstr "No se encontró ninguna cuenta con esa dirección de correo electrónico. Por favor, regístrese."
 
 #: app/routes.py:242
 msgid "Invalid tree data received."
 msgstr "Datos de árbol recibidos no válidos."
 
-#: app/routes.py:386 app/routes.py:455 app/routes.py:523 app/routes.py:655
-#: app/routes.py:740
+#: app/routes.py:343
+msgid "Your language has been updated."
+msgstr "Tu idioma ha sido actualizado."
+
+#: app/routes.py:347
+msgid "The language has been updated for this session."
+msgstr "El idioma ha sido actualizado para esta sesión."
+
+#: app/routes.py:406 app/routes.py:475 app/routes.py:543 app/routes.py:675
+#: app/routes.py:760
 msgid "Invalid data"
 msgstr "Datos inválidos"
 
-#: app/routes.py:393
+#: app/routes.py:413
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Faltan campos obligatorios: se requieren el nombre de la lista y la carga útil."
 
-#: app/routes.py:409
+#: app/routes.py:429
 msgid ""
-"Les listes publiques ne peuvent contenir que des images publiques "
-"globales. Veuillez retirer les images appartenant à des utilisateurs "
-"avant de sauvegarder publiquement."
-msgstr "Las listas públicas solo pueden contener imágenes públicas globales. Por favor, elimina las imágenes que pertenecen a los usuarios antes de guardar públicamente."
+"Public lists can only contain global public images. Please remove any "
+"user-owned images before saving publicly."
+msgstr "Las listas públicas solo pueden contener imágenes públicas globales. Por favor, elimine las imágenes de propiedad del usuario antes de guardar públicamente."
 
-#: app/routes.py:421 app/routes.py:467
+#: app/routes.py:441 app/routes.py:487
 msgid "List updated successfully"
 msgstr "Lista actualizada con éxito"
 
-#: app/routes.py:432
+#: app/routes.py:452
 msgid "List saved successfully"
 msgstr "Lista guardada con éxito"
 
-#: app/routes.py:449 app/routes.py:476
+#: app/routes.py:469 app/routes.py:496
 msgid "List not found"
 msgstr "Lista no encontrada"
 
-#: app/routes.py:451 app/routes.py:478 app/routes.py:499
+#: app/routes.py:471 app/routes.py:498 app/routes.py:519
 msgid "Unauthorized"
 msgstr "No autorizado"
 
-#: app/routes.py:483
+#: app/routes.py:503
 msgid "List deleted successfully"
 msgstr "Lista eliminada con éxito"
 
-#: app/routes.py:490
+#: app/routes.py:510
 msgid "parent_id is required"
 msgstr "se requiere parent_id"
 
-#: app/routes.py:494
+#: app/routes.py:514
 msgid "Folder not found"
 msgstr "Carpeta no encontrada"
 
-#: app/routes.py:514
+#: app/routes.py:534
 msgid "Root folder not found"
 msgstr "Carpeta raíz no encontrada"
 
-#: app/routes.py:530
+#: app/routes.py:550
 msgid "Parent folder not found or not owned by user"
 msgstr "Carpeta principal no encontrada o no es propiedad del usuario"
 
-#: app/routes.py:541
+#: app/routes.py:561
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "No se pudo crear el directorio: %(error)s"
 
-#: app/routes.py:562
+#: app/routes.py:582
 msgid "No file part"
 msgstr "Ninguna parte del archivo"
 
-#: app/routes.py:566
+#: app/routes.py:586
 msgid "No selected file"
 msgstr "Ningún archivo seleccionado"
 
-#: app/routes.py:570
+#: app/routes.py:590
 msgid "No folder_id specified"
 msgstr "No se especificó folder_id"
 
-#: app/routes.py:574 app/routes.py:748
+#: app/routes.py:594 app/routes.py:768
 msgid "Folder not found or not owned by user"
 msgstr "Carpeta no encontrada o no es propiedad del usuario"
 
-#: app/routes.py:602
+#: app/routes.py:622
 msgid "File upload failed"
 msgstr "Falló la carga del archivo"
 
-#: app/routes.py:613
+#: app/routes.py:633
 msgid "Image not found"
 msgstr "Imagen no encontrada"
 
-#: app/routes.py:617
+#: app/routes.py:637
 msgid "Unauthorized to edit this image"
 msgstr "No autorizado para editar esta imagen"
 
-#: app/routes.py:621
+#: app/routes.py:641
 msgid "Invalid JSON data"
 msgstr "Datos JSON no válidos"
 
-#: app/routes.py:634
+#: app/routes.py:654
 msgid "Image updated successfully"
 msgstr "Imagen actualizada con éxito"
 
-#: app/routes.py:662
+#: app/routes.py:682
 msgid "Missing required fields"
 msgstr "Faltan campos obligatorios"
 
-#: app/routes.py:667
+#: app/routes.py:687
 msgid "Cannot save an empty tree as public."
 msgstr "No se puede guardar un árbol vacío como público."
 
-#: app/routes.py:676
+#: app/routes.py:696
 msgid ""
-"Les arbres publics ne peuvent contenir que des images publiques globales."
-" Veuillez retirer les images appartenant à des utilisateurs avant de "
-"sauvegarder publiquement."
-msgstr "Los árboles públicos solo pueden contener imágenes públicas globales. Por favor, elimine las imágenes que pertenecen a los usuarios antes de guardarlas públicamente."
+"Public trees can only contain global public images. Please remove any "
+"user-owned images before saving publicly."
+msgstr "Los árboles públicos solo pueden contener imágenes públicas globales. Por favor, elimine las imágenes de propiedad del usuario antes de guardarlas públicamente."
 
-#: app/routes.py:686
+#: app/routes.py:706
 msgid "Tree updated successfully"
 msgstr "Árbol actualizado con éxito"
 
-#: app/routes.py:696
+#: app/routes.py:716
 msgid "Tree saved successfully"
 msgstr "Árbol guardado con éxito"
 
-#: app/routes.py:751
+#: app/routes.py:771
 msgid "Cannot delete root folder"
 msgstr "No se puede eliminar la carpeta raíz"
 
-#: app/routes.py:755
+#: app/routes.py:775
 msgid "Folder and all its contents deleted"
 msgstr "La carpeta y todo su contenido han sido eliminados"
 
-#: app/routes.py:760
+#: app/routes.py:780
 msgid "Image not found or not owned by user"
 msgstr "Imagen no encontrada o no es propiedad del usuario"
 
-#: app/routes.py:767
+#: app/routes.py:787
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "No se pudo eliminar el archivo: %(error)s"
 
-#: app/routes.py:771
+#: app/routes.py:791
 msgid "Image deleted"
 msgstr "Imagen eliminada"
 
-#: app/routes.py:773
+#: app/routes.py:793
 msgid "Invalid item type"
 msgstr "Tipo de artículo no válido"
 
-#: app/routes.py:788
+#: app/routes.py:808
 msgid "No images to export"
 msgstr "No hay imágenes para exportar"
 
@@ -295,48 +299,44 @@ msgstr "Cancelar"
 msgid "Delete My Account"
 msgstr "Eliminar mi cuenta"
 
-#: app/templates/base.html:6 app/templates/base.html:27
-#: app/templates/base.html:95
+#: app/templates/base.html:6 app/templates/base.html:28
+#: app/templates/base.html:96
 msgid "Pictogram-Tree Builder"
 msgstr "Constructor de árboles de pictogramas"
 
-#: app/templates/base.html:28
+#: app/templates/base.html:29
 msgid "Toggle navigation"
 msgstr "Alternar navegación"
 
-#: app/templates/base.html:34
+#: app/templates/base.html:35
 msgid "Home"
 msgstr "Inicio"
 
-#: app/templates/base.html:37 app/templates/builder.html:59
+#: app/templates/base.html:38 app/templates/builder.html:59
 msgid "Tree Builder"
 msgstr "Constructor de árboles"
 
-#: app/templates/base.html:40
+#: app/templates/base.html:41
 msgid "List Builder"
 msgstr "Constructor de listas"
 
-#: app/templates/base.html:44
+#: app/templates/base.html:45
 msgid "Pictogram Bank"
 msgstr "Banco de pictogramas"
 
-#: app/templates/base.html:51
-msgid "Language"
-msgstr "Idioma"
-
-#: app/templates/base.html:61
+#: app/templates/base.html:62
 msgid "Login"
 msgstr "Iniciar sesión"
 
-#: app/templates/base.html:65
+#: app/templates/base.html:66
 msgid "Account"
 msgstr "Cuenta"
 
-#: app/templates/base.html:68
+#: app/templates/base.html:69
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: app/templates/base.html:93
+#: app/templates/base.html:94
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Conectado como: %(username)s"
@@ -438,7 +438,7 @@ msgid "New tree"
 msgstr "Nuevo árbol"
 
 #: app/templates/forgot_password.html:5
-msgid "Réinitialiser le mot de passe"
+msgid "Reset Password"
 msgstr "Restablecer la contraseña"
 
 #: app/templates/index.html:8
@@ -673,39 +673,34 @@ msgid "Register"
 msgstr "Registrarse"
 
 #: app/templates/resend_confirmation_request.html:5
-msgid "Renvoyer l'e-mail de confirmation"
-msgstr "Reenviar el correo de confirmación"
+msgid "Resend Confirmation Email"
+msgstr "Reenviar correo electrónico de confirmación"
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""
-"Veuillez saisir l'adresse e-mail de votre compte. Si un compte "
-"correspondant est trouvé et n'est pas encore confirmé, nous vous "
-"enverrons un nouvel e-mail de confirmation."
-msgstr "Por favor, introduce la dirección de correo electrónico de tu cuenta. Si se encuentra una cuenta correspondiente y aún no está confirmada, te enviaremos un nuevo correo de confirmación."
+"Please enter your account's email address. If a matching account is found"
+" and is not yet confirmed, we will send a new confirmation email."
+msgstr "Por favor, introduzca la dirección de correo electrónico de su cuenta. Si se encuentra una cuenta que coincida y aún no está confirmada, le enviaremos un nuevo correo electrónico de confirmación."
 
 #: app/templates/reset_password_form.html:5
-msgid "Réinitialiser votre mot de passe"
-msgstr "Restablecer tu contraseña"
+msgid "Reset Your Password"
+msgstr "Restablecer su contraseña"
 
 #: app/templates/emails/confirm_email.html:1
 #: app/templates/emails/reset_password.html:1
-msgid "Bonjour,"
+msgid "Hello,"
 msgstr "Hola,"
 
 #: app/templates/emails/confirm_email.html:2
 msgid ""
-"Merci pour votre inscription. Veuillez cliquer sur le lien ci-dessous "
-"pour activer votre compte :"
+"Thank you for registering. Please click the link below to activate your "
+"account:"
 msgstr "Gracias por registrarte. Por favor, haz clic en el siguiente enlace para activar tu cuenta:"
 
 #: app/templates/emails/reset_password.html:2
-msgid ""
-"Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le "
-"lien suivant pour continuer :"
-msgstr "Has solicitado un restablecimiento de contraseña. Haz clic en el siguiente enlace para continuar:"
+msgid "You have requested a password reset. Click the following link to continue:"
+msgstr "Ha solicitado un restablecimiento de contraseña. Haga clic en el siguiente enlace para continuar:"
 
 #: app/templates/emails/reset_password.html:4
-msgid ""
-"Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet "
-"e-mail."
-msgstr "Si no has solicitado esto, por favor ignora este correo electrónico."
+msgid "If you did not make this request, please ignore this email."
+msgstr "Si no has realizado esta solicitud, ignora este correo electrónico."

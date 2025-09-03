@@ -61,7 +61,7 @@ def test_save_public_tree_with_user_image_fails(seeded_db):
     assert response.status_code == 400
     data = response.get_json()
     assert data['status'] == 'error'
-    assert "publics ne peuvent contenir que des images publiques globales" in data['message']
+    assert "Public trees can only contain global public images" in data['message']
 
 def test_save_public_tree_with_global_image_succeeds(seeded_db):
     """A public tree can contain global (non-user-owned) images."""
@@ -96,7 +96,7 @@ def test_save_public_list_with_user_image_fails(seeded_db):
     assert response.status_code == 400
     data = response.get_json()
     assert data['status'] == 'error'
-    assert "publiques ne peuvent contenir que des images publiques globales" in data['message']
+    assert "Public lists can only contain global public images" in data['message']
 
 def test_save_public_list_with_global_image_succeeds(seeded_db):
     """A public list can contain global (non-user-owned) images."""

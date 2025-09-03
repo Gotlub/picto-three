@@ -26,7 +26,7 @@ def test_register(client):
     }, follow_redirects=True)
     
     assert response.status_code == 200
-    assert 'Un email de confirmation a été envoyé à votre adresse e-mail.' in response.data.decode('utf-8')
+    assert 'A confirmation email has been sent to your email address.' in response.data.decode('utf-8')
     user = User.query.filter_by(username='testuser').first()
     assert user is not None
     assert user.email == 'test@example.com'
@@ -87,7 +87,7 @@ def test_login_unconfirmed_user(client):
     }, follow_redirects=True)
 
     assert response.status_code == 200
-    assert 'Votre compte n\'est pas confirmé.' in response.data.decode('utf-8')
+    assert 'Your account is not confirmed.' in response.data.decode('utf-8')
     assert b'Hi, unconfirmedlogin!' not in response.data
 
 def test_password_strength_and_account_deletion(client):
@@ -105,7 +105,7 @@ def test_password_strength_and_account_deletion(client):
         'password2': 'password'
     }, follow_redirects=True)
 
-    assert 'Un email de confirmation a été envoyé à votre adresse e-mail.' not in response.data.decode('utf-8')
+    assert 'A confirmation email has been sent to your email address.' not in response.data.decode('utf-8')
     assert b'Password must' in response.data
     user = User.query.filter_by(username='weakpassworduser').first()
     assert user is None
@@ -122,7 +122,7 @@ def test_password_strength_and_account_deletion(client):
         'password2': 'StrongPassword123'
     }, follow_redirects=True)
 
-    assert 'Un email de confirmation a été envoyé à votre adresse e-mail.' in response.data.decode('utf-8')
+    assert 'A confirmation email has been sent to your email address.' in response.data.decode('utf-8')
     user = User.query.filter_by(username='strongpassworduser').first()
     assert user is not None
 
@@ -174,7 +174,7 @@ def test_registration_sends_confirmation_email(client, monkeypatch):
     assert not user.confirmed
     assert len(sent_emails) == 1
     assert sent_emails[0]['to'] == 'confirm@example.com'
-    assert 'Confirmez votre compte' in sent_emails[0]['subject']
+    assert 'Confirm Your Account' in sent_emails[0]['subject']
 
 def test_email_confirmation(client):
     # Register user first (without mocking email)
@@ -195,7 +195,7 @@ def test_email_confirmation(client):
     # Generate a token and confirm
     response = confirm_user(client, user.email)
 
-    assert 'Votre compte a été confirmé avec succès !' in response.data.decode('utf-8')
+    assert 'Your account has been confirmed successfully!' in response.data.decode('utf-8')
     db.session.refresh(user)
     assert user.confirmed
 
@@ -227,7 +227,7 @@ def test_password_reset_flow(client, monkeypatch):
     }, follow_redirects=True)
 
     assert len(sent_emails) == 1
-    assert 'Réinitialisation de votre mot de passe' in sent_emails[0]['subject']
+    assert 'Reset Your Password' in sent_emails[0]['subject']
 
     # 3. Use the token to reset the password
     token = generate_password_reset_token(user.email)
@@ -240,7 +240,7 @@ def test_password_reset_flow(client, monkeypatch):
         'csrf_token': csrf_token
     }, follow_redirects=True)
 
-    assert 'Votre mot de passe a été réinitialisé avec succès.' in response.data.decode('utf-8')
+    assert 'Your password has been reset successfully.' in response.data.decode('utf-8')
     db.session.refresh(user)
     assert user.check_password('NewPassword123')
     assert not user.check_password('OldPassword123')
@@ -267,4 +267,4 @@ def test_resend_confirmation_request(client, monkeypatch):
     assert response.status_code == 200
     assert len(sent_emails) == 1
     assert sent_emails[0]['to'] == 'resendrequest@test.com'
-    assert 'Un nouvel email de confirmation a été envoyé.' in response.data.decode('utf-8')
+    assert 'A new confirmation email has been sent.' in response.data.decode('utf-8')

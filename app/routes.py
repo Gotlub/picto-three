@@ -41,7 +41,7 @@ def login():
             return redirect(url_for('main.login'))
 
         if not user.confirmed:
-            flash(Markup(_('Votre compte n\'est pas confirmé. Veuillez vérifier vos e-mails. <a href="%(url)s">Renvoyer l\'e-mail de confirmation ?</a>', url=url_for('main.resend_confirmation_request'))), 'warning')
+            flash(Markup(_('Your account is not confirmed. Please check your emails. <a href="%(url)s">Resend confirmation email?</a>', url=url_for('main.resend_confirmation_request'))), 'warning')
             return redirect(url_for('main.login'))
 
         login_user(user, remember=form.remember_me.data)
@@ -58,12 +58,12 @@ def forgot_password():
         if user:
             token = generate_password_reset_token(user.email)
             reset_url = url_for('main.reset_with_token_route', token=token, _external=True)
-            send_email(user.email, 'Réinitialisation de votre mot de passe', 'emails/reset_password.html', reset_url=reset_url)
-            flash(_('Un email avec les instructions pour réinitialiser votre mot de passe a été envoyé.'), 'info')
+            send_email(user.email, 'Reset Your Password', 'emails/reset_password.html', reset_url=reset_url)
+            flash(_('An email with instructions to reset your password has been sent.'), 'info')
         else:
-            flash(_('Aucun compte trouvé avec cette adresse e-mail.'), 'warning')
+            flash(_('No account found with that email address.'), 'warning')
         return redirect(url_for('main.login'))
-    return render_template('forgot_password.html', title='Mot de passe oublié', form=form)
+    return render_template('forgot_password.html', title='Forgot Password', form=form)
 
 @bp.route('/reset/<token>', methods=['GET', 'POST'])
 def reset_with_token_route(token):
@@ -71,7 +71,7 @@ def reset_with_token_route(token):
         return redirect(url_for('main.index'))
     email = confirm_password_reset_token(token)
     if not email:
-        flash(_('Le lien de réinitialisation est invalide ou a expiré.'), 'danger')
+        flash(_('The reset link is invalid or has expired.'), 'danger')
         return redirect(url_for('main.login'))
 
     form = ResetPasswordForm()
@@ -79,7 +79,7 @@ def reset_with_token_route(token):
         user = User.query.filter_by(email=email).first_or_404()
         user.set_password(form.password.data)
         db.session.commit()
-        flash(_('Votre mot de passe a été réinitialisé avec succès.'), 'success')
+        flash(_('Your password has been reset successfully.'), 'success')
         return redirect(url_for('main.login'))
 
     return render_template('reset_password_form.html', form=form)
@@ -179,9 +179,9 @@ def register():
 
         token = generate_confirmation_token(user.email)
         confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
-        send_email(user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
+        send_email(user.email, 'Confirm Your Account', 'emails/confirm_email.html', confirm_url=confirm_url)
 
-        flash(_('Un email de confirmation a été envoyé à votre adresse e-mail.'), 'success')
+        flash(_('A confirmation email has been sent to your email address.'), 'success')
         return redirect(url_for('main.login'))
     elif form.errors:
         flash(_('Registration failed. Please check the errors below.'), 'danger')
@@ -194,17 +194,17 @@ def register():
 def confirm_email_route(token):
     email = confirm_token(token)
     if not email:
-        flash(_('Le lien de confirmation est invalide ou a expiré.'), 'danger')
+        flash(_('The confirmation link is invalid or has expired.'), 'danger')
         return redirect(url_for('main.login'))
 
     user = User.query.filter_by(email=email).first_or_404()
     if user.confirmed:
-        flash(_('Compte déjà confirmé. Veuillez vous connecter.'), 'success')
+        flash(_('Account already confirmed. Please login.'), 'success')
     else:
         user.confirmed = True
         user.confirmed_on = datetime.now(UTC)
         db.session.commit()
-        flash(_('Votre compte a été confirmé avec succès !'), 'success')
+        flash(_('Your account has been confirmed successfully!'), 'success')
     return redirect(url_for('main.login'))
 
 @bp.route('/resend_confirmation_request', methods=['GET', 'POST'])
@@ -216,16 +216,16 @@ def resend_confirmation_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             if user.confirmed:
-                flash(_('Ce compte est déjà confirmé. Veuillez vous connecter.'), 'success')
+                flash(_('This account is already confirmed. Please login.'), 'success')
                 return redirect(url_for('main.login'))
             else:
                 token = generate_confirmation_token(user.email)
                 confirm_url = url_for('main.confirm_email_route', token=token, _external=True)
-                send_email(user.email, 'Confirmez votre compte', 'emails/confirm_email.html', confirm_url=confirm_url)
-                flash(_('Un nouvel email de confirmation a été envoyé.'), 'success')
+                send_email(user.email, 'Confirm Your Account', 'emails/confirm_email.html', confirm_url=confirm_url)
+                flash(_('A new confirmation email has been sent.'), 'success')
                 return redirect(url_for('main.login'))
         else:
-            flash(_('Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire.'), 'warning')
+            flash(_('No account found with that email address. Please register.'), 'warning')
     return render_template('resend_confirmation_request.html', form=form)
 
 @bp.route('/builder', methods=['GET', 'POST'])
@@ -426,7 +426,7 @@ def save_list():
             if user_owned_images:
                 return jsonify({
                     'status': 'error',
-                    'message': _('Les listes publiques ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.')
+                    'message': _('Public lists can only contain global public images. Please remove any user-owned images before saving publicly.')
                 }), 400
 
     payload_str = json.dumps(payload)
@@ -693,7 +693,7 @@ def save_tree():
             if user_owned_images:
                 return jsonify({
                     'status': 'error',
-                    'message': _('Les arbres publics ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement.')
+                    'message': _('Public trees can only contain global public images. Please remove any user-owned images before saving publicly.')
                 }), 400
 
     # Check if a tree with the same name already exists for this user
