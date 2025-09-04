@@ -1,0 +1,714 @@
+# Dutch translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-09-04 07:05+0000\n"
+"PO-Revision-Date: 2025-09-04 07:05+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: nl\n"
+"Language-Team: nl <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/routes.py:40
+msgid "Invalid username or password"
+msgstr "Ongeldige gebruikersnaam of wachtwoord"
+
+#: app/routes.py:44
+#, python-format
+msgid ""
+"Your account is not confirmed. Please check your emails. <a "
+"href=\"%(url)s\">Resend confirmation email?</a>"
+msgstr "Uw account is niet bevestigd. Controleer uw e-mails. <a href=\"%(url)s\">Bevestigingsmail opnieuw verzenden?</a>"
+
+#: app/routes.py:62
+msgid "An email with instructions to reset your password has been sent."
+msgstr "Er is een e-mail met instructies om uw wachtwoord opnieuw in te stellen verzonden."
+
+#: app/routes.py:64
+msgid "No account found with that email address."
+msgstr "Geen account gevonden met dat e-mailadres."
+
+#: app/routes.py:74
+msgid "The reset link is invalid or has expired."
+msgstr "De resetlink is ongeldig of verlopen."
+
+#: app/routes.py:82
+msgid "Your password has been reset successfully."
+msgstr "Uw wachtwoord is succesvol opnieuw ingesteld."
+
+#: app/routes.py:110
+msgid "Your password has been changed successfully."
+msgstr "Uw wachtwoord is succesvol gewijzigd."
+
+#: app/routes.py:112
+msgid "Invalid current password."
+msgstr "Ongeldig huidig wachtwoord."
+
+#: app/routes.py:116 app/routes.py:190
+#, python-format
+msgid "Error in %(field)s: %(error)s"
+msgstr "Fout in %(field)s: %(error)s"
+
+#: app/routes.py:142
+msgid "Your account has been successfully deleted."
+msgstr "Uw account is succesvol verwijderd."
+
+#: app/routes.py:145
+msgid "Invalid username confirmation. Account deletion cancelled."
+msgstr "Ongeldige bevestiging van gebruikersnaam. Verwijdering van account geannuleerd."
+
+#: app/routes.py:148
+msgid "Invalid form submission."
+msgstr "Ongeldige formulierinzending."
+
+#: app/routes.py:184
+msgid "A confirmation email has been sent to your email address."
+msgstr "Er is een bevestigingsmail naar uw e-mailadres verzonden."
+
+#: app/routes.py:187
+msgid "Registration failed. Please check the errors below."
+msgstr "Registratie mislukt. Controleer de onderstaande fouten."
+
+#: app/routes.py:197
+msgid "The confirmation link is invalid or has expired."
+msgstr "De bevestigingslink is ongeldig of verlopen."
+
+#: app/routes.py:202
+msgid "Account already confirmed. Please login."
+msgstr "Account al bevestigd. Log in."
+
+#: app/routes.py:207
+msgid "Your account has been confirmed successfully!"
+msgstr "Uw account is succesvol bevestigd!"
+
+#: app/routes.py:219
+msgid "This account is already confirmed. Please login."
+msgstr "Dit account is al bevestigd. Log in."
+
+#: app/routes.py:225
+msgid "A new confirmation email has been sent."
+msgstr "Er is een nieuwe bevestigingsmail verzonden."
+
+#: app/routes.py:228
+msgid "No account found with that email address. Please register."
+msgstr "Geen account gevonden met dat e-mailadres. Registreer u."
+
+#: app/routes.py:242
+msgid "Invalid tree data received."
+msgstr "Ongeldige boomgegevens ontvangen."
+
+#: app/routes.py:343
+msgid "Your language has been updated."
+msgstr "Uw taal is bijgewerkt."
+
+#: app/routes.py:347
+msgid "The language has been updated for this session."
+msgstr "De taal is bijgewerkt voor deze sessie."
+
+#: app/routes.py:406 app/routes.py:475 app/routes.py:543 app/routes.py:675
+#: app/routes.py:760
+msgid "Invalid data"
+msgstr "Ongeldige gegevens"
+
+#: app/routes.py:413
+msgid "Missing required fields: list_name and payload are required."
+msgstr "Ontbrekende verplichte velden: list_name en payload zijn verplicht."
+
+#: app/routes.py:429
+msgid ""
+"Public lists can only contain global public images. Please remove any "
+"user-owned images before saving publicly."
+msgstr "Openbare lijsten kunnen alleen globale openbare afbeeldingen bevatten. Verwijder alle afbeeldingen in eigendom van de gebruiker voordat u openbaar opslaat."
+
+#: app/routes.py:441 app/routes.py:487
+msgid "List updated successfully"
+msgstr "Lijst succesvol bijgewerkt"
+
+#: app/routes.py:452
+msgid "List saved successfully"
+msgstr "Lijst succesvol opgeslagen"
+
+#: app/routes.py:469 app/routes.py:496
+msgid "List not found"
+msgstr "Lijst niet gevonden"
+
+#: app/routes.py:471 app/routes.py:498 app/routes.py:519
+msgid "Unauthorized"
+msgstr "Ongeautoriseerd"
+
+#: app/routes.py:503
+msgid "List deleted successfully"
+msgstr "Lijst succesvol verwijderd"
+
+#: app/routes.py:510
+msgid "parent_id is required"
+msgstr "parent_id is verplicht"
+
+#: app/routes.py:514
+msgid "Folder not found"
+msgstr "Map niet gevonden"
+
+#: app/routes.py:534
+msgid "Root folder not found"
+msgstr "Hoofdmap niet gevonden"
+
+#: app/routes.py:550
+msgid "Parent folder not found or not owned by user"
+msgstr "Bovenliggende map niet gevonden of geen eigendom van gebruiker"
+
+#: app/routes.py:561
+#, python-format
+msgid "Could not create directory: %(error)s"
+msgstr "Kon map niet aanmaken: %(error)s"
+
+#: app/routes.py:582
+msgid "No file part"
+msgstr "Geen bestandsdeel"
+
+#: app/routes.py:586
+msgid "No selected file"
+msgstr "Geen bestand geselecteerd"
+
+#: app/routes.py:590
+msgid "No folder_id specified"
+msgstr "Geen folder_id opgegeven"
+
+#: app/routes.py:594 app/routes.py:768
+msgid "Folder not found or not owned by user"
+msgstr "Map niet gevonden of geen eigendom van gebruiker"
+
+#: app/routes.py:622
+msgid "File upload failed"
+msgstr "Bestandsupload mislukt"
+
+#: app/routes.py:633
+msgid "Image not found"
+msgstr "Afbeelding niet gevonden"
+
+#: app/routes.py:637
+msgid "Unauthorized to edit this image"
+msgstr "Ongeautoriseerd om deze afbeelding te bewerken"
+
+#: app/routes.py:641
+msgid "Invalid JSON data"
+msgstr "Ongeldige JSON-gegevens"
+
+#: app/routes.py:654
+msgid "Image updated successfully"
+msgstr "Afbeelding succesvol bijgewerkt"
+
+#: app/routes.py:682
+msgid "Missing required fields"
+msgstr "Ontbrekende verplichte velden"
+
+#: app/routes.py:687
+msgid "Cannot save an empty tree as public."
+msgstr "Kan een lege boom niet als openbaar opslaan."
+
+#: app/routes.py:696
+msgid ""
+"Public trees can only contain global public images. Please remove any "
+"user-owned images before saving publicly."
+msgstr "Openbare bomen kunnen alleen globale openbare afbeeldingen bevatten. Verwijder alle afbeeldingen in eigendom van de gebruiker voordat u openbaar opslaat."
+
+#: app/routes.py:706
+msgid "Tree updated successfully"
+msgstr "Boom succesvol bijgewerkt"
+
+#: app/routes.py:716
+msgid "Tree saved successfully"
+msgstr "Boom succesvol opgeslagen"
+
+#: app/routes.py:771
+msgid "Cannot delete root folder"
+msgstr "Kan hoofdmap niet verwijderen"
+
+#: app/routes.py:775
+msgid "Folder and all its contents deleted"
+msgstr "Map en al zijn inhoud verwijderd"
+
+#: app/routes.py:780
+msgid "Image not found or not owned by user"
+msgstr "Afbeelding niet gevonden of geen eigendom van gebruiker"
+
+#: app/routes.py:787
+#, python-format
+msgid "Could not delete file: %(error)s"
+msgstr "Kon bestand niet verwijderen: %(error)s"
+
+#: app/routes.py:791
+msgid "Image deleted"
+msgstr "Afbeelding verwijderd"
+
+#: app/routes.py:793
+msgid "Invalid item type"
+msgstr "Ongeldig itemtype"
+
+#: app/routes.py:808
+msgid "No images to export"
+msgstr "Geen afbeeldingen om te exporteren"
+
+#: app/templates/account.html:5
+msgid "Account Management"
+msgstr "Accountbeheer"
+
+#: app/templates/account.html:10
+msgid "Change Password"
+msgstr "Wachtwoord wijzigen"
+
+#: app/templates/account.html:29 app/templates/account.html:32
+msgid "Delete Account"
+msgstr "Account verwijderen"
+
+#: app/templates/account.html:30
+msgid "Once you delete your account, there is no going back. Please be certain."
+msgstr "Zodra u uw account verwijdert, is er geen weg meer terug. Wees er zeker van."
+
+#: app/templates/account.html:43
+msgid "Confirm Account Deletion"
+msgstr "Bevestig accountverwijdering"
+
+#: app/templates/account.html:47
+msgid ""
+"Are you sure you want to delete your account? This action cannot be "
+"undone. All your data will be permanently lost."
+msgstr "Weet u zeker dat u uw account wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt. Al uw gegevens gaan permanent verloren."
+
+#: app/templates/account.html:48
+msgid "To confirm, please type your username below:"
+msgstr "Om te bevestigen, typ hieronder uw gebruikersnaam:"
+
+#: app/templates/account.html:51
+msgid "Your username"
+msgstr "Uw gebruikersnaam"
+
+#: app/templates/account.html:55
+msgid "Cancel"
+msgstr "Annuleren"
+
+#: app/templates/account.html:56
+msgid "Delete My Account"
+msgstr "Mijn account verwijderen"
+
+#: app/templates/base.html:6 app/templates/base.html:28
+#: app/templates/base.html:101
+msgid "Pictogram-Tree Builder"
+msgstr "Pictogrammenboom-bouwer"
+
+#: app/templates/base.html:29
+msgid "Toggle navigation"
+msgstr "Navigatie in-/uitschakelen"
+
+#: app/templates/base.html:35
+msgid "Home"
+msgstr "Home"
+
+#: app/templates/base.html:38 app/templates/builder.html:59
+msgid "Tree Builder"
+msgstr "Boom-bouwer"
+
+#: app/templates/base.html:41
+msgid "List Builder"
+msgstr "Lijst-bouwer"
+
+#: app/templates/base.html:45
+msgid "Pictogram Bank"
+msgstr "Pictogrammenbank"
+
+#: app/templates/base.html:67
+msgid "Login"
+msgstr "Inloggen"
+
+#: app/templates/base.html:71
+msgid "Account"
+msgstr "Account"
+
+#: app/templates/base.html:74
+msgid "Logout"
+msgstr "Uitloggen"
+
+#: app/templates/base.html:99
+#, python-format
+msgid "Logged in as: %(username)s"
+msgstr "Ingelogd als: %(username)s"
+
+#: app/templates/builder.html:10
+msgid "Import Options"
+msgstr "Importopties"
+
+#: app/templates/builder.html:13
+msgid "Replace existing tree"
+msgstr "Bestaande boom vervangen"
+
+#: app/templates/builder.html:18
+msgid "Add to existing tree"
+msgstr "Toevoegen aan bestaande boom"
+
+#: app/templates/builder.html:24
+msgid "File Operations"
+msgstr "Bestandsbewerkingen"
+
+#: app/templates/builder.html:26
+msgid "Import from JSON"
+msgstr "Importeren uit JSON"
+
+#: app/templates/builder.html:27
+msgid "Export to JSON"
+msgstr "Exporteren naar JSON"
+
+#: app/templates/builder.html:33
+msgid "Database Operations"
+msgstr "Databasebewerkingen"
+
+#: app/templates/builder.html:35 app/templates/builder.html:44
+msgid "Save Tree"
+msgstr "Boom opslaan"
+
+#: app/templates/builder.html:37
+msgid "Tree Name"
+msgstr "Boomnaam"
+
+#: app/templates/builder.html:38
+msgid "Enter tree name"
+msgstr "Voer boomnaam in"
+
+#: app/templates/builder.html:42 app/templates/list.html:65
+msgid "Make Public"
+msgstr "Openbaar maken"
+
+#: app/templates/builder.html:49
+msgid "Load Tree from database"
+msgstr "Boom laden uit database"
+
+#: app/templates/builder.html:50 app/templates/list.html:30
+msgid "Search trees..."
+msgstr "Bomen zoeken..."
+
+#: app/templates/builder.html:52
+msgid "Load Tree"
+msgstr "Boom laden"
+
+#: app/templates/builder.html:60
+msgid "Visualize Tree"
+msgstr "Boom visualiseren"
+
+#: app/templates/builder.html:72
+msgid "Interactive Tree Visualization"
+msgstr "Interactieve boomvisualisatie"
+
+#: app/templates/builder.html:79
+msgid "Close"
+msgstr "Sluiten"
+
+#: app/templates/builder.html:80 app/templates/list.html:98
+msgid "Export to PDF"
+msgstr "Exporteren naar PDF"
+
+#: app/templates/builder.html:89
+msgid "Node Description"
+msgstr "Knoopbeschrijving"
+
+#: app/templates/builder.html:91
+msgid "Enter node description..."
+msgstr "Voer knoopbeschrijving in..."
+
+#: app/templates/builder.html:96
+msgid "Images"
+msgstr "Afbeeldingen"
+
+#: app/templates/builder.html:97 app/templates/list.html:146
+msgid "Search images..."
+msgstr "Afbeeldingen zoeken..."
+
+#: app/templates/builder.html:103
+msgid "Delete selected branch"
+msgstr "Geselecteerde tak verwijderen"
+
+#: app/templates/builder.html:104
+msgid "New tree"
+msgstr "Nieuwe boom"
+
+#: app/templates/forgot_password.html:5
+msgid "Reset Password"
+msgstr "Wachtwoord opnieuw instellen"
+
+#: app/templates/index.html:8
+msgid "Welcome to Pictogram-Tree Builder"
+msgstr "Welkom bij de Pictogrammenboom-bouwer"
+
+#: app/templates/index.html:9
+msgid "Create and share your own pictogram trees."
+msgstr "Maak en deel uw eigen pictogrammenbomen."
+
+#: app/templates/index.html:11
+#, python-format
+msgid "Hi, %(username)s!"
+msgstr "Hallo, %(username)s!"
+
+#: app/templates/index.html:13
+msgid "Get Started"
+msgstr "Aan de slag"
+
+#: app/templates/index.html:27 app/templates/pictogram_bank.html:24
+msgid "Create"
+msgstr "Maken"
+
+#: app/templates/index.html:28
+msgid ""
+"Easily build your own pictogram trees with our intuitive drag-and-drop "
+"interface."
+msgstr "Bouw eenvoudig uw eigen pictogrammenbomen met onze intuïtieve drag-and-drop-interface."
+
+#: app/templates/index.html:35
+msgid "Share"
+msgstr "Delen"
+
+#: app/templates/index.html:36
+msgid "Share your creations with others by making them public."
+msgstr "Deel uw creaties met anderen door ze openbaar te maken."
+
+#: app/templates/index.html:43 app/templates/list.html:122
+msgid "Export"
+msgstr "Exporteren"
+
+#: app/templates/index.html:44
+msgid "Export your trees as JSON files to use them anywhere."
+msgstr "Exporteer uw bomen als JSON-bestanden om ze overal te gebruiken."
+
+#: app/templates/list.html:17
+msgid "Tree Source"
+msgstr "Boombron"
+
+#: app/templates/list.html:19
+msgid "Import Tree from JSON"
+msgstr "Boom importeren uit JSON"
+
+#: app/templates/list.html:25
+msgid "Load Tree from Database"
+msgstr "Boom laden uit database"
+
+#: app/templates/list.html:34
+msgid "Load Selected Tree"
+msgstr "Geselecteerde boom laden"
+
+#: app/templates/list.html:43
+msgid "List Operations"
+msgstr "Lijstbewerkingen"
+
+#: app/templates/list.html:45
+msgid "Import List from JSON"
+msgstr "Lijst importeren uit JSON"
+
+#: app/templates/list.html:46
+msgid "Export List to JSON"
+msgstr "Lijst exporteren naar JSON"
+
+#: app/templates/list.html:54
+msgid "Save List to Database"
+msgstr "Lijst opslaan in database"
+
+#: app/templates/list.html:60
+msgid "List Name"
+msgstr "Lijstnaam"
+
+#: app/templates/list.html:61
+msgid "Enter list name"
+msgstr "Voer lijstnaam in"
+
+#: app/templates/list.html:67
+msgid "Save List"
+msgstr "Lijst opslaan"
+
+#: app/templates/list.html:75
+msgid "Load List from Database"
+msgstr "Lijst laden uit database"
+
+#: app/templates/list.html:80
+msgid "Search lists..."
+msgstr "Lijsten zoeken..."
+
+#: app/templates/list.html:84
+msgid "Load Selected List"
+msgstr "Geselecteerde lijst laden"
+
+#: app/templates/list.html:93
+msgid "Export Operations"
+msgstr "Exportbewerkingen"
+
+#: app/templates/list.html:104
+msgid "Image Size"
+msgstr "Afbeeldingsgrootte"
+
+#: app/templates/list.html:108
+msgid "Layout Mode"
+msgstr "Layoutmodus"
+
+#: app/templates/list.html:112
+msgid "Chain Mode"
+msgstr "Ketenmodus"
+
+#: app/templates/list.html:118
+msgid "Grid Mode"
+msgstr "Rastermodus"
+
+#: app/templates/list.html:132
+msgid "Select from Tree"
+msgstr "Selecteren uit boom"
+
+#: app/templates/list.html:133 app/templates/list.html:144
+msgid "Drag to copy to list"
+msgstr "Slepen om naar lijst te kopiëren"
+
+#: app/templates/list.html:143
+msgid "Select from Images"
+msgstr "Selecteren uit afbeeldingen"
+
+#: app/templates/list.html:151
+msgid "Selected Link Description"
+msgstr "Beschrijving van geselecteerde link"
+
+#: app/templates/list.html:152
+msgid "Select a link from the bottom list to edit its description..."
+msgstr "Selecteer een link uit de onderste lijst om de beschrijving ervan te bewerken..."
+
+#: app/templates/list.html:161
+msgid "Chained List Builder"
+msgstr "Gekoppelde lijst-bouwer"
+
+#: app/templates/list.html:163
+msgid "Delete Selected Link"
+msgstr "Geselecteerde link verwijderen"
+
+#: app/templates/list.html:164
+msgid "New Chain"
+msgstr "Nieuwe keten"
+
+#: app/templates/login.html:8
+msgid "Sign In"
+msgstr "Inloggen"
+
+#: app/templates/login.html:31
+msgid "New User?"
+msgstr "Nieuwe gebruiker?"
+
+#: app/templates/login.html:31
+msgid "Click to Register!"
+msgstr "Klik om te registreren!"
+
+#: app/templates/login.html:32
+msgid "Forgot Your Password?"
+msgstr "Wachtwoord vergeten?"
+
+#: app/templates/pictogram_bank.html:9
+msgid "My Pictograms"
+msgstr "Mijn pictogrammen"
+
+#: app/templates/pictogram_bank.html:10
+msgid "Root"
+msgstr "Hoofdmap"
+
+#: app/templates/pictogram_bank.html:11
+msgid "Delete"
+msgstr "Verwijderen"
+
+#: app/templates/pictogram_bank.html:21
+msgid "Create Folder"
+msgstr "Map maken"
+
+#: app/templates/pictogram_bank.html:23
+msgid "Folder name"
+msgstr "Mapnaam"
+
+#: app/templates/pictogram_bank.html:29
+msgid "Import Image"
+msgstr "Afbeelding importeren"
+
+#: app/templates/pictogram_bank.html:31
+msgid "Upload from disk"
+msgstr "Uploaden vanaf schijf"
+
+#: app/templates/pictogram_bank.html:34
+msgid "Choose File"
+msgstr "Kies bestand"
+
+#: app/templates/pictogram_bank.html:35
+msgid "No file chosen"
+msgstr "Geen bestand gekozen"
+
+#: app/templates/pictogram_bank.html:39
+msgid "Description (optional)"
+msgstr "Beschrijving (optioneel)"
+
+#: app/templates/pictogram_bank.html:42
+msgid "Upload"
+msgstr "Uploaden"
+
+#: app/templates/pictogram_bank.html:47
+msgid "Edit Selected Image"
+msgstr "Geselecteerde afbeelding bewerken"
+
+#: app/templates/pictogram_bank.html:49
+msgid "Description"
+msgstr "Beschrijving"
+
+#: app/templates/pictogram_bank.html:55
+msgid "Make image public"
+msgstr "Afbeelding openbaar maken"
+
+#: app/templates/pictogram_bank.html:58
+msgid "Save Changes"
+msgstr "Wijzigingen opslaan"
+
+#: app/templates/pictogram_bank.html:63
+msgid "Export Image"
+msgstr "Afbeelding exporteren"
+
+#: app/templates/pictogram_bank.html:64
+msgid "Download Selected Image"
+msgstr "Geselecteerde afbeelding downloaden"
+
+#: app/templates/register.html:8
+msgid "Register"
+msgstr "Registreren"
+
+#: app/templates/resend_confirmation_request.html:5
+msgid "Resend Confirmation Email"
+msgstr "Bevestigingsmail opnieuw verzenden"
+
+#: app/templates/resend_confirmation_request.html:6
+msgid ""
+"Please enter your account's email address. If a matching account is found"
+" and is not yet confirmed, we will send a new confirmation email."
+msgstr "Voer het e-mailadres van uw account in. Als er een overeenkomend account wordt gevonden en dit nog niet is bevestigd, sturen we een nieuwe bevestigingsmail."
+
+#: app/templates/reset_password_form.html:5
+msgid "Reset Your Password"
+msgstr "Stel uw wachtwoord opnieuw in"
+
+#: app/templates/emails/confirm_email.html:1
+#: app/templates/emails/reset_password.html:1
+msgid "Hello,"
+msgstr "Hallo,"
+
+#: app/templates/emails/confirm_email.html:2
+msgid ""
+"Thank you for registering. Please click the link below to activate your "
+"account:"
+msgstr "Bedankt voor uw registratie. Klik op de onderstaande link om uw account te activeren:"
+
+#: app/templates/emails/reset_password.html:2
+msgid "You have requested a password reset. Click the following link to continue:"
+msgstr "U heeft een wachtwoordreset aangevraagd. Klik op de volgende link om door te gaan:"
+
+#: app/templates/emails/reset_password.html:4
+msgid "If you did not make this request, please ignore this email."
+msgstr "Als u dit verzoek niet heeft gedaan, negeer deze e-mail dan."

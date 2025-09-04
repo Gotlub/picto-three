@@ -1,0 +1,715 @@
+# Polish translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-09-04 07:05+0000\n"
+"PO-Revision-Date: 2025-09-04 07:05+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pl\n"
+"Language-Team: pl <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && "
+"(n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/routes.py:40
+msgid "Invalid username or password"
+msgstr "Nieprawidłowa nazwa użytkownika lub hasło"
+
+#: app/routes.py:44
+#, python-format
+msgid ""
+"Your account is not confirmed. Please check your emails. <a "
+"href=\"%(url)s\">Resend confirmation email?</a>"
+msgstr "Twoje konto nie jest potwierdzone. Sprawdź swoją pocztę e-mail. <a href=\"%(url)s\">Wysłać ponownie e-mail z potwierdzeniem?</a>"
+
+#: app/routes.py:62
+msgid "An email with instructions to reset your password has been sent."
+msgstr "Wysłano wiadomość e-mail z instrukcjami dotyczącymi resetowania hasła."
+
+#: app/routes.py:64
+msgid "No account found with that email address."
+msgstr "Nie znaleziono konta o podanym adresie e-mail."
+
+#: app/routes.py:74
+msgid "The reset link is invalid or has expired."
+msgstr "Link do resetowania jest nieprawidłowy lub wygasł."
+
+#: app/routes.py:82
+msgid "Your password has been reset successfully."
+msgstr "Twoje hasło zostało pomyślnie zresetowane."
+
+#: app/routes.py:110
+msgid "Your password has been changed successfully."
+msgstr "Twoje hasło zostało pomyślnie zmienione."
+
+#: app/routes.py:112
+msgid "Invalid current password."
+msgstr "Nieprawidłowe bieżące hasło."
+
+#: app/routes.py:116 app/routes.py:190
+#, python-format
+msgid "Error in %(field)s: %(error)s"
+msgstr "Błąd w %(field)s: %(error)s"
+
+#: app/routes.py:142
+msgid "Your account has been successfully deleted."
+msgstr "Twoje konto zostało pomyślnie usunięte."
+
+#: app/routes.py:145
+msgid "Invalid username confirmation. Account deletion cancelled."
+msgstr "Nieprawidłowe potwierdzenie nazwy użytkownika. Anulowano usuwanie konta."
+
+#: app/routes.py:148
+msgid "Invalid form submission."
+msgstr "Nieprawidłowe przesłanie formularza."
+
+#: app/routes.py:184
+msgid "A confirmation email has been sent to your email address."
+msgstr "Na Twój adres e-mail wysłano wiadomość z potwierdzeniem."
+
+#: app/routes.py:187
+msgid "Registration failed. Please check the errors below."
+msgstr "Rejestracja nie powiodła się. Sprawdź poniższe błędy."
+
+#: app/routes.py:197
+msgid "The confirmation link is invalid or has expired."
+msgstr "Link potwierdzający jest nieprawidłowy lub wygasł."
+
+#: app/routes.py:202
+msgid "Account already confirmed. Please login."
+msgstr "Konto już potwierdzone. Zaloguj się."
+
+#: app/routes.py:207
+msgid "Your account has been confirmed successfully!"
+msgstr "Twoje konto zostało pomyślnie potwierdzone!"
+
+#: app/routes.py:219
+msgid "This account is already confirmed. Please login."
+msgstr "To konto jest już potwierdzone. Zaloguj się."
+
+#: app/routes.py:225
+msgid "A new confirmation email has been sent."
+msgstr "Wysłano nową wiadomość e-mail z potwierdzeniem."
+
+#: app/routes.py:228
+msgid "No account found with that email address. Please register."
+msgstr "Nie znaleziono konta o podanym adresie e-mail. Zarejestruj się."
+
+#: app/routes.py:242
+msgid "Invalid tree data received."
+msgstr "Otrzymano nieprawidłowe dane drzewa."
+
+#: app/routes.py:343
+msgid "Your language has been updated."
+msgstr "Twój język został zaktualizowany."
+
+#: app/routes.py:347
+msgid "The language has been updated for this session."
+msgstr "Język został zaktualizowany dla tej sesji."
+
+#: app/routes.py:406 app/routes.py:475 app/routes.py:543 app/routes.py:675
+#: app/routes.py:760
+msgid "Invalid data"
+msgstr "Nieprawidłowe dane"
+
+#: app/routes.py:413
+msgid "Missing required fields: list_name and payload are required."
+msgstr "Brak wymaganych pól: list_name i payload są wymagane."
+
+#: app/routes.py:429
+msgid ""
+"Public lists can only contain global public images. Please remove any "
+"user-owned images before saving publicly."
+msgstr "Listy publiczne mogą zawierać tylko globalne obrazy publiczne. Przed publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
+
+#: app/routes.py:441 app/routes.py:487
+msgid "List updated successfully"
+msgstr "Lista zaktualizowana pomyślnie"
+
+#: app/routes.py:452
+msgid "List saved successfully"
+msgstr "Lista zapisana pomyślnie"
+
+#: app/routes.py:469 app/routes.py:496
+msgid "List not found"
+msgstr "Nie znaleziono listy"
+
+#: app/routes.py:471 app/routes.py:498 app/routes.py:519
+msgid "Unauthorized"
+msgstr "Nieautoryzowany"
+
+#: app/routes.py:503
+msgid "List deleted successfully"
+msgstr "Lista usunięta pomyślnie"
+
+#: app/routes.py:510
+msgid "parent_id is required"
+msgstr "parent_id jest wymagany"
+
+#: app/routes.py:514
+msgid "Folder not found"
+msgstr "Nie znaleziono folderu"
+
+#: app/routes.py:534
+msgid "Root folder not found"
+msgstr "Nie znaleziono folderu głównego"
+
+#: app/routes.py:550
+msgid "Parent folder not found or not owned by user"
+msgstr "Folder nadrzędny nie został znaleziony lub nie jest własnością użytkownika"
+
+#: app/routes.py:561
+#, python-format
+msgid "Could not create directory: %(error)s"
+msgstr "Nie można utworzyć katalogu: %(error)s"
+
+#: app/routes.py:582
+msgid "No file part"
+msgstr "Brak części pliku"
+
+#: app/routes.py:586
+msgid "No selected file"
+msgstr "Nie wybrano pliku"
+
+#: app/routes.py:590
+msgid "No folder_id specified"
+msgstr "Nie określono folder_id"
+
+#: app/routes.py:594 app/routes.py:768
+msgid "Folder not found or not owned by user"
+msgstr "Folder nie został znaleziony lub nie jest własnością użytkownika"
+
+#: app/routes.py:622
+msgid "File upload failed"
+msgstr "Przesyłanie pliku nie powiodło się"
+
+#: app/routes.py:633
+msgid "Image not found"
+msgstr "Nie znaleziono obrazu"
+
+#: app/routes.py:637
+msgid "Unauthorized to edit this image"
+msgstr "Brak uprawnień do edycji tego obrazu"
+
+#: app/routes.py:641
+msgid "Invalid JSON data"
+msgstr "Nieprawidłowe dane JSON"
+
+#: app/routes.py:654
+msgid "Image updated successfully"
+msgstr "Obraz zaktualizowany pomyślnie"
+
+#: app/routes.py:682
+msgid "Missing required fields"
+msgstr "Brak wymaganych pól"
+
+#: app/routes.py:687
+msgid "Cannot save an empty tree as public."
+msgstr "Nie można zapisać pustego drzewa jako publicznego."
+
+#: app/routes.py:696
+msgid ""
+"Public trees can only contain global public images. Please remove any "
+"user-owned images before saving publicly."
+msgstr "Drzewa publiczne mogą zawierać tylko globalne obrazy publiczne. Przed publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
+
+#: app/routes.py:706
+msgid "Tree updated successfully"
+msgstr "Drzewo zaktualizowane pomyślnie"
+
+#: app/routes.py:716
+msgid "Tree saved successfully"
+msgstr "Drzewo zapisane pomyślnie"
+
+#: app/routes.py:771
+msgid "Cannot delete root folder"
+msgstr "Nie można usunąć folderu głównego"
+
+#: app/routes.py:775
+msgid "Folder and all its contents deleted"
+msgstr "Folder i cała jego zawartość usunięte"
+
+#: app/routes.py:780
+msgid "Image not found or not owned by user"
+msgstr "Obraz nie został znaleziony lub nie jest własnością użytkownika"
+
+#: app/routes.py:787
+#, python-format
+msgid "Could not delete file: %(error)s"
+msgstr "Nie można usunąć pliku: %(error)s"
+
+#: app/routes.py:791
+msgid "Image deleted"
+msgstr "Obraz usunięty"
+
+#: app/routes.py:793
+msgid "Invalid item type"
+msgstr "Nieprawidłowy typ elementu"
+
+#: app/routes.py:808
+msgid "No images to export"
+msgstr "Brak obrazów do wyeksportowania"
+
+#: app/templates/account.html:5
+msgid "Account Management"
+msgstr "Zarządzanie kontem"
+
+#: app/templates/account.html:10
+msgid "Change Password"
+msgstr "Zmień hasło"
+
+#: app/templates/account.html:29 app/templates/account.html:32
+msgid "Delete Account"
+msgstr "Usuń konto"
+
+#: app/templates/account.html:30
+msgid "Once you delete your account, there is no going back. Please be certain."
+msgstr "Po usunięciu konta nie ma odwrotu. Proszę być pewnym."
+
+#: app/templates/account.html:43
+msgid "Confirm Account Deletion"
+msgstr "Potwierdź usunięcie konta"
+
+#: app/templates/account.html:47
+msgid ""
+"Are you sure you want to delete your account? This action cannot be "
+"undone. All your data will be permanently lost."
+msgstr "Czy na pewno chcesz usunąć swoje konto? Tej czynności nie można cofnąć. Wszystkie Twoje dane zostaną trwale utracone."
+
+#: app/templates/account.html:48
+msgid "To confirm, please type your username below:"
+msgstr "Aby potwierdzić, wpisz poniżej swoją nazwę użytkownika:"
+
+#: app/templates/account.html:51
+msgid "Your username"
+msgstr "Twoja nazwa użytkownika"
+
+#: app/templates/account.html:55
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: app/templates/account.html:56
+msgid "Delete My Account"
+msgstr "Usuń moje konto"
+
+#: app/templates/base.html:6 app/templates/base.html:28
+#: app/templates/base.html:101
+msgid "Pictogram-Tree Builder"
+msgstr "Konstruktor drzewa piktogramów"
+
+#: app/templates/base.html:29
+msgid "Toggle navigation"
+msgstr "Przełącz nawigację"
+
+#: app/templates/base.html:35
+msgid "Home"
+msgstr "Strona główna"
+
+#: app/templates/base.html:38 app/templates/builder.html:59
+msgid "Tree Builder"
+msgstr "Konstruktor drzewa"
+
+#: app/templates/base.html:41
+msgid "List Builder"
+msgstr "Konstruktor listy"
+
+#: app/templates/base.html:45
+msgid "Pictogram Bank"
+msgstr "Bank piktogramów"
+
+#: app/templates/base.html:67
+msgid "Login"
+msgstr "Zaloguj się"
+
+#: app/templates/base.html:71
+msgid "Account"
+msgstr "Konto"
+
+#: app/templates/base.html:74
+msgid "Logout"
+msgstr "Wyloguj się"
+
+#: app/templates/base.html:99
+#, python-format
+msgid "Logged in as: %(username)s"
+msgstr "Zalogowany jako: %(username)s"
+
+#: app/templates/builder.html:10
+msgid "Import Options"
+msgstr "Opcje importu"
+
+#: app/templates/builder.html:13
+msgid "Replace existing tree"
+msgstr "Zastąp istniejące drzewo"
+
+#: app/templates/builder.html:18
+msgid "Add to existing tree"
+msgstr "Dodaj do istniejącego drzewa"
+
+#: app/templates/builder.html:24
+msgid "File Operations"
+msgstr "Operacje na plikach"
+
+#: app/templates/builder.html:26
+msgid "Import from JSON"
+msgstr "Importuj z JSON"
+
+#: app/templates/builder.html:27
+msgid "Export to JSON"
+msgstr "Eksportuj do JSON"
+
+#: app/templates/builder.html:33
+msgid "Database Operations"
+msgstr "Operacje na bazie danych"
+
+#: app/templates/builder.html:35 app/templates/builder.html:44
+msgid "Save Tree"
+msgstr "Zapisz drzewo"
+
+#: app/templates/builder.html:37
+msgid "Tree Name"
+msgstr "Nazwa drzewa"
+
+#: app/templates/builder.html:38
+msgid "Enter tree name"
+msgstr "Wprowadź nazwę drzewa"
+
+#: app/templates/builder.html:42 app/templates/list.html:65
+msgid "Make Public"
+msgstr "Upublicznij"
+
+#: app/templates/builder.html:49
+msgid "Load Tree from database"
+msgstr "Załaduj drzewo z bazy danych"
+
+#: app/templates/builder.html:50 app/templates/list.html:30
+msgid "Search trees..."
+msgstr "Szukaj drzew..."
+
+#: app/templates/builder.html:52
+msgid "Load Tree"
+msgstr "Załaduj drzewo"
+
+#: app/templates/builder.html:60
+msgid "Visualize Tree"
+msgstr "Wizualizuj drzewo"
+
+#: app/templates/builder.html:72
+msgid "Interactive Tree Visualization"
+msgstr "Interaktywna wizualizacja drzewa"
+
+#: app/templates/builder.html:79
+msgid "Close"
+msgstr "Zamknij"
+
+#: app/templates/builder.html:80 app/templates/list.html:98
+msgid "Export to PDF"
+msgstr "Eksportuj do PDF"
+
+#: app/templates/builder.html:89
+msgid "Node Description"
+msgstr "Opis węzła"
+
+#: app/templates/builder.html:91
+msgid "Enter node description..."
+msgstr "Wprowadź opis węzła..."
+
+#: app/templates/builder.html:96
+msgid "Images"
+msgstr "Obrazy"
+
+#: app/templates/builder.html:97 app/templates/list.html:146
+msgid "Search images..."
+msgstr "Szukaj obrazów..."
+
+#: app/templates/builder.html:103
+msgid "Delete selected branch"
+msgstr "Usuń wybraną gałąź"
+
+#: app/templates/builder.html:104
+msgid "New tree"
+msgstr "Nowe drzewo"
+
+#: app/templates/forgot_password.html:5
+msgid "Reset Password"
+msgstr "Zresetuj hasło"
+
+#: app/templates/index.html:8
+msgid "Welcome to Pictogram-Tree Builder"
+msgstr "Witamy w Konstruktorze drzewa piktogramów"
+
+#: app/templates/index.html:9
+msgid "Create and share your own pictogram trees."
+msgstr "Twórz i udostępniaj własne drzewa piktogramów."
+
+#: app/templates/index.html:11
+#, python-format
+msgid "Hi, %(username)s!"
+msgstr "Cześć, %(username)s!"
+
+#: app/templates/index.html:13
+msgid "Get Started"
+msgstr "Zaczynaj"
+
+#: app/templates/index.html:27 app/templates/pictogram_bank.html:24
+msgid "Create"
+msgstr "Utwórz"
+
+#: app/templates/index.html:28
+msgid ""
+"Easily build your own pictogram trees with our intuitive drag-and-drop "
+"interface."
+msgstr "Łatwo buduj własne drzewa piktogramów za pomocą naszego intuicyjnego interfejsu przeciągnij i upuść."
+
+#: app/templates/index.html:35
+msgid "Share"
+msgstr "Udostępnij"
+
+#: app/templates/index.html:36
+msgid "Share your creations with others by making them public."
+msgstr "Udostępniaj swoje dzieła innym, upubliczniając je."
+
+#: app/templates/index.html:43 app/templates/list.html:122
+msgid "Export"
+msgstr "Eksportuj"
+
+#: app/templates/index.html:44
+msgid "Export your trees as JSON files to use them anywhere."
+msgstr "Eksportuj swoje drzewa jako pliki JSON, aby używać ich w dowolnym miejscu."
+
+#: app/templates/list.html:17
+msgid "Tree Source"
+msgstr "Źródło drzewa"
+
+#: app/templates/list.html:19
+msgid "Import Tree from JSON"
+msgstr "Importuj drzewo z JSON"
+
+#: app/templates/list.html:25
+msgid "Load Tree from Database"
+msgstr "Załaduj drzewo z bazy danych"
+
+#: app/templates/list.html:34
+msgid "Load Selected Tree"
+msgstr "Załaduj wybrane drzewo"
+
+#: app/templates/list.html:43
+msgid "List Operations"
+msgstr "Operacje na liście"
+
+#: app/templates/list.html:45
+msgid "Import List from JSON"
+msgstr "Importuj listę z JSON"
+
+#: app/templates/list.html:46
+msgid "Export List to JSON"
+msgstr "Eksportuj listę do JSON"
+
+#: app/templates/list.html:54
+msgid "Save List to Database"
+msgstr "Zapisz listę w bazie danych"
+
+#: app/templates/list.html:60
+msgid "List Name"
+msgstr "Nazwa listy"
+
+#: app/templates/list.html:61
+msgid "Enter list name"
+msgstr "Wprowadź nazwę listy"
+
+#: app/templates/list.html:67
+msgid "Save List"
+msgstr "Zapisz listę"
+
+#: app/templates/list.html:75
+msgid "Load List from Database"
+msgstr "Załaduj listę z bazy danych"
+
+#: app/templates/list.html:80
+msgid "Search lists..."
+msgstr "Szukaj list..."
+
+#: app/templates/list.html:84
+msgid "Load Selected List"
+msgstr "Załaduj wybraną listę"
+
+#: app/templates/list.html:93
+msgid "Export Operations"
+msgstr "Operacje eksportu"
+
+#: app/templates/list.html:104
+msgid "Image Size"
+msgstr "Rozmiar obrazu"
+
+#: app/templates/list.html:108
+msgid "Layout Mode"
+msgstr "Tryb układu"
+
+#: app/templates/list.html:112
+msgid "Chain Mode"
+msgstr "Tryb łańcucha"
+
+#: app/templates/list.html:118
+msgid "Grid Mode"
+msgstr "Tryb siatki"
+
+#: app/templates/list.html:132
+msgid "Select from Tree"
+msgstr "Wybierz z drzewa"
+
+#: app/templates/list.html:133 app/templates/list.html:144
+msgid "Drag to copy to list"
+msgstr "Przeciągnij, aby skopiować do listy"
+
+#: app/templates/list.html:143
+msgid "Select from Images"
+msgstr "Wybierz z obrazów"
+
+#: app/templates/list.html:151
+msgid "Selected Link Description"
+msgstr "Opis wybranego linku"
+
+#: app/templates/list.html:152
+msgid "Select a link from the bottom list to edit its description..."
+msgstr "Wybierz link z dolnej listy, aby edytować jego opis..."
+
+#: app/templates/list.html:161
+msgid "Chained List Builder"
+msgstr "Konstruktor listy połączonej"
+
+#: app/templates/list.html:163
+msgid "Delete Selected Link"
+msgstr "Usuń wybrany link"
+
+#: app/templates/list.html:164
+msgid "New Chain"
+msgstr "Nowy łańcuch"
+
+#: app/templates/login.html:8
+msgid "Sign In"
+msgstr "Zaloguj się"
+
+#: app/templates/login.html:31
+msgid "New User?"
+msgstr "Nowy użytkownik?"
+
+#: app/templates/login.html:31
+msgid "Click to Register!"
+msgstr "Kliknij, aby się zarejestrować!"
+
+#: app/templates/login.html:32
+msgid "Forgot Your Password?"
+msgstr "Zapomniałeś hasła?"
+
+#: app/templates/pictogram_bank.html:9
+msgid "My Pictograms"
+msgstr "Moje piktogramy"
+
+#: app/templates/pictogram_bank.html:10
+msgid "Root"
+msgstr "Główny"
+
+#: app/templates/pictogram_bank.html:11
+msgid "Delete"
+msgstr "Usuń"
+
+#: app/templates/pictogram_bank.html:21
+msgid "Create Folder"
+msgstr "Utwórz folder"
+
+#: app/templates/pictogram_bank.html:23
+msgid "Folder name"
+msgstr "Nazwa folderu"
+
+#: app/templates/pictogram_bank.html:29
+msgid "Import Image"
+msgstr "Importuj obraz"
+
+#: app/templates/pictogram_bank.html:31
+msgid "Upload from disk"
+msgstr "Prześlij z dysku"
+
+#: app/templates/pictogram_bank.html:34
+msgid "Choose File"
+msgstr "Wybierz plik"
+
+#: app/templates/pictogram_bank.html:35
+msgid "No file chosen"
+msgstr "Nie wybrano pliku"
+
+#: app/templates/pictogram_bank.html:39
+msgid "Description (optional)"
+msgstr "Opis (opcjonalnie)"
+
+#: app/templates/pictogram_bank.html:42
+msgid "Upload"
+msgstr "Prześlij"
+
+#: app/templates/pictogram_bank.html:47
+msgid "Edit Selected Image"
+msgstr "Edytuj wybrany obraz"
+
+#: app/templates/pictogram_bank.html:49
+msgid "Description"
+msgstr "Opis"
+
+#: app/templates/pictogram_bank.html:55
+msgid "Make image public"
+msgstr "Upublicznij obraz"
+
+#: app/templates/pictogram_bank.html:58
+msgid "Save Changes"
+msgstr "Zapisz zmiany"
+
+#: app/templates/pictogram_bank.html:63
+msgid "Export Image"
+msgstr "Eksportuj obraz"
+
+#: app/templates/pictogram_bank.html:64
+msgid "Download Selected Image"
+msgstr "Pobierz wybrany obraz"
+
+#: app/templates/register.html:8
+msgid "Register"
+msgstr "Zarejestruj się"
+
+#: app/templates/resend_confirmation_request.html:5
+msgid "Resend Confirmation Email"
+msgstr "Wyślij ponownie e-mail z potwierdzeniem"
+
+#: app/templates/resend_confirmation_request.html:6
+msgid ""
+"Please enter your account's email address. If a matching account is found"
+" and is not yet confirmed, we will send a new confirmation email."
+msgstr "Wprowadź adres e-mail swojego konta. Jeśli zostanie znalezione pasujące konto, a nie jest ono jeszcze potwierdzone, wyślemy nową wiadomość e-mail z potwierdzeniem."
+
+#: app/templates/reset_password_form.html:5
+msgid "Reset Your Password"
+msgstr "Zresetuj swoje hasło"
+
+#: app/templates/emails/confirm_email.html:1
+#: app/templates/emails/reset_password.html:1
+msgid "Hello,"
+msgstr "Cześć,"
+
+#: app/templates/emails/confirm_email.html:2
+msgid ""
+"Thank you for registering. Please click the link below to activate your "
+"account:"
+msgstr "Dziękujemy za rejestrację. Kliknij poniższy link, aby aktywować swoje konto:"
+
+#: app/templates/emails/reset_password.html:2
+msgid "You have requested a password reset. Click the following link to continue:"
+msgstr "Zażądałeś zresetowania hasła. Kliknij poniższy link, aby kontynuować:"
+
+#: app/templates/emails/reset_password.html:4
+msgid "If you did not make this request, please ignore this email."
+msgstr "Jeśli nie złożyłeś tego żądania, zignoruj tę wiadomość e-mail."

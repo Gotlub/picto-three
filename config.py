@@ -19,7 +19,7 @@ class Config:
     # Path for storing uploaded pictograms
     PICTOGRAMS_PATH = data_dir / "pictograms"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    LANGUAGES = ['en', 'fr', 'es']
+    LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl']
 
     # Email configuration
     MAIL_SERVER = 'smtp.gmail.com'
