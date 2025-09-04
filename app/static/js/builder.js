@@ -69,7 +69,16 @@ class ImageTreeFolderNode extends ImageTreeNode {
             this.icon.src = '/static/images/folder-open-bold.png';
             this.childrenContainer.style.display = '';
             if (!this.childrenLoaded) {
-                this.loadChildren();
+                this.loadChildren().then(() => {
+                    // After children are loaded, filter them
+                    const currentFilter = this.imageTree.currentFilterTerm;
+                    if (currentFilter) {
+                        const visibleNodes = new Set();
+                        this.children.forEach(child => {
+                            child.filter(currentFilter, visibleNodes);
+                        });
+                    }
+                });
             }
         } else {
             this.icon.src = '/static/images/folder-bold.png';
@@ -196,6 +205,7 @@ class ImageTree {
         this.initialData = initialData;
         this.onImageClick = onImageClick;
         this.rootNodes = [];
+        this.currentFilterTerm = ""; // To store the current filter
         this.init();
     }
 
@@ -210,8 +220,9 @@ class ImageTree {
     }
 
     filter(term) {
+        this.currentFilterTerm = term.toLowerCase();
         const visibleNodes = new Set();
-        this.rootNodes.forEach(theNode => theNode.filter(term.toLowerCase(), visibleNodes));
+        this.rootNodes.forEach(theNode => theNode.filter(this.currentFilterTerm, visibleNodes));
     }
 }
 
