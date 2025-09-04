@@ -19,6 +19,7 @@ class ImageTreeFolderNode extends ImageTreeNode {
         super(data, imageTree);
         this.expanded = false;
         this.childrenLoaded = false;
+        this.imageRefs = [];
     }
 
     createElement() {
@@ -48,6 +49,18 @@ class ImageTreeFolderNode extends ImageTreeNode {
         contentElement.addEventListener('click', () => this.toggle());
 
         return nodeElement;
+    }
+
+    async preloadImageRefs() {
+        try {
+            const response = await fetch(`/api/folders/${this.data.id}/images_refs`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            this.imageRefs = await response.json();
+        } catch (error) {
+            console.error(`Could not preload image refs for folder ${this.data.id}:`, error);
+        }
     }
 
     toggle() {
@@ -95,24 +108,34 @@ class ImageTreeFolderNode extends ImageTreeNode {
 
     filter(term, visibleNodes) {
         const nameMatch = this.data.name.toLowerCase().includes(term);
-        let childrenMatch = false;
 
+        let childrenMatch = false;
         this.children.forEach(child => {
             if (child.filter(term, visibleNodes)) {
                 childrenMatch = true;
             }
         });
 
-        if (nameMatch || childrenMatch) {
+        let refMatch = false;
+        // Only check the preloaded references if the folder's children haven't been loaded.
+        // If the children are loaded, they are the source of truth and are handled by the `childrenMatch` logic.
+        if (this.children.length === 0) {
+            refMatch = this.imageRefs.some(img => img.name.toLowerCase().includes(term));
+        }
+
+        const match = nameMatch || childrenMatch || refMatch;
+
+        if (match) {
             this.element.style.display = '';
             visibleNodes.add(this);
+            // Auto-expand if a child is visible but the folder is collapsed
             if (childrenMatch && !this.expanded) {
                  this.toggle();
             }
         } else {
             this.element.style.display = 'none';
         }
-        return nameMatch || childrenMatch;
+        return match;
     }
 }
 
@@ -180,6 +203,7 @@ class ImageTree {
         this.container.innerHTML = '';
         this.initialData.forEach(data => {
             const theNode = new ImageTreeFolderNode(data, this);
+            theNode.preloadImageRefs();
             this.rootNodes.push(theNode);
             this.container.appendChild(theNode.element);
         });

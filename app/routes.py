@@ -526,6 +526,36 @@ def get_folder_contents():
     return jsonify(contents)
 
 
+@api_bp.route('/folders/<int:folder_id>/images_refs')
+def get_images_refs(folder_id):
+    """
+    Recursively get all image references (metadata) for a given folder.
+    """
+    start_folder = db.session.get(Folder, folder_id)
+    if not start_folder:
+        return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
+
+    # Security check: If the folder is not public, user must be logged in and own it
+    if start_folder.user_id is not None:
+        if not current_user.is_authenticated or start_folder.user_id != current_user.id:
+            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    def collect(folder):
+        results = []
+        # Add images from the current folder
+        images = Image.query.filter_by(folder_id=folder.id).all()
+        results.extend(images)
+        # Recurse into subfolders
+        subfolders = Folder.query.filter_by(parent_id=folder.id).all()
+        for f in subfolders:
+            results.extend(collect(f))
+        return results
+
+    all_images = collect(start_folder)
+    refs = [img.to_dict() for img in all_images]
+    return jsonify(refs)
+
+
 @api_bp.route('/pictograms', methods=['GET'])
 @login_required
 def get_pictograms():
