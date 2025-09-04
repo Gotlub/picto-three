@@ -319,7 +319,6 @@ class ListBuilder {
         this.selectedTreeNode = null;
 
         // Right Panel
-        this.imageSearchInput = document.getElementById('image-search-input');
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.selectImage(image), this);
         this.selectedLinkDescription = document.getElementById('selected-link-description');
@@ -373,9 +372,6 @@ class ListBuilder {
         this.loadTreeBtn?.addEventListener('click', () => this.loadSelectedTree());
         this.treeSearchInput?.addEventListener('input', () => this.filterTrees());
 
-        // Right Panel - Image Search
-        this.imageSearchInput?.addEventListener('input', () => this.filterImages());
-
         // Right Panel - Description Editor
         this.selectedLinkDescription?.addEventListener('input', () => this.updateSelectedLinkDescription());
 
@@ -413,11 +409,6 @@ class ListBuilder {
         const imageNode = document.querySelector(`#image-sidebar-tree .image[data-id='${imageData.id}'] .node-content`);
         if (imageNode) imageNode.classList.add('selected');
         // No description box for sidebar images anymore
-    }
-
-    filterImages() {
-        const searchTerm = this.imageSearchInput.value;
-        this.imageTree.filter(searchTerm);
     }
 
     // --- Drag from Source to List ---

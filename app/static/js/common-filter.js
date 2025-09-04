@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration des sélecteurs CSS ---
     const SEARCH_INPUT_ID = 'filterInput';
-    const FOLDER_CONTAINER_SELECTOR = '#category-list';
+    const FOLDER_CONTAINER_SELECTOR = '#image-sidebar-tree';
     const MAIN_IMAGE_CONTAINER_SELECTOR = '.image-container';
 
     // --- État de l'application ---
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const fetchAllPictos = async () => {
         try {
-            const response = await fetch('/api/pictograms');
+            const response = await fetch('/api/pictograms_all');
             if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
             allPictos = await response.json();
         } catch (error) {

@@ -10,20 +10,19 @@ def test_list_page_has_image_search(client):
     """Tests that the /list page contains the image search input."""
     response = client.get('/list')
     assert response.status_code == 200
-    assert b'id="image-search"' in response.data
+    assert b'id="filterInput"' in response.data
 
-def test_list_js_contains_filter_logic(client):
+def test_common_filter_js_is_used_on_list_page(client):
     """
-    Tests that the list.js file contains the filtering logic.
-    This is a proxy for a full frontend test.
+    Tests that the common-filter.js file is used on the /list page and contains the filtering logic.
     """
     # First, get the list page to find the script URL
     list_response = client.get('/list')
     assert list_response.status_code == 200
 
-    # Use regex to find the script tag for list.js, including any versioning
-    script_tag_match = re.search(r'<script src="(/static/js/list\.js[^"]*)"></script>', list_response.data.decode())
-    assert script_tag_match is not None
+    # Use regex to find the script tag for common-filter.js
+    script_tag_match = re.search(r'<script src="(/static/js/common-filter\.js[^"]*)" defer></script>', list_response.data.decode())
+    assert script_tag_match is not None, "common-filter.js script not found on /list page"
 
     script_url = script_tag_match.group(1)
 
@@ -33,7 +32,6 @@ def test_list_js_contains_filter_logic(client):
     js_content = js_response.data.decode()
 
     # Check that the key components of the filter logic exist in the file
-    assert "filterImages" in js_content
-    assert "imageTree.filter(searchTerm)" in js_content
-    assert "ImageTree.prototype.filter" not in js_content # Make sure it's on the instance
-    assert "filter(term, visibleNodes)" in js_content
+    assert "handleFilter" in js_content
+    assert "fetchAllPictos" in js_content
+    assert "fetch('/api/pictograms_all')" in js_content
