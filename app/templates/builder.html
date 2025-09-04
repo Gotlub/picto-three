@@ -94,8 +94,8 @@
 
             <!-- Images Section -->
             <h4>{{ _('Images') }}</h4>
-            <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
-            <div class="image-sidebar border p-3" id="image-sidebar-tree">
+            <input type="text" id="filterInput" class="form-control mb-2" placeholder="{{ _('Search all pictos...') }}">
+            <div class="image-sidebar border p-3 image-container" id="category-list">
                 <!-- The dynamic image tree will be built here -->
             </div>
             <hr>
@@ -132,4 +132,5 @@
 <script src="{{ url_for('static', filename='vendor/Treant.js') }}"></script>
 
 <script src="{{ url_for('static', filename='js/builder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/common-filter.js') }}" defer></script>
 {% endblock %}

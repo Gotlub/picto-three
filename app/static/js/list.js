@@ -310,10 +310,6 @@ class ListBuilder {
         this.loadTreeBtn = document.getElementById('load-tree-btn');
         this.treeSearchInput = document.getElementById('tree-search');
 
-        // Right Panel - Image Search
-        this.imageSearchInput = document.getElementById('image-search');
-
-
         // Center Panel
         this.treeDisplay = document.getElementById('tree-display');
         this.treeRoot = new ReadOnlyNode({
@@ -323,6 +319,7 @@ class ListBuilder {
         this.selectedTreeNode = null;
 
         // Right Panel
+        this.imageSearchInput = document.getElementById('image-search-input');
         const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
         this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.selectImage(image), this);
         this.selectedLinkDescription = document.getElementById('selected-link-description');
@@ -416,6 +413,11 @@ class ListBuilder {
         const imageNode = document.querySelector(`#image-sidebar-tree .image[data-id='${imageData.id}'] .node-content`);
         if (imageNode) imageNode.classList.add('selected');
         // No description box for sidebar images anymore
+    }
+
+    filterImages() {
+        const searchTerm = this.imageSearchInput.value;
+        this.imageTree.filter(searchTerm);
     }
 
     // --- Drag from Source to List ---
@@ -830,11 +832,6 @@ class ListBuilder {
                 option.style.display = optionText.includes(searchTerm) ? '' : 'none';
             });
         });
-    }
-
-    filterImages() {
-        const searchTerm = this.imageSearchInput.value;
-        this.imageTree.filter(searchTerm);
     }
 
     loadSelectedTree() {

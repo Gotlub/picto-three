@@ -793,6 +793,38 @@ def delete_item():
     return jsonify({'status': 'error', 'message': _('Invalid item type')}), 400
 
 
+@api_bp.route('/pictograms_all')
+def get_all_pictograms():
+    """
+    API endpoint to get all pictograms with their essential data in JSON format.
+    """
+    try:
+        # We only want public images or images owned by the current user
+        conditions = [Image.is_public == True]
+        if current_user.is_authenticated:
+            conditions.append(Image.user_id == current_user.id)
+
+        pictos = db.session.query(
+            Image.id,
+            Image.name,
+            Image.path,
+            Folder.name.label('category_name')
+        ).join(Folder, Image.folder_id == Folder.id).filter(or_(*conditions)).all()
+
+        pictogram_list = [
+            {
+                'id': p.id,
+                'name': p.name,
+                'path': p.path,
+                'category': p.category_name
+            }
+            for p in pictos
+        ]
+        return jsonify(pictogram_list)
+    except Exception as e:
+        print(f"Error fetching pictograms via API: {e}")
+        return jsonify({"error": "Could not fetch pictogram list"}), 500
+
 @api_bp.route('/export_pdf', methods=['POST'])
 def export_pdf():
     data = request.get_json()

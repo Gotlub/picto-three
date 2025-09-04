@@ -1,3 +1,17 @@
+/**
+ * Attache les événements nécessaires au drag-and-drop sur un élément.
+ * Cette fonction sera appelée par common-filter.js.
+ * @param {HTMLElement} element L'élément .img-list
+ */
+function attachDragEvents(element) {
+    element.addEventListener('dragstart', function(e) {
+        // S'assure de prendre l'élément img, même si on a commencé à glisser le div parent
+        const imgElement = e.target.querySelector('img') || e.target;
+        e.dataTransfer.setData('text/plain', imgElement.src);
+        e.dataTransfer.setData('image/alt', imgElement.alt);
+    });
+}
+
 // --- Start of new Image Tree for Right Sidebar ---
 
 class ImageTreeNode {
@@ -85,6 +99,7 @@ class ImageTreeFolderNode extends ImageTreeNode {
                     childNode = new ImageTreeFolderNode(childData, this.imageTree);
                 } else {
                     childNode = new ImageTreeImageNode(childData, this.imageTree);
+                    attachDragEvents(childNode.element);
                 }
                 childNode.parent = this;
                 this.children.push(childNode);
@@ -286,7 +301,6 @@ class BuilderNode {
 
 class TreeBuilder {
     constructor() {
-        this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
         this.leftSidebar = document.querySelector('.col-md-2.sidebar');
         this.rightSidebar = document.querySelector('.col-md-3.sidebar');
@@ -357,10 +371,6 @@ class TreeBuilder {
         const loadBtn = document.getElementById('load-tree-btn');
         if (loadBtn) {
             loadBtn.addEventListener('click', () => this.loadTree());
-        }
-
-        if (this.imageSearch) {
-            this.imageSearch.addEventListener('input', () => this.filterImages());
         }
 
         const deleteBtn = document.getElementById('delete-btn');
@@ -663,20 +673,44 @@ class TreeBuilder {
 
         const draggedNode = this.draggedNode;
 
-        if (!draggedNode || targetNode === draggedNode || this.isDescendant(targetNode, draggedNode)) {
-            if (this.isDescendant(targetNode, draggedNode)) {
-                alert("You cannot move a node into one of its own children.");
+        if (draggedNode) { // Internal move of an existing node in the tree
+            if (targetNode === draggedNode || this.isDescendant(targetNode, draggedNode)) {
+                if (this.isDescendant(targetNode, draggedNode)) {
+                    alert("You cannot move a node into one of its own children.");
+                }
+                return;
             }
-            return;
-        }
 
-        const oldParent = draggedNode.parent;
-        if (oldParent) {
-            oldParent.children = oldParent.children.filter(child => child !== draggedNode);
-        }
+            const oldParent = draggedNode.parent;
+            if (oldParent) {
+                oldParent.children = oldParent.children.filter(child => child !== draggedNode);
+            }
 
-        targetNode.addChild(draggedNode);
-        this.renderTree();
+            targetNode.addChild(draggedNode);
+            this.renderTree();
+        } else { // External drop from the sidebar or search results
+            const imgSrc = e.dataTransfer.getData('text/plain');
+            if (!imgSrc) return;
+
+            // The src from dataTransfer will be a full URL, e.g., "http://.../pictograms/public/actions/Help.png"
+            // The path in our `this.images` data is relative, e.g., "public/actions/Help.png"
+            // We need to find the image data that matches.
+            try {
+                const relativeSrc = new URL(imgSrc).pathname.replace('/pictograms/', '');
+                const image = this.images.find(img => img.path === relativeSrc);
+
+                if (image) {
+                    const newNode = new BuilderNode(image, this);
+                    targetNode.addChild(newNode);
+                    this.renderTree();
+                    this.selectNode(newNode);
+                } else {
+                    console.warn('Dropped image not found in available images list:', relativeSrc);
+                }
+            } catch (error) {
+                console.error('Error processing dropped image:', error);
+            }
+        }
     }
 
     handleDragEnd(e) {
@@ -858,11 +892,6 @@ class TreeBuilder {
             // Display specific error messages
             alert(`Error saving tree: ${result.message}`);
         }
-    }
-
-    filterImages() {
-        const searchTerm = this.imageSearch.value;
-        this.imageTree.filter(searchTerm);
     }
 
     filterTrees() {
