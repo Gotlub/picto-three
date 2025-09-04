@@ -96,6 +96,8 @@ class PictogramBank {
     constructor() {
         this.display = document.getElementById('pictogram-display');
         this.initialData = JSON.parse(document.getElementById('pictogram-data').textContent);
+        const fileChosen = document.getElementById('file-chosen');
+        fileChosen.dataset.defaultText = fileChosen.textContent;
 
         this.rootNode = new FolderNode(this.initialData, this);
         this.selectedNode = null;
@@ -111,6 +113,14 @@ class PictogramBank {
         document.getElementById('delete-btn').addEventListener('click', () => this.deleteSelected());
         document.getElementById('root-btn').addEventListener('click', () => this.selectRoot());
         document.getElementById('export-image-btn').addEventListener('click', () => this.exportImage());
+        document.getElementById('image-upload-file').addEventListener('change', (e) => {
+            const fileChosen = document.getElementById('file-chosen');
+            if (e.target.files.length > 0) {
+                fileChosen.textContent = e.target.files[0].name;
+            } else {
+                fileChosen.textContent = fileChosen.dataset.defaultText;
+            }
+        });
         document.getElementById('save-image-changes-btn').addEventListener('click', () => this.saveImageChanges());
 
         this.display.addEventListener('click', (e) => {

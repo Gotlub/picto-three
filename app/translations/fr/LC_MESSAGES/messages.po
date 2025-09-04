@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-03 23:23+0000\n"
+"POT-Creation-Date: 2025-09-04 00:46+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -27,11 +27,15 @@ msgstr "Nom d'utilisateur ou mot de passe invalide"
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
 "href=\"%(url)s\">Resend confirmation email?</a>"
-msgstr "Votre compte n'est pas confirmé. Veuillez consulter vos e-mails. <a href=\"%(url)s\">Renvoyer l'e-mail de confirmation ?</a>"
+msgstr ""
+"Votre compte n'est pas confirmé. Veuillez consulter vos e-mails. <a "
+"href=\"%(url)s\">Renvoyer l'e-mail de confirmation ?</a>"
 
 #: app/routes.py:62
 msgid "An email with instructions to reset your password has been sent."
-msgstr "Un e-mail avec des instructions pour réinitialiser votre mot de passe a été envoyé."
+msgstr ""
+"Un e-mail avec des instructions pour réinitialiser votre mot de passe a "
+"été envoyé."
 
 #: app/routes.py:64
 msgid "No account found with that email address."
@@ -127,7 +131,10 @@ msgstr "Champs obligatoires manquants : nom de la liste et charge utile requis."
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
-msgstr "Les listes publiques ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement."
+msgstr ""
+"Les listes publiques ne peuvent contenir que des images publiques "
+"globales. Veuillez retirer les images appartenant à des utilisateurs "
+"avant de sauvegarder publiquement."
 
 #: app/routes.py:441 app/routes.py:487
 msgid "List updated successfully"
@@ -218,7 +225,10 @@ msgstr "Impossible d'enregistrer un arbre vide en tant que public."
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
-msgstr "Les arbres publics ne peuvent contenir que des images publiques globales. Veuillez retirer les images appartenant à des utilisateurs avant de sauvegarder publiquement."
+msgstr ""
+"Les arbres publics ne peuvent contenir que des images publiques globales."
+" Veuillez retirer les images appartenant à des utilisateurs avant de "
+"sauvegarder publiquement."
 
 #: app/routes.py:706
 msgid "Tree updated successfully"
@@ -271,7 +281,9 @@ msgstr "Supprimer le compte"
 
 #: app/templates/account.html:30
 msgid "Once you delete your account, there is no going back. Please be certain."
-msgstr "Une fois que vous supprimez votre compte, il n'y a pas de retour en arrière. Soyez certain."
+msgstr ""
+"Une fois que vous supprimez votre compte, il n'y a pas de retour en "
+"arrière. Soyez certain."
 
 #: app/templates/account.html:43
 msgid "Confirm Account Deletion"
@@ -281,7 +293,9 @@ msgstr "Confirmer la suppression du compte"
 msgid ""
 "Are you sure you want to delete your account? This action cannot be "
 "undone. All your data will be permanently lost."
-msgstr "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action ne peut pas être annulée. Toutes vos données seront perdues de façon permanente."
+msgstr ""
+"Êtes-vous sûr de vouloir supprimer votre compte ? Cette action ne peut "
+"pas être annulée. Toutes vos données seront perdues de façon permanente."
 
 #: app/templates/account.html:48
 msgid "To confirm, please type your username below:"
@@ -466,7 +480,9 @@ msgstr "Créer"
 msgid ""
 "Easily build your own pictogram trees with our intuitive drag-and-drop "
 "interface."
-msgstr "Construisez facilement vos propres arbres de pictogrammes avec notre interface intuitive de glisser-déposer."
+msgstr ""
+"Construisez facilement vos propres arbres de pictogrammes avec notre "
+"interface intuitive de glisser-déposer."
 
 #: app/templates/index.html:35
 msgid "Share"
@@ -482,7 +498,9 @@ msgstr "Exporter"
 
 #: app/templates/index.html:44
 msgid "Export your trees as JSON files to use them anywhere."
-msgstr "Exportez vos arbres sous forme de fichiers JSON pour les utiliser n'importe où."
+msgstr ""
+"Exportez vos arbres sous forme de fichiers JSON pour les utiliser "
+"n'importe où."
 
 #: app/templates/list.html:17
 msgid "Tree Source"
@@ -636,35 +654,43 @@ msgstr "Importer une image"
 msgid "Upload from disk"
 msgstr "Télécharger depuis le disque"
 
+#: app/templates/pictogram_bank.html:34
+msgid "Choose File"
+msgstr "Choisir un fichier"
+
 #: app/templates/pictogram_bank.html:35
+msgid "No file chosen"
+msgstr "Aucun fichier choisi"
+
+#: app/templates/pictogram_bank.html:39
 msgid "Description (optional)"
 msgstr "Description (facultatif)"
 
-#: app/templates/pictogram_bank.html:38
+#: app/templates/pictogram_bank.html:42
 msgid "Upload"
 msgstr "Télécharger"
 
-#: app/templates/pictogram_bank.html:43
+#: app/templates/pictogram_bank.html:47
 msgid "Edit Selected Image"
 msgstr "Modifier l'image sélectionnée"
 
-#: app/templates/pictogram_bank.html:45
+#: app/templates/pictogram_bank.html:49
 msgid "Description"
 msgstr "Description"
 
-#: app/templates/pictogram_bank.html:51
+#: app/templates/pictogram_bank.html:55
 msgid "Make image public"
 msgstr "Rendre l'image publique"
 
-#: app/templates/pictogram_bank.html:54
+#: app/templates/pictogram_bank.html:58
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
-#: app/templates/pictogram_bank.html:59
+#: app/templates/pictogram_bank.html:63
 msgid "Export Image"
 msgstr "Exporter l'image"
 
-#: app/templates/pictogram_bank.html:60
+#: app/templates/pictogram_bank.html:64
 msgid "Download Selected Image"
 msgstr "Télécharger l'image sélectionnée"
 
@@ -680,7 +706,10 @@ msgstr "Renvoyer l'e-mail de confirmation"
 msgid ""
 "Please enter your account's email address. If a matching account is found"
 " and is not yet confirmed, we will send a new confirmation email."
-msgstr "Veuillez saisir l'adresse e-mail de votre compte. Si un compte correspondant est trouvé et n'est pas encore confirmé, nous vous enverrons un nouvel e-mail de confirmation."
+msgstr ""
+"Veuillez saisir l'adresse e-mail de votre compte. Si un compte "
+"correspondant est trouvé et n'est pas encore confirmé, nous vous "
+"enverrons un nouvel e-mail de confirmation."
 
 #: app/templates/reset_password_form.html:5
 msgid "Reset Your Password"
@@ -695,11 +724,15 @@ msgstr "Bonjour,"
 msgid ""
 "Thank you for registering. Please click the link below to activate your "
 "account:"
-msgstr "Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour activer votre compte :"
+msgstr ""
+"Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour "
+"activer votre compte :"
 
 #: app/templates/emails/reset_password.html:2
 msgid "You have requested a password reset. Click the following link to continue:"
-msgstr "Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le lien suivant pour continuer :"
+msgstr ""
+"Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le "
+"lien suivant pour continuer :"
 
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."

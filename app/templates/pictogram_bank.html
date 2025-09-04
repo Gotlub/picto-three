@@ -29,7 +29,11 @@
             <h4>{{ _('Import Image') }}</h4>
             <div class="mb-3">
                 <label for="image-upload-file" class="form-label">{{ _('Upload from disk') }}</label>
-                <input type="file" id="image-upload-file" class="form-control" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp">
+                <div class="input-group">
+                    <input type="file" id="image-upload-file" class="d-none" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp">
+                    <label for="image-upload-file" class="btn btn-outline-secondary">{{ _('Choose File') }}</label>
+                    <span class="form-control" id="file-chosen">{{ _('No file chosen') }}</span>
+                </div>
             </div>
             <div class="mb-3">
                 <label for="image-description" class="form-label">{{ _('Description (optional)') }}</label>

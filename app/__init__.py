@@ -52,18 +52,20 @@ def create_app( config_override = None):
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
-    babel.init_app(app, locale_selector=get_locale)
+    babel.init_app(app)
     bootstrap.init_app(app)
+
+    def get_locale():
+        if current_user.is_authenticated and current_user.locale:
+            return current_user.locale
+        if 'locale' in session and session['locale'] in current_app.config['LANGUAGES']:
+            return session['locale']
+        return request.accept_languages.best_match(current_app.config['LANGUAGES'])
+
+    app.babel_localeselector = get_locale
 
     from app.routes import bp as main_bp, api_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
 
     return app
-
-def get_locale():
-    if current_user.is_authenticated and current_user.locale:
-        return current_user.locale
-    if 'locale' in session and session['locale'] in current_app.config['LANGUAGES']:
-        return session['locale']
-    return request.accept_languages.best_match(current_app.config['LANGUAGES'])

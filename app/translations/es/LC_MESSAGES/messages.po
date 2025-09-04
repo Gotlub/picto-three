@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-03 23:23+0000\n"
+"POT-Creation-Date: 2025-09-04 00:46+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -27,15 +27,21 @@ msgstr "Nombre de usuario o contraseña inválidos"
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
 "href=\"%(url)s\">Resend confirmation email?</a>"
-msgstr "Tu cuenta no está confirmada. Por favor, revisa tus correos electrónicos. <a href=\"%(url)s\">¿Reenviar el correo de confirmación?</a>"
+msgstr ""
+"Tu cuenta no está confirmada. Por favor, revisa tus correos electrónicos."
+" <a href=\"%(url)s\">¿Reenviar el correo de confirmación?</a>"
 
 #: app/routes.py:62
 msgid "An email with instructions to reset your password has been sent."
-msgstr "Se ha enviado un correo electrónico con instrucciones para restablecer su contraseña."
+msgstr ""
+"Se ha enviado un correo electrónico con instrucciones para restablecer su"
+" contraseña."
 
 #: app/routes.py:64
 msgid "No account found with that email address."
-msgstr "No se ha encontrado ninguna cuenta con esa dirección de correo electrónico."
+msgstr ""
+"No se ha encontrado ninguna cuenta con esa dirección de correo "
+"electrónico."
 
 #: app/routes.py:74
 msgid "The reset link is invalid or has expired."
@@ -64,7 +70,9 @@ msgstr "Tu cuenta ha sido eliminada con éxito."
 
 #: app/routes.py:145
 msgid "Invalid username confirmation. Account deletion cancelled."
-msgstr "Confirmación de nombre de usuario no válida. Se canceló la eliminación de la cuenta."
+msgstr ""
+"Confirmación de nombre de usuario no válida. Se canceló la eliminación de"
+" la cuenta."
 
 #: app/routes.py:148
 msgid "Invalid form submission."
@@ -72,7 +80,9 @@ msgstr "Envío de formulario no válido."
 
 #: app/routes.py:184
 msgid "A confirmation email has been sent to your email address."
-msgstr "Se ha enviado un correo electrónico de confirmación a su dirección de correo electrónico."
+msgstr ""
+"Se ha enviado un correo electrónico de confirmación a su dirección de "
+"correo electrónico."
 
 #: app/routes.py:187
 msgid "Registration failed. Please check the errors below."
@@ -100,7 +110,9 @@ msgstr "Se ha enviado un nuevo correo electrónico de confirmación."
 
 #: app/routes.py:228
 msgid "No account found with that email address. Please register."
-msgstr "No se encontró ninguna cuenta con esa dirección de correo electrónico. Por favor, regístrese."
+msgstr ""
+"No se encontró ninguna cuenta con esa dirección de correo electrónico. "
+"Por favor, regístrese."
 
 #: app/routes.py:242
 msgid "Invalid tree data received."
@@ -121,13 +133,18 @@ msgstr "Datos inválidos"
 
 #: app/routes.py:413
 msgid "Missing required fields: list_name and payload are required."
-msgstr "Faltan campos obligatorios: se requieren el nombre de la lista y la carga útil."
+msgstr ""
+"Faltan campos obligatorios: se requieren el nombre de la lista y la carga"
+" útil."
 
 #: app/routes.py:429
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
-msgstr "Las listas públicas solo pueden contener imágenes públicas globales. Por favor, elimine las imágenes de propiedad del usuario antes de guardar públicamente."
+msgstr ""
+"Las listas públicas solo pueden contener imágenes públicas globales. Por "
+"favor, elimine las imágenes de propiedad del usuario antes de guardar "
+"públicamente."
 
 #: app/routes.py:441 app/routes.py:487
 msgid "List updated successfully"
@@ -218,7 +235,10 @@ msgstr "No se puede guardar un árbol vacío como público."
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
-msgstr "Los árboles públicos solo pueden contener imágenes públicas globales. Por favor, elimine las imágenes de propiedad del usuario antes de guardarlas públicamente."
+msgstr ""
+"Los árboles públicos solo pueden contener imágenes públicas globales. Por"
+" favor, elimine las imágenes de propiedad del usuario antes de guardarlas"
+" públicamente."
 
 #: app/routes.py:706
 msgid "Tree updated successfully"
@@ -281,7 +301,9 @@ msgstr "Confirmar la eliminación de la cuenta"
 msgid ""
 "Are you sure you want to delete your account? This action cannot be "
 "undone. All your data will be permanently lost."
-msgstr "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer. Todos tus datos se perderán permanentemente."
+msgstr ""
+"¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede "
+"deshacer. Todos tus datos se perderán permanentemente."
 
 #: app/templates/account.html:48
 msgid "To confirm, please type your username below:"
@@ -466,7 +488,9 @@ msgstr "Crear"
 msgid ""
 "Easily build your own pictogram trees with our intuitive drag-and-drop "
 "interface."
-msgstr "Construye fácilmente tus propios árboles de pictogramas con nuestra intuitiva interfaz de arrastrar y soltar."
+msgstr ""
+"Construye fácilmente tus propios árboles de pictogramas con nuestra "
+"intuitiva interfaz de arrastrar y soltar."
 
 #: app/templates/index.html:35
 msgid "Share"
@@ -636,35 +660,43 @@ msgstr "Importar imagen"
 msgid "Upload from disk"
 msgstr "Subir desde el disco"
 
+#: app/templates/pictogram_bank.html:34
+msgid "Choose File"
+msgstr "Seleccionar archivo"
+
 #: app/templates/pictogram_bank.html:35
+msgid "No file chosen"
+msgstr "Ningún archivo seleccionado"
+
+#: app/templates/pictogram_bank.html:39
 msgid "Description (optional)"
 msgstr "Descripción (opcional)"
 
-#: app/templates/pictogram_bank.html:38
+#: app/templates/pictogram_bank.html:42
 msgid "Upload"
 msgstr "Subir"
 
-#: app/templates/pictogram_bank.html:43
+#: app/templates/pictogram_bank.html:47
 msgid "Edit Selected Image"
 msgstr "Editar imagen seleccionada"
 
-#: app/templates/pictogram_bank.html:45
+#: app/templates/pictogram_bank.html:49
 msgid "Description"
 msgstr "Descripción"
 
-#: app/templates/pictogram_bank.html:51
+#: app/templates/pictogram_bank.html:55
 msgid "Make image public"
 msgstr "Hacer pública la imagen"
 
-#: app/templates/pictogram_bank.html:54
+#: app/templates/pictogram_bank.html:58
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
-#: app/templates/pictogram_bank.html:59
+#: app/templates/pictogram_bank.html:63
 msgid "Export Image"
 msgstr "Exportar imagen"
 
-#: app/templates/pictogram_bank.html:60
+#: app/templates/pictogram_bank.html:64
 msgid "Download Selected Image"
 msgstr "Descargar imagen seleccionada"
 
@@ -680,7 +712,10 @@ msgstr "Reenviar correo electrónico de confirmación"
 msgid ""
 "Please enter your account's email address. If a matching account is found"
 " and is not yet confirmed, we will send a new confirmation email."
-msgstr "Por favor, introduzca la dirección de correo electrónico de su cuenta. Si se encuentra una cuenta que coincida y aún no está confirmada, le enviaremos un nuevo correo electrónico de confirmación."
+msgstr ""
+"Por favor, introduzca la dirección de correo electrónico de su cuenta. Si"
+" se encuentra una cuenta que coincida y aún no está confirmada, le "
+"enviaremos un nuevo correo electrónico de confirmación."
 
 #: app/templates/reset_password_form.html:5
 msgid "Reset Your Password"
@@ -695,11 +730,15 @@ msgstr "Hola,"
 msgid ""
 "Thank you for registering. Please click the link below to activate your "
 "account:"
-msgstr "Gracias por registrarte. Por favor, haz clic en el siguiente enlace para activar tu cuenta:"
+msgstr ""
+"Gracias por registrarte. Por favor, haz clic en el siguiente enlace para "
+"activar tu cuenta:"
 
 #: app/templates/emails/reset_password.html:2
 msgid "You have requested a password reset. Click the following link to continue:"
-msgstr "Ha solicitado un restablecimiento de contraseña. Haga clic en el siguiente enlace para continuar:"
+msgstr ""
+"Ha solicitado un restablecimiento de contraseña. Haga clic en el "
+"siguiente enlace para continuar:"
 
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
