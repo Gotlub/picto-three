@@ -121,10 +121,6 @@ class ImageTreeFolderNode extends ImageTreeNode {
         if (match) {
             this.element.style.display = '';
             visibleNodes.add(this);
-            // Auto-expand if a child is visible but the folder is collapsed
-            if (childrenMatch && !this.expanded) {
-                 this.toggle();
-            }
         } else {
             this.element.style.display = 'none';
         }
