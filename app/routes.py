@@ -561,7 +561,6 @@ def load_tree_data():
             user_tree = build_forest(user_root)
             if user_tree:
                 tree_roots.append(user_tree)
-
     return jsonify(tree_roots)
 
 

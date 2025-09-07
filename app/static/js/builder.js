@@ -4,13 +4,16 @@ class ImageTreeNode {
     constructor(data, imageTree) {
         this.data = data;
         this.imageTree = imageTree;
-        this.element = this.createElement();
-        this.children = [];
         this.parent = null;
+        this.element = null;
     }
 
     createElement() {
         throw new Error("createElement must be implemented by subclass");
+    }
+
+    initElement() {
+        this.element = this.createElement();
     }
 }
 
@@ -18,7 +21,9 @@ class ImageTreeFolderNode extends ImageTreeNode {
     constructor(data, imageTree, childrenData) {
         super(data, imageTree);
         this.expanded = false;
-        this.childrenData = childrenData || [];
+        this.children = [];
+        this.childrenData = childrenData;
+        this.initElement();      
     }
 
     createElement() {
@@ -131,6 +136,7 @@ class ImageTreeImageNode extends ImageTreeNode {
     constructor(data, imageTree) {
         super(data, imageTree);
         this.isLoaded = false;
+        this.initElement();
     }
 
     createElement() {
@@ -202,6 +208,7 @@ class ImageTree {
         const treeData = await response.json();
 
         this.rootNodes = [];
+        
 
         treeData.forEach(nodeData => {
             // nodeData is an object { type: 'folder', data: {...}, children: [...] }
