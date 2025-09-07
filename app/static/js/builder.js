@@ -19,6 +19,7 @@ class ImageTreeFolderNode extends ImageTreeNode {
         super(data, imageTree);
         this.expanded = false;
         this.childrenLoaded = false;
+        this.childrenFolderLoaded = false;
         this.imageRefs = [];
     }
 
@@ -48,7 +49,28 @@ class ImageTreeFolderNode extends ImageTreeNode {
 
         contentElement.addEventListener('click', () => this.toggle());
 
+        this.loadChildrenFolder();
+
         return nodeElement;
+    }
+
+    async loadChildrenFolder() {
+        if (this.childrenFolderLoaded) return;
+
+        const response = await fetch(`/api/folder/children_folders?parent_id=${this.data.id}`);
+        const childrenData = await response.json();
+
+        this.childrenFolderLoaded = true;
+
+        if (childrenData.length > 0) {
+            childrenData.forEach(childData => {
+                const childNode = new ImageTreeFolderNode(childData, this.imageTree);
+                childNode.parent = this;
+                this.children.push(childNode);
+                this.childrenContainer.appendChild(childNode.element);
+            });
+        }
+        this.preloadImageRefs();
     }
 
     async preloadImageRefs() {
@@ -80,25 +102,19 @@ class ImageTreeFolderNode extends ImageTreeNode {
     async loadChildren() {
         if (this.childrenLoaded) return;
 
-        const response = await fetch(`/api/folder/contents?parent_id=${this.data.id}`);
+        const response = await fetch(`/api/folder/children_images?parent_id=${this.data.id}`);
         const childrenData = await response.json();
 
         this.childrenLoaded = true;
-        this.childrenContainer.innerHTML = ''; // Clear any loading indicator
 
-        if (childrenData.length === 0) {
+        if (childrenData.length === 0 && this.children.length === 0) {
             const noItems = document.createElement('div');
             noItems.classList.add('image-tree-node', 'info');
             noItems.textContent = 'Empty folder';
             this.childrenContainer.appendChild(noItems);
         } else {
-            childrenData.forEach(childData => {
-                let childNode;
-                if (childData.type === 'folder') {
-                    childNode = new ImageTreeFolderNode(childData, this.imageTree);
-                } else {
-                    childNode = new ImageTreeImageNode(childData, this.imageTree);
-                }
+             childrenData.forEach(childData => {
+                const childNode = new ImageTreeImageNode(childData, this.imageTree);
                 childNode.parent = this;
                 this.children.push(childNode);
                 this.childrenContainer.appendChild(childNode.element);
@@ -203,7 +219,6 @@ class ImageTree {
         this.container.innerHTML = '';
         this.initialData.forEach(data => {
             const theNode = new ImageTreeFolderNode(data, this);
-            theNode.preloadImageRefs();
             this.rootNodes.push(theNode);
             this.container.appendChild(theNode.element);
         });

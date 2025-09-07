@@ -526,6 +526,43 @@ def get_folder_contents():
     return jsonify(contents)
 
 
+@api_bp.route('/folder/children_folders', methods=['GET'])
+def get_children_folders():
+    parent_id = request.args.get('parent_id', type=int)
+    if parent_id is None:
+        return jsonify({'status': 'error', 'message': _('parent_id is required')}), 400
+
+    parent_folder = db.session.get(Folder, parent_id)
+    if not parent_folder:
+        return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
+
+    # Security check
+    if parent_folder.user_id is not None:
+        if not current_user.is_authenticated or parent_folder.user_id != current_user.id:
+            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    child_folders = [folder.to_dict() for folder in parent_folder.children.order_by(Folder.name).all()]
+    return jsonify(child_folders)
+
+@api_bp.route('/folder/children_images', methods=['GET'])
+def get_children_images():
+    parent_id = request.args.get('parent_id', type=int)
+    if parent_id is None:
+        return jsonify({'status': 'error', 'message': _('parent_id is required')}), 400
+
+    parent_folder = db.session.get(Folder, parent_id)
+    if not parent_folder:
+        return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
+
+    # Security check
+    if parent_folder.user_id is not None:
+        if not current_user.is_authenticated or parent_folder.user_id != current_user.id:
+            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    child_images = [image.to_dict() for image in parent_folder.images.order_by(Image.name).all()]
+    return jsonify(child_images)
+
+
 @api_bp.route('/folders/<int:folder_id>/images_refs')
 def get_images_refs(folder_id):
     """
