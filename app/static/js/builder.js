@@ -54,6 +54,9 @@ class ImageTreeFolderNode extends ImageTreeNode {
 
         this.buildChildrenFromData(); // Build children immediately
 
+        // Prevent dragging folders
+        nodeElement.setAttribute('draggable', 'false');
+
         return nodeElement;
     }
 
@@ -133,6 +136,17 @@ class ImageTreeImageNode extends ImageTreeNode {
         super(data, imageTree);
         this.isLoaded = false;
         this.initElement();
+
+        this.element.setAttribute('draggable', 'true');
+        this.element.addEventListener('dragstart', (e) => {
+            e.stopPropagation();
+            const dragData = {
+                type: 'image-tree-node',
+                data: this.data
+            };
+            e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+            e.dataTransfer.effectAllowed = 'copy';
+        });
     }
 
     createElement() {
@@ -350,6 +364,29 @@ class TreeBuilder {
 
         // New Image Tree initialization
         this.imageTree = new ImageTree('image-sidebar-tree', (image) => this.handleImageClick(image));
+
+        // --- Drag and Drop from Sidebar to Builder ---
+        this.treeDisplay.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Necessary to allow drop
+            e.dataTransfer.dropEffect = 'copy';
+            this.treeDisplay.classList.add('drag-over'); // Add highlight class
+        });
+
+        this.treeDisplay.addEventListener('dragleave', (e) => {
+            this.treeDisplay.classList.remove('drag-over'); // Remove highlight
+        });
+
+        this.treeDisplay.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.treeDisplay.classList.remove('drag-over');
+            const dragDataString = e.dataTransfer.getData('application/json');
+            if (dragDataString) {
+                const dragData = JSON.parse(dragDataString);
+                if (dragData.type === 'image-tree-node') {
+                    this.addNewNodeFromDrop(dragData.data, { x: e.clientX, y: e.clientY });
+                }
+            }
+        });
 
         document.addEventListener('click', (e) => {
             const deleteBtn = document.getElementById('delete-btn');
@@ -646,6 +683,63 @@ class TreeBuilder {
         parentNode.addChild(newNode);
         this.selectNode(newNode); // Select the new node
         this.renderTree();
+    }
+
+    addNewNodeFromDrop(imageData, position) {
+        const newNode = new BuilderNode(imageData, this);
+
+        // If the tree is empty, add as the first child of root.
+        if (this.rootNode.children.length === 0) {
+            this.rootNode.addChild(newNode);
+        } else {
+            // Otherwise, find the closest node to the drop position and add the new node as its child.
+            const closestNode = this.findClosestNode(position);
+            if (closestNode) {
+                closestNode.addChild(newNode);
+            } else {
+                // As a fallback, add to the root node.
+                this.rootNode.addChild(newNode);
+            }
+        }
+
+        this.selectNode(newNode); // Select the newly added node.
+        this.renderTree(); // Update the tree display.
+    }
+
+    findClosestNode(position) {
+        let allNodes = [];
+        const traverse = (node) => {
+            node.children.forEach(child => {
+                // Ensure the child node has a rendered element.
+                if (child.element) {
+                    allNodes.push(child);
+                    traverse(child);
+                }
+            });
+        };
+        traverse(this.rootNode);
+
+        // If there are no children nodes, the root is the only possible parent.
+        if (allNodes.length === 0) {
+            return this.rootNode;
+        }
+
+        let closestNode = null;
+        let minDistance = Infinity;
+
+        allNodes.forEach(node => {
+            const rect = node.element.getBoundingClientRect();
+            const nodeCenterX = rect.left + rect.width / 2;
+            const nodeCenterY = rect.top + rect.height / 2;
+            const distance = Math.sqrt(Math.pow(position.x - nodeCenterX, 2) + Math.pow(position.y - nodeCenterY, 2));
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestNode = node;
+            }
+        });
+
+        return closestNode;
     }
 
     isDescendant(potentialDescendant, potentialAncestor) {
