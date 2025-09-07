@@ -503,57 +503,66 @@ def delete_list(list_id):
     return jsonify({'status': 'success', 'message': _('List deleted successfully')})
 
 
-@api_bp.route('/folder/contents', methods=['GET'])
-def get_folder_contents():
-    parent_id = request.args.get('parent_id', type=int)
-    if parent_id is None:
-        return jsonify({'status': 'error', 'message': _('parent_id is required')}), 400
-
-    parent_folder = db.session.get(Folder, parent_id)
-    if not parent_folder:
-        return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
-
-    # Security check: If the folder is not public, user must be logged in and own it
-    if parent_folder.user_id is not None:
-        if not current_user.is_authenticated or parent_folder.user_id != current_user.id:
-            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
-
-    child_folders = [folder.to_dict() for folder in parent_folder.children.order_by(Folder.name).all()]
-    child_images = [image.to_dict() for image in parent_folder.images.order_by(Image.name).all()]
-
-    contents = child_folders + child_images
-
-    return jsonify(contents)
-
-
-@api_bp.route('/folders/<int:folder_id>/images_refs')
-def get_images_refs(folder_id):
+def build_forest(folder):
     """
-    Recursively get all image references (metadata) for a given folder.
+    Recursively builds a JSON-like structure for a folder and its contents.
     """
-    start_folder = db.session.get(Folder, folder_id)
-    if not start_folder:
-        return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
+    # The to_dict(include_children=False) is important to avoid the old logic
+    # of serializing children, and to get the 'has_children' flag if we wanted it.
+    # Here, we just want the flat data for the folder itself.
+    folder_data = folder.to_dict(include_children=False)
 
-    # Security check: If the folder is not public, user must be logged in and own it
-    if start_folder.user_id is not None:
-        if not current_user.is_authenticated or start_folder.user_id != current_user.id:
-            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+    # We don't need the 'has_children' flag in the new format,
+    # as the presence of the 'children' array is explicit.
+    folder_data.pop('has_children', None)
 
-    def collect(folder):
-        results = []
-        # Add images from the current folder
-        images = Image.query.filter_by(folder_id=folder.id).all()
-        results.extend(images)
-        # Recurse into subfolders
-        subfolders = Folder.query.filter_by(parent_id=folder.id).all()
-        for f in subfolders:
-            results.extend(collect(f))
-        return results
+    folder_node = {
+        'type': 'folder',
+        'data': folder_data,
+        'children': []
+    }
 
-    all_images = collect(start_folder)
-    refs = [img.to_dict() for img in all_images]
-    return jsonify(refs)
+    # Add child folders, sorted by name
+    child_folders = folder.children.order_by(Folder.name).all()
+    for child_folder in child_folders:
+        child_node = build_forest(child_folder)
+        if child_node:
+            folder_node['children'].append(child_node)
+
+    # Add child images, sorted by name
+    child_images = folder.images.order_by(Image.name).all()
+    for image in child_images:
+        image_node = {
+            'type': 'image',
+            'data': image.to_dict()
+        }
+        folder_node['children'].append(image_node)
+
+    return folder_node
+
+@api_bp.route('/load_tree_data')
+def load_tree_data():
+    """
+    Loads the entire folder/image tree for the public space and the current user.
+    """
+    tree_roots = []
+
+    # 1. Get public root folder
+    public_root = Folder.query.filter_by(user_id=None, parent_id=None).first()
+    if public_root:
+        public_tree = build_forest(public_root)
+        if public_tree:
+            tree_roots.append(public_tree)
+
+    # 2. Get user's root folder if authenticated
+    if current_user.is_authenticated:
+        user_root = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
+        if user_root:
+            user_tree = build_forest(user_root)
+            if user_tree:
+                tree_roots.append(user_tree)
+
+    return jsonify(tree_roots)
 
 
 @api_bp.route('/pictograms', methods=['GET'])

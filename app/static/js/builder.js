@@ -15,11 +15,10 @@ class ImageTreeNode {
 }
 
 class ImageTreeFolderNode extends ImageTreeNode {
-    constructor(data, imageTree) {
+    constructor(data, imageTree, childrenData) {
         super(data, imageTree);
         this.expanded = false;
-        this.childrenLoaded = false;
-        this.imageRefs = [];
+        this.childrenData = childrenData || [];
     }
 
     createElement() {
@@ -48,56 +47,45 @@ class ImageTreeFolderNode extends ImageTreeNode {
 
         contentElement.addEventListener('click', () => this.toggle());
 
+        this.buildChildrenFromData(); // Build children immediately
+
         return nodeElement;
     }
 
-    async preloadImageRefs() {
-        try {
-            const response = await fetch(`/api/folders/${this.data.id}/images_refs`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            this.imageRefs = await response.json();
-        } catch (error) {
-            console.error(`Could not preload image refs for folder ${this.data.id}:`, error);
-        }
-    }
 
     toggle() {
         this.expanded = !this.expanded;
         if (this.expanded) {
             this.icon.src = '/static/images/folder-open-bold.png';
             this.childrenContainer.style.display = '';
-            if (!this.childrenLoaded) {
-                this.loadChildren();
-            }
+            // Lazy load images
+            this.children.forEach(child => {
+                if (child instanceof ImageTreeImageNode) {
+                    child.load();
+                }
+            });
         } else {
             this.icon.src = '/static/images/folder-bold.png';
             this.childrenContainer.style.display = 'none';
         }
     }
 
-    async loadChildren() {
-        if (this.childrenLoaded) return;
+    buildChildrenFromData() {
+        if (this.children.length > 0) return; // Already built
 
-        const response = await fetch(`/api/folder/contents?parent_id=${this.data.id}`);
-        const childrenData = await response.json();
-
-        this.childrenLoaded = true;
-        this.childrenContainer.innerHTML = ''; // Clear any loading indicator
-
-        if (childrenData.length === 0) {
+        if (this.childrenData.length === 0) {
             const noItems = document.createElement('div');
             noItems.classList.add('image-tree-node', 'info');
             noItems.textContent = 'Empty folder';
             this.childrenContainer.appendChild(noItems);
         } else {
-            childrenData.forEach(childData => {
+            this.childrenData.forEach(childData => {
                 let childNode;
                 if (childData.type === 'folder') {
-                    childNode = new ImageTreeFolderNode(childData, this.imageTree);
-                } else {
-                    childNode = new ImageTreeImageNode(childData, this.imageTree);
+                    // Pass the nested children data to the new folder node
+                    childNode = new ImageTreeFolderNode(childData.data, this.imageTree, childData.children);
+                } else { // type === 'image'
+                    childNode = new ImageTreeImageNode(childData.data, this.imageTree);
                 }
                 childNode.parent = this;
                 this.children.push(childNode);
@@ -140,6 +128,11 @@ class ImageTreeFolderNode extends ImageTreeNode {
 }
 
 class ImageTreeImageNode extends ImageTreeNode {
+    constructor(data, imageTree) {
+        super(data, imageTree);
+        this.isLoaded = false;
+    }
+
     createElement() {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('image-tree-node', 'image');
@@ -149,9 +142,7 @@ class ImageTreeImageNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        // The path from the backend is now relative to the pictograms folder,
-        // so we build the URL for the new pictogram-serving endpoint.
-        imgElement.src = `/pictograms/${this.data.path}`;
+        imgElement.src = '/static/images/prohibit-bold.png'; // Placeholder
         imgElement.alt = this.data.name;
 
         // Add tooltip events
@@ -178,6 +169,13 @@ class ImageTreeImageNode extends ImageTreeNode {
         return nodeElement;
     }
 
+    load() {
+        if (this.isLoaded) return;
+        const imgElement = this.element.querySelector('img');
+        imgElement.src = `/pictograms/${this.data.path}`;
+        this.isLoaded = true;
+    }
+
     filter(term, visibleNodes) {
         const nameMatch = this.data.name.toLowerCase().includes(term);
         if (nameMatch) {
@@ -191,21 +189,25 @@ class ImageTreeImageNode extends ImageTreeNode {
 }
 
 class ImageTree {
-    constructor(containerId, initialData, onImageClick) {
+    constructor(containerId, onImageClick) {
         this.container = document.getElementById(containerId);
-        this.initialData = initialData;
         this.onImageClick = onImageClick;
         this.rootNodes = [];
         this.init();
     }
 
-    init() {
-        this.container.innerHTML = '';
-        this.initialData.forEach(data => {
-            const theNode = new ImageTreeFolderNode(data, this);
-            theNode.preloadImageRefs();
-            this.rootNodes.push(theNode);
-            this.container.appendChild(theNode.element);
+    async init() {
+        this.container.innerHTML = ''; // Clear container
+        const response = await fetch('/api/load_tree_data');
+        const treeData = await response.json();
+
+        this.rootNodes = [];
+
+        treeData.forEach(nodeData => {
+            // nodeData is an object { type: 'folder', data: {...}, children: [...] }
+            const folderNode = new ImageTreeFolderNode(nodeData.data, this, nodeData.children);
+            this.rootNodes.push(folderNode);
+            this.container.appendChild(folderNode.element);
         });
     }
 
@@ -344,8 +346,7 @@ class TreeBuilder {
         }
 
         // New Image Tree initialization
-        const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
-        this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.handleImageClick(image));
+        this.imageTree = new ImageTree('image-sidebar-tree', (image) => this.handleImageClick(image));
 
         document.addEventListener('click', (e) => {
             const deleteBtn = document.getElementById('delete-btn');

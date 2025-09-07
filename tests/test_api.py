@@ -2,7 +2,7 @@ import json
 import pytest
 import os
 from PIL import Image as PILImage
-from app.models import User, Tree, PictogramList
+from app.models import User, Tree, PictogramList, Folder, Image
 from app import db
 from tests.conftest import get_csrf_token, login, confirm_user
 
@@ -398,3 +398,81 @@ def test_save_list_with_duplicate_name_updates(client):
     assert json.loads(updated_list.payload)[0]['description'] == "Updated"
 
     logout(client)
+
+def test_load_tree_data(client):
+    """
+    Tests the new /api/load_tree_data endpoint for both unauthenticated
+    and authenticated users.
+    """
+    # 1. Setup the database with a public and a private folder structure
+    # Register a user
+    get_response = client.get('/register')
+    csrf_token = get_csrf_token(get_response.data.decode())
+    client.post('/register', data={'username': 'treeuser', 'email': 'tree@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    user = User.query.filter_by(username='treeuser').first()
+    assert user is not None
+
+    # This will create the user's root folder automatically
+    confirm_user(client, 'tree@test.com')
+
+    # Manually create the public root folder for the test
+    public_root = Folder(name='Public', user_id=None, parent_id=None, path='public')
+    db.session.add(public_root)
+    db.session.commit()
+
+    # Fetch folders to build the structure
+    public_root = Folder.query.filter_by(user_id=None, parent_id=None).first()
+    user_root = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+    assert public_root is not None
+    assert user_root is not None
+
+    # Add items to public folder
+    public_img = Image(name='public_img.png', path='public/public_img.png', folder_id=public_root.id)
+    public_subfolder = Folder(name='Public Sub', parent_id=public_root.id, path='public/sub')
+    db.session.add_all([public_img, public_subfolder])
+    db.session.commit()
+
+    # Add items to user's private folder
+    private_img = Image(name='private_img.png', path=f'{user.username}/private_img.png', user_id=user.id, folder_id=user_root.id)
+    db.session.add(private_img)
+    db.session.commit()
+
+    # 2. Test Case 1: Unauthenticated user
+    logout(client)
+    response_unauth = client.get('/api/load_tree_data')
+    assert response_unauth.status_code == 200
+    data_unauth = response_unauth.get_json()
+
+    assert len(data_unauth) == 1
+    public_tree = data_unauth[0]
+    assert public_tree['data']['name'] == 'Public'
+    assert public_tree['type'] == 'folder'
+    assert len(public_tree['children']) == 2
+
+    child_names_unauth = {child['data']['name'] for child in public_tree['children']}
+    assert 'public_img.png' in child_names_unauth
+    assert 'Public Sub' in child_names_unauth
+
+    # 3. Test Case 2: Authenticated user
+    login(client, 'treeuser', 'Password123')
+    response_auth = client.get('/api/load_tree_data')
+    assert response_auth.status_code == 200
+    data_auth = response_auth.get_json()
+
+    assert len(data_auth) == 2
+
+    # Find the public and user trees in the response
+    public_tree_auth = next((item for item in data_auth if item['data']['name'] == 'Public'), None)
+    user_tree_auth = next((item for item in data_auth if item['data']['name'] == 'treeuser'), None)
+
+    assert public_tree_auth is not None
+    assert user_tree_auth is not None
+
+    # Check public tree for authenticated user
+    assert len(public_tree_auth['children']) == 2
+
+    # Check user tree
+    assert user_tree_auth['type'] == 'folder'
+    assert len(user_tree_auth['children']) == 1
+    assert user_tree_auth['children'][0]['type'] == 'image'
+    assert user_tree_auth['children'][0]['data']['name'] == 'private_img.png'
