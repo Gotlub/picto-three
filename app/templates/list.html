@@ -178,5 +178,5 @@
     {{ all_images_json | safe }}
 </script>
 
-<script src="{{ url_for('static', filename='js/list.js', v='1.2') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/list.js', v='1.2') }}"></script>
 {% endblock %}
