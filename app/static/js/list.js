@@ -1,32 +1,29 @@
-// --- Start of Image Tree for Right Sidebar (reused from builder.js) ---
+// --- Start of new Image Tree for Right Sidebar ---
 
 class ImageTreeNode {
     constructor(data, imageTree) {
         this.data = data;
         this.imageTree = imageTree;
-        this.element = this.createElement();
-        this.children = [];
         this.parent = null;
-        // Make the node draggable
-        this.element.setAttribute('draggable', 'true');
-        this.element.addEventListener('dragstart', (e) => {
-            e.stopPropagation();
-            this.imageTree.listBuilder.handleSourceDragStart(e, {
-                type: 'image-tree-node',
-                data: this.data
-            });
-        });
+        this.element = null;
     }
+
     createElement() {
         throw new Error("createElement must be implemented by subclass");
+    }
+
+    initElement() {
+        this.element = this.createElement();
     }
 }
 
 class ImageTreeFolderNode extends ImageTreeNode {
-    constructor(data, imageTree) {
+    constructor(data, imageTree, childrenData) {
         super(data, imageTree);
         this.expanded = false;
-        this.childrenLoaded = false;
+        this.children = [];
+        this.childrenData = childrenData;
+        this.initElement();
     }
 
     createElement() {
@@ -55,69 +52,103 @@ class ImageTreeFolderNode extends ImageTreeNode {
 
         contentElement.addEventListener('click', () => this.toggle());
 
+        this.buildChildrenFromData(); // Build children immediately
+
         // Prevent dragging folders
         nodeElement.setAttribute('draggable', 'false');
 
         return nodeElement;
     }
 
+
     toggle() {
         this.expanded = !this.expanded;
         if (this.expanded) {
             this.icon.src = '/static/images/folder-open-bold.png';
             this.childrenContainer.style.display = '';
-            if (!this.childrenLoaded) {
-                this.loadChildren();
-            }
+            // Lazy load images
+            this.children.forEach(child => {
+                if (child instanceof ImageTreeImageNode) {
+                    child.load();
+                }
+            });
         } else {
             this.icon.src = '/static/images/folder-bold.png';
             this.childrenContainer.style.display = 'none';
         }
     }
 
-    async loadChildren() {
-        if (this.childrenLoaded) return;
-        const response = await fetch(`/api/folder/contents?parent_id=${this.data.id}`);
-        const childrenData = await response.json();
-        this.childrenLoaded = true;
-        this.childrenContainer.innerHTML = '';
-        childrenData.forEach(childData => {
-            let childNode;
-            if (childData.type === 'folder') {
-                childNode = new ImageTreeFolderNode(childData, this.imageTree);
-            } else {
-                childNode = new ImageTreeImageNode(childData, this.imageTree);
-            }
-            childNode.parent = this;
-            this.children.push(childNode);
-            this.childrenContainer.appendChild(childNode.element);
-        });
+    buildChildrenFromData() {
+        if (this.children.length > 0) return; // Already built
+
+        if (this.childrenData.length === 0) {
+            const noItems = document.createElement('div');
+            noItems.classList.add('image-tree-node', 'info');
+            noItems.textContent = 'Empty folder';
+            this.childrenContainer.appendChild(noItems);
+        } else {
+            this.childrenData.forEach(childData => {
+                let childNode;
+                if (childData.type === 'folder') {
+                    // Pass the nested children data to the new folder node
+                    childNode = new ImageTreeFolderNode(childData.data, this.imageTree, childData.children);
+                } else { // type === 'image'
+                    childNode = new ImageTreeImageNode(childData.data, this.imageTree);
+                }
+                childNode.parent = this;
+                this.children.push(childNode);
+                this.childrenContainer.appendChild(childNode.element);
+            });
+        }
     }
 
     filter(term, visibleNodes) {
         const nameMatch = this.data.name.toLowerCase().includes(term);
-        let childrenMatch = false;
 
+        let childrenMatch = false;
         this.children.forEach(child => {
             if (child.filter(term, visibleNodes)) {
                 childrenMatch = true;
             }
         });
 
-        if (nameMatch || childrenMatch) {
+        let refMatch = false;
+        // Only check the preloaded references if the folder's children haven't been loaded.
+        // If the children are loaded, they are the source of truth and are handled by the `childrenMatch` logic.
+        if (this.children.length === 0) {
+            refMatch = this.imageRefs.some(img => img.name.toLowerCase().includes(term));
+        }
+
+        const match = nameMatch || childrenMatch || refMatch;
+
+        if (match) {
             this.element.style.display = '';
             visibleNodes.add(this);
-            if (childrenMatch && !this.expanded) {
-                 this.toggle();
-            }
         } else {
             this.element.style.display = 'none';
         }
-        return nameMatch || childrenMatch;
+        return match;
     }
 }
 
 class ImageTreeImageNode extends ImageTreeNode {
+    constructor(data, imageTree) {
+        super(data, imageTree);
+        this.isLoaded = false;
+        this.initElement();
+
+        this.element.setAttribute('draggable', 'true');
+        this.element.addEventListener('dragstart', (e) => {
+            e.stopPropagation();
+            const dragData = {
+                type: 'image-tree-node',
+                data: this.data
+            };
+            e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+            e.dataTransfer.effectAllowed = 'copy';
+        });
+    }
+
     createElement() {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('image-tree-node', 'image');
@@ -127,22 +158,41 @@ class ImageTreeImageNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        // The path from the backend is now relative, so we build the URL for the new endpoint.
-        imgElement.src = `/pictograms/${this.data.path}`;
+        imgElement.src = '/static/images/prohibit-bold.png'; // Placeholder
         imgElement.alt = this.data.name;
 
+        // Add tooltip events
+        imgElement.addEventListener('mouseover', (e) => {
+            tooltip.show(e, imgElement.src);
+        });
+        imgElement.addEventListener('mouseout', (e) => {
+            tooltip.hide(e);
+        });
+
         contentElement.appendChild(imgElement);
+
         const nameElement = document.createElement('span');
         nameElement.textContent = this.data.name;
         contentElement.appendChild(nameElement);
+
         nodeElement.appendChild(contentElement);
 
         contentElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.imageTree.onImageClick(this.data);
+            // Only trigger click if the callback is provided, allowing drag-only behavior
+            if (this.imageTree.onImageClick) {
+                this.imageTree.onImageClick(this.data);
+            }
         });
 
         return nodeElement;
+    }
+
+    load() {
+        if (this.isLoaded) return;
+        const imgElement = this.element.querySelector('img');
+        imgElement.src = `/pictograms/${this.data.path}`;
+        this.isLoaded = true;
     }
 
     filter(term, visibleNodes) {
@@ -158,31 +208,37 @@ class ImageTreeImageNode extends ImageTreeNode {
 }
 
 class ImageTree {
-    constructor(containerId, initialData, onImageClick, listBuilder) {
+    constructor(containerId, onImageClick) {
         this.container = document.getElementById(containerId);
-        this.initialData = initialData;
         this.onImageClick = onImageClick;
-        this.listBuilder = listBuilder; // Pass the main controller
         this.rootNodes = [];
         this.init();
     }
 
-    init() {
-        this.container.innerHTML = '';
-        this.initialData.forEach(data => {
-            const node = new ImageTreeFolderNode(data, this);
-            this.rootNodes.push(node);
-            this.container.appendChild(node.element);
+    async init() {
+        this.container.innerHTML = ''; // Clear container
+        const response = await fetch('/api/load_tree_data');
+        const treeData = await response.json();
+
+        this.rootNodes = [];
+
+
+        treeData.forEach(nodeData => {
+            // nodeData is an object { type: 'folder', data: {...}, children: [...] }
+            const folderNode = new ImageTreeFolderNode(nodeData.data, this, nodeData.children);
+            this.rootNodes.push(folderNode);
+            this.container.appendChild(folderNode.element);
         });
     }
 
     filter(term) {
         const visibleNodes = new Set();
-        this.rootNodes.forEach(node => node.filter(term.toLowerCase(), visibleNodes));
+        this.rootNodes.forEach(theNode => theNode.filter(term.toLowerCase(), visibleNodes));
     }
 }
 
-// --- End of Image Tree ---
+
+// --- End of new Image Tree for Right Sidebar ---
 
 // --- Start of Tree Viewer (Center Panel, adapted from builder.js) ---
 class ReadOnlyNode {
@@ -323,8 +379,7 @@ class ListBuilder {
         this.selectedTreeNode = null;
 
         // Right Panel
-        const initialTreeData = JSON.parse(document.getElementById('initial-tree-data').textContent);
-        this.imageTree = new ImageTree('image-sidebar-tree', initialTreeData, (image) => this.selectImage(image), this);
+        this.imageTree = new ImageTree('image-sidebar-tree', (image) => this.selectImage(image));
         this.selectedLinkDescription = document.getElementById('selected-link-description');
         this.selectedImage = null;
 
@@ -533,38 +588,52 @@ class ListBuilder {
         e.preventDefault();
         this.removeDropIndicator();
 
-        // Find the element we are dropping before
         const afterElement = this.getDragAfterElement(this.chainedListContainer, e.clientX);
+        const newIndex = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
 
         if (this.draggedListItem) { // Reordering an existing item
             this.draggedListItem.element.classList.remove('dragging');
             const oldIndex = this.chainedListItems.indexOf(this.draggedListItem);
 
-            // Remove the item from its old position
             this.chainedListItems.splice(oldIndex, 1);
 
-            // Find the new index in the modified list
-            const newIndex = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
-
-            // Insert the item at the new position
-            this.chainedListItems.splice(newIndex, 0, this.draggedListItem);
+            const newIndexForReorder = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
+            this.chainedListItems.splice(newIndexForReorder, 0, this.draggedListItem);
 
             this.draggedListItem = null;
+        } else { // Adding a new item
+            const dragDataString = e.dataTransfer.getData('application/json');
+            let sourceData = null;
 
-        } else if (this.draggedSource) { // Adding a new item from a source
-            const newIndex = afterElement ? this.chainedListItems.indexOf(afterElement) : this.chainedListItems.length;
-            const newItemData = {
-                image_id: this.draggedSource.data.id,
-                name: this.draggedSource.data.name,
-                path: this.draggedSource.data.path,
-                description: this.draggedSource.data.description || ""
-            };
-            const newListItem = new ChainedListItem(newItemData, this);
-            this.chainedListItems.splice(newIndex, 0, newListItem);
-            this.draggedSource = null;
+            if (dragDataString) {
+                try {
+                    const dragData = JSON.parse(dragDataString);
+                    if (dragData.type === 'image-tree-node' || dragData.type === 'tree-node') {
+                        sourceData = dragData.data;
+                    }
+                } catch (err) {
+                    console.error("Could not parse drag data: ", err);
+                }
+            }
+
+            // Fallback for older drag source pattern
+            if (!sourceData && this.draggedSource) {
+                sourceData = this.draggedSource.data;
+            }
+
+            if (sourceData) {
+                const newItemData = {
+                    image_id: sourceData.id,
+                    name: sourceData.name,
+                    path: sourceData.path,
+                    description: sourceData.description || ""
+                };
+                const newListItem = new ChainedListItem(newItemData, this);
+                this.chainedListItems.splice(newIndex, 0, newListItem);
+            }
+            this.draggedSource = null; // Clear in all cases
         }
 
-        // Re-render the entire list to reflect the changes
         this.renderChainedList();
     }
 
