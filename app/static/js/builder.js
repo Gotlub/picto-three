@@ -48,7 +48,9 @@ class BuilderNode {
         contentElement.appendChild(imgElement);
 
         const nameElement = document.createElement('span');
-        nameElement.textContent = this.image.name;
+        nameElement.classList.add('node-name');
+        nameElement.textContent = this.image.description || this.image.name;
+        this.nameElement = nameElement;
         contentElement.appendChild(nameElement);
 
         nodeElement.appendChild(contentElement);
@@ -88,6 +90,12 @@ class BuilderNode {
 
         return nodeElement;
     }
+
+    updateDescription(newDescription) {
+        if (this.nameElement) {
+            this.nameElement.textContent = newDescription;
+        }
+    }
 }
 
 class TreeBuilder {
@@ -120,7 +128,12 @@ class TreeBuilder {
             this.nodeDescriptionTextarea.disabled = true;
             this.nodeDescriptionTextarea.addEventListener('input', () => {
                 if (this.selectedNode) {
-                    this.selectedNode.description = this.nodeDescriptionTextarea.value;
+                    const newDescription = this.nodeDescriptionTextarea.value;
+                    this.selectedNode.description = newDescription;
+
+                    // As `this.selectedNode` is the BuilderNode instance (the "View"),
+                    // we can call its update method directly.
+                    this.selectedNode.updateDescription(newDescription);
                 }
             });
         }
