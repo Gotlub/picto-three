@@ -784,24 +784,43 @@ class TreeBuilder {
     }
 
     handleDrop(e, targetNode) {
-        this.handleDragLeave(e, targetNode);
+        this.handleDragLeave(e, targetNode); // Clean up highlight
 
-        const draggedNode = this.draggedNode;
-
-        if (!draggedNode || targetNode === draggedNode || this.isDescendant(targetNode, draggedNode)) {
-            if (this.isDescendant(targetNode, draggedNode)) {
-                alert("You cannot move a node into one of its own children.");
+        // Case 1: Reordering an existing node from within the builder
+        if (this.draggedNode) {
+            const draggedNode = this.draggedNode;
+            if (targetNode === draggedNode || this.isDescendant(targetNode, draggedNode)) {
+                if (this.isDescendant(targetNode, draggedNode)) {
+                    alert("You cannot move a node into one of its own children.");
+                }
+                return;
             }
-            return;
+
+            const oldParent = draggedNode.parent;
+            if (oldParent) {
+                oldParent.children = oldParent.children.filter(child => child !== draggedNode);
+            }
+
+            targetNode.addChild(draggedNode);
+            this.renderTree();
+            return; // End execution here for internal drops
         }
 
-        const oldParent = draggedNode.parent;
-        if (oldParent) {
-            oldParent.children = oldParent.children.filter(child => child !== draggedNode);
+        // Case 2: Dropping a new node from the sidebar
+        const dragDataString = e.dataTransfer.getData('application/json');
+        if (dragDataString) {
+            try {
+                const dragData = JSON.parse(dragDataString);
+                if (dragData.type === 'image-tree-node') {
+                    const newNode = new BuilderNode(dragData.data, this);
+                    targetNode.addChild(newNode);
+                    this.selectNode(newNode);
+                    this.renderTree();
+                }
+            } catch (err) {
+                console.error("Error parsing drop data", err);
+            }
         }
-
-        targetNode.addChild(draggedNode);
-        this.renderTree();
     }
 
     handleDragEnd(e) {
