@@ -2,12 +2,13 @@ import ImageTree from './components/ImageTree.js';
 
 // --- Start of Tree Viewer (Center Panel, adapted from builder.js) ---
 class ReadOnlyNode {
-    constructor(image, listBuilder) {
+    constructor(nodeData, image, listBuilder) {
+        this.nodeData = nodeData;
         this.image = image;
         this.listBuilder = listBuilder;
         this.children = [];
         this.parent = null;
-        this.description = image.description || '';
+        this.description = nodeData.description || image.description || '';
         this.element = this.createElement();
 
         // Make the node draggable for copying
@@ -47,7 +48,7 @@ class ReadOnlyNode {
         imgElement.alt = this.image.name;
         contentElement.appendChild(imgElement);
         const nameElement = document.createElement('span');
-        nameElement.textContent = this.image.name;
+        nameElement.textContent = this.nodeData.description || this.image.name;
         contentElement.appendChild(nameElement);
         nodeElement.appendChild(contentElement);
         const childrenContainer = document.createElement('div');
@@ -132,10 +133,8 @@ class ListBuilder {
 
         // Center Panel
         this.treeDisplay = document.getElementById('tree-display');
-        this.treeRoot = new ReadOnlyNode({
-            id: 'root',
-            name: 'Root'
-        }, this);
+        const rootData = { id: 'root', name: 'Root', description: 'Root' };
+        this.treeRoot = new ReadOnlyNode(rootData, rootData, this);
         this.selectedTreeNode = null;
 
         // Right Panel
@@ -721,9 +720,7 @@ class ListBuilder {
                     description: 'This image is private or has been deleted.'
                 };
             }
-            // Give precedence to the description from the imported file
-            const nodeImg = { ...image, description: nodeData.description };
-            const newNode = new ReadOnlyNode(nodeImg, this);
+            const newNode = new ReadOnlyNode(nodeData, image, this);
 
             if (nodeData.children) {
                 nodeData.children.forEach(childData => {
