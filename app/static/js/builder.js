@@ -2,12 +2,14 @@ import ImageTree from './components/ImageTree.js';
 
 
 class BuilderNode {
-    constructor(image, builder) {
+    constructor(image, builder, nodeData = null) {
         this.image = image;
         this.builder = builder;
+        this.nodeData = nodeData;
         this.children = [];
         this.parent = null;
-        this.description = image.description || '';
+        // Prioritize description from saved tree data, fallback to image data.
+        this.description = (nodeData && nodeData.description !== undefined) ? nodeData.description : (image.description || '');
         this.element = this.createElement(builder);
     }
 
@@ -49,7 +51,7 @@ class BuilderNode {
 
         const nameElement = document.createElement('span');
         nameElement.classList.add('node-name');
-        nameElement.textContent = this.image.description || this.image.name;
+        nameElement.textContent = this.description || this.image.name;
         this.nameElement = nameElement;
         contentElement.appendChild(nameElement);
 
@@ -903,10 +905,7 @@ class TreeBuilder {
                 };
             }
 
-            const newNode = new BuilderNode(image, this);
-            if (nodeData.hasOwnProperty('description')) {
-                newNode.description = nodeData.description;
-            }
+            const newNode = new BuilderNode(image, this, nodeData);
 
             if (nodeData.children) {
                 nodeData.children.forEach(childData => {
