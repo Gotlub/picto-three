@@ -179,7 +179,10 @@ class ImageTreeImageNode extends ImageTreeNode {
 
         contentElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.imageTree.onImageClick(this.data);
+            // Only trigger click if the callback is provided, allowing drag-only behavior
+            if (this.imageTree.onImageClick) {
+                this.imageTree.onImageClick(this.data);
+            }
         });
 
         return nodeElement;
@@ -362,8 +365,8 @@ class TreeBuilder {
             });
         }
 
-        // New Image Tree initialization
-        this.imageTree = new ImageTree('image-sidebar-tree', (image) => this.handleImageClick(image));
+        // New Image Tree initialization. The click callback is set to null to allow drag-and-drop to work without conflict.
+        this.imageTree = new ImageTree('image-sidebar-tree', null);
 
         // --- Drag and Drop from Sidebar to Builder ---
         this.treeDisplay.addEventListener('dragover', (e) => {
@@ -677,13 +680,13 @@ class TreeBuilder {
         }
     }
 
-    handleImageClick(image) {
-        const newNode = new BuilderNode(image, this);
-        const parentNode = this.selectedNode || this.rootNode;
-        parentNode.addChild(newNode);
-        this.selectNode(newNode); // Select the new node
-        this.renderTree();
-    }
+    // handleImageClick(image) {
+    //     const newNode = new BuilderNode(image, this);
+    //     const parentNode = this.selectedNode || this.rootNode;
+    //     parentNode.addChild(newNode);
+    //     this.selectNode(newNode); // Select the new node
+    //     this.renderTree();
+    // }
 
     addNewNodeFromDrop(imageData, position) {
         const newNode = new BuilderNode(imageData, this);
