@@ -36,6 +36,12 @@
                 <div class="invalid-feedback">{{ error }}</div>
                 {% endfor %}
             </div>
+            <div class="mb-3">
+                {{ form.recaptcha }}
+                {% for error in form.recaptcha.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
             <p>{{ form.submit(class="btn btn-primary") }}</p>
                 </form>
             </div>

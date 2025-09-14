@@ -7,6 +7,8 @@ basedir = Path(__file__).parent.resolve()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
     # The database is located in a 'data' directory SIBLING to the app directory
     # e.g. /var/www/data/app.db

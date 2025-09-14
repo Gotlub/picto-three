@@ -3,7 +3,7 @@ Flask-SQLAlchemy
 Flask-Migrate
 pytest
 Flask-Login
-Flask-WTF
+Flask-WTF[recaptcha]
 email-validator
 Flask-Babel
 python-magic
