@@ -27,7 +27,7 @@ export default class ImageTreeImageNode extends ImageTreeNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        imgElement.src = '/static/images/prohibit-bold.png'; // Placeholder
+        imgElement.src = '/static/images/loading.gif'; // Placeholder
         imgElement.alt = this.data.name;
 
         // Add tooltip events
