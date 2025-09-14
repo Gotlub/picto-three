@@ -822,7 +822,7 @@ def save_tree():
 def delete_folder_recursive(folder):
     # The path from DB is relative. Combine it with the base path for physical operations.
     base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-
+    base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
     # Recursively delete children folders
     for sub_folder in folder.children:
         delete_folder_recursive(sub_folder)
@@ -832,6 +832,9 @@ def delete_folder_recursive(folder):
         try:
             physical_path = base_path / image.path
             physical_path.unlink(missing_ok=True)
+            physical_path_min = base_path_min / image.path
+            physical_path_min = physical_path_min.with_suffix('.png')
+            physical_path_min.unlink()
         except OSError as e:
             print(f"Error deleting file {physical_path}: {e}") # Or use proper logging
         db.session.delete(image)
@@ -878,6 +881,10 @@ def delete_item():
             base_path = Path(current_app.config['PICTOGRAMS_PATH'])
             physical_path = base_path / image.path
             physical_path.unlink(missing_ok=True)
+            base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+            physical_path_min = base_path_min / image.path
+            physical_path_min = physical_path_min.with_suffix('.png')
+            physical_path_min.unlink()
         except OSError as e:
             return jsonify({'status': 'error', 'message': _('Could not delete file: %(error)s', error=e)}), 500
 
