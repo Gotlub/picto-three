@@ -634,6 +634,30 @@ def create_folder():
 
     return jsonify({'status': 'success', 'folder': new_folder.to_dict(include_children=False)})
 
+# --- Helper pour la création de miniatures ---
+THUMB_SIZE = (128, 128)
+
+def create_thumbnail_for_upload(filepath_relative):
+    """Génère une miniature pour une image uploadée."""
+    try:
+        source_folder = Path(current_app.config['PICTOGRAMS_PATH'])
+        thumbs_folder = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+
+        source_path = source_folder / filepath_relative
+        thumb_path_relative = Path(filepath_relative).with_suffix('.jpeg')
+        thumb_path_full = thumbs_folder / thumb_path_relative
+
+        thumb_path_full.parent.mkdir(parents=True, exist_ok=True)
+
+        with PILImage.open(source_path) as img:
+            img.thumbnail(THUMB_SIZE)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            img.save(thumb_path_full, 'JPEG', quality=85, optimize=True)
+
+    except Exception as e:
+        current_app.logger.error(f"Erreur lors de la création de la miniature pour {filepath_relative}: {e}")
+
 @api_bp.route('/image/upload', methods=['POST'])
 @login_required
 def upload_image():
@@ -675,6 +699,13 @@ def upload_image():
         )
         db.session.add(new_image)
         db.session.commit()
+
+        # --- AJOUTER L'APPEL POUR CRÉER LA MINIATURE ---
+        try:
+            create_thumbnail_for_upload(new_image.path)
+        except Exception as e:
+            current_app.logger.error(f"Échec de la création de miniature pour {new_image.path}: {e}")
+        # --- FIN DE L'AJOUT ---
 
         return jsonify({'status': 'success', 'image': new_image.to_dict()})
 

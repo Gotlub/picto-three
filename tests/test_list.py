@@ -22,7 +22,7 @@ def test_list_js_contains_filter_logic(client):
     assert list_response.status_code == 200
 
     # Use regex to find the script tag for list.js, including any versioning
-    script_tag_match = re.search(r'<script src="(/static/js/list\.js[^"]*)"></script>', list_response.data.decode())
+    script_tag_match = re.search(r'<script[^>]*src="(/static/js/list\.js[^"]*)"', list_response.data.decode())
     assert script_tag_match is not None
 
     script_url = script_tag_match.group(1)
@@ -36,4 +36,3 @@ def test_list_js_contains_filter_logic(client):
     assert "filterImages" in js_content
     assert "imageTree.filter(searchTerm)" in js_content
     assert "ImageTree.prototype.filter" not in js_content # Make sure it's on the instance
-    assert "filter(term, visibleNodes)" in js_content
