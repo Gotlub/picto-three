@@ -365,6 +365,13 @@ def serve_pictogram(filepath):
     # send_from_directory is security-conscious and will prevent path traversal attacks.
     return send_from_directory(pictograms_path, filepath)
 
+@bp.route('/pictogramsmin/<path:filepath>')
+def serve_pictogram2(filepath):
+    """Serves a pictogram from the external data directory."""
+    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+    # send_from_directory is security-conscious and will prevent path traversal attacks.
+    return send_from_directory(pictograms_path, filepath)
+
 @api_bp.route('/trees/load', methods=['GET'])
 def load_trees():
     # Public trees are all trees with is_public = True, ordered by name
@@ -635,7 +642,7 @@ def create_folder():
     return jsonify({'status': 'success', 'folder': new_folder.to_dict(include_children=False)})
 
 # --- Helper pour la création de miniatures ---
-THUMB_SIZE = (128, 128)
+THUMB_SIZE = (48, 48)
 
 def create_thumbnail_for_upload(filepath_relative):
     """Génère une miniature pour une image uploadée."""
@@ -644,16 +651,14 @@ def create_thumbnail_for_upload(filepath_relative):
         thumbs_folder = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
 
         source_path = source_folder / filepath_relative
-        thumb_path_relative = Path(filepath_relative).with_suffix('.jpeg')
+        thumb_path_relative = Path(filepath_relative).with_suffix('.png')
         thumb_path_full = thumbs_folder / thumb_path_relative
 
         thumb_path_full.parent.mkdir(parents=True, exist_ok=True)
 
         with PILImage.open(source_path) as img:
             img.thumbnail(THUMB_SIZE)
-            if img.mode in ('RGBA', 'P'):
-                img = img.convert('RGB')
-            img.save(thumb_path_full, 'JPEG', quality=85, optimize=True)
+            img.save(thumb_path_full, 'PNG', quality=85, optimize=True)
 
     except Exception as e:
         current_app.logger.error(f"Erreur lors de la création de la miniature pour {filepath_relative}: {e}")

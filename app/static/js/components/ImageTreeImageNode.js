@@ -60,30 +60,14 @@ export default class ImageTreeImageNode extends ImageTreeNode {
     load() {
         if (this.isLoaded) return;
 
-        const imgElement = document.createElement('img');
+        const imgElement = this.element.querySelector('img');
 
-        // --- MODIFICATION POUR CHARGER LA MINIATURE ---
-        // 1. Remplacer l'extension originale par .jpeg
-        const thumbPath = this.data.path.replace(/\.[^/.]+$/, ".jpeg");
+        // 1. Remplacer l'extension originale par .png
+        const thumbPath = this.data.path.replace(/\.[^/.]+$/, ".png");
 
         // 2. Pointer vers le dossier des miniatures /pictogramsmin/
         imgElement.src = `/pictogramsmin/${thumbPath}`;
-        // --- FIN DE LA MODIFICATION ---
-
-        imgElement.alt = this.data.name;
-        imgElement.classList.add('image-tree-node-thumbnail');
-
-        imgElement.onload = () => {
-            this.contentElement.innerHTML = '';
-            this.contentElement.appendChild(imgElement);
-            this.isLoaded = true;
-        };
-
-        imgElement.onerror = () => {
-            // Gérer les erreurs de chargement (par exemple, miniature non trouvée)
-            this.contentElement.innerHTML = '<span class="error-text">Thumb not found</span>';
-            console.error(`Impossible de charger la miniature: /pictogramsmin/${thumbPath}`);
-        };
+        this.isLoaded = true;
     }
 
     filter(term, visibleNodes) {

@@ -7,7 +7,7 @@ from app import create_app, db
 from app.models import Image, Folder
 
 # --- Configuration des miniatures ---
-THUMB_SIZE = (128, 128) # Taille maximale pour les miniatures
+THUMB_SIZE = (48, 48) # Taille maximale pour les miniatures
 
 def create_thumbnail(filepath_relative, source_folder, thumbs_folder):
     """
@@ -16,7 +16,7 @@ def create_thumbnail(filepath_relative, source_folder, thumbs_folder):
     try:
         source_path = source_folder / filepath_relative
         # Construire le chemin de la miniature en changeant l'extension en .jpeg
-        thumb_path_relative = Path(filepath_relative).with_suffix('.jpeg')
+        thumb_path_relative = Path(filepath_relative).with_suffix('.png')
         thumb_path_full = thumbs_folder / thumb_path_relative
 
         # S'assurer que le dossier parent de la miniature existe
@@ -25,12 +25,9 @@ def create_thumbnail(filepath_relative, source_folder, thumbs_folder):
         with PILImage.open(source_path) as img:
             img.thumbnail(THUMB_SIZE)
 
-            # Convertir en RGB pour assurer la compatibilité avec le format JPEG
-            if img.mode in ('RGBA', 'P'):
-                img = img.convert('RGB')
 
             # Sauvegarder la miniature avec optimisation
-            img.save(thumb_path_full, 'JPEG', quality=85, optimize=True)
+            img.save(thumb_path_full, 'PNG', quality=85, optimize=True)
             # print(f"Miniature créée : {thumb_path_full}") # Décommenter pour le debug
 
     except (IOError, FileNotFoundError) as e:
@@ -45,6 +42,8 @@ def main():
 
         if not scan_root.exists():
             print(f"Le dossier source {scan_root} n'existe pas. Arrêt du script.")
+            print(f"pictograms path {source_pictograms_path} .")
+            print(f"thumbs_folder  {thumbs_folder}.") 
             return
 
         print("Début du scan et de l'ajout des pictogrammes publics...")

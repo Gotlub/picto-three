@@ -10,8 +10,9 @@ class Config:
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
-    # The database is located in a 'data' directory at the project root
-    data_dir = basedir / "data"
+    # The database is located in a 'data' directory SIBLING to the app directory
+    # e.g. /var/www/data/app.db
+    data_dir = basedir.parent / "data"
     db_path = data_dir / "app.db"
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
