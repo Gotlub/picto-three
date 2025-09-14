@@ -90,17 +90,13 @@ export default class ImageTreeFolderNode extends ImageTreeNode {
 
         let childrenMatch = false;
         this.children.forEach(child => {
+            //console.log(child);
             if (child.filter(term, visibleNodes)) {
                 childrenMatch = true;
             }
         });
 
-        let refMatch = false;
-        if (this.children.length === 0) {
-            refMatch = this.imageRefs.some(img => img.name.toLowerCase().includes(term));
-        }
-
-        const match = nameMatch || childrenMatch || refMatch;
+        const match = nameMatch || childrenMatch;
 
         if (match) {
             this.element.style.display = '';
