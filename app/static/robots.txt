@@ -1,0 +1,9 @@
+# Indique que les règles suivantes s'appliquent à tous les robots
+User-agent: *
+
+# Autorise l'exploration de tout le site
+Allow: /
+
+# Optionnel mais fortement recommandé : indique l'emplacement de ton sitemap
+# Décommente et adapte cette ligne quand tu auras un sitemap
+# Sitemap: https://ton-nom-de-domaine.com/sitemap.xml
