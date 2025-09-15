@@ -133,6 +133,9 @@ def delete_account():
             user_pictogram_folder = Path(current_app.config['PICTOGRAMS_PATH']) / user.username
             if user_pictogram_folder.exists():
                 shutil.rmtree(user_pictogram_folder)
+            user_pictogram_min_folder = Path(current_app.config['PICTOGRAMS_PATH_MIN']) / user.username
+            if user_pictogram_min_folder.exists():
+                shutil.rmtree(user_pictogram_min_folder)
             # 5. Delete all folders of the user
             Folder.query.filter_by(user_id=user.id).delete()
             # 6. Delete the user account
