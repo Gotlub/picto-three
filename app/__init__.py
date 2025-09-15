@@ -8,6 +8,7 @@ from flask_login import LoginManager, current_user
 from flask_babel import Babel, _
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
+from .extensions import sitemap
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -54,10 +55,34 @@ def create_app( config_override = None):
     mail.init_app(app)
     babel.init_app(app, locale_selector=get_locale)
     bootstrap.init_app(app)
+    sitemap.init_app(app)
+
+    def public_page_generator():
+        yield 'main.index', {}
+        yield 'main.login', {}
+        yield 'main.forgot_password', {}
+        yield 'main.register', {}
+        yield 'main.builder', {}
+        yield 'main.list_page', {}
+    sitemap.register_generator(public_page_generator)
+
     app.babel_localeselector = get_locale
     from app.routes import bp as main_bp, api_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
+
+    @app.cli.command('generate-sitemap')
+    def generate_sitemap():
+        """Génère le fichier sitemap.xml statique."""
+        try:
+            with app.app_context():
+                xml_content = sitemap.sitemap()
+            sitemap_path = Path(app.static_folder) / 'sitemap.xml'
+            with open(sitemap_path, 'w', encoding='utf-8') as f:
+                f.write(xml_content)
+            print(f"✅ Sitemap généré avec succès dans {sitemap_path}")
+        except Exception as e:
+            print(f"❌ Erreur lors de la génération du sitemap : {e}")
 
     return app
 
