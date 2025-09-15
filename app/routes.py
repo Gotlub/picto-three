@@ -847,6 +847,14 @@ def delete_folder_recursive(folder):
     except OSError as e:
         print(f"Error deleting directory {physical_path}: {e}")
 
+    # Delete the miniature folder directory itself
+    try:
+        physical_path_min = base_path_min / folder.path
+        if physical_path_min.exists():
+            shutil.rmtree(physical_path_min)
+    except OSError as e:
+        print(f"Error deleting directory {physical_path_min}: {e}")
+
     # Delete the folder from DB
     db.session.delete(folder)
 
