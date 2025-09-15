@@ -59,9 +59,6 @@ def create_app( config_override = None):
 
     def public_page_generator():
         yield 'main.index', {}
-        yield 'main.login', {}
-        yield 'main.forgot_password', {}
-        yield 'main.register', {}
         yield 'main.builder', {}
         yield 'main.list_page', {}
     sitemap.register_generator(public_page_generator)
