@@ -17,6 +17,7 @@ login.login_view = 'main.login'
 mail = Mail()
 bootstrap = Bootstrap()
 
+
 @login.unauthorized_handler
 def unauthorized():
     if request.path.startswith('/api/'):
@@ -73,6 +74,8 @@ def create_app( config_override = None):
         """Génère le fichier sitemap.xml statique."""
         try:
             with app.app_context():
+                app.config["SERVER_NAME"] = "pictotree.eu"
+                PREFERRED_URL_SCHEME = "https"
                 xml_content = sitemap.sitemap()
             sitemap_path = Path(app.static_folder) / 'sitemap.xml'
             with open(sitemap_path, 'w', encoding='utf-8') as f:
