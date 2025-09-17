@@ -1,6 +1,7 @@
 import os
 import shutil
 from io import BytesIO
+from PIL import Image as PILImage
 from pathlib import Path
 import pytest
 from app.models import Folder, Image
@@ -168,7 +169,11 @@ def test_delete_image_success(client, app):
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     # First, upload an image
-    data = {'folder_id': root_folder.id, 'file': (BytesIO(b"content"), 'delete_me.jpg')}
+    img = PILImage.new('RGB', (10, 10))
+    img_io = BytesIO()
+    img.save(img_io, 'JPEG')
+    img_io.seek(0)
+    data = {'folder_id': root_folder.id, 'file': (img_io, 'delete_me.jpg')}
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
     image = db.session.get(Image, image_id)

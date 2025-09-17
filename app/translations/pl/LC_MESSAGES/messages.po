@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-04 07:05+0000\n"
+"POT-Creation-Date: 2025-09-17 02:35+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -28,7 +28,9 @@ msgstr "Nieprawidłowa nazwa użytkownika lub hasło"
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
 "href=\"%(url)s\">Resend confirmation email?</a>"
-msgstr "Twoje konto nie jest potwierdzone. Sprawdź swoją pocztę e-mail. <a href=\"%(url)s\">Wysłać ponownie e-mail z potwierdzeniem?</a>"
+msgstr ""
+"Twoje konto nie jest potwierdzone. Sprawdź swoją pocztę e-mail. <a "
+"href=\"%(url)s\">Wysłać ponownie e-mail z potwierdzeniem?</a>"
 
 #: app/routes.py:62
 msgid "An email with instructions to reset your password has been sent."
@@ -54,207 +56,211 @@ msgstr "Twoje hasło zostało pomyślnie zmienione."
 msgid "Invalid current password."
 msgstr "Nieprawidłowe bieżące hasło."
 
-#: app/routes.py:116 app/routes.py:190
+#: app/routes.py:116 app/routes.py:193
 #, python-format
 msgid "Error in %(field)s: %(error)s"
 msgstr "Błąd w %(field)s: %(error)s"
 
-#: app/routes.py:142
+#: app/routes.py:145
 msgid "Your account has been successfully deleted."
 msgstr "Twoje konto zostało pomyślnie usunięte."
 
-#: app/routes.py:145
+#: app/routes.py:148
 msgid "Invalid username confirmation. Account deletion cancelled."
 msgstr "Nieprawidłowe potwierdzenie nazwy użytkownika. Anulowano usuwanie konta."
 
-#: app/routes.py:148
+#: app/routes.py:151
 msgid "Invalid form submission."
 msgstr "Nieprawidłowe przesłanie formularza."
 
-#: app/routes.py:184
+#: app/routes.py:187
 msgid "A confirmation email has been sent to your email address."
 msgstr "Na Twój adres e-mail wysłano wiadomość z potwierdzeniem."
 
-#: app/routes.py:187
+#: app/routes.py:190
 msgid "Registration failed. Please check the errors below."
 msgstr "Rejestracja nie powiodła się. Sprawdź poniższe błędy."
 
-#: app/routes.py:197
+#: app/routes.py:200
 msgid "The confirmation link is invalid or has expired."
 msgstr "Link potwierdzający jest nieprawidłowy lub wygasł."
 
-#: app/routes.py:202
+#: app/routes.py:205
 msgid "Account already confirmed. Please login."
 msgstr "Konto już potwierdzone. Zaloguj się."
 
-#: app/routes.py:207
+#: app/routes.py:210
 msgid "Your account has been confirmed successfully!"
 msgstr "Twoje konto zostało pomyślnie potwierdzone!"
 
-#: app/routes.py:219
+#: app/routes.py:222
 msgid "This account is already confirmed. Please login."
 msgstr "To konto jest już potwierdzone. Zaloguj się."
 
-#: app/routes.py:225
+#: app/routes.py:228
 msgid "A new confirmation email has been sent."
 msgstr "Wysłano nową wiadomość e-mail z potwierdzeniem."
 
-#: app/routes.py:228
+#: app/routes.py:231
 msgid "No account found with that email address. Please register."
 msgstr "Nie znaleziono konta o podanym adresie e-mail. Zarejestruj się."
 
-#: app/routes.py:242
+#: app/routes.py:245
 msgid "Invalid tree data received."
 msgstr "Otrzymano nieprawidłowe dane drzewa."
 
-#: app/routes.py:343
+#: app/routes.py:346
 msgid "Your language has been updated."
 msgstr "Twój język został zaktualizowany."
 
-#: app/routes.py:347
+#: app/routes.py:350
 msgid "The language has been updated for this session."
 msgstr "Język został zaktualizowany dla tej sesji."
 
-#: app/routes.py:406 app/routes.py:475 app/routes.py:543 app/routes.py:675
-#: app/routes.py:760
+#: app/routes.py:416 app/routes.py:485 app/routes.py:612 app/routes.py:773
+#: app/routes.py:869
 msgid "Invalid data"
 msgstr "Nieprawidłowe dane"
 
-#: app/routes.py:413
+#: app/routes.py:423
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Brak wymaganych pól: list_name i payload są wymagane."
 
-#: app/routes.py:429
+#: app/routes.py:439
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
-msgstr "Listy publiczne mogą zawierać tylko globalne obrazy publiczne. Przed publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
+msgstr ""
+"Listy publiczne mogą zawierać tylko globalne obrazy publiczne. Przed "
+"publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
 
-#: app/routes.py:441 app/routes.py:487
+#: app/routes.py:451 app/routes.py:497
 msgid "List updated successfully"
 msgstr "Lista zaktualizowana pomyślnie"
 
-#: app/routes.py:452
+#: app/routes.py:462
 msgid "List saved successfully"
 msgstr "Lista zapisana pomyślnie"
 
-#: app/routes.py:469 app/routes.py:496
+#: app/routes.py:479 app/routes.py:506
 msgid "List not found"
 msgstr "Nie znaleziono listy"
 
-#: app/routes.py:471 app/routes.py:498 app/routes.py:519
+#: app/routes.py:481 app/routes.py:508 app/routes.py:528
 msgid "Unauthorized"
 msgstr "Nieautoryzowany"
 
-#: app/routes.py:503
+#: app/routes.py:513
 msgid "List deleted successfully"
 msgstr "Lista usunięta pomyślnie"
 
-#: app/routes.py:510
+#: app/routes.py:519
 msgid "parent_id is required"
 msgstr "parent_id jest wymagany"
 
-#: app/routes.py:514
+#: app/routes.py:523
 msgid "Folder not found"
 msgstr "Nie znaleziono folderu"
 
-#: app/routes.py:534
+#: app/routes.py:603
 msgid "Root folder not found"
 msgstr "Nie znaleziono folderu głównego"
 
-#: app/routes.py:550
+#: app/routes.py:619
 msgid "Parent folder not found or not owned by user"
 msgstr "Folder nadrzędny nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:561
+#: app/routes.py:630
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Nie można utworzyć katalogu: %(error)s"
 
-#: app/routes.py:582
+#: app/routes.py:673
 msgid "No file part"
 msgstr "Brak części pliku"
 
-#: app/routes.py:586
+#: app/routes.py:677
 msgid "No selected file"
 msgstr "Nie wybrano pliku"
 
-#: app/routes.py:590
+#: app/routes.py:681
 msgid "No folder_id specified"
 msgstr "Nie określono folder_id"
 
-#: app/routes.py:594 app/routes.py:768
+#: app/routes.py:685 app/routes.py:877
 msgid "Folder not found or not owned by user"
 msgstr "Folder nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:622
+#: app/routes.py:720
 msgid "File upload failed"
 msgstr "Przesyłanie pliku nie powiodło się"
 
-#: app/routes.py:633
+#: app/routes.py:731
 msgid "Image not found"
 msgstr "Nie znaleziono obrazu"
 
-#: app/routes.py:637
+#: app/routes.py:735
 msgid "Unauthorized to edit this image"
 msgstr "Brak uprawnień do edycji tego obrazu"
 
-#: app/routes.py:641
+#: app/routes.py:739
 msgid "Invalid JSON data"
 msgstr "Nieprawidłowe dane JSON"
 
-#: app/routes.py:654
+#: app/routes.py:752
 msgid "Image updated successfully"
 msgstr "Obraz zaktualizowany pomyślnie"
 
-#: app/routes.py:682
+#: app/routes.py:780
 msgid "Missing required fields"
 msgstr "Brak wymaganych pól"
 
-#: app/routes.py:687
+#: app/routes.py:785
 msgid "Cannot save an empty tree as public."
 msgstr "Nie można zapisać pustego drzewa jako publicznego."
 
-#: app/routes.py:696
+#: app/routes.py:794
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
-msgstr "Drzewa publiczne mogą zawierać tylko globalne obrazy publiczne. Przed publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
+msgstr ""
+"Drzewa publiczne mogą zawierać tylko globalne obrazy publiczne. Przed "
+"publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
 
-#: app/routes.py:706
+#: app/routes.py:804
 msgid "Tree updated successfully"
 msgstr "Drzewo zaktualizowane pomyślnie"
 
-#: app/routes.py:716
+#: app/routes.py:814
 msgid "Tree saved successfully"
 msgstr "Drzewo zapisane pomyślnie"
 
-#: app/routes.py:771
+#: app/routes.py:880
 msgid "Cannot delete root folder"
 msgstr "Nie można usunąć folderu głównego"
 
-#: app/routes.py:775
+#: app/routes.py:884
 msgid "Folder and all its contents deleted"
 msgstr "Folder i cała jego zawartość usunięte"
 
-#: app/routes.py:780
+#: app/routes.py:889
 msgid "Image not found or not owned by user"
 msgstr "Obraz nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:787
+#: app/routes.py:900
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Nie można usunąć pliku: %(error)s"
 
-#: app/routes.py:791
+#: app/routes.py:904
 msgid "Image deleted"
 msgstr "Obraz usunięty"
 
-#: app/routes.py:793
+#: app/routes.py:906
 msgid "Invalid item type"
 msgstr "Nieprawidłowy typ elementu"
 
-#: app/routes.py:808
+#: app/routes.py:921
 msgid "No images to export"
 msgstr "Brak obrazów do wyeksportowania"
 
@@ -282,7 +288,9 @@ msgstr "Potwierdź usunięcie konta"
 msgid ""
 "Are you sure you want to delete your account? This action cannot be "
 "undone. All your data will be permanently lost."
-msgstr "Czy na pewno chcesz usunąć swoje konto? Tej czynności nie można cofnąć. Wszystkie Twoje dane zostaną trwale utracone."
+msgstr ""
+"Czy na pewno chcesz usunąć swoje konto? Tej czynności nie można cofnąć. "
+"Wszystkie Twoje dane zostaną trwale utracone."
 
 #: app/templates/account.html:48
 msgid "To confirm, please type your username below:"
@@ -300,28 +308,28 @@ msgstr "Anuluj"
 msgid "Delete My Account"
 msgstr "Usuń moje konto"
 
-#: app/templates/base.html:6 app/templates/base.html:28
-#: app/templates/base.html:101
+#: app/templates/base.html:6 app/templates/base.html:29
+#: app/templates/base.html:109
 msgid "Pictogram-Tree Builder"
 msgstr "Konstruktor drzewa piktogramów"
 
-#: app/templates/base.html:29
+#: app/templates/base.html:30
 msgid "Toggle navigation"
 msgstr "Przełącz nawigację"
 
-#: app/templates/base.html:35
+#: app/templates/base.html:36
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/templates/base.html:38 app/templates/builder.html:59
+#: app/templates/base.html:39 app/templates/builder.html:59
 msgid "Tree Builder"
 msgstr "Konstruktor drzewa"
 
-#: app/templates/base.html:41
+#: app/templates/base.html:42
 msgid "List Builder"
 msgstr "Konstruktor listy"
 
-#: app/templates/base.html:45
+#: app/templates/base.html:46
 msgid "Pictogram Bank"
 msgstr "Bank piktogramów"
 
@@ -337,7 +345,22 @@ msgstr "Konto"
 msgid "Logout"
 msgstr "Wyloguj się"
 
+#: app/templates/base.html:98
+msgid ""
+"This site uses only connection data (server logs) for security and "
+"maintenance purposes. No personal information is collected via tracking "
+"or advertising cookies. By continuing your navigation, you accept our"
+msgstr "This site uses only connection data (server logs) for security and maintenance purposes. No personal information is collected via tracking or advertising cookies. By continuing your navigation, you accept our"
+
 #: app/templates/base.html:99
+msgid "privacy policy"
+msgstr "privacy policy"
+
+#: app/templates/base.html:101
+msgid "I understand"
+msgstr "I understand"
+
+#: app/templates/base.html:107
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Zalogowany jako: %(username)s"
@@ -467,7 +490,9 @@ msgstr "Utwórz"
 msgid ""
 "Easily build your own pictogram trees with our intuitive drag-and-drop "
 "interface."
-msgstr "Łatwo buduj własne drzewa piktogramów za pomocą naszego intuicyjnego interfejsu przeciągnij i upuść."
+msgstr ""
+"Łatwo buduj własne drzewa piktogramów za pomocą naszego intuicyjnego "
+"interfejsu przeciągnij i upuść."
 
 #: app/templates/index.html:35
 msgid "Share"
@@ -689,7 +714,10 @@ msgstr "Wyślij ponownie e-mail z potwierdzeniem"
 msgid ""
 "Please enter your account's email address. If a matching account is found"
 " and is not yet confirmed, we will send a new confirmation email."
-msgstr "Wprowadź adres e-mail swojego konta. Jeśli zostanie znalezione pasujące konto, a nie jest ono jeszcze potwierdzone, wyślemy nową wiadomość e-mail z potwierdzeniem."
+msgstr ""
+"Wprowadź adres e-mail swojego konta. Jeśli zostanie znalezione pasujące "
+"konto, a nie jest ono jeszcze potwierdzone, wyślemy nową wiadomość e-mail"
+" z potwierdzeniem."
 
 #: app/templates/reset_password_form.html:5
 msgid "Reset Your Password"
@@ -704,7 +732,9 @@ msgstr "Cześć,"
 msgid ""
 "Thank you for registering. Please click the link below to activate your "
 "account:"
-msgstr "Dziękujemy za rejestrację. Kliknij poniższy link, aby aktywować swoje konto:"
+msgstr ""
+"Dziękujemy za rejestrację. Kliknij poniższy link, aby aktywować swoje "
+"konto:"
 
 #: app/templates/emails/reset_password.html:2
 msgid "You have requested a password reset. Click the following link to continue:"

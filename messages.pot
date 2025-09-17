@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-04 07:05+0000\n"
+"POT-Creation-Date: 2025-09-17 02:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,207 +52,207 @@ msgstr ""
 msgid "Invalid current password."
 msgstr ""
 
-#: app/routes.py:116 app/routes.py:190
+#: app/routes.py:116 app/routes.py:193
 #, python-format
 msgid "Error in %(field)s: %(error)s"
 msgstr ""
 
-#: app/routes.py:142
+#: app/routes.py:145
 msgid "Your account has been successfully deleted."
 msgstr ""
 
-#: app/routes.py:145
+#: app/routes.py:148
 msgid "Invalid username confirmation. Account deletion cancelled."
 msgstr ""
 
-#: app/routes.py:148
+#: app/routes.py:151
 msgid "Invalid form submission."
 msgstr ""
 
-#: app/routes.py:184
+#: app/routes.py:187
 msgid "A confirmation email has been sent to your email address."
 msgstr ""
 
-#: app/routes.py:187
+#: app/routes.py:190
 msgid "Registration failed. Please check the errors below."
 msgstr ""
 
-#: app/routes.py:197
+#: app/routes.py:200
 msgid "The confirmation link is invalid or has expired."
 msgstr ""
 
-#: app/routes.py:202
+#: app/routes.py:205
 msgid "Account already confirmed. Please login."
 msgstr ""
 
-#: app/routes.py:207
+#: app/routes.py:210
 msgid "Your account has been confirmed successfully!"
 msgstr ""
 
-#: app/routes.py:219
+#: app/routes.py:222
 msgid "This account is already confirmed. Please login."
 msgstr ""
 
-#: app/routes.py:225
+#: app/routes.py:228
 msgid "A new confirmation email has been sent."
 msgstr ""
 
-#: app/routes.py:228
+#: app/routes.py:231
 msgid "No account found with that email address. Please register."
 msgstr ""
 
-#: app/routes.py:242
+#: app/routes.py:245
 msgid "Invalid tree data received."
 msgstr ""
 
-#: app/routes.py:343
+#: app/routes.py:346
 msgid "Your language has been updated."
 msgstr ""
 
-#: app/routes.py:347
+#: app/routes.py:350
 msgid "The language has been updated for this session."
 msgstr ""
 
-#: app/routes.py:406 app/routes.py:475 app/routes.py:543 app/routes.py:675
-#: app/routes.py:760
+#: app/routes.py:416 app/routes.py:485 app/routes.py:612 app/routes.py:773
+#: app/routes.py:869
 msgid "Invalid data"
 msgstr ""
 
-#: app/routes.py:413
+#: app/routes.py:423
 msgid "Missing required fields: list_name and payload are required."
 msgstr ""
 
-#: app/routes.py:429
+#: app/routes.py:439
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
 msgstr ""
 
-#: app/routes.py:441 app/routes.py:487
+#: app/routes.py:451 app/routes.py:497
 msgid "List updated successfully"
 msgstr ""
 
-#: app/routes.py:452
+#: app/routes.py:462
 msgid "List saved successfully"
 msgstr ""
 
-#: app/routes.py:469 app/routes.py:496
+#: app/routes.py:479 app/routes.py:506
 msgid "List not found"
 msgstr ""
 
-#: app/routes.py:471 app/routes.py:498 app/routes.py:519
+#: app/routes.py:481 app/routes.py:508 app/routes.py:528
 msgid "Unauthorized"
 msgstr ""
 
-#: app/routes.py:503
+#: app/routes.py:513
 msgid "List deleted successfully"
 msgstr ""
 
-#: app/routes.py:510
+#: app/routes.py:519
 msgid "parent_id is required"
 msgstr ""
 
-#: app/routes.py:514
+#: app/routes.py:523
 msgid "Folder not found"
 msgstr ""
 
-#: app/routes.py:534
+#: app/routes.py:603
 msgid "Root folder not found"
 msgstr ""
 
-#: app/routes.py:550
+#: app/routes.py:619
 msgid "Parent folder not found or not owned by user"
 msgstr ""
 
-#: app/routes.py:561
+#: app/routes.py:630
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr ""
 
-#: app/routes.py:582
+#: app/routes.py:673
 msgid "No file part"
 msgstr ""
 
-#: app/routes.py:586
+#: app/routes.py:677
 msgid "No selected file"
 msgstr ""
 
-#: app/routes.py:590
+#: app/routes.py:681
 msgid "No folder_id specified"
 msgstr ""
 
-#: app/routes.py:594 app/routes.py:768
+#: app/routes.py:685 app/routes.py:877
 msgid "Folder not found or not owned by user"
 msgstr ""
 
-#: app/routes.py:622
+#: app/routes.py:720
 msgid "File upload failed"
 msgstr ""
 
-#: app/routes.py:633
+#: app/routes.py:731
 msgid "Image not found"
 msgstr ""
 
-#: app/routes.py:637
+#: app/routes.py:735
 msgid "Unauthorized to edit this image"
 msgstr ""
 
-#: app/routes.py:641
+#: app/routes.py:739
 msgid "Invalid JSON data"
 msgstr ""
 
-#: app/routes.py:654
+#: app/routes.py:752
 msgid "Image updated successfully"
 msgstr ""
 
-#: app/routes.py:682
+#: app/routes.py:780
 msgid "Missing required fields"
 msgstr ""
 
-#: app/routes.py:687
+#: app/routes.py:785
 msgid "Cannot save an empty tree as public."
 msgstr ""
 
-#: app/routes.py:696
+#: app/routes.py:794
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
 msgstr ""
 
-#: app/routes.py:706
+#: app/routes.py:804
 msgid "Tree updated successfully"
 msgstr ""
 
-#: app/routes.py:716
+#: app/routes.py:814
 msgid "Tree saved successfully"
 msgstr ""
 
-#: app/routes.py:771
+#: app/routes.py:880
 msgid "Cannot delete root folder"
 msgstr ""
 
-#: app/routes.py:775
+#: app/routes.py:884
 msgid "Folder and all its contents deleted"
 msgstr ""
 
-#: app/routes.py:780
+#: app/routes.py:889
 msgid "Image not found or not owned by user"
 msgstr ""
 
-#: app/routes.py:787
+#: app/routes.py:900
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr ""
 
-#: app/routes.py:791
+#: app/routes.py:904
 msgid "Image deleted"
 msgstr ""
 
-#: app/routes.py:793
+#: app/routes.py:906
 msgid "Invalid item type"
 msgstr ""
 
-#: app/routes.py:808
+#: app/routes.py:921
 msgid "No images to export"
 msgstr ""
 
@@ -298,28 +298,28 @@ msgstr ""
 msgid "Delete My Account"
 msgstr ""
 
-#: app/templates/base.html:6 app/templates/base.html:28
-#: app/templates/base.html:101
+#: app/templates/base.html:6 app/templates/base.html:29
+#: app/templates/base.html:109
 msgid "Pictogram-Tree Builder"
 msgstr ""
 
-#: app/templates/base.html:29
+#: app/templates/base.html:30
 msgid "Toggle navigation"
 msgstr ""
 
-#: app/templates/base.html:35
+#: app/templates/base.html:36
 msgid "Home"
 msgstr ""
 
-#: app/templates/base.html:38 app/templates/builder.html:59
+#: app/templates/base.html:39 app/templates/builder.html:59
 msgid "Tree Builder"
 msgstr ""
 
-#: app/templates/base.html:41
+#: app/templates/base.html:42
 msgid "List Builder"
 msgstr ""
 
-#: app/templates/base.html:45
+#: app/templates/base.html:46
 msgid "Pictogram Bank"
 msgstr ""
 
@@ -335,7 +335,22 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
+#: app/templates/base.html:98
+msgid ""
+"This site uses only connection data (server logs) for security and "
+"maintenance purposes. No personal information is collected via tracking "
+"or advertising cookies. By continuing your navigation, you accept our"
+msgstr ""
+
 #: app/templates/base.html:99
+msgid "privacy policy"
+msgstr ""
+
+#: app/templates/base.html:101
+msgid "I understand"
+msgstr ""
+
+#: app/templates/base.html:107
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr ""

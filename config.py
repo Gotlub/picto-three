@@ -12,7 +12,7 @@ class Config:
 
     # The database is located in a 'data' directory SIBLING to the app directory
     # e.g. /var/www/data/app.db
-    data_dir = basedir.parent / "data"
+    data_dir = basedir / "data"
     db_path = data_dir / "app.db"
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
