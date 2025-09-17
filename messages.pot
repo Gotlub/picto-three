@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-17 02:35+0000\n"
+"POT-Creation-Date: 2025-09-17 23:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -299,7 +299,7 @@ msgid "Delete My Account"
 msgstr ""
 
 #: app/templates/base.html:6 app/templates/base.html:29
-#: app/templates/base.html:109
+#: app/templates/base.html:108
 msgid "Pictogram-Tree Builder"
 msgstr ""
 
@@ -339,18 +339,15 @@ msgstr ""
 msgid ""
 "This site uses only connection data (server logs) for security and "
 "maintenance purposes. No personal information is collected via tracking "
-"or advertising cookies. By continuing your navigation, you accept our"
+"or advertising cookies. By continuing your navigation, you accept our <a "
+"href=\"#\">privacy policy</a>."
 msgstr ""
 
-#: app/templates/base.html:99
-msgid "privacy policy"
-msgstr ""
-
-#: app/templates/base.html:101
+#: app/templates/base.html:100
 msgid "I understand"
 msgstr ""
 
-#: app/templates/base.html:107
+#: app/templates/base.html:106
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr ""

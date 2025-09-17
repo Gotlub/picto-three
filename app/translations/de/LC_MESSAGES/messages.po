@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-17 02:35+0000\n"
+"POT-Creation-Date: 2025-09-17 23:44+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -317,7 +317,7 @@ msgid "Delete My Account"
 msgstr "Mein Konto löschen"
 
 #: app/templates/base.html:6 app/templates/base.html:29
-#: app/templates/base.html:109
+#: app/templates/base.html:108
 msgid "Pictogram-Tree Builder"
 msgstr "Piktogramm-Baum-Ersteller"
 
@@ -357,18 +357,20 @@ msgstr "Abmelden"
 msgid ""
 "This site uses only connection data (server logs) for security and "
 "maintenance purposes. No personal information is collected via tracking "
-"or advertising cookies. By continuing your navigation, you accept our"
-msgstr "This site uses only connection data (server logs) for security and maintenance purposes. No personal information is collected via tracking or advertising cookies. By continuing your navigation, you accept our"
+"or advertising cookies. By continuing your navigation, you accept our <a "
+"href=\"#\">privacy policy</a>."
+msgstr ""
+"Diese Website verwendet nur Verbindungsdaten (Server-Protokolle) für "
+"Sicherheits- und Wartungszwecke. Es werden keine persönlichen "
+"Informationen über Tracking- oder Werbe-Cookies gesammelt. Indem Sie Ihre"
+" Navigation fortsetzen, akzeptieren Sie unsere <a href=\"#\">"
+"Datenschutzrichtlinie</a>."
 
-#: app/templates/base.html:99
-msgid "privacy policy"
-msgstr "privacy policy"
-
-#: app/templates/base.html:101
+#: app/templates/base.html:100
 msgid "I understand"
-msgstr "I understand"
+msgstr "Ich verstehe"
 
-#: app/templates/base.html:107
+#: app/templates/base.html:106
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Angemeldet als: %(username)s"
@@ -757,3 +759,6 @@ msgid "If you did not make this request, please ignore this email."
 msgstr ""
 "Wenn Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail "
 "bitte."
+
+#~ msgid "privacy policy"
+#~ msgstr "privacy policy"

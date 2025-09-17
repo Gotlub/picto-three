@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-17 02:35+0000\n"
+"POT-Creation-Date: 2025-09-17 23:44+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -322,7 +322,7 @@ msgid "Delete My Account"
 msgstr "Eliminar mi cuenta"
 
 #: app/templates/base.html:6 app/templates/base.html:29
-#: app/templates/base.html:109
+#: app/templates/base.html:108
 msgid "Pictogram-Tree Builder"
 msgstr "Constructor de árboles de pictogramas"
 
@@ -362,18 +362,19 @@ msgstr "Cerrar sesión"
 msgid ""
 "This site uses only connection data (server logs) for security and "
 "maintenance purposes. No personal information is collected via tracking "
-"or advertising cookies. By continuing your navigation, you accept our"
-msgstr "This site uses only connection data (server logs) for security and maintenance purposes. No personal information is collected via tracking or advertising cookies. By continuing your navigation, you accept our"
+"or advertising cookies. By continuing your navigation, you accept our <a "
+"href=\"#\">privacy policy</a>."
+msgstr ""
+"Este sitio utiliza únicamente datos de conexión (registros del servidor) "
+"para fines de seguridad y mantenimiento. No se recopila información "
+"personal a través de cookies de seguimiento o publicitarias. Al continuar "
+"con su navegación, acepta nuestra <a href=\"#\">política de privacidad</a>."
 
-#: app/templates/base.html:99
-msgid "privacy policy"
-msgstr "privacy policy"
-
-#: app/templates/base.html:101
+#: app/templates/base.html:100
 msgid "I understand"
-msgstr "I understand"
+msgstr "Entendido"
 
-#: app/templates/base.html:107
+#: app/templates/base.html:106
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Conectado como: %(username)s"
@@ -758,3 +759,6 @@ msgstr ""
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Si no has realizado esta solicitud, ignora este correo electrónico."
+
+#~ msgid "privacy policy"
+#~ msgstr "privacy policy"
