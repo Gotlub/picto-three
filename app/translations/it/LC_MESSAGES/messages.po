@@ -20,7 +20,7 @@ msgstr ""
 
 #: app/routes.py:35 app/templates/legal.html:5
 msgid "Legal Information"
-msgstr "Legal Information"
+msgstr "Informazioni Legali"
 
 #: app/routes.py:45
 msgid "Invalid username or password"
@@ -317,45 +317,40 @@ msgstr "Elimina il mio account"
 
 #: app/templates/base.html:6 app/templates/base.html:29
 #: app/templates/base.html:108
-#, fuzzy
 msgid "Pictogram-Tree Builder"
-msgstr "Benvenuto nel Costruttore di alberi di pittogrammi"
+msgstr "Costruttore di alberi di pittogrammi"
 
 #: app/templates/base.html:30
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Attiva/disattiva navigazione"
 
 #: app/templates/base.html:36
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: app/templates/base.html:39 app/templates/builder.html:59
 msgid "Tree Builder"
 msgstr "Costruttore di alberi"
 
 #: app/templates/base.html:42
-#, fuzzy
 msgid "List Builder"
-msgstr "Costruttore di alberi"
+msgstr "Costruttore di liste"
 
 #: app/templates/base.html:46
-#, fuzzy
 msgid "Pictogram Bank"
-msgstr "I miei pittogrammi"
+msgstr "Banca dei pittogrammi"
 
 #: app/templates/base.html:67
 msgid "Login"
-msgstr ""
+msgstr "Accesso"
 
 #: app/templates/base.html:71
-#, fuzzy
 msgid "Account"
-msgstr "Account Data:"
+msgstr "Account"
 
 #: app/templates/base.html:74
-#, fuzzy
 msgid "Logout"
-msgstr "Radice"
+msgstr "Disconnessione"
 
 #: app/templates/base.html:98
 #, python-format
@@ -365,19 +360,24 @@ msgid ""
 "or advertising cookies. By continuing your navigation, you accept our <a "
 "href=\"%(href)s\">privacy policy</a>."
 msgstr ""
+"Questo sito utilizza solo dati di connessione (log del server) per scopi "
+"di sicurezza e manutenzione. Nessuna informazione personale viene "
+"raccolta tramite cookie di tracciamento o pubblicitari. Continuando la "
+"navigazione, accetti la nostra <a href=\"%(href)s\">informativa sulla "
+"privacy</a>."
 
 #: app/templates/base.html:100
 msgid "I understand"
-msgstr ""
+msgstr "Ho capito"
 
 #: app/templates/base.html:106
-#, fuzzy, python-format
+#, python-format
 msgid "Logged in as: %(username)s"
-msgstr "Ciao, %(username)s!"
+msgstr "Accesso come: %(username)s"
 
 #: app/templates/base.html:110
 msgid "Terms & Privacy"
-msgstr "Terms & Privacy"
+msgstr "Termini e Privacy"
 
 #: app/templates/builder.html:10
 msgid "Import Options"
@@ -526,15 +526,15 @@ msgstr "Esporta i tuoi alberi come file JSON per usarli ovunque."
 
 #: app/templates/legal.html:8
 msgid "TERMS OF SERVICE"
-msgstr "TERMS OF SERVICE"
+msgstr "TERMINI DI SERVIZIO"
 
 #: app/templates/legal.html:9 app/templates/legal.html:38
 msgid "Last Revision:"
-msgstr "Last Revision:"
+msgstr "Ultima revisione:"
 
 #: app/templates/legal.html:9 app/templates/legal.html:38
 msgid "September 18, 2025"
-msgstr "September 18, 2025"
+msgstr "18 settembre 2025"
 
 #: app/templates/legal.html:10
 msgid ""
@@ -542,13 +542,13 @@ msgid ""
 " https://pictotree.eu website (the \"Service\") operated by the "
 "Pictotree.eu team (\"us\", \"we\", or \"our\")."
 msgstr ""
-"Please read these Terms of Service (\"Terms\") carefully before using the"
-" https://pictotree.eu website (the \"Service\") operated by the "
-"Pictotree.eu team (\"us\", \"we\", or \"our\")."
+"Si prega di leggere attentamente questi Termini di servizio (\"Termini\") "
+"prima di utilizzare il sito web https://pictotree.eu (il \"Servizio\") "
+"gestito dal team di Pictotree.eu (\"noi\", \"ci\" o \"nostro\")."
 
 #: app/templates/legal.html:12
 msgid "1. Acceptance of Terms"
-msgstr "1. Acceptance of Terms"
+msgstr "1. Accettazione dei termini"
 
 #: app/templates/legal.html:13
 msgid ""
@@ -556,13 +556,13 @@ msgid ""
 "If you disagree with any part of the terms, then you may not access the "
 "Service."
 msgstr ""
-"By accessing or using the Service, you agree to be bound by these Terms. "
-"If you disagree with any part of the terms, then you may not access the "
-"Service."
+"Accedendo o utilizzando il Servizio, l'utente accetta di essere vincolato "
+"da questi Termini. Se non si è d'accordo con una qualsiasi parte dei "
+"termini, non è possibile accedere al Servizio."
 
 #: app/templates/legal.html:15
 msgid "2. User Accounts"
-msgstr "2. User Accounts"
+msgstr "2. Account utente"
 
 #: app/templates/legal.html:16
 msgid ""
@@ -574,49 +574,50 @@ msgid ""
 " details, all images you have uploaded, and any associated database "
 "entries."
 msgstr ""
-"To access certain features of the Service, you must register for an "
-"account. You are responsible for safeguarding your password and for all "
-"activities that occur under your account. You may terminate your account "
-"at any time through your user settings. Upon termination, a cascading "
-"deletion process will be initiated, which permanently erases your account"
-" details, all images you have uploaded, and any associated database "
-"entries."
+"Per accedere a determinate funzionalità del Servizio, è necessario "
+"registrarsi per un account. L'utente è responsabile della salvaguardia "
+"della propria password e di tutte le attività che si verificano con il "
+"proprio account. È possibile chiudere il proprio account in qualsiasi "
+"momento tramite le impostazioni utente. Alla chiusura, verrà avviato un "
+"processo di eliminazione a cascata, che cancellerà in modo permanente i "
+"dettagli dell'account, tutte le immagini caricate e qualsiasi voce di "
+"database associata."
 
 #: app/templates/legal.html:18
 msgid "3. User-Generated Content"
-msgstr "3. User-Generated Content"
+msgstr "3. Contenuti generati dagli utenti"
 
 #: app/templates/legal.html:19
 msgid ""
 "You retain all ownership rights to the content you submit to the Service "
 "(\"/pictogram-bank\")."
 msgstr ""
-"You retain all ownership rights to the content you submit to the Service "
-"(\"/pictogram-bank\")."
+"L'utente mantiene tutti i diritti di proprietà sui contenuti inviati al "
+"Servizio (\"/pictogram-bank\")."
 
 #: app/templates/legal.html:20
 msgid "You agree not to post User Content that:"
-msgstr "You agree not to post User Content that:"
+msgstr "L'utente si impegna a non pubblicare Contenuti utente che:"
 
 #: app/templates/legal.html:22
 msgid ""
 "Is unlawful, defamatory, libelous, obscene, pornographic, harassing, "
 "threatening, or promotes discrimination, bigotry, racism, or hatred."
 msgstr ""
-"Is unlawful, defamatory, libelous, obscene, pornographic, harassing, "
-"threatening, or promotes discrimination, bigotry, racism, or hatred."
+"Sia illegale, diffamatorio, calunnioso, osceno, pornografico, molesto, "
+"minaccioso o che promuova discriminazione, bigottismo, razzismo o odio."
 
 #: app/templates/legal.html:23
 msgid ""
 "Violates any third-party's right, including any intellectual property "
 "rights or rights of privacy."
 msgstr ""
-"Violates any third-party's right, including any intellectual property "
-"rights or rights of privacy."
+"Violare i diritti di terzi, inclusi i diritti di proprietà intellettuale "
+"o i diritti alla privacy."
 
 #: app/templates/legal.html:26
 msgid "4. Prohibited Conduct"
-msgstr "4. Prohibited Conduct"
+msgstr "4. Condotta proibita"
 
 #: app/templates/legal.html:27
 msgid ""
@@ -624,13 +625,14 @@ msgid ""
 "includes, but is not limited to, interfering with our Service, uploading "
 "malicious code, or attempting to breach security measures."
 msgstr ""
-"You agree not to misuse the Service or help anyone else to do so. This "
-"includes, but is not limited to, interfering with our Service, uploading "
-"malicious code, or attempting to breach security measures."
+"L'utente si impegna a non abusare del Servizio o ad aiutare chiunque altro"
+" a farlo. Ciò include, a titolo esemplificativo, l'interferenza con il "
+"nostro Servizio, il caricamento di codice dannoso o il tentativo di "
+"violare le misure di sicurezza."
 
 #: app/templates/legal.html:29
 msgid "5. Moderation and Enforcement"
-msgstr "5. Moderation and Enforcement"
+msgstr "5. Moderazione e applicazione"
 
 #: app/templates/legal.html:30
 msgid ""
@@ -640,15 +642,16 @@ msgid ""
 "reporting illegal activities to the relevant law enforcement authorities "
 "and pursuing legal action against violators."
 msgstr ""
-"We reserve the right, but are not obligated, to review and remove any "
-"User Content or terminate user accounts that, in our sole judgment, "
-"violate these Terms. We may take any action we deem necessary, including "
-"reporting illegal activities to the relevant law enforcement authorities "
-"and pursuing legal action against violators."
+"Ci riserviamo il diritto, ma non siamo obbligati, di rivedere e rimuovere "
+"qualsiasi Contenuto dell'utente o di chiudere gli account utente che, a "
+"nostro insindacabile giudizio, violano questi Termini. Possiamo intraprendere"
+" qualsiasi azione che riteniamo necessaria, inclusa la segnalazione di "
+"attività illegali alle autorità competenti e l'azione legale contro i "
+"trasgressori."
 
 #: app/templates/legal.html:32
 msgid "6. Disclaimer of Warranties"
-msgstr "6. Disclaimer of Warranties"
+msgstr "6. Esclusione di garanzie"
 
 #: app/templates/legal.html:33
 msgid ""
@@ -656,17 +659,17 @@ msgid ""
 "make no warranty that the Service will be uninterrupted, timely, or "
 "error-free."
 msgstr ""
-"The Service is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. We "
-"make no warranty that the Service will be uninterrupted, timely, or "
-"error-free."
+"Il Servizio è fornito \"COSÌ COM'È\" e \"COME DISPONIBILE\". Non forniamo "
+"alcuna garanzia che il Servizio sarà ininterrotto, tempestivo o privo di "
+"errori."
 
 #: app/templates/legal.html:37
 msgid "PRIVACY POLICY"
-msgstr "PRIVACY POLICY"
+msgstr "INFORMATIVA SULLA PRIVACY"
 
 #: app/templates/legal.html:40
 msgid "1. Introduction"
-msgstr "1. Introduction"
+msgstr "1. Introduzione"
 
 #: app/templates/legal.html:41
 msgid ""
@@ -676,23 +679,24 @@ msgid ""
 "(GDPR). The data controller for this Service is the Pictotree.eu team, "
 "reachable at the form contact."
 msgstr ""
-"This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
-" uses, and protects your personal data. We are committed to protecting "
-"your privacy in compliance with the General Data Protection Regulation "
-"(GDPR). The data controller for this Service is the Pictotree.eu team, "
-"reachable at the form contact."
+"La presente Informativa sulla privacy descrive come Pictotree.eu (il "
+"\"Servizio\") raccoglie, utilizza e protegge i dati personali dell'utente. "
+"Ci impegniamo a proteggere la privacy dell'utente in conformità con il "
+"Regolamento generale sulla protezione dei dati (GDPR). Il titolare del "
+"trattamento dei dati per questo servizio è il team di Pictotree.eu, "
+"raggiungibile tramite il modulo di contatto."
 
 #: app/templates/legal.html:43
 msgid "2. Personal Data We Collect"
-msgstr "2. Personal Data We Collect"
+msgstr "2. Dati personali che raccogliamo"
 
 #: app/templates/legal.html:44
 msgid "We collect the following types of personal data:"
-msgstr "We collect the following types of personal data:"
+msgstr "Raccogliamo i seguenti tipi di dati personali:"
 
 #: app/templates/legal.html:46
 msgid "Account Data:"
-msgstr "Account Data:"
+msgstr "Dati dell'account:"
 
 #: app/templates/legal.html:46
 msgid ""
@@ -700,13 +704,13 @@ msgid ""
 "address. The lawful basis for this processing is the performance of a "
 "contract (our Terms of Service)."
 msgstr ""
-"Information you provide upon registration, such as username and email "
-"address. The lawful basis for this processing is the performance of a "
-"contract (our Terms of Service)."
+"Informazioni fornite al momento della registrazione, come nome utente e "
+"indirizzo e-mail. La base giuridica di questo trattamento è l'esecuzione "
+"di un contratto (i nostri Termini di servizio)."
 
 #: app/templates/legal.html:47
 msgid "User-Generated Content:"
-msgstr "User-Generated Content:"
+msgstr "Contenuti generati dagli utenti:"
 
 #: app/templates/legal.html:47
 msgid ""
@@ -714,13 +718,13 @@ msgid ""
 "basis is your consent and our legitimate interest in providing the "
 "Service's core functionality."
 msgstr ""
-"Images and other data you voluntarily upload to the Service. The lawful "
-"basis is your consent and our legitimate interest in providing the "
-"Service's core functionality."
+"Immagini e altri dati caricati volontariamente dall'utente sul Servizio. "
+"La base giuridica è il consenso dell'utente e il nostro legittimo "
+"interesse a fornire la funzionalità principale del Servizio."
 
 #: app/templates/legal.html:48 app/templates/legal.html:54
 msgid "Technical Log Data:"
-msgstr "Technical Log Data:"
+msgstr "Dati di registro tecnici:"
 
 #: app/templates/legal.html:48
 msgid ""
@@ -729,18 +733,19 @@ msgid ""
 "string, and timestamps of access. The lawful basis for this processing is"
 " our legitimate interest in preventing fraud and securing our Service."
 msgstr ""
-"For the purpose of maintaining the security and integrity of our systems,"
-" we process server logs which may include your IP address, user-agent "
-"string, and timestamps of access. The lawful basis for this processing is"
-" our legitimate interest in preventing fraud and securing our Service."
+"Al fine di mantenere la sicurezza e l'integrità dei nostri sistemi, "
+"elaboriamo i registri del server che possono includere l'indirizzo IP "
+"dell'utente, la stringa user-agent e i timestamp di accesso. La base "
+"giuridica di questo trattamento è il nostro legittimo interesse a "
+"prevenire le frodi e a proteggere il nostro Servizio."
 
 #: app/templates/legal.html:51
 msgid "3. Data Retention"
-msgstr "3. Data Retention"
+msgstr "3. Conservazione dei dati"
 
 #: app/templates/legal.html:53
 msgid "Account and User-Generated Content:"
-msgstr "Account and User-Generated Content:"
+msgstr "Account e contenuti generati dagli utenti:"
 
 #: app/templates/legal.html:53
 msgid ""
@@ -748,69 +753,73 @@ msgid ""
 " permanently and irrevocably deleted upon your request to terminate the "
 "account."
 msgstr ""
-"This data is retained for the duration of your account's existence. It is"
-" permanently and irrevocably deleted upon your request to terminate the "
-"account."
+"Questi dati vengono conservati per tutta la durata dell'esistenza "
+"dell'account dell'utente. Vengono eliminati in modo permanente e "
+"irrevocabile su richiesta di chiusura dell'account."
 
 #: app/templates/legal.html:54
 msgid "Server logs are automatically purged after a period of six (6) months."
-msgstr "Server logs are automatically purged after a period of six (6) months."
+msgstr ""
+"I registri del server vengono eliminati automaticamente dopo un periodo "
+"di sei (6) mesi."
 
 #: app/templates/legal.html:57
 msgid "4. Your Rights as a Data Subject"
-msgstr "4. Your Rights as a Data Subject"
+msgstr "4. I tuoi diritti come interessato"
 
 #: app/templates/legal.html:58
 msgid ""
 "Under the GDPR, you have the following rights regarding your personal "
 "data:"
 msgstr ""
-"Under the GDPR, you have the following rights regarding your personal "
-"data:"
+"Ai sensi del GDPR, l'utente ha i seguenti diritti in merito ai propri "
+"dati personali:"
 
 #: app/templates/legal.html:60
 msgid "The right to access: You can request copies of your personal data."
-msgstr "The right to access: You can request copies of your personal data."
+msgstr ""
+"Il diritto di accesso: puoi richiedere copie dei tuoi dati personali."
 
 #: app/templates/legal.html:61
 msgid ""
 "The right to rectification: You can request that we correct any "
 "information you believe is inaccurate."
 msgstr ""
-"The right to rectification: You can request that we correct any "
-"information you believe is inaccurate."
+"Il diritto di rettifica: puoi richiedere la correzione di qualsiasi "
+"informazione che ritieni inesatta."
 
 #: app/templates/legal.html:62
 msgid ""
 "The right to erasure (right to be forgotten): You can request the erasure"
 " of your personal data. This is actioned by deleting your account."
 msgstr ""
-"The right to erasure (right to be forgotten): You can request the erasure"
-" of your personal data. This is actioned by deleting your account."
+"Il diritto alla cancellazione (diritto all'oblio): puoi richiedere la "
+"cancellazione dei tuoi dati personali. Ciò avviene eliminando il tuo "
+"account."
 
 #: app/templates/legal.html:63
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
 msgstr ""
-"The right to restrict processing: You can request that we restrict the "
-"processing of your personal data under certain conditions."
+"Il diritto di limitare il trattamento: puoi richiederci di limitare il "
+"trattamento dei tuoi dati personali a determinate condizioni."
 
 #: app/templates/legal.html:64
 msgid ""
 "The right to object to processing: You can object to our processing of "
 "your personal data."
 msgstr ""
-"The right to object to processing: You can object to our processing of "
-"your personal data."
+"Il diritto di opposizione al trattamento: puoi opporti al nostro "
+"trattamento dei tuoi dati personali."
 
 #: app/templates/legal.html:65
 msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
 msgstr ""
-"The right to data portability: You can request that we transfer the data "
-"that we have collected to another organization, or directly to you."
+"Il diritto alla portabilità dei dati: puoi richiedere che trasferiamo i "
+"dati che abbiamo raccolto a un'altra organizzazione o direttamente a te."
 
 #: app/templates/legal.html:67
 msgid ""
@@ -818,13 +827,14 @@ msgid ""
 " You also have the right to lodge a complaint with a supervisory "
 "authority (such as the CNIL in France)."
 msgstr ""
-"To exercise any of these rights, please contact us with the form contact."
-" You also have the right to lodge a complaint with a supervisory "
-"authority (such as the CNIL in France)."
+"Per esercitare uno qualsiasi di questi diritti, ti preghiamo di "
+"contattarci tramite il modulo di contatto. Hai anche il diritto di "
+"presentare un reclamo a un'autorità di controllo (come il CNIL in "
+"Francia)."
 
 #: app/templates/legal.html:69
 msgid "5. Data Security & Transfer"
-msgstr "5. Data Security & Transfer"
+msgstr "5. Sicurezza e trasferimento dei dati"
 
 #: app/templates/legal.html:70
 msgid ""
@@ -833,10 +843,10 @@ msgid ""
 "servers located within the European Union. We do not sell or share your "
 "personal data with third parties for marketing purposes."
 msgstr ""
-"We implement appropriate technical and organizational measures to ensure "
-"a level of security appropriate to the risk. Your data is stored on "
-"servers located within the European Union. We do not sell or share your "
-"personal data with third parties for marketing purposes."
+"Implementiamo misure tecniche e organizzative adeguate per garantire un "
+"livello di sicurezza adeguato al rischio. I tuoi dati sono archiviati su "
+"server situati all'interno dell'Unione Europea. Non vendiamo né "
+"condividiamo i tuoi dati personali con terze parti per scopi di marketing."
 
 #: app/templates/list.html:17
 msgid "Tree Source"
