@@ -29,6 +29,11 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 def index():
     return render_template('index.html', title='Home')
 
+
+@bp.route('/legal')
+def legal_page():
+    return render_template('legal.html', title=_('Legal Information'))
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -837,7 +842,7 @@ def delete_folder_recursive(folder):
             physical_path.unlink(missing_ok=True)
             physical_path_min = base_path_min / image.path
             physical_path_min = physical_path_min.with_suffix('.png')
-            physical_path_min.unlink()
+            physical_path_min.unlink(missing_ok=True)
         except OSError as e:
             print(f"Error deleting file {physical_path}: {e}") # Or use proper logging
         db.session.delete(image)

@@ -95,18 +95,19 @@
 
         <div id="cookie-banner">
             <p>
-                {% trans %}This site uses only connection data (server logs) for security and maintenance purposes. No personal information is collected via tracking or advertising cookies. By continuing your navigation, you accept our <a href="#">privacy policy</a>.{% endtrans %}
+                {% set policy_url = url_for('main.legal_page') %}{% trans href=policy_url %}This site uses only connection data (server logs) for security and maintenance purposes. No personal information is collected via tracking or advertising cookies. By continuing your navigation, you accept our <a href="{{ href }}">privacy policy</a>.{% endtrans %}
             </p>
             <button id="cookie-consent-button">{{ _("I understand") }}</button>
         </div>
 
         <footer class="footer mt-auto py-3 bg-dark text-white">
-            <div class="container text-center">
+            <div class="container d-flex">
                 {% if current_user.is_authenticated %}
                 <span>{{ _('Logged in as: %(username)s', username=current_user.username) }}</span>
                 {% else %}
                 <span>{{ _('Pictogram-Tree Builder') }}</span>
                 {% endif %}
+                <a href="{{ url_for('main.legal_page') }}" class="ms-auto text-white">{{ _('Terms & Privacy') }}</a>
             </div>
         </footer>
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-17 23:44+0000\n"
+"POT-Creation-Date: 2025-09-18 16:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,242 +17,246 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:40
+#: app/routes.py:35 app/templates/legal.html:5
+msgid "Legal Information"
+msgstr ""
+
+#: app/routes.py:45
 msgid "Invalid username or password"
 msgstr ""
 
-#: app/routes.py:44
+#: app/routes.py:49
 #, python-format
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
 "href=\"%(url)s\">Resend confirmation email?</a>"
 msgstr ""
 
-#: app/routes.py:62
+#: app/routes.py:67
 msgid "An email with instructions to reset your password has been sent."
 msgstr ""
 
-#: app/routes.py:64
+#: app/routes.py:69
 msgid "No account found with that email address."
 msgstr ""
 
-#: app/routes.py:74
+#: app/routes.py:79
 msgid "The reset link is invalid or has expired."
 msgstr ""
 
-#: app/routes.py:82
+#: app/routes.py:87
 msgid "Your password has been reset successfully."
 msgstr ""
 
-#: app/routes.py:110
+#: app/routes.py:115
 msgid "Your password has been changed successfully."
 msgstr ""
 
-#: app/routes.py:112
+#: app/routes.py:117
 msgid "Invalid current password."
 msgstr ""
 
-#: app/routes.py:116 app/routes.py:193
+#: app/routes.py:121 app/routes.py:198
 #, python-format
 msgid "Error in %(field)s: %(error)s"
 msgstr ""
 
-#: app/routes.py:145
+#: app/routes.py:150
 msgid "Your account has been successfully deleted."
 msgstr ""
 
-#: app/routes.py:148
+#: app/routes.py:153
 msgid "Invalid username confirmation. Account deletion cancelled."
 msgstr ""
 
-#: app/routes.py:151
+#: app/routes.py:156
 msgid "Invalid form submission."
 msgstr ""
 
-#: app/routes.py:187
+#: app/routes.py:192
 msgid "A confirmation email has been sent to your email address."
 msgstr ""
 
-#: app/routes.py:190
+#: app/routes.py:195
 msgid "Registration failed. Please check the errors below."
 msgstr ""
 
-#: app/routes.py:200
+#: app/routes.py:205
 msgid "The confirmation link is invalid or has expired."
 msgstr ""
 
-#: app/routes.py:205
+#: app/routes.py:210
 msgid "Account already confirmed. Please login."
 msgstr ""
 
-#: app/routes.py:210
+#: app/routes.py:215
 msgid "Your account has been confirmed successfully!"
 msgstr ""
 
-#: app/routes.py:222
+#: app/routes.py:227
 msgid "This account is already confirmed. Please login."
 msgstr ""
 
-#: app/routes.py:228
+#: app/routes.py:233
 msgid "A new confirmation email has been sent."
 msgstr ""
 
-#: app/routes.py:231
+#: app/routes.py:236
 msgid "No account found with that email address. Please register."
 msgstr ""
 
-#: app/routes.py:245
+#: app/routes.py:250
 msgid "Invalid tree data received."
 msgstr ""
 
-#: app/routes.py:346
+#: app/routes.py:351
 msgid "Your language has been updated."
 msgstr ""
 
-#: app/routes.py:350
+#: app/routes.py:355
 msgid "The language has been updated for this session."
 msgstr ""
 
-#: app/routes.py:416 app/routes.py:485 app/routes.py:612 app/routes.py:773
-#: app/routes.py:869
+#: app/routes.py:421 app/routes.py:490 app/routes.py:617 app/routes.py:778
+#: app/routes.py:874
 msgid "Invalid data"
 msgstr ""
 
-#: app/routes.py:423
+#: app/routes.py:428
 msgid "Missing required fields: list_name and payload are required."
 msgstr ""
 
-#: app/routes.py:439
+#: app/routes.py:444
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
 msgstr ""
 
-#: app/routes.py:451 app/routes.py:497
+#: app/routes.py:456 app/routes.py:502
 msgid "List updated successfully"
 msgstr ""
 
-#: app/routes.py:462
+#: app/routes.py:467
 msgid "List saved successfully"
 msgstr ""
 
-#: app/routes.py:479 app/routes.py:506
+#: app/routes.py:484 app/routes.py:511
 msgid "List not found"
 msgstr ""
 
-#: app/routes.py:481 app/routes.py:508 app/routes.py:528
+#: app/routes.py:486 app/routes.py:513 app/routes.py:533
 msgid "Unauthorized"
 msgstr ""
 
-#: app/routes.py:513
+#: app/routes.py:518
 msgid "List deleted successfully"
 msgstr ""
 
-#: app/routes.py:519
+#: app/routes.py:524
 msgid "parent_id is required"
 msgstr ""
 
-#: app/routes.py:523
+#: app/routes.py:528
 msgid "Folder not found"
 msgstr ""
 
-#: app/routes.py:603
+#: app/routes.py:608
 msgid "Root folder not found"
 msgstr ""
 
-#: app/routes.py:619
+#: app/routes.py:624
 msgid "Parent folder not found or not owned by user"
 msgstr ""
 
-#: app/routes.py:630
+#: app/routes.py:635
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr ""
 
-#: app/routes.py:673
+#: app/routes.py:678
 msgid "No file part"
 msgstr ""
 
-#: app/routes.py:677
+#: app/routes.py:682
 msgid "No selected file"
 msgstr ""
 
-#: app/routes.py:681
+#: app/routes.py:686
 msgid "No folder_id specified"
 msgstr ""
 
-#: app/routes.py:685 app/routes.py:877
+#: app/routes.py:690 app/routes.py:882
 msgid "Folder not found or not owned by user"
 msgstr ""
 
-#: app/routes.py:720
+#: app/routes.py:725
 msgid "File upload failed"
 msgstr ""
 
-#: app/routes.py:731
+#: app/routes.py:736
 msgid "Image not found"
 msgstr ""
 
-#: app/routes.py:735
+#: app/routes.py:740
 msgid "Unauthorized to edit this image"
 msgstr ""
 
-#: app/routes.py:739
+#: app/routes.py:744
 msgid "Invalid JSON data"
 msgstr ""
 
-#: app/routes.py:752
+#: app/routes.py:757
 msgid "Image updated successfully"
 msgstr ""
 
-#: app/routes.py:780
+#: app/routes.py:785
 msgid "Missing required fields"
 msgstr ""
 
-#: app/routes.py:785
+#: app/routes.py:790
 msgid "Cannot save an empty tree as public."
 msgstr ""
 
-#: app/routes.py:794
+#: app/routes.py:799
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
 msgstr ""
 
-#: app/routes.py:804
+#: app/routes.py:809
 msgid "Tree updated successfully"
 msgstr ""
 
-#: app/routes.py:814
+#: app/routes.py:819
 msgid "Tree saved successfully"
 msgstr ""
 
-#: app/routes.py:880
+#: app/routes.py:885
 msgid "Cannot delete root folder"
 msgstr ""
 
-#: app/routes.py:884
+#: app/routes.py:889
 msgid "Folder and all its contents deleted"
 msgstr ""
 
-#: app/routes.py:889
+#: app/routes.py:894
 msgid "Image not found or not owned by user"
 msgstr ""
 
-#: app/routes.py:900
+#: app/routes.py:905
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr ""
 
-#: app/routes.py:904
+#: app/routes.py:909
 msgid "Image deleted"
 msgstr ""
 
-#: app/routes.py:906
+#: app/routes.py:911
 msgid "Invalid item type"
 msgstr ""
 
-#: app/routes.py:921
+#: app/routes.py:926
 msgid "No images to export"
 msgstr ""
 
@@ -336,11 +340,12 @@ msgid "Logout"
 msgstr ""
 
 #: app/templates/base.html:98
+#, python-format
 msgid ""
 "This site uses only connection data (server logs) for security and "
 "maintenance purposes. No personal information is collected via tracking "
 "or advertising cookies. By continuing your navigation, you accept our <a "
-"href=\"#\">privacy policy</a>."
+"href=\"%(href)s\">privacy policy</a>."
 msgstr ""
 
 #: app/templates/base.html:100
@@ -350,6 +355,10 @@ msgstr ""
 #: app/templates/base.html:106
 #, python-format
 msgid "Logged in as: %(username)s"
+msgstr ""
+
+#: app/templates/base.html:110
+msgid "Terms & Privacy"
 msgstr ""
 
 #: app/templates/builder.html:10
@@ -493,6 +502,253 @@ msgstr ""
 
 #: app/templates/index.html:44
 msgid "Export your trees as JSON files to use them anywhere."
+msgstr ""
+
+#: app/templates/legal.html:8
+msgid "TERMS OF SERVICE"
+msgstr ""
+
+#: app/templates/legal.html:9 app/templates/legal.html:38
+msgid "Last Revision:"
+msgstr ""
+
+#: app/templates/legal.html:9 app/templates/legal.html:38
+msgid "September 18, 2025"
+msgstr ""
+
+#: app/templates/legal.html:10
+msgid ""
+"Please read these Terms of Service (\"Terms\") carefully before using the"
+" https://pictotree.eu website (the \"Service\") operated by the "
+"Pictotree.eu team (\"us\", \"we\", or \"our\")."
+msgstr ""
+
+#: app/templates/legal.html:12
+msgid "1. Acceptance of Terms"
+msgstr ""
+
+#: app/templates/legal.html:13
+msgid ""
+"By accessing or using the Service, you agree to be bound by these Terms. "
+"If you disagree with any part of the terms, then you may not access the "
+"Service."
+msgstr ""
+
+#: app/templates/legal.html:15
+msgid "2. User Accounts"
+msgstr ""
+
+#: app/templates/legal.html:16
+msgid ""
+"To access certain features of the Service, you must register for an "
+"account. You are responsible for safeguarding your password and for all "
+"activities that occur under your account. You may terminate your account "
+"at any time through your user settings. Upon termination, a cascading "
+"deletion process will be initiated, which permanently erases your account"
+" details, all images you have uploaded, and any associated database "
+"entries."
+msgstr ""
+
+#: app/templates/legal.html:18
+msgid "3. User-Generated Content"
+msgstr ""
+
+#: app/templates/legal.html:19
+msgid ""
+"You retain all ownership rights to the content you submit to the Service "
+"(\"/pictogram-bank\")."
+msgstr ""
+
+#: app/templates/legal.html:20
+msgid "You agree not to post User Content that:"
+msgstr ""
+
+#: app/templates/legal.html:22
+msgid ""
+"Is unlawful, defamatory, libelous, obscene, pornographic, harassing, "
+"threatening, or promotes discrimination, bigotry, racism, or hatred."
+msgstr ""
+
+#: app/templates/legal.html:23
+msgid ""
+"Violates any third-party's right, including any intellectual property "
+"rights or rights of privacy."
+msgstr ""
+
+#: app/templates/legal.html:26
+msgid "4. Prohibited Conduct"
+msgstr ""
+
+#: app/templates/legal.html:27
+msgid ""
+"You agree not to misuse the Service or help anyone else to do so. This "
+"includes, but is not limited to, interfering with our Service, uploading "
+"malicious code, or attempting to breach security measures."
+msgstr ""
+
+#: app/templates/legal.html:29
+msgid "5. Moderation and Enforcement"
+msgstr ""
+
+#: app/templates/legal.html:30
+msgid ""
+"We reserve the right, but are not obligated, to review and remove any "
+"User Content or terminate user accounts that, in our sole judgment, "
+"violate these Terms. We may take any action we deem necessary, including "
+"reporting illegal activities to the relevant law enforcement authorities "
+"and pursuing legal action against violators."
+msgstr ""
+
+#: app/templates/legal.html:32
+msgid "6. Disclaimer of Warranties"
+msgstr ""
+
+#: app/templates/legal.html:33
+msgid ""
+"The Service is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. We "
+"make no warranty that the Service will be uninterrupted, timely, or "
+"error-free."
+msgstr ""
+
+#: app/templates/legal.html:37
+msgid "PRIVACY POLICY"
+msgstr ""
+
+#: app/templates/legal.html:40
+msgid "1. Introduction"
+msgstr ""
+
+#: app/templates/legal.html:41
+msgid ""
+"This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
+" uses, and protects your personal data. We are committed to protecting "
+"your privacy in compliance with the General Data Protection Regulation "
+"(GDPR). The data controller for this Service is the Pictotree.eu team, "
+"reachable at the form contact."
+msgstr ""
+
+#: app/templates/legal.html:43
+msgid "2. Personal Data We Collect"
+msgstr ""
+
+#: app/templates/legal.html:44
+msgid "We collect the following types of personal data:"
+msgstr ""
+
+#: app/templates/legal.html:46
+msgid "Account Data:"
+msgstr ""
+
+#: app/templates/legal.html:46
+msgid ""
+"Information you provide upon registration, such as username and email "
+"address. The lawful basis for this processing is the performance of a "
+"contract (our Terms of Service)."
+msgstr ""
+
+#: app/templates/legal.html:47
+msgid "User-Generated Content:"
+msgstr ""
+
+#: app/templates/legal.html:47
+msgid ""
+"Images and other data you voluntarily upload to the Service. The lawful "
+"basis is your consent and our legitimate interest in providing the "
+"Service's core functionality."
+msgstr ""
+
+#: app/templates/legal.html:48 app/templates/legal.html:54
+msgid "Technical Log Data:"
+msgstr ""
+
+#: app/templates/legal.html:48
+msgid ""
+"For the purpose of maintaining the security and integrity of our systems,"
+" we process server logs which may include your IP address, user-agent "
+"string, and timestamps of access. The lawful basis for this processing is"
+" our legitimate interest in preventing fraud and securing our Service."
+msgstr ""
+
+#: app/templates/legal.html:51
+msgid "3. Data Retention"
+msgstr ""
+
+#: app/templates/legal.html:53
+msgid "Account and User-Generated Content:"
+msgstr ""
+
+#: app/templates/legal.html:53
+msgid ""
+"This data is retained for the duration of your account's existence. It is"
+" permanently and irrevocably deleted upon your request to terminate the "
+"account."
+msgstr ""
+
+#: app/templates/legal.html:54
+msgid "Server logs are automatically purged after a period of six (6) months."
+msgstr ""
+
+#: app/templates/legal.html:57
+msgid "4. Your Rights as a Data Subject"
+msgstr ""
+
+#: app/templates/legal.html:58
+msgid ""
+"Under the GDPR, you have the following rights regarding your personal "
+"data:"
+msgstr ""
+
+#: app/templates/legal.html:60
+msgid "The right to access: You can request copies of your personal data."
+msgstr ""
+
+#: app/templates/legal.html:61
+msgid ""
+"The right to rectification: You can request that we correct any "
+"information you believe is inaccurate."
+msgstr ""
+
+#: app/templates/legal.html:62
+msgid ""
+"The right to erasure (right to be forgotten): You can request the erasure"
+" of your personal data. This is actioned by deleting your account."
+msgstr ""
+
+#: app/templates/legal.html:63
+msgid ""
+"The right to restrict processing: You can request that we restrict the "
+"processing of your personal data under certain conditions."
+msgstr ""
+
+#: app/templates/legal.html:64
+msgid ""
+"The right to object to processing: You can object to our processing of "
+"your personal data."
+msgstr ""
+
+#: app/templates/legal.html:65
+msgid ""
+"The right to data portability: You can request that we transfer the data "
+"that we have collected to another organization, or directly to you."
+msgstr ""
+
+#: app/templates/legal.html:67
+msgid ""
+"To exercise any of these rights, please contact us with the form contact."
+" You also have the right to lodge a complaint with a supervisory "
+"authority (such as the CNIL in France)."
+msgstr ""
+
+#: app/templates/legal.html:69
+msgid "5. Data Security & Transfer"
+msgstr ""
+
+#: app/templates/legal.html:70
+msgid ""
+"We implement appropriate technical and organizational measures to ensure "
+"a level of security appropriate to the risk. Your data is stored on "
+"servers located within the European Union. We do not sell or share your "
+"personal data with third parties for marketing purposes."
 msgstr ""
 
 #: app/templates/list.html:17
