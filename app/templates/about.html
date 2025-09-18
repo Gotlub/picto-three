@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from 'macros.html' import render_field %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ _('About & Contact') }}</h1>
+    <hr>
+
+    <h2>{{ _('Open Source') }}</h2>
+    <p>{{ _('This project is open source and proudly hosted on GitHub. You are free to view the source code, contribute, or reuse it for any non-commercial purposes.') }}</p>
+    <p><a href="https://github.com/Gotlub/picto-three" target="_blank" class="btn btn-secondary">{{ _('View Source Code on GitHub') }}</a></p>
+
+    <hr>
+
+    <h2>{{ _('Contact Us') }}</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <form method="POST" action="{{ url_for('main.about') }}">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.name, class="form-control") }}
+                {{ render_field(form.email, class="form-control") }}
+                {{ render_field(form.message, class="form-control", rows=5) }}
+                {{ render_field(form.recaptcha) }}
+                {{ render_field(form.submit, class="btn btn-primary") }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

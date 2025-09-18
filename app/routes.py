@@ -13,7 +13,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from PIL import Image as PILImage
 from app import db
-from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm, ResendConfirmationForm
+from app.forms import ContactForm, LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm, ResendConfirmationForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 from flask_login import current_user, login_user, logout_user, login_required
@@ -33,6 +33,26 @@ def index():
 @bp.route('/legal')
 def legal_page():
     return render_template('legal.html', title=_('Legal Information'))
+
+@bp.route('/about', methods=['GET', 'POST'])
+def about():
+    form = ContactForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        message = form.message.data
+        send_email(
+            current_app.config['ADMIN_EMAIL'],
+            f'New message from {name}',
+            'emails/contact_form.html',
+            name=name,
+            email=email,
+            message_body=message
+        )
+        flash(_('Your message has been sent successfully!'), 'success')
+        return redirect(url_for('main.about'))
+    return render_template('about.html', title=_('About & Contact'), form=form)
+
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-18 16:09+0000\n"
+"POT-Creation-Date: 2025-09-18 17:16+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -23,11 +23,19 @@ msgstr ""
 msgid "Legal Information"
 msgstr "Informacje Prawne"
 
-#: app/routes.py:45
+#: app/routes.py:52
+msgid "Your message has been sent successfully!"
+msgstr "Twoja wiadomość została pomyślnie wysłana!"
+
+#: app/routes.py:54 app/templates/about.html:6 app/templates/base.html:111
+msgid "About & Contact"
+msgstr "O nas i Kontakt"
+
+#: app/routes.py:65
 msgid "Invalid username or password"
 msgstr "Nieprawidłowa nazwa użytkownika lub hasło"
 
-#: app/routes.py:49
+#: app/routes.py:69
 #, python-format
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
@@ -36,101 +44,101 @@ msgstr ""
 "Twoje konto nie jest potwierdzone. Sprawdź swoją pocztę e-mail. <a "
 "href=\"%(url)s\">Wysłać ponownie e-mail z potwierdzeniem?</a>"
 
-#: app/routes.py:67
+#: app/routes.py:87
 msgid "An email with instructions to reset your password has been sent."
 msgstr "Wysłano wiadomość e-mail z instrukcjami dotyczącymi resetowania hasła."
 
-#: app/routes.py:69
+#: app/routes.py:89
 msgid "No account found with that email address."
 msgstr "Nie znaleziono konta o podanym adresie e-mail."
 
-#: app/routes.py:79
+#: app/routes.py:99
 msgid "The reset link is invalid or has expired."
 msgstr "Link do resetowania jest nieprawidłowy lub wygasł."
 
-#: app/routes.py:87
+#: app/routes.py:107
 msgid "Your password has been reset successfully."
 msgstr "Twoje hasło zostało pomyślnie zresetowane."
 
-#: app/routes.py:115
+#: app/routes.py:135
 msgid "Your password has been changed successfully."
 msgstr "Twoje hasło zostało pomyślnie zmienione."
 
-#: app/routes.py:117
+#: app/routes.py:137
 msgid "Invalid current password."
 msgstr "Nieprawidłowe bieżące hasło."
 
-#: app/routes.py:121 app/routes.py:198
+#: app/routes.py:141 app/routes.py:218
 #, python-format
 msgid "Error in %(field)s: %(error)s"
 msgstr "Błąd w %(field)s: %(error)s"
 
-#: app/routes.py:150
+#: app/routes.py:170
 msgid "Your account has been successfully deleted."
 msgstr "Twoje konto zostało pomyślnie usunięte."
 
-#: app/routes.py:153
+#: app/routes.py:173
 msgid "Invalid username confirmation. Account deletion cancelled."
 msgstr "Nieprawidłowe potwierdzenie nazwy użytkownika. Anulowano usuwanie konta."
 
-#: app/routes.py:156
+#: app/routes.py:176
 msgid "Invalid form submission."
 msgstr "Nieprawidłowe przesłanie formularza."
 
-#: app/routes.py:192
+#: app/routes.py:212
 msgid "A confirmation email has been sent to your email address."
 msgstr "Na Twój adres e-mail wysłano wiadomość z potwierdzeniem."
 
-#: app/routes.py:195
+#: app/routes.py:215
 msgid "Registration failed. Please check the errors below."
 msgstr "Rejestracja nie powiodła się. Sprawdź poniższe błędy."
 
-#: app/routes.py:205
+#: app/routes.py:225
 msgid "The confirmation link is invalid or has expired."
 msgstr "Link potwierdzający jest nieprawidłowy lub wygasł."
 
-#: app/routes.py:210
+#: app/routes.py:230
 msgid "Account already confirmed. Please login."
 msgstr "Konto już potwierdzone. Zaloguj się."
 
-#: app/routes.py:215
+#: app/routes.py:235
 msgid "Your account has been confirmed successfully!"
 msgstr "Twoje konto zostało pomyślnie potwierdzone!"
 
-#: app/routes.py:227
+#: app/routes.py:247
 msgid "This account is already confirmed. Please login."
 msgstr "To konto jest już potwierdzone. Zaloguj się."
 
-#: app/routes.py:233
+#: app/routes.py:253
 msgid "A new confirmation email has been sent."
 msgstr "Wysłano nową wiadomość e-mail z potwierdzeniem."
 
-#: app/routes.py:236
+#: app/routes.py:256
 msgid "No account found with that email address. Please register."
 msgstr "Nie znaleziono konta o podanym adresie e-mail. Zarejestruj się."
 
-#: app/routes.py:250
+#: app/routes.py:270
 msgid "Invalid tree data received."
 msgstr "Otrzymano nieprawidłowe dane drzewa."
 
-#: app/routes.py:351
+#: app/routes.py:371
 msgid "Your language has been updated."
 msgstr "Twój język został zaktualizowany."
 
-#: app/routes.py:355
+#: app/routes.py:375
 msgid "The language has been updated for this session."
 msgstr "Język został zaktualizowany dla tej sesji."
 
-#: app/routes.py:421 app/routes.py:490 app/routes.py:617 app/routes.py:778
-#: app/routes.py:874
+#: app/routes.py:441 app/routes.py:510 app/routes.py:637 app/routes.py:798
+#: app/routes.py:894
 msgid "Invalid data"
 msgstr "Nieprawidłowe dane"
 
-#: app/routes.py:428
+#: app/routes.py:448
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Brak wymaganych pól: list_name i payload są wymagane."
 
-#: app/routes.py:444
+#: app/routes.py:464
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -138,92 +146,92 @@ msgstr ""
 "Listy publiczne mogą zawierać tylko globalne obrazy publiczne. Przed "
 "publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
 
-#: app/routes.py:456 app/routes.py:502
+#: app/routes.py:476 app/routes.py:522
 msgid "List updated successfully"
 msgstr "Lista zaktualizowana pomyślnie"
 
-#: app/routes.py:467
+#: app/routes.py:487
 msgid "List saved successfully"
 msgstr "Lista zapisana pomyślnie"
 
-#: app/routes.py:484 app/routes.py:511
+#: app/routes.py:504 app/routes.py:531
 msgid "List not found"
 msgstr "Nie znaleziono listy"
 
-#: app/routes.py:486 app/routes.py:513 app/routes.py:533
+#: app/routes.py:506 app/routes.py:533 app/routes.py:553
 msgid "Unauthorized"
 msgstr "Nieautoryzowany"
 
-#: app/routes.py:518
+#: app/routes.py:538
 msgid "List deleted successfully"
 msgstr "Lista usunięta pomyślnie"
 
-#: app/routes.py:524
+#: app/routes.py:544
 msgid "parent_id is required"
 msgstr "parent_id jest wymagany"
 
-#: app/routes.py:528
+#: app/routes.py:548
 msgid "Folder not found"
 msgstr "Nie znaleziono folderu"
 
-#: app/routes.py:608
+#: app/routes.py:628
 msgid "Root folder not found"
 msgstr "Nie znaleziono folderu głównego"
 
-#: app/routes.py:624
+#: app/routes.py:644
 msgid "Parent folder not found or not owned by user"
 msgstr "Folder nadrzędny nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:635
+#: app/routes.py:655
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Nie można utworzyć katalogu: %(error)s"
 
-#: app/routes.py:678
+#: app/routes.py:698
 msgid "No file part"
 msgstr "Brak części pliku"
 
-#: app/routes.py:682
+#: app/routes.py:702
 msgid "No selected file"
 msgstr "Nie wybrano pliku"
 
-#: app/routes.py:686
+#: app/routes.py:706
 msgid "No folder_id specified"
 msgstr "Nie określono folder_id"
 
-#: app/routes.py:690 app/routes.py:882
+#: app/routes.py:710 app/routes.py:902
 msgid "Folder not found or not owned by user"
 msgstr "Folder nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:725
+#: app/routes.py:745
 msgid "File upload failed"
 msgstr "Przesyłanie pliku nie powiodło się"
 
-#: app/routes.py:736
+#: app/routes.py:756
 msgid "Image not found"
 msgstr "Nie znaleziono obrazu"
 
-#: app/routes.py:740
+#: app/routes.py:760
 msgid "Unauthorized to edit this image"
 msgstr "Brak uprawnień do edycji tego obrazu"
 
-#: app/routes.py:744
+#: app/routes.py:764
 msgid "Invalid JSON data"
 msgstr "Nieprawidłowe dane JSON"
 
-#: app/routes.py:757
+#: app/routes.py:777
 msgid "Image updated successfully"
 msgstr "Obraz zaktualizowany pomyślnie"
 
-#: app/routes.py:785
+#: app/routes.py:805
 msgid "Missing required fields"
 msgstr "Brak wymaganych pól"
 
-#: app/routes.py:790
+#: app/routes.py:810
 msgid "Cannot save an empty tree as public."
 msgstr "Nie można zapisać pustego drzewa jako publicznego."
 
-#: app/routes.py:799
+#: app/routes.py:819
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -231,42 +239,61 @@ msgstr ""
 "Drzewa publiczne mogą zawierać tylko globalne obrazy publiczne. Przed "
 "publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
 
-#: app/routes.py:809
+#: app/routes.py:829
 msgid "Tree updated successfully"
 msgstr "Drzewo zaktualizowane pomyślnie"
 
-#: app/routes.py:819
+#: app/routes.py:839
 msgid "Tree saved successfully"
 msgstr "Drzewo zapisane pomyślnie"
 
-#: app/routes.py:885
+#: app/routes.py:905
 msgid "Cannot delete root folder"
 msgstr "Nie można usunąć folderu głównego"
 
-#: app/routes.py:889
+#: app/routes.py:909
 msgid "Folder and all its contents deleted"
 msgstr "Folder i cała jego zawartość usunięte"
 
-#: app/routes.py:894
+#: app/routes.py:914
 msgid "Image not found or not owned by user"
 msgstr "Obraz nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:905
+#: app/routes.py:925
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Nie można usunąć pliku: %(error)s"
 
-#: app/routes.py:909
+#: app/routes.py:929
 msgid "Image deleted"
 msgstr "Obraz usunięty"
 
-#: app/routes.py:911
+#: app/routes.py:931
 msgid "Invalid item type"
 msgstr "Nieprawidłowy typ elementu"
 
-#: app/routes.py:926
+#: app/routes.py:946
 msgid "No images to export"
 msgstr "Brak obrazów do wyeksportowania"
+
+#: app/templates/about.html:9
+msgid "Open Source"
+msgstr "Open Source"
+
+#: app/templates/about.html:10
+msgid ""
+"This project is open source and proudly hosted on GitHub. You are free to"
+" view the source code, contribute, or reuse it for any non-commercial "
+"purposes."
+msgstr "Ten projekt jest open source i jest dumnie hostowany na GitHub. Możesz przeglądać kod źródłowy, wnosić wkład lub ponownie go wykorzystywać w celach niekomercyjnych."
+
+#: app/templates/about.html:11
+msgid "View Source Code on GitHub"
+msgstr "Zobacz kod źródłowy na GitHub"
+
+#: app/templates/about.html:15
+msgid "Contact Us"
+msgstr "Skontaktuj się z nami"
 
 #: app/templates/account.html:5
 msgid "Account Management"
@@ -358,8 +385,8 @@ msgid ""
 "href=\"%(href)s\">privacy policy</a>."
 msgstr ""
 "Ta strona używa tylko danych połączeniowych (logi serwera) w celach "
-"bezpieczeństwa i konserwacji. Żadne dane osobowe nie są zbierane za pomocą"
-" plików cookie śledzących lub reklamowych. Kontynuując nawigację, "
+"bezpieczeństwa i konserwacji. Żadne dane osobowe nie są zbierane za "
+"pomocą plików cookie śledzących lub reklamowych. Kontynuując nawigację, "
 "akceptujesz naszą <a href=\"%(href)s\">politykę prywatności</a>."
 
 #: app/templates/base.html:100
@@ -538,10 +565,10 @@ msgid ""
 " https://pictotree.eu website (the \"Service\") operated by the "
 "Pictotree.eu team (\"us\", \"we\", or \"our\")."
 msgstr ""
-"Prosimy o uważne zapoznanie się z niniejszymi Warunkami świadczenia usług "
-"(\"Warunki\") przed rozpoczęciem korzystania ze strony internetowej "
-"https://pictotree.eu (\"Serwis\") obsługiwanej przez zespół "
-"Pictotree.eu (\"nas\", \"my\" lub \"nasz\")."
+"Prosimy o uważne zapoznanie się z niniejszymi Warunkami świadczenia usług"
+" (\"Warunki\") przed rozpoczęciem korzystania ze strony internetowej "
+"https://pictotree.eu (\"Serwis\") obsługiwanej przez zespół Pictotree.eu "
+"(\"nas\", \"my\" lub \"nasz\")."
 
 #: app/templates/legal.html:12
 msgid "1. Acceptance of Terms"
@@ -749,13 +776,12 @@ msgid ""
 " permanently and irrevocably deleted upon your request to terminate the "
 "account."
 msgstr ""
-"Dane te są przechowywane przez cały okres istnienia Twojego konta. Są one "
-"trwale i nieodwracalnie usuwane na Twoją prośbę o zamknięcie konta."
+"Dane te są przechowywane przez cały okres istnienia Twojego konta. Są one"
+" trwale i nieodwracalnie usuwane na Twoją prośbę o zamknięcie konta."
 
 #: app/templates/legal.html:54
 msgid "Server logs are automatically purged after a period of six (6) months."
-msgstr ""
-"Logi serwera są automatycznie usuwane po okresie sześciu (6) miesięcy."
+msgstr "Logi serwera są automatycznie usuwane po okresie sześciu (6) miesięcy."
 
 #: app/templates/legal.html:57
 msgid "4. Your Rights as a Data Subject"
@@ -836,8 +862,8 @@ msgid ""
 msgstr ""
 "Wdrażamy odpowiednie środki techniczne i organizacyjne, aby zapewnić "
 "poziom bezpieczeństwa odpowiedni do ryzyka. Twoje dane są przechowywane "
-"na serwerach zlokalizowanych w Unii Europejskiej. Nie sprzedajemy ani nie "
-"udostępniamy Twoich danych osobowych stronom trzecim w celach "
+"na serwerach zlokalizowanych w Unii Europejskiej. Nie sprzedajemy ani nie"
+" udostępniamy Twoich danych osobowych stronom trzecim w celach "
 "marketingowych."
 
 #: app/templates/list.html:17
@@ -1073,10 +1099,6 @@ msgstr "Zażądałeś zresetowania hasła. Kliknij poniższy link, aby kontynuow
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Jeśli nie złożyłeś tego żądania, zignoruj tę wiadomość e-mail."
-
-#: app/templates/base.html:108
-msgid "Terms & Privacy"
-msgstr "Warunki i Prywatność"
 
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"

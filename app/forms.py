@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User
 from flask_babel import lazy_gettext as _l
@@ -69,3 +69,10 @@ class ResetPasswordForm(FlaskForm):
 class ResendConfirmationForm(FlaskForm):
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     submit = SubmitField(_l('Resend Confirmation Email'))
+
+class ContactForm(FlaskForm):
+    name = StringField(_l('Name'), validators=[DataRequired()])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    message = TextAreaField(_l('Message'), validators=[DataRequired()])
+    recaptcha = RecaptchaField()
+    submit = SubmitField(_l('Send'))
