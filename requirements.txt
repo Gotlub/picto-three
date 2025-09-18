@@ -14,3 +14,4 @@ itsdangerous
 Flask-Bootstrap
 Flask-Sitemap
 gunicorn
+Jinja2
