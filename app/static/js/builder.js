@@ -116,6 +116,7 @@ class TreeBuilder {
         this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
         this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
+        this.treeDisplay.appendChild(this.rootNode.element);
         this.selectedNode = null;
         this.draggedNode = null;
 
