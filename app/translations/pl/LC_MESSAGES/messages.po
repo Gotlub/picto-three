@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-18 17:16+0000\n"
+"POT-Creation-Date: 2025-09-20 00:21+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -285,7 +285,10 @@ msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
 " view the source code, contribute, or reuse it for any non-commercial "
 "purposes."
-msgstr "Ten projekt jest open source i jest dumnie hostowany na GitHub. Możesz przeglądać kod źródłowy, wnosić wkład lub ponownie go wykorzystywać w celach niekomercyjnych."
+msgstr ""
+"Ten projekt jest open source i jest dumnie hostowany na GitHub. Możesz "
+"przeglądać kod źródłowy, wnosić wkład lub ponownie go wykorzystywać w "
+"celach niekomercyjnych."
 
 #: app/templates/about.html:11
 msgid "View Source Code on GitHub"
@@ -1062,6 +1065,14 @@ msgstr "Pobierz wybrany obraz"
 msgid "Register"
 msgstr "Zarejestruj się"
 
+#: app/templates/register.html:48
+msgid "I accept the"
+msgstr "Akceptuję"
+
+#: app/templates/register.html:48
+msgid "Terms & Privacy Policy"
+msgstr "Warunki korzystania z usługi i Politykę prywatności"
+
 #: app/templates/resend_confirmation_request.html:5
 msgid "Resend Confirmation Email"
 msgstr "Wyślij ponownie e-mail z potwierdzeniem"
@@ -1099,6 +1110,14 @@ msgstr "Zażądałeś zresetowania hasła. Kliknij poniższy link, aby kontynuow
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Jeśli nie złożyłeś tego żądania, zignoruj tę wiadomość e-mail."
+
+#: app/forms.py:35
+msgid "I accept the Terms & Privacy Policy"
+msgstr "Akceptuję Warunki korzystania z usługi i Politykę prywatności"
+
+#: app/forms.py:35
+msgid "You must accept the terms and privacy policy to continue."
+msgstr "Aby kontynuować, musisz zaakceptować warunki i politykę prywatności."
 
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"

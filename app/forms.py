@@ -32,6 +32,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField(_l('Password'), validators=[DataRequired(), password_strength_validator])
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
+    accept_terms = BooleanField(_l('I accept the Terms & Privacy Policy'), validators=[DataRequired(_l('You must accept the terms and privacy policy to continue.'))])
     recaptcha = RecaptchaField()
     submit = SubmitField(_l('Register'))
 

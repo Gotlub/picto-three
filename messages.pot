@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-18 17:16+0000\n"
+"POT-Creation-Date: 2025-09-20 00:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -974,6 +974,14 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
+#: app/templates/register.html:48
+msgid "I accept the"
+msgstr ""
+
+#: app/templates/register.html:48
+msgid "Terms & Privacy Policy"
+msgstr ""
+
 #: app/templates/resend_confirmation_request.html:5
 msgid "Resend Confirmation Email"
 msgstr ""
@@ -1005,4 +1013,12 @@ msgstr ""
 
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
+msgstr ""
+
+#: app/forms.py:35
+msgid "I accept the Terms & Privacy Policy"
+msgstr ""
+
+#: app/forms.py:35
+msgid "You must accept the terms and privacy policy to continue."
 msgstr ""

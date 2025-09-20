@@ -42,6 +42,15 @@
                 <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
             </div>
+            <div class="form-check mb-3">
+                {{ form.accept_terms(class="form-check-input" + (" is-invalid" if form.accept_terms.errors else "")) }}
+                <label class="form-check-label" for="accept_terms">
+                    {{ _('I accept the') }} <a href="{{ url_for('main.legal') }}" target="_blank">{{ _('Terms & Privacy Policy') }}</a>
+                </label>
+                {% for error in form.accept_terms.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
             <p>{{ form.submit(class="btn btn-primary") }}</p>
                 </form>
             </div>

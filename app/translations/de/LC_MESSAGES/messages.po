@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-18 17:16+0000\n"
+"POT-Creation-Date: 2025-09-20 00:21+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -290,7 +290,10 @@ msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
 " view the source code, contribute, or reuse it for any non-commercial "
 "purposes."
-msgstr "Dieses Projekt ist Open Source und wird mit Stolz auf GitHub gehostet. Sie können den Quellcode einsehen, dazu beitragen oder ihn für nicht-kommerzielle Zwecke wiederverwenden."
+msgstr ""
+"Dieses Projekt ist Open Source und wird mit Stolz auf GitHub gehostet. "
+"Sie können den Quellcode einsehen, dazu beitragen oder ihn für nicht-"
+"kommerzielle Zwecke wiederverwenden."
 
 #: app/templates/about.html:11
 msgid "View Source Code on GitHub"
@@ -1084,6 +1087,14 @@ msgstr "Ausgewähltes Bild herunterladen"
 msgid "Register"
 msgstr "Registrieren"
 
+#: app/templates/register.html:48
+msgid "I accept the"
+msgstr "Ich akzeptiere die"
+
+#: app/templates/register.html:48
+msgid "Terms & Privacy Policy"
+msgstr "Nutzungsbedingungen und Datenschutzrichtlinie"
+
 #: app/templates/resend_confirmation_request.html:5
 msgid "Resend Confirmation Email"
 msgstr "Bestätigungs-E-Mail erneut senden"
@@ -1125,6 +1136,14 @@ msgid "If you did not make this request, please ignore this email."
 msgstr ""
 "Wenn Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail "
 "bitte."
+
+#: app/forms.py:35
+msgid "I accept the Terms & Privacy Policy"
+msgstr "Ich akzeptiere die Nutzungsbedingungen und die Datenschutzrichtlinie"
+
+#: app/forms.py:35
+msgid "You must accept the terms and privacy policy to continue."
+msgstr "Sie müssen die Nutzungsbedingungen und die Datenschutzrichtlinie akzeptieren, um fortzufahren."
 
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"

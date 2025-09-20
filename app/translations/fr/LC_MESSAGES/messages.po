@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-18 17:16+0000\n"
+"POT-Creation-Date: 2025-09-20 00:21+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -288,7 +288,10 @@ msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
 " view the source code, contribute, or reuse it for any non-commercial "
 "purposes."
-msgstr "Ce projet est open source et fièrement hébergé sur GitHub. Vous êtes libre de consulter le code source, de contribuer ou de le réutiliser à des fins non commerciales."
+msgstr ""
+"Ce projet est open source et fièrement hébergé sur GitHub. Vous êtes "
+"libre de consulter le code source, de contribuer ou de le réutiliser à "
+"des fins non commerciales."
 
 #: app/templates/about.html:11
 msgid "View Source Code on GitHub"
@@ -1079,6 +1082,14 @@ msgstr "Télécharger l'image sélectionnée"
 msgid "Register"
 msgstr "S'inscrire"
 
+#: app/templates/register.html:48
+msgid "I accept the"
+msgstr "J'accepte les"
+
+#: app/templates/register.html:48
+msgid "Terms & Privacy Policy"
+msgstr "Conditions d'utilisation et politique de confidentialité"
+
 #: app/templates/resend_confirmation_request.html:5
 msgid "Resend Confirmation Email"
 msgstr "Renvoyer l'e-mail de confirmation"
@@ -1118,6 +1129,14 @@ msgstr ""
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Si vous n'avez pas fait cette demande, veuillez ignorer cet e-mail."
+
+#: app/forms.py:35
+msgid "I accept the Terms & Privacy Policy"
+msgstr "J'accepte les conditions d'utilisation et la politique de confidentialité"
+
+#: app/forms.py:35
+msgid "You must accept the terms and privacy policy to continue."
+msgstr "Vous devez accepter les conditions d'utilisation et la politique de confidentialité pour continuer."
 
 #~ msgid "privacy policy"
 #~ msgstr "politique de confidentialité"
