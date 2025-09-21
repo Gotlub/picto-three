@@ -15,12 +15,29 @@ class ReadOnlyNode {
         this.element.setAttribute('draggable', 'true');
         this.element.addEventListener('dragstart', (e) => {
             e.stopPropagation();
-            this.listBuilder.handleSourceDragStart(e, {
-                type: 'tree-node',
-                data: { ...this.image,
-                    description: this.description
+            // 1. Fonction récursive pour collecter les données de la branche (inchangée)
+            const collectBranchData = (node) => {
+                const nodeData = { ...node.image, description: node.description };
+                let branch = [nodeData];
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(child => {
+                        branch = branch.concat(collectBranchData(child));
+                    });
                 }
-            });
+                return  branch;
+            };
+
+            // 2. Collecte des données
+            const branchData = collectBranchData(this);
+
+            // 3. Préparation de la charge utile (payload)
+            const payload = {
+                type: 'tree-branch', // Nouveau type pour identifier une branche complète
+                data: branchData
+            };
+
+            // 4. Appel de la fonction de ListBuilder pour démarrer le drag
+            this.listBuilder.handleSourceDragStart(e, payload);
         });
     }
 
@@ -36,7 +53,7 @@ class ReadOnlyNode {
         contentElement.classList.add('node-content');
         const imgElement = document.createElement('img');
         if (this.image.id === 'root') {
-            imgElement.src = '/static/images/folder-bold.png';
+            imgElement.src = '/static/images/folder-open-bold.png';
         } else if (this.image.path) {
             // Path can be a new relative path or an old absolute one during transition
             if (this.image.path.startsWith('/')) {
@@ -133,7 +150,11 @@ class ListBuilder {
 
         // Center Panel
         this.treeDisplay = document.getElementById('tree-display');
-        const rootData = { id: 'root', name: 'Root', description: 'Root' };
+        const rootData = {
+                            id: 'root',
+                            name: 'Root',
+                            path: '/static/images/folder-open-bold.png',
+                        };
         this.treeRoot = new ReadOnlyNode(rootData, rootData, this);
         this.selectedTreeNode = null;
 
@@ -236,7 +257,9 @@ class ListBuilder {
     handleSourceDragStart(e, source) {
         this.draggedSource = source;
         e.dataTransfer.effectAllowed = 'copy';
-        e.dataTransfer.setData('text/plain', source.data.id);
+        e.dataTransfer.setData('application/json', JSON.stringify(source));
+        const fallbackId = Array.isArray(source.data) ? source.data[0].id : source.data.id;
+        e.dataTransfer.setData('text/plain', fallbackId);
     }
 
     // --- Chained List (Bottom Panel) Logic ---
@@ -360,40 +383,52 @@ class ListBuilder {
             this.chainedListItems.splice(newIndexForReorder, 0, this.draggedListItem);
 
             this.draggedListItem = null;
-        } else { // Adding a new item
+        } else { // Ajout d'un ou plusieurs nouveaux items
             const dragDataString = e.dataTransfer.getData('application/json');
-            let sourceData = null;
+            let dragData = null;
 
             if (dragDataString) {
                 try {
-                    const dragData = JSON.parse(dragDataString);
-                    if (dragData.type === 'image-tree-node' || dragData.type === 'tree-node') {
-                        sourceData = dragData.data;
-                    }
+                    dragData = JSON.parse(dragDataString);
                 } catch (err) {
                     console.error("Could not parse drag data: ", err);
                 }
             }
 
-            // Fallback for older drag source pattern
-            if (!sourceData && this.draggedSource) {
-                sourceData = this.draggedSource.data;
+            // Si on a bien des données au format JSON
+            if (dragData) {
+                // CAS 1 : C'est une branche complète
+                if (dragData.type === 'tree-branch' && Array.isArray(dragData.data)) {
+                    dragData.data.forEach(itemData => {
+                        const newItemData = {
+                            image_id: itemData.id,
+                            name: itemData.name,
+                            path: itemData.path,
+                            description: itemData.description || ""
+                        };
+                        if (newItemData.name !== "Root") {
+                            const newListItem = new ChainedListItem(newItemData, this);
+                            // On insère l'item et on incrémente l'index pour le suivant
+                            this.chainedListItems.splice(newIndex + 1, 0, newListItem);
+                        }
+                    });
+                }
+                // CAS 2 : C'est un nœud simple (comportement original)
+                else if (dragData.type === 'image-tree-node' || dragData.type === 'tree-node') {
+                    const sourceData = dragData.data;
+                    const newItemData = {
+                        image_id: sourceData.id,
+                        name: sourceData.name,
+                        path: sourceData.path,
+                        description: sourceData.description || ""
+                    };
+                    const newListItem = new ChainedListItem(newItemData, this);
+                    this.chainedListItems.splice(newIndex, 0, newListItem);
+                }
             }
-
-            if (sourceData) {
-                const newItemData = {
-                    image_id: sourceData.id,
-                    name: sourceData.name,
-                    path: sourceData.path,
-                    description: sourceData.description || ""
-                };
-                const newListItem = new ChainedListItem(newItemData, this);
-                this.chainedListItems.splice(newIndex, 0, newListItem);
-            }
-            this.draggedSource = null; // Clear in all cases
+            this.draggedSource = null;
         }
-
-        this.renderChainedList();
+    this.renderChainedList();
     }
 
 
@@ -706,8 +741,12 @@ class ListBuilder {
     }
 
     rebuildTreeViewer(treeData) {
-        // Re-initialize the root node completely to ensure a clean slate
-        this.treeRoot = new ReadOnlyNode({ id: 'root', name: 'Root' }, this);
+        const rootDisplayData = {
+            id: 'root',
+            name: 'Root',
+            path: '/static/images/folder-open-bold.png' 
+        };
+        this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
 
         const buildNode = (nodeData) => {
             let image = this.allImages.find(img => img.id === nodeData.id);
