@@ -62,10 +62,8 @@ export default class ImageTreeImageNode extends ImageTreeNode {
 
         const imgElement = this.element.querySelector('img');
 
-        // 1. Remplacer l'extension originale par .png
-        const thumbPath = this.data.path.replace(/\.[^/.]+$/, ".png");
+        const thumbPath = this.data.path;
 
-        // 2. Pointer vers le dossier des miniatures /pictogramsmin/
         imgElement.src = `/pictogramsmin/${thumbPath}`;
         this.isLoaded = true;
     }
