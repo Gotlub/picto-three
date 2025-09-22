@@ -2,9 +2,8 @@ import ImageTreeFolderNode from './ImageTreeFolderNode.js';
 import ImageTreeImageNode from './ImageTreeImageNode.js';
 
 export default class ImageTree {
-    constructor(containerId, onImageClick) {
+    constructor(containerId) {
         this.container = document.getElementById(containerId);
-        this.onImageClick = onImageClick;
         this.rootNodes = [];
         this.nodeTypes = {
             FOLDER: ImageTreeFolderNode,

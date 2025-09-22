@@ -159,9 +159,8 @@ class ListBuilder {
         this.selectedTreeNode = null;
 
         // Right Panel
-        this.imageTree = new ImageTree('image-sidebar-tree', (image) => this.selectImage(image));
+        this.imageTree = new ImageTree('image-sidebar-tree');
         this.selectedLinkDescription = document.getElementById('selected-link-description');
-        this.selectedImage = null;
 
         // Bottom Panel
         this.chainedListContainer = document.getElementById('chained-list-container');
@@ -225,9 +224,72 @@ class ListBuilder {
         this.chainedListContainer.addEventListener('dragover', (e) => this.handleChainedListDragOver(e));
         this.chainedListContainer.addEventListener('dragleave', (e) => this.handleChainedListDragLeave(e));
         this.chainedListContainer.addEventListener('drop', (e) => this.handleChainedListDrop(e));
+
+        //Center Panel - unlight the branch
+        document.addEventListener('click', (e) => {
+            const isClickInsideTree = this.treeDisplay.contains(e.target);
+            if (isClickInsideTree) {
+                return;
+            }
+
+            // Otherwise, deselect any selected node.
+            this.deselectAllNodes();
+        });
+    }
+
+    selectTreeNode(theNode) {
+        this.deselectAllNodes();
+        this.selectedNode = theNode;
+
+        const applyHighlight = (n) => {
+            if (n.element) {
+                const content = n.element.querySelector('.node-content');
+                if (content) {
+                    content.classList.add('selected');
+                }
+            }
+            n.children.forEach(applyHighlight);
+        };
+
+        if (this.selectedNode) {
+            applyHighlight(this.selectedNode);
+            if (this.selectedNode.element) {
+                this.selectedNode.element.classList.add('is-selected');
+            }
+        }
+
+        if (this.nodeDescriptionTextarea) {
+            if (this.selectedNode) {
+                this.nodeDescriptionTextarea.value = this.selectedNode.description || '';
+                this.nodeDescriptionTextarea.disabled = false;
+            } else {
+                this.nodeDescriptionTextarea.value = '';
+                this.nodeDescriptionTextarea.disabled = true;
+            }
+        }
+    }
+
+    deselectAllNodes() {
+        this.selectedTreeNode = null;
+        const selectedElements = this.treeDisplay.querySelectorAll('.node-content.selected');
+        selectedElements.forEach(el => {
+            el.classList.remove('selected');
+        });
+        const selectedNodes = this.treeDisplay.querySelectorAll('.node.is-selected');
+        selectedNodes.forEach(el => {
+            el.classList.remove('is-selected');
+        });
+        this.selectedNode = null;
+        if (this.nodeDescriptionTextarea) {
+            this.nodeDescriptionTextarea.value = '';
+            this.nodeDescriptionTextarea.disabled = true;
+        }
+        const allImageNodes = document.querySelectorAll('#image-sidebar-tree .node-content.selected');
+        allImageNodes.forEach(n => n.classList.remove('selected'));
     }
 
     // --- Source Selection (Center and Right panels) ---
+    /*
     selectTreeNode(node) {
         // Deselect others
         if (this.selectedTreeNode) this.selectedTreeNode.element.querySelector('.node-content').classList.remove('selected');
@@ -235,23 +297,11 @@ class ListBuilder {
         const allImageNodes = document.querySelectorAll('#image-sidebar-tree .node-content.selected');
         allImageNodes.forEach(n => n.classList.remove('selected'));
 
+        
         this.selectedTreeNode = node;
         node.element.querySelector('.node-content').classList.add('selected');
         // No description box for tree nodes anymore
-    }
-
-    selectImage(imageData) {
-        // Deselect others
-        if (this.selectedTreeNode) this.selectedTreeNode.element.querySelector('.node-content').classList.remove('selected');
-        this.selectedTreeNode = null;
-        const allImageNodes = document.querySelectorAll('#image-sidebar-tree .node-content.selected');
-        allImageNodes.forEach(n => n.classList.remove('selected'));
-
-        this.selectedImage = imageData;
-        const imageNode = document.querySelector(`#image-sidebar-tree .image[data-id='${imageData.id}'] .node-content`);
-        if (imageNode) imageNode.classList.add('selected');
-        // No description box for sidebar images anymore
-    }
+    }*/
 
     // --- Drag from Source to List ---
     handleSourceDragStart(e, source) {
