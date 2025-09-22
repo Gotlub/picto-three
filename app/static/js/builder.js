@@ -142,7 +142,7 @@ class TreeBuilder {
         }
 
         // New Image Tree initialization. The click callback is set to null to allow drag-and-drop to work without conflict.
-        this.imageTree = new ImageTree('image-sidebar-tree', null);
+        this.imageTree = new ImageTree('image-sidebar-tree');
 
         // --- Drag and Drop from Sidebar to Builder ---
         this.treeDisplay.addEventListener('dragover', (e) => {
