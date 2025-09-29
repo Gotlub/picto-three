@@ -28,7 +28,15 @@ class ReadOnlyNode {
             };
 
             // 2. Collecte des données
-            const branchData = collectBranchData(this);
+            let branchData;
+            if (this.listBuilder.selectionMode === 'branch') {
+                // Comportement actuel : copier toute la branche
+                branchData = collectBranchData(this);
+            } else {
+                // Nouveau comportement : copier uniquement le nœud sélectionné
+                const nodeData = { ...this.image, description: this.description };
+                branchData = [nodeData];
+            }
 
             // 3. Préparation de la charge utile (payload)
             const payload = {
@@ -149,6 +157,8 @@ class ListBuilder {
 
 
         // Center Panel
+        this.selectionModeRadios = document.querySelectorAll('input[name="selectionMode"]');
+        this.selectionMode = 'branch'; // 'branch' est la valeur par défaut car cochée en HTML
         this.treeDisplay = document.getElementById('tree-display');
         const rootData = {
                             id: 'root',
@@ -184,6 +194,15 @@ class ListBuilder {
         this.loadSavedTrees();
     }
 
+    initSelectionModeListener() {
+        this.selectionModeRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                this.selectionMode = event.target.value;
+                console.log('Selection mode changed to:', this.selectionMode); // Pour le débogage
+            });
+        });
+    }
+
     createDropIndicator() {
         const indicator = document.createElement('div');
         indicator.classList.add('drop-indicator');
@@ -191,6 +210,8 @@ class ListBuilder {
     }
 
     initEventListeners() {
+        this.initSelectionModeListener();
+
         // PDF Export
         this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
         this.pdfImageSizeSlider?.addEventListener('input', () => {
