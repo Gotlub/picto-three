@@ -269,23 +269,15 @@ class ListBuilder {
                     content.classList.add('selected');
                 }
             }
-            n.children.forEach(applyHighlight);
-        };
+            if(this.selectionMode === 'branch') {
+                n.children.forEach(applyHighlight);
+            }
+        };        
 
-        if (this.selectedNode) {
+        if (this.selectedNode) { 
             applyHighlight(this.selectedNode);
             if (this.selectedNode.element) {
                 this.selectedNode.element.classList.add('is-selected');
-            }
-        }
-
-        if (this.nodeDescriptionTextarea) {
-            if (this.selectedNode) {
-                this.nodeDescriptionTextarea.value = this.selectedNode.description || '';
-                this.nodeDescriptionTextarea.disabled = false;
-            } else {
-                this.nodeDescriptionTextarea.value = '';
-                this.nodeDescriptionTextarea.disabled = true;
             }
         }
     }
@@ -301,10 +293,6 @@ class ListBuilder {
             el.classList.remove('is-selected');
         });
         this.selectedNode = null;
-        if (this.nodeDescriptionTextarea) {
-            this.nodeDescriptionTextarea.value = '';
-            this.nodeDescriptionTextarea.disabled = true;
-        }
         const allImageNodes = document.querySelectorAll('#image-sidebar-tree .node-content.selected');
         allImageNodes.forEach(n => n.classList.remove('selected'));
     }
