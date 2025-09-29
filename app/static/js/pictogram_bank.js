@@ -1,3 +1,5 @@
+import { initializeDynamicContainerHeight } from './utils.js';
+
 class BaseNode {
     constructor(data, bank) {
         this.data = data;
@@ -402,4 +404,5 @@ class PictogramBank {
 
 document.addEventListener('DOMContentLoaded', () => {
     new PictogramBank();
+    initializeDynamicContainerHeight('pictogram-bank-page-container');
 });

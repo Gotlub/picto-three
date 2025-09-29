@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div id="index-page-container">
     <div class="row align-items-center">
         <div class="col-md-6">
             <div class="p-5 mb-4 bg-light rounded-3">
@@ -46,4 +47,6 @@
             </div>
         </div>
     </div>
+</div>
+<script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

@@ -1,4 +1,5 @@
 import ImageTree from './components/ImageTree.js';
+import { initializeDynamicContainerHeight } from './utils.js';
 
 // --- Start of Tree Viewer (Center Panel, adapted from builder.js) ---
 class ReadOnlyNode {
@@ -911,30 +912,7 @@ class ListBuilder {
     }
 }
 
-function updateContainerHeight() {
-    const header = document.querySelector('nav.navbar');
-    const footer = document.querySelector('footer.footer');
-    const mainContent = document.querySelector('main.content');
-    const listPageContainer = document.getElementById('list-page-container');
-
-    if (!header || !footer || !mainContent || !listPageContainer) {
-        return;
-    }
-
-    const mainContentStyles = window.getComputedStyle(mainContent);
-    const mainMarginTop = parseInt(mainContentStyles.marginTop, 10) || 0;
-    const mainMarginBottom = parseInt(mainContentStyles.marginBottom, 10) || 0;
-
-    const headerHeight = header.offsetHeight;
-    const footerHeight = footer.offsetHeight;
-
-    const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom);
-
-    listPageContainer.style.height = `${availableHeight}px`;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     new ListBuilder();
-    updateContainerHeight();
-    window.addEventListener('resize', updateContainerHeight);
+    initializeDynamicContainerHeight('list-page-container');
 });

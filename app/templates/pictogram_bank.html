@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div id="pictogram-bank-page-container" class="container-fluid">
     <div class="row">
         <!-- Main Content -->
         <div class="col-md-9">
@@ -69,5 +69,5 @@
 <script id="pictogram-data" type="application/json">
     {{ pictograms_json | safe }}
 </script>
-<script src="{{ url_for('static', filename='js/pictogram_bank.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pictogram_bank.js') }}"></script>
 {% endblock %}

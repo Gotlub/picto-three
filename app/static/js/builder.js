@@ -1,4 +1,5 @@
 import ImageTree from './components/ImageTree.js';
+import { initializeDynamicContainerHeight } from './utils.js';
 
 
 class BuilderNode {
@@ -1089,4 +1090,5 @@ document.addEventListener('DOMContentLoaded', () => {
         new bootstrap.Dropdown(dropdownEl);
     }
     new TreeBuilder();
+    initializeDynamicContainerHeight('builder-page-container');
 });
