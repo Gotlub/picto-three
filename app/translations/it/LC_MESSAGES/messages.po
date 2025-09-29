@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-20 00:21+0000\n"
+"POT-Creation-Date: 2025-09-29 02:42+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -128,16 +128,16 @@ msgstr "La tua lingua è stata aggiornata."
 msgid "The language has been updated for this session."
 msgstr "La lingua è stata aggiornata per questa sessione."
 
-#: app/routes.py:441 app/routes.py:510 app/routes.py:637 app/routes.py:798
-#: app/routes.py:894
+#: app/routes.py:460 app/routes.py:529 app/routes.py:656 app/routes.py:817
+#: app/routes.py:913
 msgid "Invalid data"
 msgstr "Dati non validi"
 
-#: app/routes.py:448
+#: app/routes.py:467
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Campi obbligatori mancanti: list_name e payload sono obbligatori."
 
-#: app/routes.py:464
+#: app/routes.py:483
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -146,92 +146,92 @@ msgstr ""
 "Rimuovi eventuali immagini di proprietà dell'utente prima di salvare "
 "pubblicamente."
 
-#: app/routes.py:476 app/routes.py:522
+#: app/routes.py:495 app/routes.py:541
 msgid "List updated successfully"
 msgstr "Lista aggiornata con successo"
 
-#: app/routes.py:487
+#: app/routes.py:506
 msgid "List saved successfully"
 msgstr "Lista salvata con successo"
 
-#: app/routes.py:504 app/routes.py:531
+#: app/routes.py:523 app/routes.py:550
 msgid "List not found"
 msgstr "Lista non trovata"
 
-#: app/routes.py:506 app/routes.py:533 app/routes.py:553
+#: app/routes.py:525 app/routes.py:552 app/routes.py:572
 msgid "Unauthorized"
 msgstr "Non autorizzato"
 
-#: app/routes.py:538
+#: app/routes.py:557
 msgid "List deleted successfully"
 msgstr "Lista eliminata con successo"
 
-#: app/routes.py:544
+#: app/routes.py:563
 msgid "parent_id is required"
 msgstr "parent_id è obbligatorio"
 
-#: app/routes.py:548
+#: app/routes.py:567
 msgid "Folder not found"
 msgstr "Cartella non trovata"
 
-#: app/routes.py:628
+#: app/routes.py:647
 msgid "Root folder not found"
 msgstr "Cartella principale non trovata"
 
-#: app/routes.py:644
+#: app/routes.py:663
 msgid "Parent folder not found or not owned by user"
 msgstr "Cartella principale non trovata o non di proprietà dell'utente"
 
-#: app/routes.py:655
+#: app/routes.py:674
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Impossibile creare la directory: %(error)s"
 
-#: app/routes.py:698
+#: app/routes.py:717
 msgid "No file part"
 msgstr "Nessuna parte di file"
 
-#: app/routes.py:702
+#: app/routes.py:721
 msgid "No selected file"
 msgstr "Nessun file selezionato"
 
-#: app/routes.py:706
+#: app/routes.py:725
 msgid "No folder_id specified"
 msgstr "Nessun folder_id specificato"
 
-#: app/routes.py:710 app/routes.py:902
+#: app/routes.py:729 app/routes.py:921
 msgid "Folder not found or not owned by user"
 msgstr "Cartella non trovata o non di proprietà dell'utente"
 
-#: app/routes.py:745
+#: app/routes.py:764
 msgid "File upload failed"
 msgstr "Caricamento file fallito"
 
-#: app/routes.py:756
+#: app/routes.py:775
 msgid "Image not found"
 msgstr "Immagine non trovata"
 
-#: app/routes.py:760
+#: app/routes.py:779
 msgid "Unauthorized to edit this image"
 msgstr "Non autorizzato a modificare questa immagine"
 
-#: app/routes.py:764
+#: app/routes.py:783
 msgid "Invalid JSON data"
 msgstr "Dati JSON non validi"
 
-#: app/routes.py:777
+#: app/routes.py:796
 msgid "Image updated successfully"
 msgstr "Immagine aggiornata con successo"
 
-#: app/routes.py:805
+#: app/routes.py:824
 msgid "Missing required fields"
 msgstr "Campi obbligatori mancanti"
 
-#: app/routes.py:810
+#: app/routes.py:829
 msgid "Cannot save an empty tree as public."
 msgstr "Impossibile salvare un albero vuoto come pubblico."
 
-#: app/routes.py:819
+#: app/routes.py:838
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -240,40 +240,40 @@ msgstr ""
 "Rimuovi eventuali immagini di proprietà dell'utente prima di salvare "
 "pubblicamente."
 
-#: app/routes.py:829
+#: app/routes.py:848
 msgid "Tree updated successfully"
 msgstr "Albero aggiornato con successo"
 
-#: app/routes.py:839
+#: app/routes.py:858
 msgid "Tree saved successfully"
 msgstr "Albero salvato con successo"
 
-#: app/routes.py:905
+#: app/routes.py:924
 msgid "Cannot delete root folder"
 msgstr "Impossibile eliminare la cartella principale"
 
-#: app/routes.py:909
+#: app/routes.py:928
 msgid "Folder and all its contents deleted"
 msgstr "Cartella e tutto il suo contenuto eliminati"
 
-#: app/routes.py:914
+#: app/routes.py:933
 msgid "Image not found or not owned by user"
 msgstr "Immagine non trovata o non di proprietà dell'utente"
 
-#: app/routes.py:925
+#: app/routes.py:944
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Impossibile eliminare il file: %(error)s"
 
-#: app/routes.py:929
+#: app/routes.py:948
 msgid "Image deleted"
 msgstr "Immagine eliminata"
 
-#: app/routes.py:931
+#: app/routes.py:950
 msgid "Invalid item type"
 msgstr "Tipo di elemento non valido"
 
-#: app/routes.py:946
+#: app/routes.py:965
 msgid "No images to export"
 msgstr "Nessuna immagine da esportare"
 
@@ -493,7 +493,7 @@ msgstr "Inserisci descrizione nodo..."
 msgid "Images"
 msgstr "Immagini"
 
-#: app/templates/builder.html:97 app/templates/list.html:146
+#: app/templates/builder.html:97 app/templates/list.html:156
 msgid "Search images..."
 msgstr "Cerca immagini..."
 
@@ -958,31 +958,39 @@ msgstr "Modalità griglia"
 msgid "Select from Tree"
 msgstr "Seleziona da albero"
 
-#: app/templates/list.html:133 app/templates/list.html:144
+#: app/templates/list.html:136
+msgid "Element"
+msgstr "Elemento"
+
+#: app/templates/list.html:140
+msgid "Branch"
+msgstr "Ramo"
+
+#: app/templates/list.html:143 app/templates/list.html:154
 msgid "Drag to copy to list"
 msgstr "Trascina per copiare nella lista"
 
-#: app/templates/list.html:143
+#: app/templates/list.html:153
 msgid "Select from Images"
 msgstr "Seleziona da immagini"
 
-#: app/templates/list.html:151
+#: app/templates/list.html:161
 msgid "Selected Link Description"
 msgstr "Descrizione link selezionato"
 
-#: app/templates/list.html:152
+#: app/templates/list.html:162
 msgid "Select a link from the bottom list to edit its description..."
 msgstr "Seleziona un link dalla lista in basso per modificarne la descrizione..."
 
-#: app/templates/list.html:161
+#: app/templates/list.html:171
 msgid "Chained List Builder"
 msgstr "Costruttore di liste concatenate"
 
-#: app/templates/list.html:163
+#: app/templates/list.html:173
 msgid "Delete Selected Link"
 msgstr "Elimina link selezionato"
 
-#: app/templates/list.html:164
+#: app/templates/list.html:174
 msgid "New Chain"
 msgstr "Nuova catena"
 
@@ -1122,14 +1130,6 @@ msgstr ""
 msgid "If you did not make this request, please ignore this email."
 msgstr "Se non hai effettuato questa richiesta, ignora questa email."
 
-#: app/forms.py:35
-msgid "I accept the Terms & Privacy Policy"
-msgstr "Accetto i Termini e l'Informativa sulla Privacy"
-
-#: app/forms.py:35
-msgid "You must accept the terms and privacy policy to continue."
-msgstr "Devi accettare i termini e l'informativa sulla privacy per continuare."
-
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"
 
@@ -1177,3 +1177,9 @@ msgstr "Devi accettare i termini e l'informativa sulla privacy per continuare."
 
 #~ msgid "Logged in as: %(username)s"
 #~ msgstr "Accesso come: %(username)s"
+
+#~ msgid "I accept the Terms & Privacy Policy"
+#~ msgstr "Accetto i Termini e l'Informativa sulla Privacy"
+
+#~ msgid "You must accept the terms and privacy policy to continue."
+#~ msgstr "Devi accettare i termini e l'informativa sulla privacy per continuare."

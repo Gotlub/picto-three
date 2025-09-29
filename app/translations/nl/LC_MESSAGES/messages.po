@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-20 00:21+0000\n"
+"POT-Creation-Date: 2025-09-29 02:42+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: nl\n"
@@ -132,16 +132,16 @@ msgstr "Uw taal is bijgewerkt."
 msgid "The language has been updated for this session."
 msgstr "De taal is bijgewerkt voor deze sessie."
 
-#: app/routes.py:441 app/routes.py:510 app/routes.py:637 app/routes.py:798
-#: app/routes.py:894
+#: app/routes.py:460 app/routes.py:529 app/routes.py:656 app/routes.py:817
+#: app/routes.py:913
 msgid "Invalid data"
 msgstr "Ongeldige gegevens"
 
-#: app/routes.py:448
+#: app/routes.py:467
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Ontbrekende verplichte velden: list_name en payload zijn verplicht."
 
-#: app/routes.py:464
+#: app/routes.py:483
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -150,92 +150,92 @@ msgstr ""
 "Verwijder alle afbeeldingen in eigendom van de gebruiker voordat u "
 "openbaar opslaat."
 
-#: app/routes.py:476 app/routes.py:522
+#: app/routes.py:495 app/routes.py:541
 msgid "List updated successfully"
 msgstr "Lijst succesvol bijgewerkt"
 
-#: app/routes.py:487
+#: app/routes.py:506
 msgid "List saved successfully"
 msgstr "Lijst succesvol opgeslagen"
 
-#: app/routes.py:504 app/routes.py:531
+#: app/routes.py:523 app/routes.py:550
 msgid "List not found"
 msgstr "Lijst niet gevonden"
 
-#: app/routes.py:506 app/routes.py:533 app/routes.py:553
+#: app/routes.py:525 app/routes.py:552 app/routes.py:572
 msgid "Unauthorized"
 msgstr "Ongeautoriseerd"
 
-#: app/routes.py:538
+#: app/routes.py:557
 msgid "List deleted successfully"
 msgstr "Lijst succesvol verwijderd"
 
-#: app/routes.py:544
+#: app/routes.py:563
 msgid "parent_id is required"
 msgstr "parent_id is verplicht"
 
-#: app/routes.py:548
+#: app/routes.py:567
 msgid "Folder not found"
 msgstr "Map niet gevonden"
 
-#: app/routes.py:628
+#: app/routes.py:647
 msgid "Root folder not found"
 msgstr "Hoofdmap niet gevonden"
 
-#: app/routes.py:644
+#: app/routes.py:663
 msgid "Parent folder not found or not owned by user"
 msgstr "Bovenliggende map niet gevonden of geen eigendom van gebruiker"
 
-#: app/routes.py:655
+#: app/routes.py:674
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Kon map niet aanmaken: %(error)s"
 
-#: app/routes.py:698
+#: app/routes.py:717
 msgid "No file part"
 msgstr "Geen bestandsdeel"
 
-#: app/routes.py:702
+#: app/routes.py:721
 msgid "No selected file"
 msgstr "Geen bestand geselecteerd"
 
-#: app/routes.py:706
+#: app/routes.py:725
 msgid "No folder_id specified"
 msgstr "Geen folder_id opgegeven"
 
-#: app/routes.py:710 app/routes.py:902
+#: app/routes.py:729 app/routes.py:921
 msgid "Folder not found or not owned by user"
 msgstr "Map niet gevonden of geen eigendom van gebruiker"
 
-#: app/routes.py:745
+#: app/routes.py:764
 msgid "File upload failed"
 msgstr "Bestandsupload mislukt"
 
-#: app/routes.py:756
+#: app/routes.py:775
 msgid "Image not found"
 msgstr "Afbeelding niet gevonden"
 
-#: app/routes.py:760
+#: app/routes.py:779
 msgid "Unauthorized to edit this image"
 msgstr "Ongeautoriseerd om deze afbeelding te bewerken"
 
-#: app/routes.py:764
+#: app/routes.py:783
 msgid "Invalid JSON data"
 msgstr "Ongeldige JSON-gegevens"
 
-#: app/routes.py:777
+#: app/routes.py:796
 msgid "Image updated successfully"
 msgstr "Afbeelding succesvol bijgewerkt"
 
-#: app/routes.py:805
+#: app/routes.py:824
 msgid "Missing required fields"
 msgstr "Ontbrekende verplichte velden"
 
-#: app/routes.py:810
+#: app/routes.py:829
 msgid "Cannot save an empty tree as public."
 msgstr "Kan een lege boom niet als openbaar opslaan."
 
-#: app/routes.py:819
+#: app/routes.py:838
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -244,40 +244,40 @@ msgstr ""
 "Verwijder alle afbeeldingen in eigendom van de gebruiker voordat u "
 "openbaar opslaat."
 
-#: app/routes.py:829
+#: app/routes.py:848
 msgid "Tree updated successfully"
 msgstr "Boom succesvol bijgewerkt"
 
-#: app/routes.py:839
+#: app/routes.py:858
 msgid "Tree saved successfully"
 msgstr "Boom succesvol opgeslagen"
 
-#: app/routes.py:905
+#: app/routes.py:924
 msgid "Cannot delete root folder"
 msgstr "Kan hoofdmap niet verwijderen"
 
-#: app/routes.py:909
+#: app/routes.py:928
 msgid "Folder and all its contents deleted"
 msgstr "Map en al zijn inhoud verwijderd"
 
-#: app/routes.py:914
+#: app/routes.py:933
 msgid "Image not found or not owned by user"
 msgstr "Afbeelding niet gevonden of geen eigendom van gebruiker"
 
-#: app/routes.py:925
+#: app/routes.py:944
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Kon bestand niet verwijderen: %(error)s"
 
-#: app/routes.py:929
+#: app/routes.py:948
 msgid "Image deleted"
 msgstr "Afbeelding verwijderd"
 
-#: app/routes.py:931
+#: app/routes.py:950
 msgid "Invalid item type"
 msgstr "Ongeldig itemtype"
 
-#: app/routes.py:946
+#: app/routes.py:965
 msgid "No images to export"
 msgstr "Geen afbeeldingen om te exporteren"
 
@@ -496,7 +496,7 @@ msgstr "Voer knoopbeschrijving in..."
 msgid "Images"
 msgstr "Afbeeldingen"
 
-#: app/templates/builder.html:97 app/templates/list.html:146
+#: app/templates/builder.html:97 app/templates/list.html:156
 msgid "Search images..."
 msgstr "Afbeeldingen zoeken..."
 
@@ -964,33 +964,41 @@ msgstr "Rastermodus"
 msgid "Select from Tree"
 msgstr "Selecteren uit boom"
 
-#: app/templates/list.html:133 app/templates/list.html:144
+#: app/templates/list.html:136
+msgid "Element"
+msgstr "Element"
+
+#: app/templates/list.html:140
+msgid "Branch"
+msgstr "Tak"
+
+#: app/templates/list.html:143 app/templates/list.html:154
 msgid "Drag to copy to list"
 msgstr "Slepen om naar lijst te kopiëren"
 
-#: app/templates/list.html:143
+#: app/templates/list.html:153
 msgid "Select from Images"
 msgstr "Selecteren uit afbeeldingen"
 
-#: app/templates/list.html:151
+#: app/templates/list.html:161
 msgid "Selected Link Description"
 msgstr "Beschrijving van geselecteerde link"
 
-#: app/templates/list.html:152
+#: app/templates/list.html:162
 msgid "Select a link from the bottom list to edit its description..."
 msgstr ""
 "Selecteer een link uit de onderste lijst om de beschrijving ervan te "
 "bewerken..."
 
-#: app/templates/list.html:161
+#: app/templates/list.html:171
 msgid "Chained List Builder"
 msgstr "Gekoppelde lijst-bouwer"
 
-#: app/templates/list.html:163
+#: app/templates/list.html:173
 msgid "Delete Selected Link"
 msgstr "Geselecteerde link verwijderen"
 
-#: app/templates/list.html:164
+#: app/templates/list.html:174
 msgid "New Chain"
 msgstr "Nieuwe keten"
 
@@ -1130,14 +1138,6 @@ msgstr ""
 msgid "If you did not make this request, please ignore this email."
 msgstr "Als u dit verzoek niet heeft gedaan, negeer deze e-mail dan."
 
-#: app/forms.py:35
-msgid "I accept the Terms & Privacy Policy"
-msgstr "Ik ga akkoord met de Gebruiksvoorwaarden en het Privacybeleid"
-
-#: app/forms.py:35
-msgid "You must accept the terms and privacy policy to continue."
-msgstr "U moet de voorwaarden en het privacybeleid accepteren om door te gaan."
-
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"
 
@@ -1184,3 +1184,9 @@ msgstr "U moet de voorwaarden en het privacybeleid accepteren om door te gaan."
 
 #~ msgid "Logged in as: %(username)s"
 #~ msgstr "Ingelogd als: %(username)s"
+
+#~ msgid "I accept the Terms & Privacy Policy"
+#~ msgstr "Ik ga akkoord met de Gebruiksvoorwaarden en het Privacybeleid"
+
+#~ msgid "You must accept the terms and privacy policy to continue."
+#~ msgstr "U moet de voorwaarden en het privacybeleid accepteren om door te gaan."

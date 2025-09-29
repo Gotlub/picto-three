@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-20 00:21+0000\n"
+"POT-Creation-Date: 2025-09-29 02:42+0000\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -129,16 +129,16 @@ msgstr "Twój język został zaktualizowany."
 msgid "The language has been updated for this session."
 msgstr "Język został zaktualizowany dla tej sesji."
 
-#: app/routes.py:441 app/routes.py:510 app/routes.py:637 app/routes.py:798
-#: app/routes.py:894
+#: app/routes.py:460 app/routes.py:529 app/routes.py:656 app/routes.py:817
+#: app/routes.py:913
 msgid "Invalid data"
 msgstr "Nieprawidłowe dane"
 
-#: app/routes.py:448
+#: app/routes.py:467
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Brak wymaganych pól: list_name i payload są wymagane."
 
-#: app/routes.py:464
+#: app/routes.py:483
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -146,92 +146,92 @@ msgstr ""
 "Listy publiczne mogą zawierać tylko globalne obrazy publiczne. Przed "
 "publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
 
-#: app/routes.py:476 app/routes.py:522
+#: app/routes.py:495 app/routes.py:541
 msgid "List updated successfully"
 msgstr "Lista zaktualizowana pomyślnie"
 
-#: app/routes.py:487
+#: app/routes.py:506
 msgid "List saved successfully"
 msgstr "Lista zapisana pomyślnie"
 
-#: app/routes.py:504 app/routes.py:531
+#: app/routes.py:523 app/routes.py:550
 msgid "List not found"
 msgstr "Nie znaleziono listy"
 
-#: app/routes.py:506 app/routes.py:533 app/routes.py:553
+#: app/routes.py:525 app/routes.py:552 app/routes.py:572
 msgid "Unauthorized"
 msgstr "Nieautoryzowany"
 
-#: app/routes.py:538
+#: app/routes.py:557
 msgid "List deleted successfully"
 msgstr "Lista usunięta pomyślnie"
 
-#: app/routes.py:544
+#: app/routes.py:563
 msgid "parent_id is required"
 msgstr "parent_id jest wymagany"
 
-#: app/routes.py:548
+#: app/routes.py:567
 msgid "Folder not found"
 msgstr "Nie znaleziono folderu"
 
-#: app/routes.py:628
+#: app/routes.py:647
 msgid "Root folder not found"
 msgstr "Nie znaleziono folderu głównego"
 
-#: app/routes.py:644
+#: app/routes.py:663
 msgid "Parent folder not found or not owned by user"
 msgstr "Folder nadrzędny nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:655
+#: app/routes.py:674
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Nie można utworzyć katalogu: %(error)s"
 
-#: app/routes.py:698
+#: app/routes.py:717
 msgid "No file part"
 msgstr "Brak części pliku"
 
-#: app/routes.py:702
+#: app/routes.py:721
 msgid "No selected file"
 msgstr "Nie wybrano pliku"
 
-#: app/routes.py:706
+#: app/routes.py:725
 msgid "No folder_id specified"
 msgstr "Nie określono folder_id"
 
-#: app/routes.py:710 app/routes.py:902
+#: app/routes.py:729 app/routes.py:921
 msgid "Folder not found or not owned by user"
 msgstr "Folder nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:745
+#: app/routes.py:764
 msgid "File upload failed"
 msgstr "Przesyłanie pliku nie powiodło się"
 
-#: app/routes.py:756
+#: app/routes.py:775
 msgid "Image not found"
 msgstr "Nie znaleziono obrazu"
 
-#: app/routes.py:760
+#: app/routes.py:779
 msgid "Unauthorized to edit this image"
 msgstr "Brak uprawnień do edycji tego obrazu"
 
-#: app/routes.py:764
+#: app/routes.py:783
 msgid "Invalid JSON data"
 msgstr "Nieprawidłowe dane JSON"
 
-#: app/routes.py:777
+#: app/routes.py:796
 msgid "Image updated successfully"
 msgstr "Obraz zaktualizowany pomyślnie"
 
-#: app/routes.py:805
+#: app/routes.py:824
 msgid "Missing required fields"
 msgstr "Brak wymaganych pól"
 
-#: app/routes.py:810
+#: app/routes.py:829
 msgid "Cannot save an empty tree as public."
 msgstr "Nie można zapisać pustego drzewa jako publicznego."
 
-#: app/routes.py:819
+#: app/routes.py:838
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -239,40 +239,40 @@ msgstr ""
 "Drzewa publiczne mogą zawierać tylko globalne obrazy publiczne. Przed "
 "publicznym zapisaniem usuń wszystkie obrazy należące do użytkownika."
 
-#: app/routes.py:829
+#: app/routes.py:848
 msgid "Tree updated successfully"
 msgstr "Drzewo zaktualizowane pomyślnie"
 
-#: app/routes.py:839
+#: app/routes.py:858
 msgid "Tree saved successfully"
 msgstr "Drzewo zapisane pomyślnie"
 
-#: app/routes.py:905
+#: app/routes.py:924
 msgid "Cannot delete root folder"
 msgstr "Nie można usunąć folderu głównego"
 
-#: app/routes.py:909
+#: app/routes.py:928
 msgid "Folder and all its contents deleted"
 msgstr "Folder i cała jego zawartość usunięte"
 
-#: app/routes.py:914
+#: app/routes.py:933
 msgid "Image not found or not owned by user"
 msgstr "Obraz nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes.py:925
+#: app/routes.py:944
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Nie można usunąć pliku: %(error)s"
 
-#: app/routes.py:929
+#: app/routes.py:948
 msgid "Image deleted"
 msgstr "Obraz usunięty"
 
-#: app/routes.py:931
+#: app/routes.py:950
 msgid "Invalid item type"
 msgstr "Nieprawidłowy typ elementu"
 
-#: app/routes.py:946
+#: app/routes.py:965
 msgid "No images to export"
 msgstr "Brak obrazów do wyeksportowania"
 
@@ -489,7 +489,7 @@ msgstr "Wprowadź opis węzła..."
 msgid "Images"
 msgstr "Obrazy"
 
-#: app/templates/builder.html:97 app/templates/list.html:146
+#: app/templates/builder.html:97 app/templates/list.html:156
 msgid "Search images..."
 msgstr "Szukaj obrazów..."
 
@@ -949,31 +949,39 @@ msgstr "Tryb siatki"
 msgid "Select from Tree"
 msgstr "Wybierz z drzewa"
 
-#: app/templates/list.html:133 app/templates/list.html:144
+#: app/templates/list.html:136
+msgid "Element"
+msgstr "Element"
+
+#: app/templates/list.html:140
+msgid "Branch"
+msgstr "Gałąź"
+
+#: app/templates/list.html:143 app/templates/list.html:154
 msgid "Drag to copy to list"
 msgstr "Przeciągnij, aby skopiować do listy"
 
-#: app/templates/list.html:143
+#: app/templates/list.html:153
 msgid "Select from Images"
 msgstr "Wybierz z obrazów"
 
-#: app/templates/list.html:151
+#: app/templates/list.html:161
 msgid "Selected Link Description"
 msgstr "Opis wybranego linku"
 
-#: app/templates/list.html:152
+#: app/templates/list.html:162
 msgid "Select a link from the bottom list to edit its description..."
 msgstr "Wybierz link z dolnej listy, aby edytować jego opis..."
 
-#: app/templates/list.html:161
+#: app/templates/list.html:171
 msgid "Chained List Builder"
 msgstr "Konstruktor listy połączonej"
 
-#: app/templates/list.html:163
+#: app/templates/list.html:173
 msgid "Delete Selected Link"
 msgstr "Usuń wybrany link"
 
-#: app/templates/list.html:164
+#: app/templates/list.html:174
 msgid "New Chain"
 msgstr "Nowy łańcuch"
 
@@ -1111,14 +1119,6 @@ msgstr "Zażądałeś zresetowania hasła. Kliknij poniższy link, aby kontynuow
 msgid "If you did not make this request, please ignore this email."
 msgstr "Jeśli nie złożyłeś tego żądania, zignoruj tę wiadomość e-mail."
 
-#: app/forms.py:35
-msgid "I accept the Terms & Privacy Policy"
-msgstr "Akceptuję Warunki korzystania z usługi i Politykę prywatności"
-
-#: app/forms.py:35
-msgid "You must accept the terms and privacy policy to continue."
-msgstr "Aby kontynuować, musisz zaakceptować warunki i politykę prywatności."
-
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"
 
@@ -1165,3 +1165,9 @@ msgstr "Aby kontynuować, musisz zaakceptować warunki i politykę prywatności.
 
 #~ msgid "Logged in as: %(username)s"
 #~ msgstr "Zalogowany jako: %(username)s"
+
+#~ msgid "I accept the Terms & Privacy Policy"
+#~ msgstr "Akceptuję Warunki korzystania z usługi i Politykę prywatności"
+
+#~ msgid "You must accept the terms and privacy policy to continue."
+#~ msgstr "Aby kontynuować, musisz zaakceptować warunki i politykę prywatności."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-20 00:21+0000\n"
+"POT-Creation-Date: 2025-09-29 02:42+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -130,16 +130,16 @@ msgstr "Votre langue a été mise à jour."
 msgid "The language has been updated for this session."
 msgstr "La langue a été mise à jour pour cette session."
 
-#: app/routes.py:441 app/routes.py:510 app/routes.py:637 app/routes.py:798
-#: app/routes.py:894
+#: app/routes.py:460 app/routes.py:529 app/routes.py:656 app/routes.py:817
+#: app/routes.py:913
 msgid "Invalid data"
 msgstr "Données invalides"
 
-#: app/routes.py:448
+#: app/routes.py:467
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Champs obligatoires manquants : nom de la liste et charge utile requis."
 
-#: app/routes.py:464
+#: app/routes.py:483
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -148,92 +148,92 @@ msgstr ""
 "globales. Veuillez retirer les images appartenant à des utilisateurs "
 "avant de sauvegarder publiquement."
 
-#: app/routes.py:476 app/routes.py:522
+#: app/routes.py:495 app/routes.py:541
 msgid "List updated successfully"
 msgstr "Liste mise à jour avec succès"
 
-#: app/routes.py:487
+#: app/routes.py:506
 msgid "List saved successfully"
 msgstr "Liste enregistrée avec succès"
 
-#: app/routes.py:504 app/routes.py:531
+#: app/routes.py:523 app/routes.py:550
 msgid "List not found"
 msgstr "Liste non trouvée"
 
-#: app/routes.py:506 app/routes.py:533 app/routes.py:553
+#: app/routes.py:525 app/routes.py:552 app/routes.py:572
 msgid "Unauthorized"
 msgstr "Non autorisé"
 
-#: app/routes.py:538
+#: app/routes.py:557
 msgid "List deleted successfully"
 msgstr "Liste supprimée avec succès"
 
-#: app/routes.py:544
+#: app/routes.py:563
 msgid "parent_id is required"
 msgstr "parent_id est requis"
 
-#: app/routes.py:548
+#: app/routes.py:567
 msgid "Folder not found"
 msgstr "Dossier non trouvé"
 
-#: app/routes.py:628
+#: app/routes.py:647
 msgid "Root folder not found"
 msgstr "Dossier racine non trouvé"
 
-#: app/routes.py:644
+#: app/routes.py:663
 msgid "Parent folder not found or not owned by user"
 msgstr "Dossier parent non trouvé ou n'appartenant pas à l'utilisateur"
 
-#: app/routes.py:655
+#: app/routes.py:674
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Impossible de créer le répertoire : %(error)s"
 
-#: app/routes.py:698
+#: app/routes.py:717
 msgid "No file part"
 msgstr "Aucune partie de fichier"
 
-#: app/routes.py:702
+#: app/routes.py:721
 msgid "No selected file"
 msgstr "Aucun fichier sélectionné"
 
-#: app/routes.py:706
+#: app/routes.py:725
 msgid "No folder_id specified"
 msgstr "Aucun folder_id spécifié"
 
-#: app/routes.py:710 app/routes.py:902
+#: app/routes.py:729 app/routes.py:921
 msgid "Folder not found or not owned by user"
 msgstr "Dossier non trouvé ou n'appartenant pas à l'utilisateur"
 
-#: app/routes.py:745
+#: app/routes.py:764
 msgid "File upload failed"
 msgstr "Échec du téléchargement du fichier"
 
-#: app/routes.py:756
+#: app/routes.py:775
 msgid "Image not found"
 msgstr "Image non trouvée"
 
-#: app/routes.py:760
+#: app/routes.py:779
 msgid "Unauthorized to edit this image"
 msgstr "Non autorisé à modifier cette image"
 
-#: app/routes.py:764
+#: app/routes.py:783
 msgid "Invalid JSON data"
 msgstr "Données JSON non valides"
 
-#: app/routes.py:777
+#: app/routes.py:796
 msgid "Image updated successfully"
 msgstr "Image mise à jour avec succès"
 
-#: app/routes.py:805
+#: app/routes.py:824
 msgid "Missing required fields"
 msgstr "Champs obligatoires manquants"
 
-#: app/routes.py:810
+#: app/routes.py:829
 msgid "Cannot save an empty tree as public."
 msgstr "Impossible d'enregistrer un arbre vide en tant que public."
 
-#: app/routes.py:819
+#: app/routes.py:838
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -242,40 +242,40 @@ msgstr ""
 " Veuillez retirer les images appartenant à des utilisateurs avant de "
 "sauvegarder publiquement."
 
-#: app/routes.py:829
+#: app/routes.py:848
 msgid "Tree updated successfully"
 msgstr "Arbre mis à jour avec succès"
 
-#: app/routes.py:839
+#: app/routes.py:858
 msgid "Tree saved successfully"
 msgstr "Arbre enregistré avec succès"
 
-#: app/routes.py:905
+#: app/routes.py:924
 msgid "Cannot delete root folder"
 msgstr "Impossible de supprimer le dossier racine"
 
-#: app/routes.py:909
+#: app/routes.py:928
 msgid "Folder and all its contents deleted"
 msgstr "Le dossier et tout son contenu ont été supprimés"
 
-#: app/routes.py:914
+#: app/routes.py:933
 msgid "Image not found or not owned by user"
 msgstr "Image non trouvée ou n'appartenant pas à l'utilisateur"
 
-#: app/routes.py:925
+#: app/routes.py:944
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Impossible de supprimer le fichier : %(error)s"
 
-#: app/routes.py:929
+#: app/routes.py:948
 msgid "Image deleted"
 msgstr "Image supprimée"
 
-#: app/routes.py:931
+#: app/routes.py:950
 msgid "Invalid item type"
 msgstr "Type d'élément non valide"
 
-#: app/routes.py:946
+#: app/routes.py:965
 msgid "No images to export"
 msgstr "Aucune image à exporter"
 
@@ -495,7 +495,7 @@ msgstr "Entrez la description du nœud..."
 msgid "Images"
 msgstr "Images"
 
-#: app/templates/builder.html:97 app/templates/list.html:146
+#: app/templates/builder.html:97 app/templates/list.html:156
 msgid "Search images..."
 msgstr "Rechercher des images..."
 
@@ -966,31 +966,39 @@ msgstr "Mode grille"
 msgid "Select from Tree"
 msgstr "Sélectionner depuis l'arbre"
 
-#: app/templates/list.html:133 app/templates/list.html:144
+#: app/templates/list.html:136
+msgid "Element"
+msgstr "Élément"
+
+#: app/templates/list.html:140
+msgid "Branch"
+msgstr "Branche"
+
+#: app/templates/list.html:143 app/templates/list.html:154
 msgid "Drag to copy to list"
 msgstr "Glisser pour copier dans la liste"
 
-#: app/templates/list.html:143
+#: app/templates/list.html:153
 msgid "Select from Images"
 msgstr "Sélectionner parmi les images"
 
-#: app/templates/list.html:151
+#: app/templates/list.html:161
 msgid "Selected Link Description"
 msgstr "Description du lien sélectionné"
 
-#: app/templates/list.html:152
+#: app/templates/list.html:162
 msgid "Select a link from the bottom list to edit its description..."
 msgstr "Sélectionnez un lien dans la liste du bas pour modifier sa description..."
 
-#: app/templates/list.html:161
+#: app/templates/list.html:171
 msgid "Chained List Builder"
 msgstr "Constructeur de listes chaînées"
 
-#: app/templates/list.html:163
+#: app/templates/list.html:173
 msgid "Delete Selected Link"
 msgstr "Supprimer le lien sélectionné"
 
-#: app/templates/list.html:164
+#: app/templates/list.html:174
 msgid "New Chain"
 msgstr "Nouvelle chaîne"
 
@@ -1130,14 +1138,6 @@ msgstr ""
 msgid "If you did not make this request, please ignore this email."
 msgstr "Si vous n'avez pas fait cette demande, veuillez ignorer cet e-mail."
 
-#: app/forms.py:35
-msgid "I accept the Terms & Privacy Policy"
-msgstr "J'accepte les conditions d'utilisation et la politique de confidentialité"
-
-#: app/forms.py:35
-msgid "You must accept the terms and privacy policy to continue."
-msgstr "Vous devez accepter les conditions d'utilisation et la politique de confidentialité pour continuer."
-
 #~ msgid "privacy policy"
 #~ msgstr "politique de confidentialité"
 
@@ -1185,3 +1185,14 @@ msgstr "Vous devez accepter les conditions d'utilisation et la politique de conf
 
 #~ msgid "Logged in as: %(username)s"
 #~ msgstr "Connecté en tant que : %(username)s"
+
+#~ msgid "I accept the Terms & Privacy Policy"
+#~ msgstr ""
+#~ "J'accepte les conditions d'utilisation et "
+#~ "la politique de confidentialité"
+
+#~ msgid "You must accept the terms and privacy policy to continue."
+#~ msgstr ""
+#~ "Vous devez accepter les conditions "
+#~ "d'utilisation et la politique de "
+#~ "confidentialité pour continuer."
