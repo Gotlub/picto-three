@@ -13,7 +13,7 @@ export default class ArasaacSearch {
             <div class="arasaac-search-box mb-2">
                 <input type="text" class="form-control" placeholder="Search Arasaac..." id="arasaac-input-${this.container.id}">
             </div>
-            <div class="arasaac-results" id="arasaac-results-${this.container.id}" style="overflow-y: auto; height: calc(100% - 50px); display: flex; flex-wrap: wrap; gap: 5px;">
+            <div class="arasaac-results" id="arasaac-results-${this.container.id}" style="overflow-y: auto; height: calc(100% - 50px); display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start;">
                 <!-- Results will appear here -->
                 <div class="text-muted small text-center w-100 mt-3">Type to search symbols from Arasaac...</div>
             </div>
