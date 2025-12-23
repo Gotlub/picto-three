@@ -91,6 +91,9 @@ def create_app(config_override=None):
         except Exception as e:
             print(f"❌ Erreur lors de la génération du sitemap : {e}")
 
+    # Expose get_locale to templates
+    app.jinja_env.globals.update(get_locale=get_locale)
+
     return app
 
 def get_locale():

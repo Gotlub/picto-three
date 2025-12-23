@@ -1,131 +1,150 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% if title %}{{ title }}{% else %}{{ _('Pictogram-Tree Builder') }}{% endif %}</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/builder.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/tooltip.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/cookie_banner.css') }}">
-        <style>
-            body {
-                display: flex;
-                flex-direction: column;
-                min-height: 100vh;
-            }
-            .content {
-                flex: 1;
-            }
-        </style>
-    </head>
-    <body class="d-flex flex-column">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('main.index') }}">{{ _('Pictogram-Tree Builder') }}</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('builder.builder') }}">{{ _('Tree Builder') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('builder.list_page') }}">{{ _('List Builder') }}</a>
-                        </li>
-                        {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('builder.pictogram_bank') }}">{{ _('Pictogram Bank') }}</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLang" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-translate"></i>
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownLang">
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='en') }}">🇬🇧 English</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='es') }}">🇪🇸 Español</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='fr') }}">🇫🇷 Français</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='de') }}">🇩🇪 Deutsch</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='it') }}">🇮🇹 Italiano</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='nl') }}">🇳🇱 Nederlands</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='pl') }}">🇵🇱 Polski</a></li>
-                            </ul>
-                        </li>
-                        {% if current_user.is_anonymous %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
-                        </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.account') }}">{{ _('Account') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if title %}{{ title }}{% else %}{{ _('Pictogram-Tree Builder') }}{% endif %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/builder.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tooltip.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cookie_banner.css') }}">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content {
+            flex: 1;
+        }
+    </style>
+    <script>
+        window.CURRENT_LOCALE = "{{ get_locale() }}";
+    </script>
+</head>
+
+<body class="d-flex flex-column">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">{{ _('Pictogram-Tree Builder') }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Toggle navigation') }}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('builder.builder') }}">{{ _('Tree Builder') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('builder.list_page') }}">{{ _('List Builder') }}</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('builder.pictogram_bank') }}">{{ _('Pictogram Bank') }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLang" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownLang">
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='en') }}">🇬🇧
+                                    English</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='es') }}">🇪🇸
+                                    Español</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='fr') }}">🇫🇷
+                                    Français</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='de') }}">🇩🇪
+                                    Deutsch</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='it') }}">🇮🇹
+                                    Italiano</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='nl') }}">🇳🇱
+                                    Nederlands</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', locale='pl') }}">🇵🇱
+                                    Polski</a></li>
+                        </ul>
+                    </li>
+                    {% if current_user.is_anonymous %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.account') }}">{{ _('Account') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
-        </nav>
-
-        <main class="container-fluid mt-4 content">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-            {% endwith %}
-            {% block content %}{% endblock %}
-        </main>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="{{ url_for('static', filename='js/tooltip.js') }}"></script>
-
-        <div id="cookie-banner">
-            <p>
-                {% set policy_url = url_for('main.legal_page') %}{% trans href=policy_url %}This site uses only connection data (server logs) for security and maintenance purposes. No personal information is collected via tracking or advertising cookies. By continuing your navigation, you accept our <a href="{{ href }}">privacy policy</a>.{% endtrans %}
-            </p>
-            <button id="cookie-consent-button">{{ _("I understand") }}</button>
         </div>
+    </nav>
 
-        <footer class="footer mt-auto py-3 bg-dark text-white">
-            <div class="container d-flex">
-                {% if current_user.is_authenticated %}
-                <span>{{ _('Logged in as: %(username)s', username=current_user.username) }}</span>
-                {% else %}
-                <span>{{ _('Pictogram-Tree Builder') }}</span>
-                {% endif %}
-                <a href="{{ url_for('main.legal_page') }}" class="ms-auto text-white">{{ _('Terms & Privacy') }}</a>
-                <a href="{{ url_for('main.about') }}" class="ms-3 text-white">{{ _('About & Contact') }}</a>
-            </div>
-        </footer>
+    <main class="container-fluid mt-4 content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var banner = document.getElementById('cookie-banner');
-                var consentButton = document.getElementById('cookie-consent-button');
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/tooltip.js') }}"></script>
 
-                if (!localStorage.getItem('consentementDonne')) {
-                    banner.style.display = 'block';
-                }
+    <div id="cookie-banner">
+        <p>
+            {% set policy_url = url_for('main.legal_page') %}{% trans href=policy_url %}This site uses only connection
+            data (server logs) for security and maintenance purposes. No personal information is collected via tracking
+            or advertising cookies. By continuing your navigation, you accept our <a href="{{ href }}">privacy
+                policy</a>.{% endtrans %}
+        </p>
+        <button id="cookie-consent-button">{{ _("I understand") }}</button>
+    </div>
 
-                consentButton.addEventListener('click', function() {
-                    banner.style.display = 'none';
-                    localStorage.setItem('consentementDonne', 'true');
-                });
+    <footer class="footer mt-auto py-3 bg-dark text-white">
+        <div class="container d-flex">
+            {% if current_user.is_authenticated %}
+            <span>{{ _('Logged in as: %(username)s', username=current_user.username) }}</span>
+            {% else %}
+            <span>{{ _('Pictogram-Tree Builder') }}</span>
+            {% endif %}
+            <a href="{{ url_for('main.legal_page') }}" class="ms-auto text-white">{{ _('Terms & Privacy') }}</a>
+            <a href="{{ url_for('main.about') }}" class="ms-3 text-white">{{ _('About & Contact') }}</a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var banner = document.getElementById('cookie-banner');
+            var consentButton = document.getElementById('cookie-consent-button');
+
+            if (!localStorage.getItem('consentementDonne')) {
+                banner.style.display = 'block';
+            }
+
+            consentButton.addEventListener('click', function () {
+                banner.style.display = 'none';
+                localStorage.setItem('consentementDonne', 'true');
             });
-        </script>
-    </body>
+        });
+    </script>
+</body>
+
 </html>

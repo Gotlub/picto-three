@@ -39,8 +39,9 @@ export default class ArasaacSearch {
         this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">Loading...</div>';
 
         try {
-            // Using French locale ('fr') as per user context impliations
-            const response = await fetch(`https://api.arasaac.org/api/pictograms/fr/search/${encodeURIComponent(query)}`);
+            // Use the global locale variable injected in base.html, defaulting to 'en'
+            const locale = window.CURRENT_LOCALE || 'en';
+            const response = await fetch(`https://api.arasaac.org/api/pictograms/${locale}/search/${encodeURIComponent(query)}`);
             const data = await response.json();
 
             this.resultsContainer.innerHTML = '';
