@@ -65,7 +65,10 @@ class ReadOnlyNode {
             imgElement.src = '/static/images/folder-open-bold.png';
         } else if (this.image.path) {
             // Path can be a new relative path or an old absolute one during transition
-            if (this.image.path.startsWith('/')) {
+            // or an external URL from Arasaac
+            if (this.image.path.startsWith('http')) {
+                imgElement.src = this.image.path;
+            } else if (this.image.path.startsWith('/')) {
                 imgElement.src = this.image.path; // It's already a full URL
             } else {
                 imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
@@ -571,23 +574,19 @@ class ListBuilder {
 
         const payload = this.chainedListItems.map(item => {
             let imageId = item.data.image_id;
-            let imageUrl = null;
-            let imageName = null;
+            let imageUrl = item.data.path;
+            let imageName = item.data.name;
 
-            // Check for Arasaac/External image
-            if (item.data.path && item.data.path.startsWith('http')) {
+            if (imageUrl && imageUrl.startsWith('http')) {
                 imageId = -1;
-                imageUrl = item.data.path;
-                imageName = item.data.name;
             }
 
-            const obj = {
+            return {
                 image_id: imageId,
+                url: imageUrl,
+                name: imageName,
                 description: item.data.description
             };
-            if (imageUrl) obj.url = imageUrl;
-            if (imageName) obj.name = imageName;
-            return obj;
         });
         const isPublic = this.isPublicCheckbox.checked;
 
@@ -674,27 +673,31 @@ class ListBuilder {
         this.chainedListItems = payload.map(itemData => {
             let imageInfo = null;
 
-            if (itemData.image_id === -1 && itemData.url) {
+            if (itemData.url) {
+                // Unified format or Arasaac
                 imageInfo = {
-                    id: -1,
-                    name: itemData.name || 'External Image',
-                    path: itemData.url
+                    id: itemData.image_id, // Could be -1 or specific ID
+                    name: itemData.name || 'Unknown',
+                    path: itemData.url,
                 };
             } else {
+                // Legacy format (fallback to ID lookup)
                 imageInfo = this.allImages.find(img => img.id === itemData.image_id);
-                if (!imageInfo) {
-                    console.warn(`Image with ID ${itemData.image_id} is not accessible. Using a placeholder.`);
-                    imageInfo = {
-                        id: itemData.image_id,
-                        name: 'Image inaccessible',
-                        path: '/static/images/prohibit-bold.png',
-                    };
-                }
             }
+
+            if (!imageInfo) {
+                console.warn(`Image with ID ${itemData.image_id} is not accessible. Using a placeholder.`);
+                imageInfo = {
+                    id: itemData.image_id,
+                    name: 'Image inaccessible',
+                    path: '/static/images/prohibit-bold.png',
+                };
+            }
+
             // Combine found/placeholder info with description from payload
             const finalData = {
                 ...imageInfo,
-                image_id: imageInfo.id, // Ensure image_id is consistent
+                image_id: imageInfo.id,
                 description: itemData.description
             };
             return new ChainedListItem(finalData, this);
@@ -710,25 +713,19 @@ class ListBuilder {
         }
         const payload = this.chainedListItems.map(item => {
             let imageId = item.data.image_id;
-            let imageUrl = null;
-            let imageName = null;
+            let imageUrl = item.data.path;
+            let imageName = item.data.name;
 
-            if (item.data.path && item.data.path.startsWith('http')) {
+            if (imageUrl && imageUrl.startsWith('http')) {
                 imageId = -1;
-                imageUrl = item.data.path;
-                imageName = item.data.name;
             }
 
-            const obj = {
-                image_id: item.data.image_id, // Wait, I should use imageId here!
+            return {
+                image_id: imageId,
+                url: imageUrl,
+                name: imageName,
                 description: item.data.description
             };
-            // Correction from previous step thought process: ensuring I use the variable
-            obj.image_id = imageId;
-
-            if (imageUrl) obj.url = imageUrl;
-            if (imageName) obj.name = imageName;
-            return obj;
         });
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
         const downloadAnchorNode = document.createElement('a');
@@ -880,16 +877,29 @@ class ListBuilder {
         this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
 
         const buildNode = (nodeData) => {
-            let image = this.allImages.find(img => img.id === nodeData.id);
-            if (!image) {
-                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+            let image = null;
+
+            // Handle Arasaac / External Images
+            if (nodeData.id === -1 && nodeData.url) {
                 image = {
-                    id: nodeData.id,
-                    name: 'Image inaccessible',
-                    path: '/static/images/prohibit-bold.png',
-                    description: 'This image is private or has been deleted.'
+                    id: -1,
+                    name: nodeData.name || 'External Image',
+                    path: nodeData.url,
+                    description: 'External Image'
                 };
+            } else {
+                image = this.allImages.find(img => img.id === nodeData.id);
+                if (!image) {
+                    console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+                    image = {
+                        id: nodeData.id,
+                        name: 'Image inaccessible',
+                        path: '/static/images/prohibit-bold.png',
+                        description: 'This image is private or has been deleted.'
+                    };
+                }
             }
+
             const newNode = new ReadOnlyNode(nodeData, image, this);
 
             if (nodeData.children) {

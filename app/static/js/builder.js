@@ -726,25 +726,27 @@ class TreeBuilder {
 
     getTreeAsJSON() {
         const buildNode = (theNode) => {
-            let imageId = theNode.image.id;
-            let imageUrl = null;
-            let imageName = null;
+            // Unify data format: Always save descriptive data
+            // ID: Maintain ID for database matching (local) or -1 (external)
+            // URL/Path: Always save the path/url as 'url'
+            // Name: Always save the name
 
-            // Check for Arasaac image (starts with http)
-            if (theNode.image.path && theNode.image.path.startsWith('http')) {
+            let imageId = theNode.image.id;
+            let imageUrl = theNode.image.path;
+            let imageName = theNode.image.name;
+
+            // If it's an Arasaac image, ensure ID is -1 (though it likely is already)
+            if (imageUrl && imageUrl.startsWith('http')) {
                 imageId = -1;
-                imageUrl = theNode.image.path;
-                imageName = theNode.image.name;
             }
 
             const nodeData = {
                 id: imageId,
+                url: imageUrl,
+                name: imageName,
                 description: theNode.description,
                 children: []
             };
-
-            if (imageUrl) nodeData.url = imageUrl;
-            if (imageName) nodeData.name = imageName;
 
             theNode.children.forEach(child => {
                 nodeData.children.push(buildNode(child));
@@ -935,26 +937,30 @@ class TreeBuilder {
         const buildNode = (nodeData) => {
             let image = null;
 
-            // Handle Arasaac / External Images
-            if (nodeData.id === -1 && nodeData.url) {
+            // Strategy: Prefer explicit data (URL/Name) if available (Unified Format)
+            // Fallback: Use ID lookup (Legacy Format or validation)
+
+            if (nodeData.url) {
                 image = {
-                    id: -1,
-                    name: nodeData.name || 'External Image',
+                    id: nodeData.id,
+                    name: nodeData.name || 'Unknown',
                     path: nodeData.url,
-                    description: 'External Image'
+                    description: nodeData.description || nodeData.name // description is handled by builder node separately?
                 };
             } else {
-                // Handle Local Images
+                // Fallback for legacy saves (only ID)
                 image = this.images.find(img => img.id === nodeData.id);
-                if (!image) {
-                    console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
-                    image = {
-                        id: nodeData.id,
-                        name: 'Image inaccessible',
-                        path: '/static/images/prohibit-bold.png',
-                        description: 'This image is private or has been deleted.'
-                    };
-                }
+            }
+
+            // If still no image (e.g. ID lookup failed and no URL), use placeholder
+            if (!image) {
+                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+                image = {
+                    id: nodeData.id,
+                    name: 'Image inaccessible',
+                    path: '/static/images/prohibit-bold.png',
+                    description: 'This image is private or has been deleted.'
+                };
             }
 
             const newNode = new BuilderNode(image, this, nodeData);
