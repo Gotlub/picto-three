@@ -31,8 +31,9 @@ class BuilderNode {
         if (this.image.path) {
             // Path can be a new relative path (e.g., 'public/foo.png')
             // or an absolute URL for the root node icon (e.g., '/pictograms/public/...')
-            if (this.image.path.startsWith('/')) {
-                imgElement.src = this.image.path; // It's already a full URL
+            // or an external URL from Arasaac (e.g. 'https://static.arasaac.org/...')
+            if (this.image.path.startsWith('http') || this.image.path.startsWith('/')) {
+                imgElement.src = this.image.path; // It's already a full URL or absolute path
             } else {
                 imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
             }

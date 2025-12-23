@@ -78,6 +78,17 @@ export default class ArasaacSearch {
 
                 itemDiv.appendChild(img);
 
+                // Setup Tooltip
+                // Use the global 'tooltip' object defined in tooltip.js
+                if (typeof tooltip !== 'undefined') {
+                    itemDiv.addEventListener('mouseover', (e) => {
+                        tooltip.show(e, imgUrl);
+                    });
+                    itemDiv.addEventListener('mouseout', (e) => {
+                        tooltip.hide(e);
+                    });
+                }
+
                 // Setup Drag
                 itemDiv.addEventListener('dragstart', (e) => {
                     e.stopPropagation();
