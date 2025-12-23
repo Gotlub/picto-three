@@ -360,9 +360,18 @@ class TreeBuilder {
 
     getTreeForVisualization() {
         const buildTreantNode = (builderNode) => {
+            let imageSrc = '';
+            if (builderNode.image.path.startsWith('http')) {
+                imageSrc = builderNode.image.path;
+            } else if (builderNode.image.path.startsWith('/')) {
+                imageSrc = builderNode.image.path;
+            } else {
+                imageSrc = `/pictograms/${builderNode.image.path}`;
+            }
+
             const treantNode = {
                 text: { name: builderNode.image.name },
-                image: builderNode.image.path.startsWith('/') ? builderNode.image.path : `/pictograms/${builderNode.image.path}`,
+                image: imageSrc,
                 children: []
             };
 
@@ -717,11 +726,26 @@ class TreeBuilder {
 
     getTreeAsJSON() {
         const buildNode = (theNode) => {
+            let imageId = theNode.image.id;
+            let imageUrl = null;
+            let imageName = null;
+
+            // Check for Arasaac image (starts with http)
+            if (theNode.image.path && theNode.image.path.startsWith('http')) {
+                imageId = -1;
+                imageUrl = theNode.image.path;
+                imageName = theNode.image.name;
+            }
+
             const nodeData = {
-                id: theNode.image.id,
+                id: imageId,
                 description: theNode.description,
                 children: []
             };
+
+            if (imageUrl) nodeData.url = imageUrl;
+            if (imageName) nodeData.name = imageName;
+
             theNode.children.forEach(child => {
                 nodeData.children.push(buildNode(child));
             });
@@ -909,15 +933,28 @@ class TreeBuilder {
         this.selectedNode = this.rootNode; // Select root by default
 
         const buildNode = (nodeData) => {
-            let image = this.images.find(img => img.id === nodeData.id);
-            if (!image) {
-                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+            let image = null;
+
+            // Handle Arasaac / External Images
+            if (nodeData.id === -1 && nodeData.url) {
                 image = {
-                    id: nodeData.id,
-                    name: 'Image inaccessible',
-                    path: '/static/images/prohibit-bold.png',
-                    description: 'This image is private or has been deleted.'
+                    id: -1,
+                    name: nodeData.name || 'External Image',
+                    path: nodeData.url,
+                    description: 'External Image'
                 };
+            } else {
+                // Handle Local Images
+                image = this.images.find(img => img.id === nodeData.id);
+                if (!image) {
+                    console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+                    image = {
+                        id: nodeData.id,
+                        name: 'Image inaccessible',
+                        path: '/static/images/prohibit-bold.png',
+                        description: 'This image is private or has been deleted.'
+                    };
+                }
             }
 
             const newNode = new BuilderNode(image, this, nodeData);

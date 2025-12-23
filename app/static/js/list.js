@@ -569,10 +569,26 @@ class ListBuilder {
             return; // Stop if the user cancels
         }
 
-        const payload = this.chainedListItems.map(item => ({
-            image_id: item.data.image_id,
-            description: item.data.description
-        }));
+        const payload = this.chainedListItems.map(item => {
+            let imageId = item.data.image_id;
+            let imageUrl = null;
+            let imageName = null;
+
+            // Check for Arasaac/External image
+            if (item.data.path && item.data.path.startsWith('http')) {
+                imageId = -1;
+                imageUrl = item.data.path;
+                imageName = item.data.name;
+            }
+
+            const obj = {
+                image_id: imageId,
+                description: item.data.description
+            };
+            if (imageUrl) obj.url = imageUrl;
+            if (imageName) obj.name = imageName;
+            return obj;
+        });
         const isPublic = this.isPublicCheckbox.checked;
 
         const response = await fetch('/api/lists', {
@@ -656,14 +672,24 @@ class ListBuilder {
         const payload = JSON.parse(listData.payload);
 
         this.chainedListItems = payload.map(itemData => {
-            let imageInfo = this.allImages.find(img => img.id === itemData.image_id);
-            if (!imageInfo) {
-                console.warn(`Image with ID ${itemData.image_id} is not accessible. Using a placeholder.`);
+            let imageInfo = null;
+
+            if (itemData.image_id === -1 && itemData.url) {
                 imageInfo = {
-                    id: itemData.image_id,
-                    name: 'Image inaccessible',
-                    path: '/static/images/prohibit-bold.png',
+                    id: -1,
+                    name: itemData.name || 'External Image',
+                    path: itemData.url
                 };
+            } else {
+                imageInfo = this.allImages.find(img => img.id === itemData.image_id);
+                if (!imageInfo) {
+                    console.warn(`Image with ID ${itemData.image_id} is not accessible. Using a placeholder.`);
+                    imageInfo = {
+                        id: itemData.image_id,
+                        name: 'Image inaccessible',
+                        path: '/static/images/prohibit-bold.png',
+                    };
+                }
             }
             // Combine found/placeholder info with description from payload
             const finalData = {
@@ -682,10 +708,28 @@ class ListBuilder {
             alert('The list is empty.');
             return;
         }
-        const payload = this.chainedListItems.map(item => ({
-            image_id: item.data.image_id,
-            description: item.data.description
-        }));
+        const payload = this.chainedListItems.map(item => {
+            let imageId = item.data.image_id;
+            let imageUrl = null;
+            let imageName = null;
+
+            if (item.data.path && item.data.path.startsWith('http')) {
+                imageId = -1;
+                imageUrl = item.data.path;
+                imageName = item.data.name;
+            }
+
+            const obj = {
+                image_id: item.data.image_id, // Wait, I should use imageId here!
+                description: item.data.description
+            };
+            // Correction from previous step thought process: ensuring I use the variable
+            obj.image_id = imageId;
+
+            if (imageUrl) obj.url = imageUrl;
+            if (imageName) obj.name = imageName;
+            return obj;
+        });
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);

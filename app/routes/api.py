@@ -68,7 +68,10 @@ def save_list():
         if isinstance(payload, list):
             for item in payload:
                 if isinstance(item, dict) and 'image_id' in item:
-                    image_ids.add(item['image_id'])
+                    # Filter out Arasaac images (id = -1)
+                    # Filter out Arasaac images (id = -1)
+                    if item['image_id'] != -1:
+                        image_ids.add(item['image_id'])
 
         if image_ids:
             # Public lists cannot contain any user-owned images (user_id is not NULL)
@@ -398,7 +401,7 @@ def get_image_ids_from_tree(nodes):
     image_ids = set()
     for node in nodes:
         # The 'id' in the tree data corresponds to the image ID
-        if 'id' in node:
+        if 'id' in node and node['id'] != -1:
             image_ids.add(node['id'])
         if 'children' in node and node['children']:
             image_ids.update(get_image_ids_from_tree(node['children']))
