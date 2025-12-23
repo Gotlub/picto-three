@@ -589,7 +589,8 @@ def export_pdf():
 
     # Define margins and spacing
     margin = 50
-    padding = 10 # Padding inside the item box
+    padding_x = data.get('padding_x', 10)
+    padding_y = data.get('padding_y', 10)
     item_spacing = 10 # Spacing between items
     
     # Helper to draw a single item
@@ -613,8 +614,8 @@ def export_pdf():
         
         text_height = font_size + 5 if show_text and description else 0
         
-        img_area_height = item_height - (padding * 2) - text_height
-        img_area_width = item_width - (padding * 2)
+        img_area_height = item_height - (padding_y * 2) - text_height
+        img_area_width = item_width - (padding_x * 2)
         
         if img_area_height <= 0 or img_area_width <= 0:
             return # Too small to draw
@@ -638,13 +639,13 @@ def export_pdf():
                 h = ih * scale
                 
                 # Center image in its area
-                ix = x + padding + (img_area_width - w) / 2
+                ix = x + padding_x + (img_area_width - w) / 2
                 
                 # Y position depends on text position
                 if show_text and text_position == 'top':
-                    iy = y + padding # Image is below text
+                    iy = y + padding_y # Image is below text
                 else:
-                    iy = y + padding + text_height # Image is above text (bottom) or just padding
+                    iy = y + padding_y + text_height # Image is above text (bottom) or just padding
                 
                 c.drawImage(img_reader, ix, iy, width=w, height=h, mask='auto')
         except Exception as e:
@@ -657,9 +658,9 @@ def export_pdf():
             
             tx = x + item_width / 2
             if text_position == 'top':
-                ty = y + item_height - padding - font_size + 2 # Approximate baseline
+                ty = y + item_height - padding_y - font_size + 2 # Approximate baseline
             else:
-                ty = y + padding + 2
+                ty = y + padding_y + 2
                 
             c.drawCentredString(tx, ty, description)
 
@@ -676,10 +677,10 @@ def export_pdf():
     
     # Let's define a fixed box size for grid/strip based on the requested image size
     # We assume the box is square-ish or fixed aspect for the container
-    box_width = image_size + (padding * 2)
+    box_width = image_size + (padding_x * 2)
     # Height needs to accommodate text
     text_allowance = (font_size + 5) if show_text else 0
-    box_height = image_size + (padding * 2) + text_allowance
+    box_height = image_size + (padding_y * 2) + text_allowance
 
     for item in image_data:
         image_path_relative = item.get('path')

@@ -871,6 +871,8 @@ class ListBuilder {
             layout_mode: document.getElementById('pdf-layout-mode').value,
             orientation: document.querySelector('input[name="pdf-orientation"]:checked').value,
             image_size: parseInt(document.getElementById('pdf-image-size').value, 10),
+            padding_x: parseInt(document.getElementById('pdf-padding-x').value, 10),
+            padding_y: parseInt(document.getElementById('pdf-padding-y').value, 10),
 
             // Style
             border_color: document.getElementById('pdf-border-color').value,
