@@ -1,4 +1,5 @@
 import ImageTree from './components/ImageTree.js';
+import ArasaacSearch from './components/ArasaacSearch.js';
 
 
 class BuilderNode {
@@ -143,6 +144,11 @@ class TreeBuilder {
 
         // New Image Tree initialization. The click callback is set to null to allow drag-and-drop to work without conflict.
         this.imageTree = new ImageTree('image-sidebar-tree');
+
+        // Initialize Arasaac Search
+        this.arasaacSearch = new ArasaacSearch('arasaac-search-container', (e, payload) => {
+            this.handleArasaacDragStart(e, payload);
+        });
 
         // --- Drag and Drop from Sidebar to Builder ---
         this.treeDisplay.addEventListener('dragover', (e) => {
@@ -582,12 +588,12 @@ class TreeBuilder {
             return; // End execution here for internal drops
         }
 
-        // Case 2: Dropping a new node from the sidebar
+        // Case 2: Dropping a new node from the sidebar (Local or Arasaac)
         const dragDataString = e.dataTransfer.getData('application/json');
         if (dragDataString) {
             try {
                 const dragData = JSON.parse(dragDataString);
-                if (dragData.type === 'image-tree-node') {
+                if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
                     const newNode = new BuilderNode(dragData.data, this);
                     targetNode.addChild(newNode);
                     this.selectNode(newNode);
@@ -597,6 +603,13 @@ class TreeBuilder {
                 console.error("Error parsing drop data", err);
             }
         }
+    }
+
+    handleArasaacDragStart(e, payload) {
+        // No notion of "draggedNode" internal state for external items, but we set dataTransfer
+        e.dataTransfer.effectAllowed = 'copy';
+        e.dataTransfer.setData('application/json', JSON.stringify(payload));
+        e.dataTransfer.setData('text/plain', payload.data.id.toString());
     }
 
     handleDragEnd(e) {

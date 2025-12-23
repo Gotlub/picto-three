@@ -1,4 +1,5 @@
 import ImageTree from './components/ImageTree.js';
+import ArasaacSearch from './components/ArasaacSearch.js';
 
 // --- Start of Tree Viewer (Center Panel, adapted from builder.js) ---
 class ReadOnlyNode {
@@ -106,7 +107,18 @@ class ChainedListItem {
 
         const img = document.createElement('img');
         // The path from the backend is now relative, so we build the URL for the new endpoint.
-        img.src = `/pictograms/${this.data.path}`;
+        // Unless it is an external URL (Arasaac)
+        if (this.data.path.startsWith('http')) {
+            img.src = this.data.path;
+        } else {
+            // Backward compatibility or local relative paths
+            // Adjust if path already starts with / or not
+            if (this.data.path.startsWith('/')) {
+                img.src = this.data.path;
+            } else {
+                img.src = `/pictograms/${this.data.path}`;
+            }
+        }
         img.alt = this.data.name;
         itemElement.appendChild(img);
 
@@ -171,6 +183,11 @@ class ListBuilder {
         // Right Panel
         this.imageTree = new ImageTree('image-sidebar-tree');
         this.selectedLinkDescription = document.getElementById('selected-link-description');
+
+        // Initialize Arasaac Search
+        this.arasaacSearch = new ArasaacSearch('arasaac-search-container', (e, payload) => {
+            this.handleSourceDragStart(e, payload);
+        });
 
         // Bottom Panel
         this.chainedListContainer = document.getElementById('chained-list-container');
@@ -472,13 +489,24 @@ class ListBuilder {
                         }
                     });
                 }
-                // CAS 2 : C'est un nœud simple (comportement original)
+                // CAS 2 : C'est un nœud simple (comportement original) ou une image Arasaac
                 else if (dragData.type === 'image-tree-node' || dragData.type === 'tree-node') {
                     const sourceData = dragData.data;
                     const newItemData = {
                         image_id: sourceData.id,
                         name: sourceData.name,
                         path: sourceData.path,
+                        description: sourceData.description || ""
+                    };
+                    const newListItem = new ChainedListItem(newItemData, this);
+                    this.chainedListItems.splice(newIndex, 0, newListItem);
+                }
+                else if (dragData.type === 'arasaac-image') {
+                    const sourceData = dragData.data;
+                    const newItemData = {
+                        image_id: sourceData.id, // ID Arasaac
+                        name: sourceData.name,
+                        path: sourceData.path, // Full URL
                         description: sourceData.description || ""
                     };
                     const newListItem = new ChainedListItem(newItemData, this);
