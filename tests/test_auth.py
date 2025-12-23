@@ -22,7 +22,8 @@ def test_register(client):
         'csrf_token': csrf_token,
         'email': 'test@example.com',
         'password': 'Password123',
-        'password2': 'Password123'
+        'password2': 'Password123',
+        'accept_terms': 'y'
     }, follow_redirects=True)
     
     assert response.status_code == 200
@@ -30,9 +31,6 @@ def test_register(client):
     user = User.query.filter_by(username='testuser').first()
     assert user is not None
     assert user.email == 'test@example.com'
-    #if user:
-        #db.session.delete(user)
-        #db.session.commit()
 
 
 def test_login_logout(client):
@@ -48,7 +46,8 @@ def test_login_logout(client):
         'csrf_token': csrf_token,
         'email': 'test@example.com',
         'password': 'Password123',
-        'password2': 'Password123'
+        'password2': 'Password123',
+        'accept_terms': 'y'
     })
     confirm_user(client, 'test@example.com')
 
@@ -69,9 +68,6 @@ def test_login_logout(client):
         assert response.status_code == 200
         assert b'Hi, testuser!' not in response.data
         assert b'Login' in response.data
-        #if user:
-        #    db.session.delete(user)
-        #    db.session.commit()
 
 def test_login_unconfirmed_user(client):
     # Register a user
@@ -102,7 +98,8 @@ def test_password_strength_and_account_deletion(client):
         'csrf_token': csrf_token,
         'email': 'weak@example.com',
         'password': 'password',
-        'password2': 'password'
+        'password2': 'password',
+        'accept_terms': 'y'
     }, follow_redirects=True)
 
     assert 'A confirmation email has been sent to your email address.' not in response.data.decode('utf-8')
@@ -119,7 +116,8 @@ def test_password_strength_and_account_deletion(client):
         'csrf_token': csrf_token,
         'email': 'strong@example.com',
         'password': 'StrongPassword123',
-        'password2': 'StrongPassword123'
+        'password2': 'StrongPassword123',
+        'accept_terms': 'y'
     }, follow_redirects=True)
 
     assert 'A confirmation email has been sent to your email address.' in response.data.decode('utf-8')
@@ -155,7 +153,7 @@ def test_registration_sends_confirmation_email(client, monkeypatch):
     def mock_send_email(to, subject, template, **kwargs):
         sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
 
-    monkeypatch.setattr('app.routes.send_email', mock_send_email)
+    monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
 
     get_response = client.get('/register')
     html = get_response.data.decode()
@@ -166,7 +164,8 @@ def test_registration_sends_confirmation_email(client, monkeypatch):
         'csrf_token': csrf_token,
         'email': 'confirm@example.com',
         'password': 'Password123',
-        'password2': 'Password123'
+        'password2': 'Password123',
+        'accept_terms': 'y'
     }, follow_redirects=True)
 
     user = User.query.filter_by(username='confirmuser').first()
@@ -186,7 +185,8 @@ def test_email_confirmation(client):
         'csrf_token': csrf_token,
         'email': 'confirm2@example.com',
         'password': 'Password123',
-        'password2': 'Password123'
+        'password2': 'Password123',
+        'accept_terms': 'y'
     })
     user = User.query.filter_by(email='confirm2@example.com').first()
     assert user is not None
@@ -208,7 +208,8 @@ def test_password_reset_flow(client, monkeypatch):
         'csrf_token': csrf_token,
         'email': 'reset@example.com',
         'password': 'OldPassword123',
-        'password2': 'OldPassword123'
+        'password2': 'OldPassword123',
+        'accept_terms': 'y'
     })
     user = User.query.filter_by(email='reset@example.com').first()
     assert user is not None
@@ -217,7 +218,7 @@ def test_password_reset_flow(client, monkeypatch):
     sent_emails = []
     def mock_send_email(to, subject, template, **kwargs):
         sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
-    monkeypatch.setattr('app.routes.send_email', mock_send_email)
+    monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
 
     get_response = client.get('/forgot_password')
     csrf_token = get_csrf_token(get_response.data.decode())
@@ -253,7 +254,7 @@ def test_resend_confirmation_request(client, monkeypatch):
     sent_emails = []
     def mock_send_email(to, subject, template, **kwargs):
         sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
-    monkeypatch.setattr('app.routes.send_email', mock_send_email)
+    monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
 
     # 3. Request resend
     get_response = client.get('/resend_confirmation_request')

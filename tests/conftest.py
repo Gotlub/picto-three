@@ -73,6 +73,7 @@ def create_user(client, username='testuser', password='Password123', email=None)
         email=email,
         password=password,
         password2=password,
+        accept_terms='y',
         csrf_token=csrf_token
     ), follow_redirects=True)
     return User.query.filter_by(username=username).first()

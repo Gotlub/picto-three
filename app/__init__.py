@@ -13,7 +13,7 @@ from .extensions import sitemap
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
-login.login_view = 'main.login'
+login.login_view = 'auth.login'
 mail = Mail()
 bootstrap = Bootstrap()
 
@@ -22,12 +22,12 @@ bootstrap = Bootstrap()
 def unauthorized():
     if request.path.startswith('/api/'):
         return jsonify(error="unauthorized"), 401
-    return redirect(url_for('main.login'))
+    return redirect(url_for('auth.login'))
 
 babel = Babel()
 config_class = Config
 
-def create_app( config_override = None):
+def create_app(config_override=None):
     app = Flask(__name__)
     app.config.from_object(config_class)
     if config_override:
@@ -48,8 +48,9 @@ def create_app( config_override = None):
     pictograms_path.mkdir(parents=True, exist_ok=True)
 
     csrf = CSRFProtect(app)
-    from app.routes import api_bp
-    csrf.exempt(api_bp)
+    from app.routes import api
+    csrf.exempt(api.bp)
+
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
@@ -60,14 +61,20 @@ def create_app( config_override = None):
 
     def public_page_generator():
         yield 'main.index', {}
-        yield 'main.builder', {}
-        yield 'main.list_page', {}
+        yield 'builder.builder', {}
+        yield 'builder.list_page', {}
     sitemap.register_generator(public_page_generator)
 
     app.babel_localeselector = get_locale
-    from app.routes import bp as main_bp, api_bp
-    app.register_blueprint(main_bp)
-    app.register_blueprint(api_bp)
+
+    # Register Blueprints
+    from app.routes import auth, main, builder, files
+    # api is already imported above
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(main.bp)
+    app.register_blueprint(builder.bp)
+    app.register_blueprint(api.bp)
+    app.register_blueprint(files.bp)
 
     @app.cli.command('generate-sitemap')
     def generate_sitemap():

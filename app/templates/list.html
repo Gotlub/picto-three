@@ -21,17 +21,21 @@
             <div class="accordion" id="treeAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingLoadTree">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoadTree" aria-expanded="false" aria-controls="collapseLoadTree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseLoadTree" aria-expanded="false" aria-controls="collapseLoadTree">
                             {{ _('Load Tree from Database') }}
                         </button>
                     </h2>
-                    <div id="collapseLoadTree" class="accordion-collapse collapse" aria-labelledby="headingLoadTree" data-bs-parent="#treeAccordion">
+                    <div id="collapseLoadTree" class="accordion-collapse collapse" aria-labelledby="headingLoadTree"
+                        data-bs-parent="#treeAccordion">
                         <div class="accordion-body">
-                            <input type="text" id="tree-search" class="form-control form-control-sm mb-2" placeholder="{{ _('Search trees...') }}">
+                            <input type="text" id="tree-search" class="form-control form-control-sm mb-2"
+                                placeholder="{{ _('Search trees...') }}">
                             <div id="tree-container" style="overflow-y: auto; max-height: 150px;">
                                 <!-- Trees will be loaded here -->
                             </div>
-                            <button id="load-tree-btn" class="btn btn-sm btn-success w-100 mt-2">{{ _('Load Selected Tree') }}</button>
+                            <button id="load-tree-btn" class="btn btn-sm btn-success w-100 mt-2">{{ _('Load Selected
+                                Tree') }}</button>
                         </div>
                     </div>
                 </div>
@@ -42,46 +46,56 @@
             <!-- List Operations Section -->
             <h5>{{ _('List Operations') }}</h5>
             <div class="d-grid gap-2 mb-3">
-                <button id="import-list-json-btn" class="btn btn-sm btn-secondary">{{ _('Import List from JSON') }}</button>
-                <button id="export-list-json-btn" class="btn btn-sm btn-secondary">{{ _('Export List to JSON') }}</button>
+                <button id="import-list-json-btn" class="btn btn-sm btn-secondary">{{ _('Import List from JSON')
+                    }}</button>
+                <button id="export-list-json-btn" class="btn btn-sm btn-secondary">{{ _('Export List to JSON')
+                    }}</button>
             </div>
 
             <div class="accordion" id="listAccordion">
                 {% if current_user.is_authenticated %}
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingSaveList">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSaveList" aria-expanded="false" aria-controls="collapseSaveList">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseSaveList" aria-expanded="false" aria-controls="collapseSaveList">
                             {{ _('Save List to Database') }}
                         </button>
                     </h2>
-                    <div id="collapseSaveList" class="accordion-collapse collapse" aria-labelledby="headingSaveList" data-bs-parent="#listAccordion">
+                    <div id="collapseSaveList" class="accordion-collapse collapse" aria-labelledby="headingSaveList"
+                        data-bs-parent="#listAccordion">
                         <div class="accordion-body">
                             <div class="form-group mb-2">
                                 <label for="list-name" class="form-label-sm">{{ _('List Name') }}</label>
-                                <input type="text" id="list-name" class="form-control form-control-sm" placeholder="{{ _('Enter list name') }}">
+                                <input type="text" id="list-name" class="form-control form-control-sm"
+                                    placeholder="{{ _('Enter list name') }}">
                             </div>
                             <div class="form-check mb-2">
                                 <input type="checkbox" id="list-is-public" class="form-check-input">
                                 <label class="form-check-label" for="list-is-public">{{ _('Make Public') }}</label>
                             </div>
-                            <button id="save-list-btn" class="btn btn-sm btn-primary w-100">{{ _('Save List') }}</button>
+                            <button id="save-list-btn" class="btn btn-sm btn-primary w-100">{{ _('Save List')
+                                }}</button>
                         </div>
                     </div>
                 </div>
                 {% endif %}
                 <div class="accordion-item">
-                     <h2 class="accordion-header" id="headingLoadList">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoadList" aria-expanded="false" aria-controls="collapseLoadList">
-                           {{ _('Load List from Database') }}
+                    <h2 class="accordion-header" id="headingLoadList">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseLoadList" aria-expanded="false" aria-controls="collapseLoadList">
+                            {{ _('Load List from Database') }}
                         </button>
                     </h2>
-                    <div id="collapseLoadList" class="accordion-collapse collapse" aria-labelledby="headingLoadList" data-bs-parent="#listAccordion">
+                    <div id="collapseLoadList" class="accordion-collapse collapse" aria-labelledby="headingLoadList"
+                        data-bs-parent="#listAccordion">
                         <div class="accordion-body">
-                             <input type="text" id="list-search" class="form-control form-control-sm mb-2" placeholder="{{ _('Search lists...') }}">
+                            <input type="text" id="list-search" class="form-control form-control-sm mb-2"
+                                placeholder="{{ _('Search lists...') }}">
                             <div id="list-container" class="flex-grow-1" style="overflow-y: auto; min-height: 150px;">
                                 <!-- Lists will be loaded here -->
                             </div>
-                            <button id="load-list-btn" class="btn btn-sm btn-success w-100 mt-2">{{ _('Load Selected List') }}</button>
+                            <button id="load-list-btn" class="btn btn-sm btn-success w-100 mt-2">{{ _('Load Selected
+                                List') }}</button>
                         </div>
                     </div>
                 </div>
@@ -91,35 +105,149 @@
 
             <!-- PDF Export Section -->
             <h5>{{ _('Export Operations') }}</h5>
-             <div class="accordion" id="exportAccordion">
+            <div class="accordion" id="exportAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingExportPdf">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExportPdf" aria-expanded="false" aria-controls="collapseExportPdf">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseExportPdf" aria-expanded="false" aria-controls="collapseExportPdf">
                             {{ _('Export to PDF') }}
                         </button>
                     </h2>
-                    <div id="collapseExportPdf" class="accordion-collapse collapse" aria-labelledby="headingExportPdf" data-bs-parent="#exportAccordion">
-                        <div class="accordion-body">
-                            <div class="form-group mb-3">
-                                <label for="pdf-image-size" class="form-label form-label-sm">{{ _('Image Size') }}: <span id="pdf-image-size-value">100</span>px</label>
-                                <input type="range" class="form-range" min="50" max="200" value="100" id="pdf-image-size">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label form-label-sm">{{ _('Layout Mode') }}</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="pdf-layout-mode" id="pdf-layout-chain" value="chain" checked>
-                                    <label class="form-check-label" for="pdf-layout-chain">
-                                        {{ _('Chain Mode') }}
-                                    </label>
+                    <div id="collapseExportPdf" class="accordion-collapse collapse" aria-labelledby="headingExportPdf"
+                        data-bs-parent="#exportAccordion">
+                        <div class="accordion-body p-2">
+
+                            <!-- Tabs for Export Options -->
+                            <ul class="nav nav-tabs mb-3" id="exportTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active py-1 px-2" id="layout-tab" data-bs-toggle="tab"
+                                        data-bs-target="#layout" type="button" role="tab" aria-controls="layout"
+                                        aria-selected="true" style="font-size: 0.8rem;">{{ _('Layout') }}</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link py-1 px-2" id="style-tab" data-bs-toggle="tab"
+                                        data-bs-target="#style" type="button" role="tab" aria-controls="style"
+                                        aria-selected="false" style="font-size: 0.8rem;">{{ _('Style') }}</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link py-1 px-2" id="text-tab" data-bs-toggle="tab"
+                                        data-bs-target="#text" type="button" role="tab" aria-controls="text"
+                                        aria-selected="false" style="font-size: 0.8rem;">{{ _('Text') }}</button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="exportTabsContent">
+
+                                <!-- Layout Tab -->
+                                <div class="tab-pane fade show active" id="layout" role="tabpanel"
+                                    aria-labelledby="layout-tab">
+                                    <div class="mb-2">
+                                        <label class="form-label form-label-sm fw-bold">{{ _('Layout Mode') }}</label>
+                                        <select class="form-select form-select-sm" id="pdf-layout-mode">
+                                            <option value="chain">{{ _('Vertical Chain') }}</option>
+                                            <option value="strip">{{ _('Horizontal Strip') }}</option>
+                                            <option value="grid">{{ _('Grid') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label form-label-sm fw-bold">{{ _('Page Orientation')
+                                            }}</label>
+                                        <div class="btn-group w-100" role="group">
+                                            <input type="radio" class="btn-check" name="pdf-orientation"
+                                                id="orient-portrait" value="portrait" checked>
+                                            <label class="btn btn-outline-secondary btn-sm" for="orient-portrait">{{
+                                                _('Portrait') }}</label>
+                                            <input type="radio" class="btn-check" name="pdf-orientation"
+                                                id="orient-landscape" value="landscape">
+                                            <label class="btn btn-outline-secondary btn-sm" for="orient-landscape">{{
+                                                _('Landscape') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="pdf-image-size" class="form-label form-label-sm fw-bold">{{ _('Image
+                                            Size') }}: <span id="pdf-image-size-value">100</span>px</label>
+                                        <input type="range" class="form-range" min="50" max="300" value="100"
+                                            id="pdf-image-size">
+                                    </div>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="pdf-layout-mode" id="pdf-layout-grid" value="grid">
-                                    <label class="form-check-label" for="pdf-layout-grid">
-                                        {{ _('Grid Mode') }}
-                                    </label>
+
+                                <!-- Style Tab -->
+                                <div class="tab-pane fade" id="style" role="tabpanel" aria-labelledby="style-tab">
+                                    <div class="mb-2">
+                                        <label class="form-label form-label-sm fw-bold">{{ _('Border') }}</label>
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text">{{ _('Color') }}</span>
+                                            <input type="color" class="form-control form-control-color"
+                                                id="pdf-border-color" value="#000000" title="Choose border color">
+                                        </div>
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text">{{ _('Width') }}</span>
+                                            <input type="number" class="form-control" id="pdf-border-width" value="1"
+                                                min="0" max="10">
+                                            <span class="input-group-text">px</span>
+                                        </div>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">{{ _('Radius') }}</span>
+                                            <input type="number" class="form-control" id="pdf-border-radius" value="0"
+                                                min="0" max="50">
+                                            <span class="input-group-text">px</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label form-label-sm fw-bold">{{ _('Background') }}</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">{{ _('Color') }}</span>
+                                            <input type="color" class="form-control form-control-color"
+                                                id="pdf-bg-color" value="#ffffff" title="Choose background color">
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="pdf-show-shadow">
+                                        <label class="form-check-label form-label-sm" for="pdf-show-shadow">{{ _('Show
+                                            Shadow') }}</label>
+                                    </div>
+                                </div>
+
+                                <!-- Text Tab -->
+                                <div class="tab-pane fade" id="text" role="tabpanel" aria-labelledby="text-tab">
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" id="pdf-show-text" checked>
+                                        <label class="form-check-label form-label-sm fw-bold" for="pdf-show-text">{{
+                                            _('Show Text') }}</label>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label form-label-sm">{{ _('Position') }}</label>
+                                        <select class="form-select form-select-sm" id="pdf-text-position">
+                                            <option value="bottom" selected>{{ _('Bottom') }}</option>
+                                            <option value="top">{{ _('Top') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label form-label-sm">{{ _('Font') }}</label>
+                                        <select class="form-select form-select-sm mb-1" id="pdf-font-family">
+                                            <option value="Helvetica" selected>Helvetica</option>
+                                            <option value="Times-Roman">Times New Roman</option>
+                                            <option value="Courier">Courier</option>
+                                        </select>
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text">{{ _('Size') }}</span>
+                                            <input type="number" class="form-control" id="pdf-font-size" value="12"
+                                                min="6" max="36">
+                                            <span class="input-group-text">pt</span>
+                                        </div>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">{{ _('Color') }}</span>
+                                            <input type="color" class="form-control form-control-color"
+                                                id="pdf-text-color" value="#000000">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <button id="export-pdf-btn" class="btn btn-sm btn-primary w-100">{{ _('Export') }}</button>
+
+                            <hr class="my-2">
+                            <button id="export-pdf-btn" class="btn btn-sm btn-primary w-100 fw-bold">
+                                <i class="bi bi-file-earmark-pdf"></i> {{ _('Generate PDF') }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -128,15 +256,17 @@
 
         <!-- Center Panel: Tree Visualization (Read-only) -->
         <div class="col-md-5 d-flex flex-column h-100">
-             <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center">
                 <h4>{{ _('Select from Tree') }}</h4>
                 <div class="form-group text-center mb-2">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="selectionMode" id="modeElement" value="element">
+                        <input class="form-check-input" type="radio" name="selectionMode" id="modeElement"
+                            value="element">
                         <label class="form-check-label" for="modeElement">{{ _('Element') }}</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="selectionMode" id="modeBranch" value="branch" checked>
+                        <input class="form-check-input" type="radio" name="selectionMode" id="modeBranch" value="branch"
+                            checked>
                         <label class="form-check-label" for="modeBranch">{{ _('Branch') }}</label>
                     </div>
                 </div>
@@ -151,15 +281,16 @@
         <div class="col-md-4 sidebar d-flex flex-column h-100">
             <div class="d-flex justify-content-between align-items-center">
                 <h4>{{ _('Select from Images') }}</h4>
-                 <small class="text-muted">{{ _('Drag to copy to list') }}</small>
+                <small class="text-muted">{{ _('Drag to copy to list') }}</small>
             </div>
             <input type="text" id="image-search" class="form-control mb-2" placeholder="{{ _('Search images...') }}">
             <div class="image-sidebar border p-3 flex-grow-1" id="image-sidebar-tree" style="overflow: auto;">
                 <!-- The dynamic image tree will be built here -->
             </div>
-             <div class="form-group mt-2">
+            <div class="form-group mt-2">
                 <label for="selected-link-description">{{ _('Selected Link Description') }}</label>
-                <textarea id="selected-link-description" class="form-control" rows="2" placeholder="{{ _('Select a link from the bottom list to edit its description...') }}"></textarea>
+                <textarea id="selected-link-description" class="form-control" rows="2"
+                    placeholder="{{ _('Select a link from the bottom list to edit its description...') }}"></textarea>
             </div>
         </div>
     </div>
@@ -167,14 +298,15 @@
     <!-- Bottom panel row -->
     <div class="row mt-2" style="height: 30%;">
         <div class="col-12 d-flex flex-column h-100">
-             <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>{{ _('Chained List Builder') }}</h4>
                 <div>
                     <button id="delete-link-btn" class="btn btn-danger">{{ _('Delete Selected Link') }}</button>
                     <button id="new-chain-btn" class="btn btn-secondary">{{ _('New Chain') }}</button>
                 </div>
             </div>
-            <div class="chained-list-container border p-3 rounded flex-grow-1" id="chained-list-container" style="display: flex; flex-direction: row; align-items: center; gap: 10px; overflow-x: auto;">
+            <div class="chained-list-container border p-3 rounded flex-grow-1" id="chained-list-container"
+                style="display: flex; flex-direction: row; align-items: center; gap: 10px; overflow-x: auto;">
                 <!-- Chained list items will be built here -->
             </div>
         </div>

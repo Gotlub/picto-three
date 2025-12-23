@@ -24,7 +24,7 @@ class ReadOnlyNode {
                         branch = branch.concat(collectBranchData(child));
                     });
                 }
-                return  branch;
+                return branch;
             };
 
             // 2. Collecte des données
@@ -161,10 +161,10 @@ class ListBuilder {
         this.selectionMode = 'branch'; // 'branch' est la valeur par défaut car cochée en HTML
         this.treeDisplay = document.getElementById('tree-display');
         const rootData = {
-                            id: 'root',
-                            name: 'Root',
-                            path: '/static/images/folder-open-bold.png',
-                        };
+            id: 'root',
+            name: 'Root',
+            path: '/static/images/folder-open-bold.png',
+        };
         this.treeRoot = new ReadOnlyNode(rootData, rootData, this);
         this.selectedTreeNode = null;
 
@@ -215,7 +215,7 @@ class ListBuilder {
         // PDF Export
         this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
         this.pdfImageSizeSlider?.addEventListener('input', () => {
-            if(this.pdfImageSizeValue) {
+            if (this.pdfImageSizeValue) {
                 this.pdfImageSizeValue.textContent = this.pdfImageSizeSlider.value;
             }
         });
@@ -269,12 +269,12 @@ class ListBuilder {
                     content.classList.add('selected');
                 }
             }
-            if(this.selectionMode === 'branch') {
+            if (this.selectionMode === 'branch') {
                 n.children.forEach(applyHighlight);
             }
-        };        
+        };
 
-        if (this.selectedNode) { 
+        if (this.selectedNode) {
             applyHighlight(this.selectedNode);
             if (this.selectedNode.element) {
                 this.selectedNode.element.classList.add('is-selected');
@@ -404,7 +404,7 @@ class ListBuilder {
                 container.insertBefore(this.dropIndicator, afterElement.element);
             }
         } else if (this.draggedSource) { // Dropping new item
-             if (afterElement == null) {
+            if (afterElement == null) {
                 container.appendChild(this.dropIndicator);
             } else {
                 container.insertBefore(this.dropIndicator, afterElement.element);
@@ -413,13 +413,13 @@ class ListBuilder {
     }
 
     handleChainedListDragLeave(e) {
-       if (e.target === this.chainedListContainer) {
+        if (e.target === this.chainedListContainer) {
             this.removeDropIndicator();
-       }
+        }
     }
 
     removeDropIndicator() {
-         if (this.dropIndicator.parentNode) {
+        if (this.dropIndicator.parentNode) {
             this.dropIndicator.parentNode.removeChild(this.dropIndicator);
         }
     }
@@ -487,7 +487,7 @@ class ListBuilder {
             }
             this.draggedSource = null;
         }
-    this.renderChainedList();
+        this.renderChainedList();
     }
 
 
@@ -803,7 +803,7 @@ class ListBuilder {
         const rootDisplayData = {
             id: 'root',
             name: 'Root',
-            path: '/static/images/folder-open-bold.png' 
+            path: '/static/images/folder-open-bold.png'
         };
         this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
 
@@ -864,11 +864,31 @@ class ListBuilder {
             description: item.data.description
         }));
 
-        const imageSize = parseInt(this.pdfImageSizeSlider.value, 10);
-        const layoutMode = document.querySelector('input[name="pdf-layout-mode"]:checked').value;
+        // Collect all export options
+        const exportOptions = {
+            image_data: imageData,
+            // Layout
+            layout_mode: document.getElementById('pdf-layout-mode').value,
+            orientation: document.querySelector('input[name="pdf-orientation"]:checked').value,
+            image_size: parseInt(document.getElementById('pdf-image-size').value, 10),
 
-        const originalBtnText = this.exportPdfBtn.textContent;
-        this.exportPdfBtn.innerHTML = 'Generating...';
+            // Style
+            border_color: document.getElementById('pdf-border-color').value,
+            border_width: parseInt(document.getElementById('pdf-border-width').value, 10),
+            border_radius: parseInt(document.getElementById('pdf-border-radius').value, 10),
+            bg_color: document.getElementById('pdf-bg-color').value,
+            show_shadow: document.getElementById('pdf-show-shadow').checked,
+
+            // Text
+            show_text: document.getElementById('pdf-show-text').checked,
+            text_position: document.getElementById('pdf-text-position').value,
+            font_family: document.getElementById('pdf-font-family').value,
+            font_size: parseInt(document.getElementById('pdf-font-size').value, 10),
+            text_color: document.getElementById('pdf-text-color').value
+        };
+
+        const originalBtnText = this.exportPdfBtn.innerHTML;
+        this.exportPdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
         this.exportPdfBtn.disabled = true;
 
         try {
@@ -877,11 +897,7 @@ class ListBuilder {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    image_data: imageData,
-                    image_size: imageSize,
-                    layout_mode: layoutMode
-                })
+                body: JSON.stringify(exportOptions)
             });
 
             if (!response.ok) {

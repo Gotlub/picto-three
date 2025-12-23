@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-md-6">
             <h2>{{ _('Change Password') }}</h2>
-            <form action="{{ url_for('main.change_password') }}" method="post">
+            <form action="{{ url_for('auth.change_password') }}" method="post">
                 {{ change_password_form.hidden_tag() }}
                 <div class="mb-3">
                     {{ change_password_form.current_password.label(class="form-label") }}
@@ -36,7 +36,8 @@
 </div>
 
 <!-- Delete Account Modal -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -44,39 +45,43 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>{{ _('Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently lost.') }}</p>
-                <p><strong>{{ _('To confirm, please type your username below:') }} {{ current_user.username }}</strong></p>
-                <form id="deleteAccountForm" action="{{ url_for('main.delete_account') }}" method="post">
+                <p>{{ _('Are you sure you want to delete your account? This action cannot be undone. All your data will
+                    be permanently lost.') }}</p>
+                <p><strong>{{ _('To confirm, please type your username below:') }} {{ current_user.username }}</strong>
+                </p>
+                <form id="deleteAccountForm" action="{{ url_for('auth.delete_account') }}" method="post">
                     {{ delete_account_form.hidden_tag() }}
-                    {{ delete_account_form.username_confirm(class="form-control", placeholder=_('Your username'), id="username_confirm") }}
+                    {{ delete_account_form.username_confirm(class="form-control", placeholder=_('Your username'),
+                    id="username_confirm") }}
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>{{ _('Delete My Account') }}</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>{{ _('Delete My Account')
+                    }}</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    const usernameConfirmInput = document.getElementById('username_confirm');
-    const deleteAccountForm = document.getElementById('deleteAccountForm');
-    const correctUsername = "{{ current_user.username }}";
+    document.addEventListener('DOMContentLoaded', function () {
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const usernameConfirmInput = document.getElementById('username_confirm');
+        const deleteAccountForm = document.getElementById('deleteAccountForm');
+        const correctUsername = "{{ current_user.username }}";
 
-    usernameConfirmInput.addEventListener('input', function() {
-        if (usernameConfirmInput.value === correctUsername) {
-            confirmDeleteBtn.disabled = false;
-        } else {
-            confirmDeleteBtn.disabled = true;
-        }
-    });
+        usernameConfirmInput.addEventListener('input', function () {
+            if (usernameConfirmInput.value === correctUsername) {
+                confirmDeleteBtn.disabled = false;
+            } else {
+                confirmDeleteBtn.disabled = true;
+            }
+        });
 
-    confirmDeleteBtn.addEventListener('click', function() {
-        deleteAccountForm.submit();
+        confirmDeleteBtn.addEventListener('click', function () {
+            deleteAccountForm.submit();
+        });
     });
-});
 </script>
 {% endblock %}

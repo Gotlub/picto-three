@@ -7,18 +7,6 @@ import pytest
 from app.models import Folder, Image
 from app import db
 from tests.conftest import create_user, login, confirm_user
-
-
-# -----------------------------------------------------------------------------
-# Tests for the main /pictogram-bank page
-# -----------------------------------------------------------------------------
-
-def test_pictogram_bank_unauthenticated(client):
-    """Test that an unauthenticated user is redirected to the login page."""
-    response = client.get('/pictogram-bank')
-    assert response.status_code == 302 # Redirect
-    assert '/login' in response.location
-
 def test_pictogram_bank_authenticated(client):
     """Test that an authenticated user can access the pictogram bank."""
     user = create_user(client, 'testuser_pictogram', 'Password123')

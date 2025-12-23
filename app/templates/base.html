@@ -36,14 +36,14 @@
                             <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.builder') }}">{{ _('Tree Builder') }}</a>
+                            <a class="nav-link" href="{{ url_for('builder.builder') }}">{{ _('Tree Builder') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.list_page') }}">{{ _('List Builder') }}</a>
+                            <a class="nav-link" href="{{ url_for('builder.list_page') }}">{{ _('List Builder') }}</a>
                         </li>
                         {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.pictogram_bank') }}">{{ _('Pictogram Bank') }}</a>
+                            <a class="nav-link" href="{{ url_for('builder.pictogram_bank') }}">{{ _('Pictogram Bank') }}</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -64,14 +64,14 @@
                         </li>
                         {% if current_user.is_anonymous %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.login') }}">{{ _('Login') }}</a>
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.account') }}">{{ _('Account') }}</a>
+                            <a class="nav-link" href="{{ url_for('auth.account') }}">{{ _('Account') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.logout') }}">{{ _('Logout') }}</a>
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
                         </li>
                         {% endif %}
                     </ul>

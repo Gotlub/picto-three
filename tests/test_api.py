@@ -17,7 +17,7 @@ def test_save_tree_authenticated(client):
     # Register a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     # Confirm user then login
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -52,7 +52,7 @@ def test_save_tree_missing_data(client):
     # Register a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     # Confirm user then login
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -78,7 +78,7 @@ def test_load_trees_authenticated(client):
     # Register and login user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     user = User.query.filter_by(username='testuser').first()
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -119,7 +119,7 @@ def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
 
@@ -170,7 +170,7 @@ def test_save_and_load_lists(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     user = User.query.filter_by(username='listuser').first()
     confirm_user(client, 'list@test.com')
     login(client, 'listuser', 'Password123')
@@ -220,7 +220,7 @@ def test_update_list(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     confirm_user(client, 'update@test.com')
     login(client, 'updateuser', 'Password123')
 
@@ -250,7 +250,7 @@ def test_delete_list(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     confirm_user(client, 'delete@test.com')
     login(client, 'deleteuser', 'Password123')
 
@@ -274,12 +274,12 @@ def test_update_delete_unauthorized(client):
     # Register two users
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     confirm_user(client, 'owner@test.com')
 
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     confirm_user(client, 'hacker@test.com')
 
     # Owner logs in and creates a list
@@ -321,7 +321,10 @@ def test_export_pdf(client):
     payload_chain = {
         'image_data': image_data,
         'image_size': 120,
-        'layout_mode': 'chain'
+        'layout_mode': 'chain',
+        'orientation': 'portrait',
+        'show_text': True,
+        'text_position': 'bottom'
     }
     response_chain = client.post('/api/export_pdf', json=payload_chain)
     assert response_chain.status_code == 200
@@ -332,12 +335,29 @@ def test_export_pdf(client):
     payload_grid = {
         'image_data': image_data,
         'image_size': 80,
-        'layout_mode': 'grid'
+        'layout_mode': 'grid',
+        'orientation': 'landscape',
+        'border_width': 2,
+        'border_color': '#ff0000'
     }
     response_grid = client.post('/api/export_pdf', json=payload_grid)
     assert response_grid.status_code == 200
     assert response_grid.mimetype == 'application/pdf'
     assert response_grid.data.startswith(b'%PDF-')
+
+    # Test with valid data in 'strip' mode (new)
+    payload_strip = {
+        'image_data': image_data,
+        'image_size': 80,
+        'layout_mode': 'strip',
+        'orientation': 'landscape',
+        'bg_color': '#ffff00',
+        'show_shadow': True
+    }
+    response_strip = client.post('/api/export_pdf', json=payload_strip)
+    assert response_strip.status_code == 200
+    assert response_strip.mimetype == 'application/pdf'
+    assert response_strip.data.startswith(b'%PDF-')
 
     # Test with no images
     response_no_images = client.post('/api/export_pdf', json={'image_data': []})
@@ -364,7 +384,7 @@ def test_save_list_with_duplicate_name_updates(client):
     # Register and login a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     confirm_user(client, 'listupdate@test.com')
     login(client, 'listupdateuser', 'Password123')
 
@@ -408,7 +428,7 @@ def test_load_tree_data(client):
     # Register a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'treeuser', 'email': 'tree@test.com', 'password': 'Password123', 'password2': 'Password123', 'csrf_token': csrf_token})
+    client.post('/register', data={'username': 'treeuser', 'email': 'tree@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
     user = User.query.filter_by(username='treeuser').first()
     assert user is not None
 
