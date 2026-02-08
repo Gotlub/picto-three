@@ -7,6 +7,7 @@ basedir = Path(__file__).parent.resolve()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    MAIL_USERNAME = = os.environ.get('MAIL_USERNAME') or 'you-will-never-guess'
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
@@ -25,10 +26,8 @@ class Config:
     LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl']
 
     # Email configuration
-    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_SERVER = 'smtp-relay.brevo.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = "pictotree.noreply@gmail.com"
-    MAIL_PASSWORD = "utiy oceh kuhc pjhm"
     ADMIN_EMAIL = "nicolas.frere86@gmail.com"
-    MAIL_DEFAULT_SENDER = ('Pictogram-Tree Builder', os.environ.get('MAIL_USERNAME'))
+    MAIL_DEFAULT_SENDER = 'contact@pictotree.eu'
