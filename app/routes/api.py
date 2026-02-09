@@ -11,7 +11,9 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape, portrait
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import HexColor
+from reportlab.lib.colors import HexColor
 from PIL import Image as PILImage
+import requests
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -692,20 +694,42 @@ def export_pdf():
         if not image_path_relative:
             continue
 
-        base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-        image_path_absolute = base_path / image_path_relative
+        # --- Image Source Logic ---
+        img_source = None
+        
+        # 1. Handle Remote URLs (Arasaac or others)
+        if image_path_relative.startswith(('http://', 'https://')):
+            try:
+                # Download the image into memory
+                response = requests.get(image_path_relative, timeout=5)
+                if response.status_code == 200:
+                    img_source = io.BytesIO(response.content)
+                else:
+                    print(f"Failed to fetch remote image: {image_path_relative} (Status: {response.status_code})")
+            except Exception as e:
+                print(f"Error fetching remote image {image_path_relative}: {e}")
+        
+        # 2. Handle Local Files
+        else:
+            base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+            image_path_absolute = base_path / image_path_relative
 
-        if not image_path_absolute.exists():
-            legacy_path = Path(current_app.root_path) / 'static' / image_path_relative
-            if not legacy_path.exists():
-                continue
-            image_path_absolute = legacy_path
+            if image_path_absolute.exists():
+                img_source = image_path_absolute
+            else:
+                # Fallback to static folder (legacy or app assets)
+                legacy_path = Path(current_app.root_path) / 'static' / image_path_relative
+                if legacy_path.exists():
+                    img_source = legacy_path
+
+        if not img_source:
+             # Skip if image cannot be found locally or downloaded
+             continue
 
         # --- Layout Logic ---
         
         if layout_mode == 'chain':
             # Vertical stack, centered
-            # For chain, we can let the height be flexible if we wanted, but let's stick to the box model for consistency
             
             if cursor_y - box_height < margin:
                 c.showPage()
@@ -715,7 +739,7 @@ def export_pdf():
             item_x = (width - box_width) / 2
             item_y = cursor_y - box_height
             
-            draw_item(c, item_x, item_y, box_width, box_height, image_path_absolute, description)
+            draw_item(c, item_x, item_y, box_width, box_height, img_source, description)
             
             cursor_y -= (box_height + item_spacing)
 
@@ -730,20 +754,12 @@ def export_pdf():
                 cursor_x = margin
                 cursor_y = height - margin
             
-            draw_item(c, cursor_x, cursor_y - box_height, box_width, box_height, image_path_absolute, description)
+            draw_item(c, cursor_x, cursor_y - box_height, box_width, box_height, img_source, description)
             
             cursor_x += (box_width + item_spacing)
 
         elif layout_mode == 'strip':
-            # Horizontal line
-            # If it overflows, we wrap to next line (essentially a grid), 
-            # OR we could just rotate the page? But user selected orientation.
-            # Let's treat strip as "fill line then wrap", which is same as grid but maybe we center the row?
-            # For now, let's implement it same as grid but maybe with different spacing or alignment intent.
-            # Actually, "Strip" usually implies a single sequence. Let's just use the grid logic which handles wrapping naturally.
-            # To distinguish, maybe strip centers the content on the page if it's just a few items?
-            # Let's stick to standard grid wrapping for robustness.
-            
+             # Same as grid for now
              if cursor_x + box_width > width - margin:
                 cursor_x = margin
                 cursor_y -= (box_height + item_spacing)
@@ -753,7 +769,7 @@ def export_pdf():
                 cursor_x = margin
                 cursor_y = height - margin
             
-             draw_item(c, cursor_x, cursor_y - box_height, box_width, box_height, image_path_absolute, description)
+             draw_item(c, cursor_x, cursor_y - box_height, box_width, box_height, img_source, description)
             
              cursor_x += (box_width + item_spacing)
 
