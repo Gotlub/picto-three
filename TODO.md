@@ -97,3 +97,7 @@ Liste des jalons et tâches à réaliser par les agents IA.
     - [x] Gérer les interactions utilisateur et les appels API.
 - [x] **Mise à jour de la navigation**
     - [x] Ajouter le lien "banque de pictogrammes" dans la barre de navigation.
+
+## Maintenance
+- [x] Corriger la configuration SMTP pour Brevo (séparation user/sender).
+```

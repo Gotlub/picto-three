@@ -30,5 +30,5 @@ class Config:
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'you-will-never-guess'
-    ADMIN_EMAIL = "nicolas.frere86@gmail.com"
-    MAIL_DEFAULT_SENDER = 'contact@pictotree.eu'
+    ADMIN_EMAIL = "contact@pictotree.eu"
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'contact@pictotree.eu'

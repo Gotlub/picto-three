@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Add github workflows
 
+### Fixed
+- Updated SMTP configuration to support Brevo by separating `MAIL_USERNAME` (auth) from `MAIL_DEFAULT_SENDER` (sender address).
+
 ### Changed
 - Externalized the database to a sibling `data/` directory (`../data/`) to fully separate data from application code, improving deployment and security.
 
