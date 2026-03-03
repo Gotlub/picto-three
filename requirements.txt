@@ -16,3 +16,4 @@ Flask-Sitemap
 gunicorn
 Jinja2
 requests
+Flask-JWT-Extended

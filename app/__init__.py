@@ -9,6 +9,8 @@ from flask_babel import Babel, _
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from .extensions import sitemap
+from app.routes import mobile_api
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -16,7 +18,7 @@ login = LoginManager()
 login.login_view = 'auth.login'
 mail = Mail()
 bootstrap = Bootstrap()
-
+jwt = JWTManager()
 
 @login.unauthorized_handler
 def unauthorized():
@@ -59,6 +61,10 @@ def create_app(config_override=None):
     bootstrap.init_app(app)
     sitemap.init_app(app)
 
+    # JWT Configuration for mobile API
+    app.config['JWT_SECRET_KEY'] = 'a-changer-pour-la-production-avec-githubSecretKey'
+    jwt.init_app(app)
+
     def public_page_generator():
         yield 'main.index', {}
         yield 'builder.builder', {}
@@ -75,7 +81,7 @@ def create_app(config_override=None):
     app.register_blueprint(builder.bp)
     app.register_blueprint(api.bp)
     app.register_blueprint(files.bp)
-
+    app.register_blueprint(mobile_api.bp)
     @app.cli.command('generate-sitemap')
     def generate_sitemap():
         """Génère le fichier sitemap.xml statique."""
