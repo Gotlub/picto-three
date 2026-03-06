@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 import shutil
 from app.utils import generate_confirmation_token
-from app.models import User
+from app.models import User, Image
 
 @pytest.fixture
 def app():
@@ -28,7 +28,6 @@ def app():
     # Cleanup the test pictograms directory
     shutil.rmtree(test_pictos_path)
 
-from app.models import Image
 
 @pytest.fixture
 def client(app):

@@ -29,3 +29,7 @@ jobs:
       # Étape 4 : Le Linter (Cherche le code mort, les variables non utilisées, les imports foireux)
       - name: 🕵️‍♂️ Analyse du code statique (Ruff)
         run: ruff check .
+
+      # Étape 5 : Les tests unitaires
+      - name: 🧪 Tests automatisés (Pytest)
+        run: pytest -v

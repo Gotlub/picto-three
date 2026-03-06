@@ -1,5 +1,4 @@
 import json
-import pytest
 import os
 from PIL import Image as PILImage
 from app.models import User, Tree, PictogramList, Folder, Image
@@ -171,7 +170,7 @@ def test_save_and_load_lists(client):
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
     client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
-    user = User.query.filter_by(username='listuser').first()
+    User.query.filter_by(username='listuser').first()
     confirm_user(client, 'list@test.com')
     login(client, 'listuser', 'Password123')
 

@@ -18,7 +18,7 @@ def confirm_token(token, expiration=3600):
     try:
         email = serializer.loads(token, salt='email-confirmation-salt', max_age=expiration)
         return email
-    except:
+    except Exception:
         return False
 
 def generate_password_reset_token(email):
@@ -30,5 +30,5 @@ def confirm_password_reset_token(token, expiration=3600):
     try:
         email = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
         return email
-    except:
+    except Exception:
         return False

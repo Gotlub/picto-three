@@ -120,7 +120,7 @@ def main():
 
         db.session.commit()
         print("-" * 20)
-        print(f"Opération terminée.")
+        print("Opération terminée.")
         print(f"{folders_added} nouveau(x) dossier(s) ajouté(s).")
         print(f"{images_added} nouvelle(s) image(s) ajoutée(s).")
         print("Les miniatures manquantes pour les images existantes ont été créées.")

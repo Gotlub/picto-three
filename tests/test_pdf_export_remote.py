@@ -1,7 +1,4 @@
 from unittest.mock import patch, MagicMock
-import io
-import shutil
-from pathlib import Path
 
 def test_export_pdf_with_remote_image(client, app):
     """Test that the PDF export endpoint handles remote images correctly."""

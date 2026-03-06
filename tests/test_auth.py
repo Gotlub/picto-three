@@ -1,8 +1,6 @@
 from app.models import User
 from app import db
-import pytest
-from app import utils
-from app.utils import generate_confirmation_token, generate_password_reset_token
+from app.utils import generate_password_reset_token
 from tests.conftest import get_csrf_token, login, confirm_user, create_user
 
 def test_app_config(app):
@@ -60,7 +58,7 @@ def test_login_logout(client):
         }, follow_redirects=True)
         assert response.status_code == 200
         assert b'Hi, testuser!' in response.data
-        user = User.query.filter_by(username='testuser').first()
+        User.query.filter_by(username='testuser').first()
         assert b'Logout' in response.data
 
         # Logout

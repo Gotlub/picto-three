@@ -1,9 +1,6 @@
-import os
-import shutil
 from io import BytesIO
 from PIL import Image as PILImage
 from pathlib import Path
-import pytest
 from app.models import Folder, Image
 from app import db
 from tests.conftest import create_user, login, confirm_user

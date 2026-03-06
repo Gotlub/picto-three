@@ -36,8 +36,8 @@ def builder():
 
     # Load only images that are public or owned by the current user.
     conditions = [
-        Image.user_id == None,  # Global public images
-        Image.is_public == True   # User-owned but public images
+        Image.user_id.is_(None),  # Global public images
+        Image.is_public.is_(True)   # User-owned but public images
     ]
     if current_user.is_authenticated:
         conditions.append(Image.user_id == current_user.id)
@@ -86,8 +86,8 @@ def list_page():
 
     # Load only images that are public or owned by the current user.
     conditions = [
-        Image.user_id == None,  # Global public images
-        Image.is_public == True   # User-owned but public images
+        Image.user_id.is_(None),  # Global public images
+        Image.is_public.is_(True)   # User-owned but public images
     ]
     if current_user.is_authenticated:
         conditions.append(Image.user_id == current_user.id)

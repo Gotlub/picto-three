@@ -11,7 +11,6 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape, portrait
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import HexColor
-from reportlab.lib.colors import HexColor
 from PIL import Image as PILImage
 import requests
 
@@ -46,8 +45,8 @@ def load_lists():
     # In to_dict(), the payload is already a string, but if it were an object, we'd need to handle it.
     # The current to_dict returns the payload as is, which is what we want.
     return jsonify({
-        'public_lists': [l.to_dict() for l in public_lists],
-        'user_lists': [l.to_dict() for l in user_lists]
+        'public_lists': [lst.to_dict() for lst in public_lists],
+        'user_lists': [lst.to_dict() for lst in user_lists]
     })
 
 @bp.route('/lists', methods=['POST'])
@@ -77,7 +76,7 @@ def save_list():
 
         if image_ids:
             # Public lists cannot contain any user-owned images (user_id is not NULL)
-            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id != None).all()
+            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
             if user_owned_images:
                 return jsonify({
                     'status': 'error',
@@ -431,7 +430,7 @@ def save_tree():
         image_ids = get_image_ids_from_tree(json_data['roots'])
         if image_ids:
             # Public trees cannot contain any user-owned images (user_id is not NULL)
-            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id != None).all()
+            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
             if user_owned_images:
                 return jsonify({
                     'status': 'error',
@@ -635,7 +634,7 @@ def export_pdf():
             # We already have the absolute path logic in the main loop, let's assume img_path is valid
             img_reader = ImageReader(img_path)
             iw, ih = img_reader.getSize()
-            aspect = ih / float(iw) if iw else 0
+            # aspect = ih / float(iw) if iw else 0
             
             # Fit into img_area
             if iw > 0 and ih > 0:
@@ -673,7 +672,7 @@ def export_pdf():
     # Main Loop
     cursor_x = margin
     cursor_y = height - margin
-    row_max_height = 0
+    # row_max_height = 0
     
     # Calculate item dimensions based on image_size and options
     # image_size is the target width of the image content

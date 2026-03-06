@@ -1,4 +1,4 @@
-from app import create_app, db, babel
+from app import create_app, db
 from app.models import User, Image, Tree
 
 app = create_app()

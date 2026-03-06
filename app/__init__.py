@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, current_user
-from flask_babel import Babel, _
+from flask_babel import Babel
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from .extensions import sitemap
@@ -89,7 +89,7 @@ def create_app(config_override=None):
         try:
             with app.app_context():
                 app.config["SERVER_NAME"] = "pictotree.eu"
-                PREFERRED_URL_SCHEME = "https"
+                # Removed PREFERRED_URL_SCHEME assignment
                 xml_content = sitemap.sitemap()
             sitemap_path = Path(app.static_folder) / 'sitemap.xml'
             with open(sitemap_path, 'w', encoding='utf-8') as f:

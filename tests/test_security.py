@@ -1,7 +1,7 @@
 import json
 import pytest
 from app import db
-from app.models import User, Image, Tree, PictogramList
+from app.models import User, Image
 from tests.conftest import login
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def test_save_public_tree_with_user_image_fails(seeded_db):
     client = seeded_db
     login(client, 'user1', 'password')
 
-    user1 = User.query.filter_by(username='user1').one()
+    User.query.filter_by(username='user1').one()
 
     # Tree data contains an image owned by user1
     tree_data = {
