@@ -1,0 +1,31 @@
+name: 🐍 Flask Code Review & Tests
+
+# Se lance à chaque push, sur n'importe quelle branche
+on: [push]
+
+jobs:
+  review-python:
+    name: Lint & Pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      # Étape 2 : On installe Python (je mets 3.11, modifie si tu utilises 3.10 ou 3.12)
+      - name: 🐍 Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # Astuce : GitHub garde les paquets en cache pour accélérer les prochains runs
+
+      # Étape 3 : Installation de tes extensions
+      - name: 📦 Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff # On force l'installation du linter
+
+      # Étape 4 : Le Linter (Cherche le code mort, les variables non utilisées, les imports foireux)
+      - name: 🕵️‍♂️ Analyse du code statique (Ruff)
+        run: ruff check .

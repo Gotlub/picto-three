@@ -9,7 +9,6 @@ from flask_babel import Babel, _
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from .extensions import sitemap
-from app.routes import mobile_api
 from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
@@ -51,7 +50,7 @@ def create_app(config_override=None):
 
     csrf = CSRFProtect(app)
     from app.routes import api
-    csrf.exempt(api.bp)
+    csrf.exempt(api.bp)  #a retirer par la suite.
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -74,7 +73,7 @@ def create_app(config_override=None):
     app.babel_localeselector = get_locale
 
     # Register Blueprints
-    from app.routes import auth, main, builder, files
+    from app.routes import auth, main, builder, files, mobile_api
     # api is already imported above
     app.register_blueprint(auth.bp)
     app.register_blueprint(main.bp)
@@ -82,6 +81,8 @@ def create_app(config_override=None):
     app.register_blueprint(api.bp)
     app.register_blueprint(files.bp)
     app.register_blueprint(mobile_api.bp)
+    csrf.exempt(mobile_api.bp) #a garder on va utiliser des jeutons pour la partie mobile.
+
     @app.cli.command('generate-sitemap')
     def generate_sitemap():
         """Génère le fichier sitemap.xml statique."""
