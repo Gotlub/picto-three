@@ -1,0 +1,82 @@
+name: Claude - Audit Complet du Projet
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit-complet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit complet par fichier
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          mkdir -p reviews
+
+          find . -type f \( -name "*.py" -o -name "*.js" \) \
+            ! -path "./venv/*" \
+            ! -path "./.venv/*" \
+            ! -path "./node_modules/*" \
+            ! -path "./.git/*" \
+            ! -name "*.min.js" \
+            > fichiers.txt
+
+          echo "Fichiers a analyser :"
+          cat fichiers.txt
+          echo "---"
+
+          while IFS= read -r fichier; do
+            echo "Analyse de $fichier..."
+
+            CONTENU=$(cat "$fichier")
+            TAILLE=$(wc -c < "$fichier")
+
+            if [ "$TAILLE" -lt 100 ]; then
+              echo "Skip $fichier (trop petit)"
+              continue
+            fi
+
+            RESPONSE=$(curl -s https://api.anthropic.com/v1/messages \
+              -H "x-api-key: $ANTHROPIC_API_KEY" \
+              -H "anthropic-version: 2023-06-01" \
+              -H "content-type: application/json" \
+              -d "$(jq -n \
+                --arg fichier "$fichier" \
+                --arg contenu "$CONTENU" \
+                '{
+                  model: "claude-sonnet-4-6",
+                  max_tokens: 4096,
+                  messages: [{
+                    role: "user",
+                    content: ("Tu es un auditeur de securite expert et pedagogique.\nCe projet Flask/JS est developpe par un etudiant seul.\n\nArchitecture :\n- Flask + Flask-Login/JWT + SQLAlchemy\n- Routes web (CSRF) + routes /api/ (JWT pour Android)\n- Frontend Vanilla JS / jQuery\n\nFichier a auditer : " + $fichier + "\n\nChecklist :\n\nCRITIQUE - Securite :\n- Injections SQL\n- SECRET_KEY ou credentials hardcodes\n- DEBUG=True\n- JWT : algo none accepte, pas de verif expiration/signature\n- Endpoints sensibles sans auth\n- CORS wildcard\n- Upload sans validation MIME\n- CSRF manquant sur POST web\n- Cookies sans HttpOnly/Secure\n- XSS via innerHTML\n\nIMPORTANT :\n- Permissions : un user peut acceder aux data dun autre ?\n- Transactions DB sans rollback\n- JWT dans localStorage\n- fetch/ajax sans gestion erreurs\n- Memory leaks JS\n\nMINEUR :\n- Cas limites non geres\n- Logique metier douteuse\n\nFormat de reponse :\n- Organise par numero de ligne\n- Risque concret + correction avec exemple de code\n- Label CRITIQUE / IMPORTANT / MINEUR\n- Pedagogique, explique le pourquoi\n- Si fichier clean : dis-le en une ligne\n- Ignore : style, nommage, formatage\n\nContenu du fichier :\n" + $contenu)
+                  }]
+                }')"
+            )
+
+            REVIEW=$(echo "$RESPONSE" | jq -r '.content[0].text')
+
+            SAFE_NAME=$(echo "$fichier" | tr '/' '_' | tr '.' '_')
+            echo "# Review : $fichier" > "reviews/${SAFE_NAME}.md"
+            echo "" >> "reviews/${SAFE_NAME}.md"
+            echo "$REVIEW" >> "reviews/${SAFE_NAME}.md"
+
+            echo "::group::$fichier"
+            echo "$REVIEW"
+            echo "::endgroup::"
+
+            sleep 2
+
+          done < fichiers.txt
+
+          echo "---"
+          echo "Audit termine. Fichiers analyses : $(wc -l < fichiers.txt)"
+          echo "Critiques : $(grep -rl "CRITIQUE" reviews/ | wc -l) fichiers"
+
+      - name: Upload des reviews
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-complet-claude
+          path: reviews/
+          retention-days: 30
