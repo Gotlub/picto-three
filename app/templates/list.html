@@ -317,7 +317,8 @@
                 </li>
             </ul>
 
-            <div class="tab-content d-flex flex-column flex-grow-1" id="imageTabsContent" style="min-height: 0; overflow: hidden;">
+            <div class="tab-content d-flex flex-column flex-grow-1" id="imageTabsContent"
+                style="min-height: 0; overflow: hidden;">
                 <!-- Local Images Tab -->
                 <div class="tab-pane fade show active h-100" id="local-images" role="tabpanel"
                     aria-labelledby="local-tab">
@@ -356,9 +357,21 @@
                     <button id="new-chain-btn" class="btn btn-secondary">{{ _('New Chain') }}</button>
                 </div>
             </div>
-            <div class="chained-list-container border p-3 rounded flex-grow-1" id="chained-list-container"
-                style="display: flex; flex-direction: row; align-items: center; gap: 10px; overflow-x: auto;">
-                <!-- Chained list items will be built here -->
+            <div class="position-relative flex-grow-1" style="min-height: 0;">
+                <button id="scroll-list-left"
+                    class="btn btn-sm btn-light position-absolute start-0 top-50 translate-middle-y z-1 shadow-sm d-none"
+                    style="border-radius: 50%; padding: 5px 10px;">
+                    <i class="fas fa-chevron-left" style="pointer-events: none;">&lt;</i>
+                </button>
+                <button id="scroll-list-right"
+                    class="btn btn-sm btn-light position-absolute end-0 top-50 translate-middle-y z-1 shadow-sm d-none"
+                    style="border-radius: 50%; padding: 5px 10px;">
+                    <i class="fas fa-chevron-right" style="pointer-events: none;">&gt;</i>
+                </button>
+                <div class="chained-list-container border p-3 rounded h-100" id="chained-list-container"
+                    style="display: flex; flex-direction: row; align-items: center; gap: 10px; overflow-x: auto; scroll-behavior: smooth;">
+                    <!-- Chained list items will be built here -->
+                </div>
             </div>
         </div>
     </div>

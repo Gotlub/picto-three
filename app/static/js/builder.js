@@ -179,6 +179,26 @@ class TreeBuilder {
             e.preventDefault(); // Necessary to allow drop
             e.dataTransfer.dropEffect = 'copy';
             this.treeDisplay.classList.add('drag-over'); // Add highlight class
+
+            // Auto-scroll logic
+            const container = this.treeDisplay;
+            const threshold = 50; // pixels near the edge to trigger scrolling
+            const scrollSpeed = 10;
+            const rect = container.getBoundingClientRect();
+
+            // Vertical scrolling
+            if (e.clientY - rect.top < threshold) {
+                container.scrollTop -= scrollSpeed;
+            } else if (rect.bottom - e.clientY < threshold) {
+                container.scrollTop += scrollSpeed;
+            }
+
+            // Horizontal scrolling
+            if (e.clientX - rect.left < threshold) {
+                container.scrollLeft -= scrollSpeed;
+            } else if (rect.right - e.clientX < threshold) {
+                container.scrollLeft += scrollSpeed;
+            }
         });
 
         this.treeDisplay.addEventListener('dragleave', () => {
@@ -191,7 +211,7 @@ class TreeBuilder {
             const dragDataString = e.dataTransfer.getData('application/json');
             if (dragDataString) {
                 const dragData = JSON.parse(dragDataString);
-                if (dragData.type === 'image-tree-node') {
+                if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
                     this.addNewNodeFromDrop(dragData.data, { x: e.clientX, y: e.clientY });
                 }
             }
@@ -586,7 +606,11 @@ class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
-                targetContent.classList.add('drag-over');
+                if (targetNode.image.id === 'root') {
+                    targetContent.classList.add('drag-over-root');
+                } else {
+                    targetContent.classList.add('drag-over-add');
+                }
             }
         }
     }
@@ -594,7 +618,8 @@ class TreeBuilder {
     handleDragLeave(e, targetNode) {
         const targetContent = targetNode.element.querySelector('.node-content');
         if (targetContent) {
-            targetContent.classList.remove('drag-over');
+            targetContent.classList.remove('drag-over-root');
+            targetContent.classList.remove('drag-over-add');
         }
     }
 
@@ -681,8 +706,9 @@ class TreeBuilder {
             this.draggedNode.element.classList.remove('dragging');
         }
         this.draggedNode = null;
-        document.querySelectorAll('.node-content.drag-over').forEach(el => {
-            el.classList.remove('drag-over');
+        document.querySelectorAll('.node-content.drag-over-add, .node-content.drag-over-root').forEach(el => {
+            el.classList.remove('drag-over-add');
+            el.classList.remove('drag-over-root');
         });
     }
 
@@ -1100,15 +1126,23 @@ class TreeBuilder {
 
     exportTreeToJSON() {
         const jsonData = this.getTreeAsJSON();
-        if (!jsonData) {
+        if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
             alert('The tree is empty.');
             return;
+        }
+
+        let filename = prompt("Enter a filename for your JSON export:", "tree.json");
+        if (!filename) {
+            return; // User cancelled
+        }
+        if (!filename.endsWith('.json')) {
+            filename += '.json';
         }
 
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonData, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "tree.json");
+        downloadAnchorNode.setAttribute("download", filename);
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();
         downloadAnchorNode.remove();

@@ -192,6 +192,8 @@ class ListBuilder {
 
         // Bottom Panel
         this.chainedListContainer = document.getElementById('chained-list-container');
+        this.scrollListLeftBtn = document.getElementById('scroll-list-left');
+        this.scrollListRightBtn = document.getElementById('scroll-list-right');
         this.deleteLinkBtn = document.getElementById('delete-link-btn');
         this.newChainBtn = document.getElementById('new-chain-btn');
         this.chainedListItems = [];
@@ -265,6 +267,19 @@ class ListBuilder {
         this.chainedListContainer.addEventListener('drop', (e) => this.handleChainedListDrop(e));
 
         //Center Panel - unlight the branch
+        // Bottom Panel Scroll Buttons
+        this.scrollListLeftBtn?.addEventListener('click', () => {
+            this.chainedListContainer.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+
+        this.scrollListRightBtn?.addEventListener('click', () => {
+            this.chainedListContainer.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+
+        // Add scroll event listener to update button visibility dynamically
+        this.chainedListContainer?.addEventListener('scroll', () => this.updateScrollButtonsVisibility());
+        window.addEventListener('resize', () => this.updateScrollButtonsVisibility());
+
         document.addEventListener('click', (e) => {
             const isClickInsideTree = this.treeDisplay.contains(e.target);
             if (isClickInsideTree) {
@@ -402,6 +417,37 @@ class ListBuilder {
         this.chainedListItems.forEach(item => {
             this.chainedListContainer.appendChild(item.element);
         });
+        // Delay overflow check to allow DOM to update
+        setTimeout(() => this.updateScrollButtonsVisibility(), 50);
+    }
+
+    updateScrollButtonsVisibility() {
+        if (!this.chainedListContainer || !this.scrollListLeftBtn || !this.scrollListRightBtn) return;
+
+        const container = this.chainedListContainer;
+
+        // Check if list is scrollable
+        const isScrollable = container.scrollWidth > container.clientWidth;
+
+        if (isScrollable) {
+            // Show/hide left button
+            if (container.scrollLeft > 0) {
+                this.scrollListLeftBtn.classList.remove('d-none');
+            } else {
+                this.scrollListLeftBtn.classList.add('d-none');
+            }
+
+            // Show/hide right button
+            if (Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth) {
+                this.scrollListRightBtn.classList.add('d-none');
+            } else {
+                this.scrollListRightBtn.classList.remove('d-none');
+            }
+        } else {
+            // Not scrollable, hide both
+            this.scrollListLeftBtn.classList.add('d-none');
+            this.scrollListRightBtn.classList.add('d-none');
+        }
     }
 
     // --- Reordering Logic for Chained List ---
@@ -414,7 +460,21 @@ class ListBuilder {
     handleChainedListDragOver(e) {
         e.preventDefault();
         const container = this.chainedListContainer;
+
+        // --- Auto-scroll horizontal logic ---
+        const rect = container.getBoundingClientRect();
+        const threshold = 50; // pixels from the edge to trigger scroll
+        const scrollSpeed = 15;
+
+        if (e.clientX - rect.left < threshold) {
+            container.scrollLeft -= scrollSpeed;
+        } else if (rect.right - e.clientX < threshold) {
+            container.scrollLeft += scrollSpeed;
+        }
+        // ------------------------------------
+
         const afterElement = this.getDragAfterElement(container, e.clientX);
+
         if (this.draggedListItem) { // Reordering
             if (afterElement == null) {
                 container.appendChild(this.dropIndicator);
@@ -709,6 +769,15 @@ class ListBuilder {
             alert('The list is empty.');
             return;
         }
+
+        let filename = prompt("Enter a filename for your JSON export:", "list.json");
+        if (!filename) {
+            return; // User cancelled
+        }
+        if (!filename.endsWith('.json')) {
+            filename += '.json';
+        }
+
         const payload = this.chainedListItems.map(item => {
             let imageId = item.data.image_id;
             let imageUrl = item.data.path;
@@ -728,7 +797,7 @@ class ListBuilder {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "list.json");
+        downloadAnchorNode.setAttribute("download", filename);
         document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();

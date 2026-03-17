@@ -117,8 +117,14 @@
     opacity: 0.4;
 }
 
-.node-content.drag-over {
-    background-color: #d3d3d3; /* light gray */
+.node-content.drag-over-add {
+    background-color: #d4edda; /* Light green for adding */
+    border: 2px dashed #28a745;
+}
+
+.node-content.drag-over-root {
+    background-color: #cce5ff; /* Light blue for root replacement */
+    border: 2px dashed #007bff;
 }
 
 /* Style for the T-connector of the selected node */

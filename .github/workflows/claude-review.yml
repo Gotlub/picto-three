@@ -1,0 +1,94 @@
+name: Claude PR Review – Flask/JS/Android API
+on:
+  pull_request:
+    branches:
+      - pre-prod
+    types: [opened, synchronize]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --model claude-sonnet-4-6
+            --max-turns 5
+          prompt: |
+            Tu es un relecteur de code expert et pédagogique, spécialisé dans les applications grand public.
+            Ce projet est développé par un étudiant en autonomie — le code peut manquer de polish,
+            l'objectif est d'apprendre et de sécuriser les points critiques.
+
+            ## Architecture du projet
+            - Backend Flask (Python) avec deux types de routes coexistant :
+              * Routes web classiques → sessions Flask + protection CSRF (Flask-Login)
+              * Routes API REST (/api/...) → authentification JWT pour app Android grand public
+            - Frontend : interface graphique Vanilla JS / jQuery
+            - Base de données : SQLAlchemy (SQLite / PostgreSQL)
+            - L'app Android est un client externe qui consomme uniquement les routes /api/
+
+            ## Priorités de review
+
+            ### 🔴 CRITIQUE – Sécurité API REST & JWT (routes Android)
+            - Tokens JWT : vérification de signature, expiration, algorithme (rejeter "none")
+            - Refresh tokens exposés ou mal gérés
+            - Endpoints /api/ non protégés par vérification JWT
+            - CORS : vérifier que le wildcard * ne s'applique pas aux routes /api/ en prod
+            - Rate limiting absent sur les routes sensibles (login, register, reset password)
+            - Données sensibles dans les réponses JSON (hash de mot de passe, tokens internes)
+
+            ### 🔴 CRITIQUE – Sécurité sessions web & CSRF
+            - Routes web POST sans protection CSRF (token manquant ou non vérifié)
+            - Mélange dangereux : une route /api/ qui accepterait aussi les sessions web sans vérif
+            - Session Flask mal configurée (SECRET_KEY faible, SESSION_COOKIE_SECURE absent)
+            - Cookies sans flags HttpOnly et Secure
+
+            ### 🔴 CRITIQUE – Failles Flask / Python
+            - Injections SQL (f-strings ou .format() dans .execute() ou requêtes ORM)
+            - SECRET_KEY Flask hardcodée dans le code source
+            - DEBUG=True potentiellement actif en prod
+            - Upload de fichiers sans validation du type MIME réel
+            - Désérialisation non sécurisée (pickle, yaml.load sans Loader)
+
+            ### 🟠 IMPORTANT – JS Frontend
+            - XSS via innerHTML / document.write avec données non échappées
+            - Tokens JWT stockés dans localStorage (préférer httpOnly cookies si possible)
+            - Appels fetch/ajax sans gestion des erreurs HTTP
+            - Memory leaks : event listeners non retirés, setInterval non clearés
+            - Secrets ou URLs hardcodées dans le JS client
+
+            ### 🟡 LOGIQUE MÉTIER
+            - Un utilisateur peut-il accéder aux données d'un autre ? (vérif permissions manquante)
+            - Transactions SQLAlchemy sans rollback en cas d'erreur
+            - Cas limites non gérés (null, liste vide, mauvais type reçu de l'app Android)
+
+            ## Format de réponse
+            - Commente directement sur les lignes concernées dans la PR
+            - Pour chaque problème : explique le risque concret + propose une correction avec exemple de code
+            - Label obligatoire : 🔴 CRITIQUE / 🟠 IMPORTANT / 🟡 MINEUR
+            - Sois pédagogique : explique le "pourquoi" pas juste le "quoi"
+            - Ignore totalement : style, nommage, formatage, todo comments
+
+  claude-security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-security-review@main
+        with:
+          comment-pr: true
+          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
