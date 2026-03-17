@@ -10,10 +10,10 @@ export default class ArasaacSearch {
         if (!this.container) return;
 
         this.container.innerHTML = `
-            <div class="arasaac-search-box mb-2">
+            <div class="arasaac-search-box mb-2 flex-shrink-0">
                 <input type="text" class="form-control" placeholder="Search Arasaac..." id="arasaac-input-${this.container.id}">
             </div>
-            <div class="arasaac-results" id="arasaac-results-${this.container.id}" style="overflow-y: auto; height: calc(100% - 50px); display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start;">
+            <div class="arasaac-results flex-grow-1" id="arasaac-results-${this.container.id}" style="overflow-y: auto; display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; min-height: 0;">
                 <!-- Results will appear here -->
                 <div class="text-muted small text-center w-100 mt-3">Type to search symbols from Arasaac...</div>
             </div>

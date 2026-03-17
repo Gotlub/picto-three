@@ -3333,7 +3333,7 @@
     	}
 
     	function isCommand(code) {
-    	  /*eslint-disable no-bitwise*/
+    	   
     	  switch (code | 0x20) {
     	    case 0x6D/* m */:
     	    case 0x7A/* z */:
@@ -3887,7 +3887,7 @@
     	var TAU = Math.PI * 2;
 
 
-    	/* eslint-disable space-infix-ops */
+    	 
 
     	// Calculate an angle between two unit vectors
     	//
@@ -4077,7 +4077,7 @@
     	if (hasRequiredEllipse) return ellipse;
     	hasRequiredEllipse = 1;
 
-    	/* eslint-disable space-infix-ops */
+    	 
 
     	// The precision used to consider an ellipse as a circle
     	//
@@ -4146,7 +4146,7 @@
     	  var l1 = JK + D/2,
     	      l2 = JK - D/2;
     	  // the x - axis - rotation angle is the argument of the l1 - eigenvector
-    	  /*eslint-disable indent*/
+    	   
     	  this.ax = (Math.abs(L) < epsilon && Math.abs(l1 - K) < epsilon) ?
     	    90
     	  :
@@ -4155,7 +4155,7 @@
     	    :
     	      L / (l1 - K)
     	    ) * 180 / Math.PI;
-    	  /*eslint-enable indent*/
+    	   
 
     	  // if ax > 0 => rx = sqrt(l1), ry = sqrt(l2), else exchange axes and ax += 90
     	  if (this.ax >= 0) {

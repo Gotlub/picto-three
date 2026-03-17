@@ -417,6 +417,8 @@ def save_tree():
 
     tree_name = data.get('name')
     is_public = data.get('is_public', False)
+    root_id = data.get('root_id', -1)
+    root_url = data.get('root_url')
     json_data = data.get('json_data')
 
     if not tree_name or not json_data:
@@ -428,6 +430,9 @@ def save_tree():
             return jsonify({'status': 'error', 'message': _('Cannot save an empty tree as public.')}), 400
 
         image_ids = get_image_ids_from_tree(json_data['roots'])
+        if root_id != -1:
+             image_ids.add(root_id)
+             
         if image_ids:
             # Public trees cannot contain any user-owned images (user_id is not NULL)
             user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
@@ -443,6 +448,8 @@ def save_tree():
     if tree:
         # If it exists, update it
         tree.is_public = is_public
+        tree.root_id = root_id
+        tree.root_url = root_url
         tree.json_data = json.dumps(json_data)
         message = _('Tree updated successfully')
     else:
@@ -451,6 +458,8 @@ def save_tree():
             user_id=current_user.id,
             name=tree_name,
             is_public=is_public,
+            root_id=root_id,
+            root_url=root_url,
             json_data=json.dumps(json_data)
         )
         db.session.add(tree)

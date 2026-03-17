@@ -33,3 +33,16 @@ jobs:
       # Étape 5 : Les tests unitaires
       - name: 🧪 Tests automatisés (Pytest)
         run: pytest -v
+
+      # Étape 6 : Analyse statique JavaScript (ESLint)
+      - name: 🟢 Configuration de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Installation des dépendances JS
+        run: npm install
+
+      - name: 🕵️‍♂️ Analyse du code JavaScript (ESLint)
+        run: npx eslint "app/static/js/**/*.js"

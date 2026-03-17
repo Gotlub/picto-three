@@ -61,9 +61,7 @@ class ReadOnlyNode {
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
         const imgElement = document.createElement('img');
-        if (this.image.id === 'root') {
-            imgElement.src = '/static/images/folder-open-bold.png';
-        } else if (this.image.path) {
+        if (this.image.path) {
             // Path can be a new relative path or an old absolute one during transition
             // or an external URL from Arasaac
             if (this.image.path.startsWith('http')) {
@@ -671,7 +669,7 @@ class ListBuilder {
         const payload = JSON.parse(listData.payload);
 
         this.chainedListItems = payload.map(itemData => {
-            let imageInfo = null;
+            let imageInfo;
 
             if (itemData.url) {
                 // Unified format or Arasaac
@@ -748,7 +746,7 @@ class ListBuilder {
                     try {
                         const payload = JSON.parse(event.target.result);
                         this.rebuildListFromData({ payload: JSON.stringify(payload) });
-                    } catch (error) {
+                    } catch {
                         alert('Error parsing JSON file.');
                     }
                 };
@@ -858,7 +856,7 @@ class ListBuilder {
                     try {
                         const treeData = JSON.parse(event.target.result);
                         this.rebuildTreeViewer(treeData);
-                    } catch (error) {
+                    } catch {
                         alert('Error parsing JSON file.');
                     }
                 };
@@ -869,30 +867,25 @@ class ListBuilder {
     }
 
     rebuildTreeViewer(treeData) {
-        const rootDisplayData = {
-            id: 'root',
-            name: 'Root',
-            path: '/static/images/folder-open-bold.png'
-        };
-        this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
-
+        // Find the root if it exists in the new array structure
         const buildNode = (nodeData) => {
-            let image = null;
+            let image;
 
-            // Handle Arasaac / External Images
-            if (nodeData.id === -1 && nodeData.url) {
+            // Handle Arasaac / External Images / Unified Format
+            if (nodeData.url) {
                 image = {
-                    id: -1,
+                    id: nodeData.id !== undefined ? nodeData.id : nodeData.real_id,
+                    real_id: nodeData.real_id,
                     name: nodeData.name || 'External Image',
                     path: nodeData.url,
-                    description: 'External Image'
+                    description: nodeData.description || nodeData.name
                 };
             } else {
                 image = this.allImages.find(img => img.id === nodeData.id);
                 if (!image) {
                     console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
                     image = {
-                        id: nodeData.id,
+                        id: nodeData.id !== undefined ? nodeData.id : -1,
                         name: 'Image inaccessible',
                         path: '/static/images/prohibit-bold.png',
                         description: 'This image is private or has been deleted.'
@@ -910,12 +903,37 @@ class ListBuilder {
             }
             return newNode;
         };
-        if (treeData.roots) {
+
+        if (treeData.roots && treeData.roots.length === 1) {
+            const rootData = treeData.roots[0];
+            const rootImage = {
+                id: 'root',
+                real_id: rootData.id !== undefined ? rootData.id : rootData.real_id,
+                name: rootData.name || 'Root',
+                path: rootData.url || '/static/images/folder-open-bold.png',
+                description: rootData.description || rootData.name
+            };
+            this.treeRoot = new ReadOnlyNode(rootData, rootImage, this);
+
+            if (rootData.children) {
+                rootData.children.forEach(childData => {
+                    const childNode = buildNode(childData);
+                    if (childNode) this.treeRoot.addChild(childNode);
+                });
+            }
+        } else if (treeData.roots && treeData.roots.length > 1) {
+            const rootDisplayData = { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png', description: 'Root' };
+            this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
+
             treeData.roots.forEach(rootData => {
                 const rootNode = buildNode(rootData);
                 if (rootNode) this.treeRoot.addChild(rootNode);
             });
+        } else {
+            const rootDisplayData = { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png', description: 'Root' };
+            this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
         }
+
         this.renderTreeViewer();
     }
 

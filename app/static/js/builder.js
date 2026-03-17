@@ -11,6 +11,7 @@ class BuilderNode {
         this.parent = null;
         // Prioritize description from saved tree data, fallback to image data.
         this.description = (nodeData && nodeData.description !== undefined) ? nodeData.description : (image.description || '');
+        this.isDefaultRoot = (image.id === 'root' && (!nodeData || !nodeData.url));
         this.element = this.createElement(builder);
     }
 
@@ -56,6 +57,28 @@ class BuilderNode {
         nameElement.textContent = this.description || this.image.name;
         this.nameElement = nameElement;
         contentElement.appendChild(nameElement);
+
+        if (this.image.id === 'root') {
+            // For the root node, add a visual indicator that it can be changed
+            const hintElement = document.createElement('div');
+            hintElement.style.fontSize = '0.7em';
+            hintElement.style.color = '#888';
+            hintElement.style.marginTop = '4px';
+
+            if (this.isDefaultRoot) {
+                hintElement.textContent = 'Drop an image here to set the root';
+                nameElement.textContent = 'Choose the root image';
+            } else {
+                hintElement.textContent = 'Drop here to change root';
+            }
+
+            contentElement.appendChild(hintElement);
+            // Ensure it's visually distinct before an image is set
+            if (this.isDefaultRoot) {
+                contentElement.style.border = '2px dashed #007bff';
+                contentElement.style.backgroundColor = '#f8f9fa';
+            }
+        }
 
         nodeElement.appendChild(contentElement);
 
@@ -158,7 +181,7 @@ class TreeBuilder {
             this.treeDisplay.classList.add('drag-over'); // Add highlight class
         });
 
-        this.treeDisplay.addEventListener('dragleave', (e) => {
+        this.treeDisplay.addEventListener('dragleave', () => {
             this.treeDisplay.classList.remove('drag-over'); // Remove highlight
         });
 
@@ -221,7 +244,7 @@ class TreeBuilder {
 
         const newTreeBtn = document.getElementById('new-tree-btn');
         if (newTreeBtn) {
-            newTreeBtn.addEventListener('click', (e) => {
+            newTreeBtn.addEventListener('click', () => {
                 if (this.rootNode.children.length > 0) {
                     if (confirm('You have an unsaved tree. Are you sure you want to leave?')) {
                         window.location.href = '/builder';
@@ -360,7 +383,7 @@ class TreeBuilder {
 
     getTreeForVisualization() {
         const buildTreantNode = (builderNode) => {
-            let imageSrc = '';
+            let imageSrc;
             if (builderNode.image.path.startsWith('http')) {
                 imageSrc = builderNode.image.path;
             } else if (builderNode.image.path.startsWith('/')) {
@@ -604,6 +627,13 @@ class TreeBuilder {
             try {
                 const dragData = JSON.parse(dragDataString);
                 if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
+
+                    if (targetNode.image.id === 'root') {
+                        // If dropping on root, change the root's image instead of adding a child
+                        this.updateRootImage(dragData.data);
+                        return;
+                    }
+
                     const newNode = new BuilderNode(dragData.data, this);
                     targetNode.addChild(newNode);
                     this.selectNode(newNode);
@@ -615,6 +645,30 @@ class TreeBuilder {
         }
     }
 
+    updateRootImage(imageData) {
+        // Keep the children but recreate the root node with the new image
+        const children = this.rootNode.children;
+        const newRootData = {
+            id: 'root', // Keep it identified as root
+            real_id: imageData.id, // The actual image ID
+            name: imageData.name,
+            path: imageData.path || imageData.url,
+            description: imageData.description || imageData.name
+        };
+
+        // Custom node logic to handle our modified root
+        this.rootNode = new BuilderNode(newRootData, this, { url: newRootData.path });
+        this.rootNode.children = children;
+
+        // Re-assign parents
+        children.forEach(child => {
+            child.parent = this.rootNode;
+        });
+
+        this.selectNode(this.rootNode);
+        this.renderTree();
+    }
+
     handleArasaacDragStart(e, payload) {
         // No notion of "draggedNode" internal state for external items, but we set dataTransfer
         e.dataTransfer.effectAllowed = 'copy';
@@ -622,7 +676,7 @@ class TreeBuilder {
         e.dataTransfer.setData('text/plain', payload.data.id.toString());
     }
 
-    handleDragEnd(e) {
+    handleDragEnd() {
         if (this.draggedNode && this.draggedNode.element) {
             this.draggedNode.element.classList.remove('dragging');
         }
@@ -755,9 +809,13 @@ class TreeBuilder {
         };
 
         const roots = [];
-        this.rootNode.children.forEach(child => {
-            roots.push(buildNode(child));
-        });
+
+        // Push the root node into the JSON hierarchy (as the single root array element)
+        // If it's a default root, we don't strictly need to export its placeholder image,
+        // but it keeps the structure consistent.
+        if (this.rootNode) {
+            roots.push(buildNode(this.rootNode));
+        }
 
         return {
             roots: roots
@@ -777,6 +835,18 @@ class TreeBuilder {
         if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
             alert('The tree is empty. Cannot save.');
             return;
+        }
+
+        // Determine if there's a valid root image
+        let root_id = -1;
+        let root_url = null;
+        if (this.rootNode && !this.rootNode.isDefaultRoot) {
+            root_id = this.rootNode.image.real_id !== undefined ? this.rootNode.image.real_id : this.rootNode.image.id;
+            root_url = this.rootNode.image.path;
+
+            if (root_url && root_url.startsWith('http')) {
+                root_id = -1; // Arasaac or external
+            }
         }
 
         // Check if a tree with the same name exists for the current user
@@ -799,6 +869,8 @@ class TreeBuilder {
             body: JSON.stringify({
                 name: treeName,
                 is_public: isPublic,
+                root_id: root_id,
+                root_url: root_url,
                 json_data: jsonData,
             }),
         });
@@ -913,16 +985,21 @@ class TreeBuilder {
             const importMode = document.querySelector('input[name="import_mode"]:checked').value;
 
             if (importMode === 'replace') {
-                this.rebuildTreeFromJSON(importedData);
+                this.rebuildTreeFromJSON(importedData, true);
             } else { // 'add'
-                const currentTreeData = this.getTreeAsJSON();
-
-                if (currentTreeData.roots.length > 0 && importedData.roots && importedData.roots.length > 0) {
-                    const mergedRoots = currentTreeData.roots.concat(importedData.roots);
-                    const mergedTreeData = { roots: mergedRoots };
-                    this.rebuildTreeFromJSON(mergedTreeData);
-                } else {
-                    this.rebuildTreeFromJSON(importedData);
+                // For 'add', we want to keep the current root, and add the *children* of the imported roots
+                if (importedData.roots && importedData.roots.length > 0) {
+                    importedData.roots.forEach(importedRoot => {
+                        if (importedRoot.children) {
+                            importedRoot.children.forEach(childData => {
+                                const childNode = this.buildNodeFromJsonData(childData);
+                                if (childNode) {
+                                    this.rootNode.addChild(childNode);
+                                }
+                            });
+                        }
+                    });
+                    this.renderTree();
                 }
             }
         } else {
@@ -930,63 +1007,96 @@ class TreeBuilder {
         }
     }
 
-    rebuildTreeFromJSON(treeData) {
-        this.rootNode.children = []; // Clear existing tree before importing
-        this.selectedNode = this.rootNode; // Select root by default
+    buildNodeFromJsonData(nodeData) {
+        let image;
 
-        const buildNode = (nodeData) => {
-            let image = null;
+        if (nodeData.url) {
+            image = {
+                id: nodeData.id !== undefined ? nodeData.id : nodeData.real_id, // fallback to old format
+                real_id: nodeData.real_id,
+                name: nodeData.name || 'Unknown',
+                path: nodeData.url,
+                description: nodeData.description || nodeData.name
+            };
+        } else {
+            image = this.images.find(img => img.id === nodeData.id);
+        }
 
-            // Strategy: Prefer explicit data (URL/Name) if available (Unified Format)
-            // Fallback: Use ID lookup (Legacy Format or validation)
+        if (!image) {
+            console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+            image = {
+                id: nodeData.id !== undefined ? nodeData.id : -1,
+                name: 'Image inaccessible',
+                path: '/static/images/prohibit-bold.png',
+                description: 'This image is private or has been deleted.'
+            };
+        }
 
-            if (nodeData.url) {
-                image = {
-                    id: nodeData.id,
-                    name: nodeData.name || 'Unknown',
-                    path: nodeData.url,
-                    description: nodeData.description || nodeData.name // description is handled by builder node separately?
-                };
-            } else {
-                // Fallback for legacy saves (only ID)
-                image = this.images.find(img => img.id === nodeData.id);
-            }
+        const newNode = new BuilderNode(image, this, nodeData);
 
-            // If still no image (e.g. ID lookup failed and no URL), use placeholder
-            if (!image) {
-                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
-                image = {
-                    id: nodeData.id,
-                    name: 'Image inaccessible',
-                    path: '/static/images/prohibit-bold.png',
-                    description: 'This image is private or has been deleted.'
-                };
-            }
-
-            const newNode = new BuilderNode(image, this, nodeData);
-
-            if (nodeData.children) {
-                nodeData.children.forEach(childData => {
-                    const childNode = buildNode(childData);
-                    if (childNode) {
-                        newNode.addChild(childNode);
-                    }
-                });
-            }
-            return newNode;
-        };
-
-        if (treeData.roots) {
-            treeData.roots.forEach(rootData => {
-                const rootNode = buildNode(rootData);
-                if (rootNode) {
-                    this.rootNode.addChild(rootNode);
+        if (nodeData.children) {
+            nodeData.children.forEach(childData => {
+                const childNode = this.buildNodeFromJsonData(childData);
+                if (childNode) {
+                    newNode.addChild(childNode);
                 }
             });
         }
+        return newNode;
+    }
 
+    rebuildTreeFromJSON(treeData, isFullReplace = true) {
+        if (isFullReplace) {
+            this.rootNode.children = []; // Clear existing tree before importing
+
+            // Check if the treeData has a root node properties attached directly
+            // (older versions or the new version might structure the DB representation differently)
+            // Based on our saveTree, the DB JSON data is just {"roots": [...]}
+            // The root properties (root_id, root_url) are passed via the backend endpoint optionally, 
+            // but treeData might just have `roots`.
+
+            // If treeData has exactly 1 root, let's make it the actual root of the builder
+            if (treeData.roots && treeData.roots.length === 1) {
+                const rootData = treeData.roots[0];
+                // Initialize root Node from the data
+                const rootImage = {
+                    id: 'root',
+                    real_id: rootData.id !== undefined ? rootData.id : rootData.real_id,
+                    name: rootData.name || 'Root',
+                    path: rootData.url || '/static/images/folder-open-bold.png',
+                    description: rootData.description || rootData.name
+                };
+                this.rootNode = new BuilderNode(rootImage, this, rootData);
+
+                // Process its children
+                if (rootData.children) {
+                    rootData.children.forEach(childData => {
+                        const childNode = this.buildNodeFromJsonData(childData);
+                        if (childNode) {
+                            this.rootNode.addChild(childNode);
+                        }
+                    });
+                }
+            } else if (treeData.roots && treeData.roots.length > 1) {
+                // Fallback for older saves where multiple roots were allowed at top level
+                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
+                treeData.roots.forEach(rootData => {
+                    const rootNode = this.buildNodeFromJsonData(rootData);
+                    if (rootNode) {
+                        this.rootNode.addChild(rootNode);
+                    }
+                });
+            } else {
+                // Empty
+                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
+            }
+        }
+
+        this.selectedNode = this.rootNode;
         this.renderTree();
     }
+
+
 
     exportTreeToJSON() {
         const jsonData = this.getTreeAsJSON();
@@ -1018,19 +1128,23 @@ class TreeBuilder {
                         const importMode = document.querySelector('input[name="import_mode"]:checked').value;
 
                         if (importMode === 'replace') {
-                            this.rebuildTreeFromJSON(importedData);
+                            this.rebuildTreeFromJSON(importedData, true);
                         } else { // 'add'
-                            const currentTreeData = this.getTreeAsJSON();
-
-                            if (currentTreeData.roots.length > 0 && importedData.roots && importedData.roots.length > 0) {
-                                const mergedRoots = currentTreeData.roots.concat(importedData.roots);
-                                const mergedTreeData = { roots: mergedRoots };
-                                this.rebuildTreeFromJSON(mergedTreeData);
-                            } else {
-                                this.rebuildTreeFromJSON(importedData);
+                            if (importedData.roots && importedData.roots.length > 0) {
+                                importedData.roots.forEach(importedRoot => {
+                                    if (importedRoot.children) {
+                                        importedRoot.children.forEach(childData => {
+                                            const childNode = this.buildNodeFromJsonData(childData);
+                                            if (childNode) {
+                                                this.rootNode.addChild(childNode);
+                                            }
+                                        });
+                                    }
+                                });
+                                this.renderTree();
                             }
                         }
-                    } catch (error) {
+                    } catch {
                         alert('Error parsing JSON file.');
                     }
                 };

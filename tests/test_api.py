@@ -24,6 +24,8 @@ def test_save_tree_authenticated(client):
     tree_data = {
         "name": "My Test Tree",
         "is_public": True,
+        "root_id": 10,
+        "root_url": "/test/url.png",
         "json_data": {
             "roots": [
                 {
@@ -44,6 +46,8 @@ def test_save_tree_authenticated(client):
     assert tree is not None
     assert tree.name == "My Test Tree"
     assert tree.is_public is True
+    assert tree.root_id == 10
+    assert tree.root_url == "/test/url.png"
     saved_json_data = json.loads(tree.json_data)
     assert 'roots' in saved_json_data
 
@@ -127,6 +131,8 @@ def test_save_tree_with_duplicate_name_updates(client):
     response1 = client.post('/api/tree/save', json={
         'name': 'My Duplicate Test Tree',
         'is_public': False,
+        'root_id': 1,
+        'root_url': '/test/1.png',
         'json_data': tree_data1
     })
     assert response1.status_code == 200
@@ -139,6 +145,8 @@ def test_save_tree_with_duplicate_name_updates(client):
     response2 = client.post('/api/tree/save', json={
         'name': 'My Duplicate Test Tree',
         'is_public': True, # Also testing update of is_public
+        'root_id': 2,
+        'root_url': '/test/2.png',
         'json_data': tree_data2
     })
     assert response2.status_code == 200
@@ -151,6 +159,8 @@ def test_save_tree_with_duplicate_name_updates(client):
     updated_tree = db.session.get(Tree, tree_id)
     assert updated_tree is not None
     assert updated_tree.is_public is True
+    assert updated_tree.root_id == 2
+    assert updated_tree.root_url == '/test/2.png'
     saved_json_data = json.loads(updated_tree.json_data)
     assert saved_json_data['roots'][0]['description'] == 'Second version'
 

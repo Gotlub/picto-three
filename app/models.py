@@ -87,6 +87,8 @@ class Tree(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(64))
     is_public = db.Column(db.Boolean, default=False)
+    root_id = db.Column(db.Integer, default=-1, nullable=True)
+    root_url = db.Column(db.String(256), nullable=True)
     json_data = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
@@ -104,6 +106,8 @@ class Tree(db.Model):
             'username': self.user.username if self.user else None,
             'name': self.name,
             'is_public': self.is_public,
+            'root_id': self.root_id,
+            'root_url': self.root_url,
             'json_data': self.json_data,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()

@@ -82,4 +82,4 @@ class Tooltip {
 // Create a single, global instance of the Tooltip class.
 // This ensures that all scripts on a page share the same tooltip,
 // preventing multiple tooltips from appearing.
-var tooltip = tooltip || new Tooltip();
+window.tooltip = window.tooltip || new Tooltip();
