@@ -1,8 +1,9 @@
 name: Claude PR Review – Flask/JS/Android API
 on:
-  push:
+  pull_request:
     branches:
       - pre-prod
+    types: [opened, synchronize, reopened]
 
 jobs:
   claude-review:
@@ -10,6 +11,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write          # ← manquait, nécessaire pour poster les commentaires
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,7 +23,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
             --model claude-sonnet-4-6
-            --max-turns 50
+            --max-turns 20
           prompt: |
             Tu es un relecteur de code expert et pédagogique, spécialisé dans les applications grand public.
             Ce projet est développé par un étudiant en autonomie — le code peut manquer de polish,
@@ -82,6 +84,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write          # ← idem ici
     steps:
       - uses: actions/checkout@v4
         with:
