@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ _('Legal Information') }}</h1>
+    <hr>
+
+    <h2>{{ _('TERMS OF SERVICE') }}</h2>
+    <p><em>{{ _('Last Revision:') }} {{ _('September 18, 2025') }}</em></p>
+    <p>{{ _('Please read these Terms of Service ("Terms") carefully before using the https://pictotree.eu website (the "Service") operated by the Pictotree.eu team ("us", "we", or "our").') }}</p>
+
+    <h3>{{ _('1. Acceptance of Terms') }}</h3>
+    <p>{{ _('By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.') }}</p>
+
+    <h3>{{ _('2. User Accounts') }}</h3>
+    <p>{{ _('To access certain features of the Service, you must register for an account. You are responsible for safeguarding your password and for all activities that occur under your account. You may terminate your account at any time through your user settings. Upon termination, a cascading deletion process will be initiated, which permanently erases your account details, all images you have uploaded, and any associated database entries.') }}</p>
+
+    <h3>{{ _('3. User-Generated Content') }}</h3>
+    <p>{{ _('You retain all ownership rights to the content you submit to the Service ("/pictogram-bank").') }}</p>
+    <p>{{ _('You agree not to post User Content that:') }}</p>
+    <ul>
+        <li>{{ _('Is unlawful, defamatory, libelous, obscene, pornographic, harassing, threatening, or promotes discrimination, bigotry, racism, or hatred.') }}</li>
+        <li>{{ _('Violates any third-party\'s right, including any intellectual property rights or rights of privacy.') }}</li>
+    </ul>
+
+    <h3>{{ _('4. Prohibited Conduct') }}</h3>
+    <p>{{ _('You agree not to misuse the Service or help anyone else to do so. This includes, but is not limited to, interfering with our Service, uploading malicious code, or attempting to breach security measures.') }}</p>
+
+    <h3>{{ _('5. Moderation and Enforcement') }}</h3>
+    <p>{{ _('We reserve the right, but are not obligated, to review and remove any User Content or terminate user accounts that, in our sole judgment, violate these Terms. We may take any action we deem necessary, including reporting illegal activities to the relevant law enforcement authorities and pursuing legal action against violators.') }}</p>
+
+    <h3>{{ _('6. Disclaimer of Warranties') }}</h3>
+    <p>{{ _('The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranty that the Service will be uninterrupted, timely, or error-free.') }}</p>
+
+    <hr>
+
+    <h2>{{ _('PRIVACY POLICY') }}</h2>
+    <p><em>{{ _('Last Revision:') }} {{ _('September 18, 2025') }}</em></p>
+
+    <h3>{{ _('1. Introduction') }}</h3>
+    <p>{{ _('This Privacy Policy outlines how Pictotree.eu (the "Service") collects, uses, and protects your personal data. We are committed to protecting your privacy in compliance with the General Data Protection Regulation (GDPR). The data controller for this Service is the Pictotree.eu team, reachable at the form contact.') }}</p>
+
+    <h3>{{ _('2. Personal Data We Collect') }}</h3>
+    <p>{{ _('We collect the following types of personal data:') }}</p>
+    <ul>
+        <li><strong>{{ _('Account Data:') }}</strong> {{ _('Information you provide upon registration, such as username and email address. The lawful basis for this processing is the performance of a contract (our Terms of Service).') }}</li>
+        <li><strong>{{ _('User-Generated Content:') }}</strong> {{ _('Images and other data you voluntarily upload to the Service. The lawful basis is your consent and our legitimate interest in providing the Service\'s core functionality.') }}</li>
+        <li><strong>{{ _('Technical Log Data:') }}</strong> {{ _('For the purpose of maintaining the security and integrity of our systems, we process server logs which may include your IP address, user-agent string, and timestamps of access. The lawful basis for this processing is our legitimate interest in preventing fraud and securing our Service.') }}</li>
+    </ul>
+
+    <h3>{{ _('3. Data Retention') }}</h3>
+    <ul>
+        <li><strong>{{ _('Account and User-Generated Content:') }}</strong> {{ _('This data is retained for the duration of your account\'s existence. It is permanently and irrevocably deleted upon your request to terminate the account.') }}</li>
+        <li><strong>{{ _('Technical Log Data:') }}</strong> {{ _('Server logs are automatically purged after a period of six (6) months.') }}</li>
+    </ul>
+
+    <h3>{{ _('4. Your Rights as a Data Subject') }}</h3>
+    <p>{{ _('Under the GDPR, you have the following rights regarding your personal data:') }}</p>
+    <ul>
+        <li>{{ _('The right to access: You can request copies of your personal data.') }}</li>
+        <li>{{ _('The right to rectification: You can request that we correct any information you believe is inaccurate.') }}</li>
+        <li>{{ _('The right to erasure (right to be forgotten): You can request the erasure of your personal data. This is actioned by deleting your account.') }}</li>
+        <li>{{ _('The right to restrict processing: You can request that we restrict the processing of your personal data under certain conditions.') }}</li>
+        <li>{{ _('The right to object to processing: You can object to our processing of your personal data.') }}</li>
+        <li>{{ _('The right to data portability: You can request that we transfer the data that we have collected to another organization, or directly to you.') }}</li>
+    </ul>
+    <p>{{ _('To exercise any of these rights, please contact us with the form contact. You also have the right to lodge a complaint with a supervisory authority (such as the CNIL in France).') }}</p>
+
+    <h3>{{ _('5. Data Security & Transfer') }}</h3>
+    <p>{{ _('We implement appropriate technical and organizational measures to ensure a level of security appropriate to the risk. Your data is stored on servers located within the European Union. We do not sell or share your personal data with third parties for marketing purposes.') }}</p>
+
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+FLASK_APP=pictogram.py
