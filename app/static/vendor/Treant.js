@@ -1840,7 +1840,7 @@
     TreeNode.prototype.buildNodeFromText = function (node) {
         // IMAGE
         if (this.image) {
-            image = document.createElement('img');
+            var image = document.createElement('img');
             image.src = this.image;
             node.appendChild(image);
         }
@@ -1894,12 +1894,19 @@
                 node.className += " node";
             }
             else {
-                node.innerHTML = "<b> Wrong ID selector </b>";
+                var b = document.createElement('b');
+                b.textContent = 'Wrong ID selector';
+                node.appendChild(b);
             }
         }
         else {
             // insert your custom HTML into a node
-            node.innerHTML = this.nodeInnerHTML;
+            if (typeof DOMPurify !== 'undefined') {
+                node.innerHTML = DOMPurify.sanitize(this.nodeInnerHTML);
+            } else {
+                console.warn('Treant: DOMPurify absent, nodeInnerHTML set as text content for fallback security');
+                node.textContent = this.nodeInnerHTML;
+            }
         }
         return node;
     };

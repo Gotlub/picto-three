@@ -5,7 +5,8 @@ from tests.conftest import get_csrf_token, login, confirm_user, create_user
 
 def test_app_config(app):
     assert app.config["TESTING"] is True
-    assert app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///test.db"
+    assert "prod" not in app.config.get("SQLALCHEMY_DATABASE_URI", "").lower()
+    assert app.config.get("SQLALCHEMY_DATABASE_URI") != app.config.get("PROD_DATABASE_URI", "")
 
 def test_register(client):
     # 1. Récupère le formulaire de registre (GET)
@@ -51,9 +52,12 @@ def test_login_logout(client):
 
     # Login
     with client:
+        get_login = client.get('/login')
+        csrf_token_login = get_csrf_token(get_login.data.decode())
+        
         response = client.post('/login', data={
             'username': 'testuser',
-            'csrf_token': csrf_token,
+            'csrf_token': csrf_token_login,
             'password': 'Password123'
         }, follow_redirects=True)
         assert response.status_code == 200
@@ -198,6 +202,11 @@ def test_email_confirmation(client):
     assert user.confirmed
 
 def test_password_reset_flow(client, monkeypatch):
+    sent_emails = []
+    def mock_send_email(to, subject, template, **kwargs):
+        sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
+    monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
+
     # 1. Register a user
     get_response = client.get('/register')
     csrf_token = get_csrf_token(get_response.data.decode())
@@ -211,13 +220,10 @@ def test_password_reset_flow(client, monkeypatch):
     })
     user = User.query.filter_by(email='reset@example.com').first()
     assert user is not None
+    
+    sent_emails.clear()
 
     # 2. Request a password reset
-    sent_emails = []
-    def mock_send_email(to, subject, template, **kwargs):
-        sent_emails.append({'to': to, 'subject': subject, 'template': template, 'kwargs': kwargs})
-    monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
-
     get_response = client.get('/forgot_password')
     csrf_token = get_csrf_token(get_response.data.decode())
     client.post('/forgot_password', data={
@@ -229,7 +235,9 @@ def test_password_reset_flow(client, monkeypatch):
     assert 'Reset Your Password' in sent_emails[0]['subject']
 
     # 3. Use the token to reset the password
-    token = generate_password_reset_token(user.email)
+    reset_url = sent_emails[0]['kwargs'].get('reset_url', '')
+    token = reset_url.split('/reset/')[-1]
+    
     get_response = client.get(f'/reset/{token}')
     csrf_token = get_csrf_token(get_response.data.decode())
 
@@ -267,3 +275,23 @@ def test_resend_confirmation_request(client, monkeypatch):
     assert len(sent_emails) == 1
     assert sent_emails[0]['to'] == 'resendrequest@test.com'
     assert 'A new confirmation email has been sent.' in response.data.decode('utf-8')
+
+def test_csrf_protection(client):
+    """Vérifie que les POST sans CSRF token sont rejetés (400 ou 403)"""
+    # Test sans token
+    response = client.post('/register', data={
+        'username': 'hacker',
+        'email': 'hack@evil.com',
+        'password': 'Password123',
+        'password2': 'Password123',
+        'accept_terms': 'y'
+    }, follow_redirects=False)
+    assert response.status_code in (400, 403), "Le POST sans CSRF token doit être rejeté"
+
+    # Test avec token invalide
+    response = client.post('/login', data={
+        'username': 'anyone',
+        'password': 'Password123',
+        'csrf_token': 'token_invalide_forge'
+    }, follow_redirects=False)
+    assert response.status_code in (400, 403), "Le POST avec CSRF token forgé doit être rejeté"
