@@ -52,7 +52,7 @@ def create_admin_user(username, email, password):
 
         print(f"✅ Dossier racine créé avec succès (ID: {root_folder.id}).")
         print("--------------------------------------------------")
-        print(f"Tu peux maintenant te connecter avec :")
+        print("Tu peux maintenant te connecter avec :")
         print(f"- Pseudo : {username}")
         print(f"- Mot de passe : {password}")
 

@@ -1,6 +1,5 @@
 from app.models import User
 from app import db
-from app.utils import generate_password_reset_token
 from tests.conftest import get_csrf_token, login, confirm_user, create_user
 
 def test_app_config(app):
