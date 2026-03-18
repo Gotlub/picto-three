@@ -205,9 +205,13 @@ class PictogramBank {
             return;
         }
 
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/folder/create', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ name, parent_id: parentId }),
         });
 
@@ -265,8 +269,12 @@ class PictogramBank {
         formData.append('folder_id', parentId);
         formData.append('description', description);
 
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/image/upload', {
             method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
             body: formData,
         });
 
@@ -287,9 +295,13 @@ class PictogramBank {
         }
 
         if (confirm('Are you sure you want to delete the selected item? This action cannot be undone.')) {
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
             const response = await fetch('/api/item/delete', {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({ id: this.selectedNode.data.id, type: this.selectedNode.data.type }),
             });
 
@@ -332,9 +344,13 @@ class PictogramBank {
         const description = document.getElementById('edit-image-description').value;
         const isPublic = document.getElementById('edit-image-public').checked;
 
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch(`/api/image/${imageId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({
                 description: description,
                 is_public: isPublic,

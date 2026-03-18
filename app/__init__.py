@@ -50,8 +50,7 @@ def create_app(config_override=None):
 
     csrf = CSRFProtect(app)
     from app.routes import api
-    csrf.exempt(api.bp)  #a retirer par la suite.
-
+    
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)

@@ -648,10 +648,12 @@ class ListBuilder {
         });
         const isPublic = this.isPublicCheckbox.checked;
 
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/lists', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify({
                 list_name: listName,
@@ -1063,10 +1065,12 @@ class ListBuilder {
         this.exportPdfBtn.disabled = true;
 
         try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
             const response = await fetch('/api/export_pdf', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify(exportOptions)
             });

@@ -719,15 +719,26 @@ def export_pdf():
         
         # 2. Handle Local Files
         else:
-            base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-            image_path_absolute = base_path / image_path_relative
+            base_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+            try:
+                image_path_absolute = (base_path / image_path_relative).resolve()
+                if not image_path_absolute.is_relative_to(base_path):
+                    continue
+            except Exception:
+                continue
 
-            if image_path_absolute.exists():
+            if image_path_absolute.exists() and image_path_absolute.is_file():
                 img_source = image_path_absolute
             else:
                 # Fallback to static folder (legacy or app assets)
-                legacy_path = Path(current_app.root_path) / 'static' / image_path_relative
-                if legacy_path.exists():
+                legacy_base = (Path(current_app.root_path) / 'static').resolve()
+                try:
+                    legacy_path = (legacy_base / image_path_relative).resolve()
+                    if not legacy_path.is_relative_to(legacy_base):
+                        continue
+                except Exception:
+                    continue
+                if legacy_path.exists() and legacy_path.is_file():
                     img_source = legacy_path
 
         if not img_source:

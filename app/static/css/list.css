@@ -39,6 +39,7 @@
     height: 100px; /* Match item height */
     background-color: black;
     align-self: center;
+    flex-shrink: 0;
 }
 
 /* Dragging styles */

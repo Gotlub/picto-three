@@ -19,8 +19,14 @@ class Tooltip {
                 document.body.appendChild(this.tooltipElement);
             }
 
-            // Set the content
-            this.tooltipElement.innerHTML = `<img src="${imageUrl}" style="max-width: 300px; max-height: 300px; object-fit: contain;">`;
+            // Set the content securely
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.maxWidth = '300px';
+            img.style.maxHeight = '300px';
+            img.style.objectFit = 'contain';
+            
+            this.tooltipElement.replaceChildren(img);
 
             // Position the tooltip
             this.updatePosition(event);

@@ -1,0 +1,33 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.4, pytest-8.4.1, pluggy-1.6.0 -- C:\Program Files (x86)\Python311-32\python.exe
+cachedir: .pytest_cache
+rootdir: D:\picto\picto-three
+collecting ... collected 1 item
+run-last-failure: rerun previous 1 failure (skipped 7 files)
+
+tests/test_auth.py::test_csrf_protection FAILED                          [100%]
+
+================================== FAILURES ===================================
+____________________________ test_csrf_protection _____________________________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_csrf_protection(client):
+        """Vérifie que les POST sans CSRF token sont rejetés (400 ou 403)"""
+        # Test sans token
+        response = client.post('/register', data={
+            'username': 'hacker',
+            'email': 'hack@evil.com',
+            'password': 'Password123',
+            'password2': 'Password123',
+            'accept_terms': 'y'
+        }, follow_redirects=False)
+>       assert response.status_code in (400, 403), "Le POST sans CSRF token doit être rejeté"
+E       AssertionError: Le POST sans CSRF token doit être rejeté
+E       assert 302 in (400, 403)
+E        +  where 302 = <WrapperTestResponse streamed [302 FOUND]>.status_code
+
+tests\test_auth.py:258: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_auth.py::test_csrf_protection - AssertionError: Le POST san...
+============================== 1 failed in 0.81s ==============================
