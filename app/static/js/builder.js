@@ -427,7 +427,7 @@ class TreeBuilder {
                     <p class="node-name">${description}</p>
                 </div>
             `;
-            treantNode.innerHTML = window.DOMPurify ? DOMPurify.sanitize(rawHTML) : rawHTML;
+            treantNode.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(rawHTML) : rawHTML;
 
 
             builderNode.children.forEach(child => {
