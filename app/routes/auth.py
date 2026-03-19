@@ -47,23 +47,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        # Create user's personal pictogram directory
-        # The physical path is based on the PICTOGRAMS_PATH config
-        user_physical_path = Path(current_app.config['PICTOGRAMS_PATH']) / user.username
-        user_physical_path.mkdir(exist_ok=True)
 
-        # The path stored in DB is relative to PICTOGRAMS_PATH
-        user_relative_path = user.username
-
-        # Create root folder for the user
-        root_folder = Folder(
-            name=user.username,
-            user_id=user.id,
-            parent_id=None,
-            path=user_relative_path
-        )
-        db.session.add(root_folder)
-        db.session.commit()
 
         token = generate_confirmation_token(user.email)
         confirm_url = url_for('auth.confirm_email_route', token=token, _external=True)
@@ -91,6 +75,23 @@ def confirm_email_route(token):
     else:
         user.confirmed = True
         user.confirmed_on = datetime.now(UTC)
+
+        # Create user's personal pictogram directory
+        # The physical path is based on the PICTOGRAMS_PATH config
+        user_physical_path = Path(current_app.config['PICTOGRAMS_PATH']) / user.username
+        user_physical_path.mkdir(exist_ok=True)
+
+        # The path stored in DB is relative to PICTOGRAMS_PATH
+        user_relative_path = user.username
+
+        # Create root folder for the user
+        root_folder = Folder(
+            name=user.username,
+            user_id=user.id,
+            parent_id=None,
+            path=user_relative_path
+        )
+        db.session.add(root_folder)
         db.session.commit()
         flash(_('Your account has been confirmed successfully!'), 'success')
     return redirect(url_for('auth.login'))
