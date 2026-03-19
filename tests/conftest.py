@@ -1,6 +1,5 @@
 import pytest
 from app import create_app, db
-import re
 from pathlib import Path
 import shutil
 from app.utils import generate_confirmation_token
@@ -45,7 +44,7 @@ def runner(app):
 
 
 def login(client, username, password):
-    get_response = client.get('/login')
+    client.get('/login')
     return client.post('/login', data=dict(
         username=username,
         password=password
@@ -60,7 +59,7 @@ def create_user(client, username='testuser', password='Password123', email=None)
     """Helper function to create a test user."""
     if email is None:
         email = f'{username}@test.com'
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data=dict(
         username=username,
         email=email,

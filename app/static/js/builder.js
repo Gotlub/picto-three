@@ -607,7 +607,7 @@ class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
-                if (targetNode.image.id === 'root') {
+                if (targetNode.image.id === 'root' && !this.draggedNode) {
                     targetContent.classList.add('drag-over-root');
                 } else {
                     targetContent.classList.add('drag-over-add');

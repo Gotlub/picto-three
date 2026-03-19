@@ -280,6 +280,10 @@ class ListBuilder {
         this.chainedListContainer?.addEventListener('scroll', () => this.updateScrollButtonsVisibility());
         window.addEventListener('resize', () => this.updateScrollButtonsVisibility());
 
+        // Add class to body during drag to disable scroll arrow pointer events
+        document.addEventListener('dragstart', () => document.body.classList.add('is-dragging-list-item'));
+        document.addEventListener('dragend', () => document.body.classList.remove('is-dragging-list-item'));
+
         document.addEventListener('click', (e) => {
             const isClickInsideTree = this.treeDisplay.contains(e.target);
             if (isClickInsideTree) {

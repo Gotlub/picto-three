@@ -1,3 +1,4 @@
+import pytest
 from app.models import User
 from app import db
 from tests.conftest import login, confirm_user, create_user
@@ -10,7 +11,7 @@ def test_app_config(app):
 def test_register(client):
     # 1. Récupère le formulaire de registre (GET)
     get_response = client.get('/register')
-    html = get_response.data.decode()
+    get_response.data.decode()
      # 2. Extrait le CSRF token
 
     response = client.post('/register', data={
@@ -31,7 +32,7 @@ def test_register(client):
 def test_login_logout(client):
     # Register a user first
     get_response = client.get('/register')
-    html = get_response.data.decode()
+    get_response.data.decode()
      # 2. Extrait le CSRF token
 
     client.post('/register', data={
@@ -45,7 +46,7 @@ def test_login_logout(client):
 
     # Login
     with client:
-        get_login = client.get('/login')
+        client.get('/login')
         
         response = client.post('/login', data={
             'username': 'testuser',
@@ -67,7 +68,7 @@ def test_login_unconfirmed_user(client):
     create_user(client, 'unconfirmedlogin', 'Password123', 'unconfirmedlogin@test.com')
 
     # Try to login
-    get_response = client.get('/login')
+    client.get('/login')
     response = client.post('/login', data={
         'username': 'unconfirmedlogin',
         'password': 'Password123'
@@ -80,7 +81,7 @@ def test_login_unconfirmed_user(client):
 def test_password_strength_and_account_deletion(client):
     # 1. Test registration with a weak password
     get_response = client.get('/register')
-    html = get_response.data.decode()
+    get_response.data.decode()
 
     response = client.post('/register', data={
         'username': 'weakpassworduser',
@@ -97,7 +98,7 @@ def test_password_strength_and_account_deletion(client):
 
     # 2. Test registration with a strong password
     get_response = client.get('/register')
-    html = get_response.data.decode()
+    get_response.data.decode()
     response = client.post('/register', data={
         'username': 'strongpassworduser',
         'email': 'strong@example.com',
@@ -120,7 +121,7 @@ def test_password_strength_and_account_deletion(client):
         assert b'Logout' in login_response.data
 
         # Get CSRF token from a form on a protected page (e.g., account page)
-        account_page_response = client.get('/account')
+        client.get('/account')
 
         # Post to delete account
         delete_response = client.post('/delete_account', data={
@@ -139,7 +140,7 @@ def test_registration_sends_confirmation_email(client, monkeypatch):
     monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
 
     get_response = client.get('/register')
-    html = get_response.data.decode()
+    get_response.data.decode()
 
     client.post('/register', data={
         'username': 'confirmuser',
@@ -159,7 +160,7 @@ def test_registration_sends_confirmation_email(client, monkeypatch):
 def test_email_confirmation(client):
     # Register user first (without mocking email)
     get_response = client.get('/register')
-    html = get_response.data.decode()
+    get_response.data.decode()
     client.post('/register', data={
         'username': 'confirmuser2',
         'email': 'confirm2@example.com',
@@ -185,7 +186,7 @@ def test_password_reset_flow(client, monkeypatch):
     monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
 
     # 1. Register a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={
         'username': 'resetuser',
         'email': 'reset@example.com',
@@ -199,7 +200,7 @@ def test_password_reset_flow(client, monkeypatch):
     sent_emails.clear()
 
     # 2. Request a password reset
-    get_response = client.get('/forgot_password')
+    client.get('/forgot_password')
     client.post('/forgot_password', data={
         'email': 'reset@example.com'
     }, follow_redirects=True)
@@ -211,7 +212,7 @@ def test_password_reset_flow(client, monkeypatch):
     reset_url = sent_emails[0]['kwargs'].get('reset_url', '')
     token = reset_url.split('/reset/')[-1]
     
-    get_response = client.get(f'/reset/{token}')
+    client.get(f'/reset/{token}')
 
     response = client.post(f'/reset/{token}', data={
         'password': 'NewPassword123',
@@ -234,7 +235,7 @@ def test_resend_confirmation_request(client, monkeypatch):
     monkeypatch.setattr('app.routes.auth.send_email', mock_send_email)
 
     # 3. Request resend
-    get_response = client.get('/resend_confirmation_request')
+    client.get('/resend_confirmation_request')
     response = client.post('/resend_confirmation_request', data={
         'email': 'resendrequest@test.com'
     }, follow_redirects=True)
@@ -244,8 +245,6 @@ def test_resend_confirmation_request(client, monkeypatch):
     assert len(sent_emails) == 1
     assert sent_emails[0]['to'] == 'resendrequest@test.com'
     assert 'A new confirmation email has been sent.' in response.data.decode('utf-8')
-
-import pytest
 
 @pytest.mark.skip(reason="CSRF protection is handled by WTF_CSRF_ENABLED=False during tests")
 def test_csrf_protection(client):

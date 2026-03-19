@@ -14,7 +14,7 @@ def test_save_tree_unauthenticated(client):
 
 def test_save_tree_authenticated(client):
     # Register a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     # Confirm user then login
     confirm_user(client, 'test@test.com')
@@ -52,7 +52,7 @@ def test_save_tree_authenticated(client):
 
 def test_save_tree_missing_data(client):
     # Register a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     # Confirm user then login
     confirm_user(client, 'test@test.com')
@@ -77,7 +77,7 @@ def test_load_trees_unauthenticated(client):
 
 def test_load_trees_authenticated(client):
     # Register and login user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     user = User.query.filter_by(username='testuser').first()
     confirm_user(client, 'test@test.com')
@@ -117,7 +117,7 @@ def test_load_trees_authenticated(client):
 
 def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -173,7 +173,7 @@ def test_save_list_unauthenticated(client):
 def test_save_and_load_lists(client):
     """Test saving a list and then loading it."""
     # Register and login a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     User.query.filter_by(username='listuser').first()
     confirm_user(client, 'list@test.com')
@@ -222,7 +222,7 @@ def test_save_and_load_lists(client):
 
 def test_update_list(client):
     # Register and login a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'update@test.com')
     login(client, 'updateuser', 'Password123')
@@ -251,7 +251,7 @@ def test_update_list(client):
 
 def test_delete_list(client):
     # Register and login a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'delete@test.com')
     login(client, 'deleteuser', 'Password123')
@@ -274,11 +274,11 @@ def test_delete_list(client):
 
 def test_update_delete_unauthorized(client):
     # Register two users
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'owner@test.com')
 
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'hacker@test.com')
 
@@ -382,7 +382,7 @@ def test_export_pdf(client):
 
 def test_save_list_with_duplicate_name_updates(client):
     # Register and login a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'listupdate@test.com')
     login(client, 'listupdateuser', 'Password123')
@@ -425,7 +425,7 @@ def test_load_tree_data(client):
     """
     # 1. Setup the database with a public and a private folder structure
     # Register a user
-    get_response = client.get('/register')
+    client.get('/register')
     client.post('/register', data={'username': 'treeuser', 'email': 'tree@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     user = User.query.filter_by(username='treeuser').first()
     assert user is not None

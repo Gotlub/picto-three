@@ -55,3 +55,8 @@
 #image-sidebar-tree .node-content {
      cursor: grab;
 }
+
+body.is-dragging-list-item #scroll-list-left,
+body.is-dragging-list-item #scroll-list-right {
+    pointer-events: none !important;
+}
