@@ -1,6 +1,5 @@
 import pytest
 from app import create_app, db
-import re
 from pathlib import Path
 import shutil
 from app.utils import generate_confirmation_token
@@ -17,7 +16,8 @@ def app():
     app = create_app({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
-        "PICTOGRAMS_PATH": str(test_pictos_path) # Override the pictogram path for tests
+        "PICTOGRAMS_PATH": str(test_pictos_path), # Override the pictogram path for tests
+        "WTF_CSRF_ENABLED": False
     })
 
     with app.app_context():
@@ -42,18 +42,12 @@ def client(app):
 def runner(app):
     return app.test_cli_runner()
 
-def get_csrf_token(html):
-    # Utilise une regex pour extraire le CSRF token depuis l'input caché du formulaire
-    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
-    return match.group(1) if match else None
 
 def login(client, username, password):
-    get_response = client.get('/login')
-    csrf_token = get_csrf_token(get_response.data.decode())
+    client.get('/login')
     return client.post('/login', data=dict(
         username=username,
-        password=password,
-        csrf_token=csrf_token
+        password=password
     ), follow_redirects=True)
 
 def confirm_user(client, email):
@@ -65,14 +59,12 @@ def create_user(client, username='testuser', password='Password123', email=None)
     """Helper function to create a test user."""
     if email is None:
         email = f'{username}@test.com'
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
+    client.get('/register')
     client.post('/register', data=dict(
         username=username,
         email=email,
         password=password,
         password2=password,
-        accept_terms='y',
-        csrf_token=csrf_token
+        accept_terms='y'
     ), follow_redirects=True)
     return User.query.filter_by(username=username).first()

@@ -39,6 +39,7 @@
     height: 100px; /* Match item height */
     background-color: black;
     align-self: center;
+    flex-shrink: 0;
 }
 
 /* Dragging styles */
@@ -53,4 +54,9 @@
 
 #image-sidebar-tree .node-content {
      cursor: grab;
+}
+
+body.is-dragging-list-item #scroll-list-left,
+body.is-dragging-list-item #scroll-list-right {
+    pointer-events: none !important;
 }

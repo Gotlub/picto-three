@@ -5,15 +5,18 @@ from datetime import datetime, UTC
 
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    try:
+        return User.query.get(int(id))
+    except (ValueError, TypeError):
+        return None
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    username = db.Column(db.String(64), index=True, unique=True, nullable=False)
+    email = db.Column(db.String(120), index=True, unique=True, nullable=False)
+    password_hash = db.Column(db.String(256))
     locale = db.Column(db.String(10)) # ex: 'en', 'es', 'fr'
-    confirmed = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=False, nullable=False, server_default='0')
     confirmed_on = db.Column(db.DateTime, nullable=True)
 
     def set_password(self, password):
@@ -64,7 +67,7 @@ class Image(db.Model):
     name = db.Column(db.String(64))
     description = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    is_public = db.Column(db.Boolean, default=False)
+    is_public = db.Column(db.Boolean, default=False, nullable=False, server_default='0')
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
 
     def to_dict(self):
@@ -86,7 +89,7 @@ class Tree(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(64))
-    is_public = db.Column(db.Boolean, default=False)
+    is_public = db.Column(db.Boolean, default=False, nullable=False, server_default='0')
     root_id = db.Column(db.Integer, default=-1, nullable=True)
     root_url = db.Column(db.String(256), nullable=True)
     json_data = db.Column(db.Text)

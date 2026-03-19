@@ -6,6 +6,9 @@ from app.models import User
 from flask_babel import lazy_gettext as _l
 import re
 
+def strip_filter(x):
+    return x.strip() if x else None
+
 def password_strength_validator(form, field):
     password = field.data
     errors = []
@@ -21,14 +24,14 @@ def password_strength_validator(form, field):
         raise ValidationError(error_message)
 
 class LoginForm(FlaskForm):
-    username = StringField(_l('Username'), validators=[DataRequired()])
+    username = StringField(_l('Username'), validators=[DataRequired()], filters=[strip_filter])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
     remember_me = BooleanField(_l('Remember Me'))
     submit = SubmitField(_l('Sign In'))
 
 class RegistrationForm(FlaskForm):
-    username = StringField(_l('Username'), validators=[DataRequired()])
-    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    username = StringField(_l('Username'), validators=[DataRequired()], filters=[strip_filter])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()], filters=[strip_filter])
     password = PasswordField(_l('Password'), validators=[DataRequired(), password_strength_validator])
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
@@ -54,11 +57,11 @@ class ChangePasswordForm(FlaskForm):
     submit_change_password = SubmitField(_l('Change Password'))
 
 class DeleteAccountForm(FlaskForm):
-    username_confirm = StringField(_l('Username'), validators=[DataRequired()])
+    username_confirm = StringField(_l('Username'), validators=[DataRequired()], filters=[strip_filter])
     submit_delete_account = SubmitField(_l('Delete My Account'))
 
 class ForgotPasswordForm(FlaskForm):
-    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()], filters=[strip_filter])
     submit = SubmitField(_l('Request Password Reset'))
 
 class ResetPasswordForm(FlaskForm):
@@ -68,12 +71,12 @@ class ResetPasswordForm(FlaskForm):
     submit = SubmitField(_l('Reset Password'))
 
 class ResendConfirmationForm(FlaskForm):
-    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()], filters=[strip_filter])
     submit = SubmitField(_l('Resend Confirmation Email'))
 
 class ContactForm(FlaskForm):
-    name = StringField(_l('Name'), validators=[DataRequired()])
-    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    name = StringField(_l('Name'), validators=[DataRequired()], filters=[strip_filter])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()], filters=[strip_filter])
     message = TextAreaField(_l('Message'), validators=[DataRequired()])
     recaptcha = RecaptchaField()
     submit = SubmitField(_l('Send'))

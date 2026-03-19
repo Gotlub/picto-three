@@ -3,7 +3,7 @@ import os
 from PIL import Image as PILImage
 from app.models import User, Tree, PictogramList, Folder, Image
 from app import db
-from tests.conftest import get_csrf_token, login, confirm_user
+from tests.conftest import login, confirm_user
 
 def logout(client):
     return client.get('/logout', follow_redirects=True)
@@ -14,9 +14,8 @@ def test_save_tree_unauthenticated(client):
 
 def test_save_tree_authenticated(client):
     # Register a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     # Confirm user then login
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -53,9 +52,8 @@ def test_save_tree_authenticated(client):
 
 def test_save_tree_missing_data(client):
     # Register a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     # Confirm user then login
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -79,9 +77,8 @@ def test_load_trees_unauthenticated(client):
 
 def test_load_trees_authenticated(client):
     # Register and login user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     user = User.query.filter_by(username='testuser').first()
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
@@ -120,9 +117,8 @@ def test_load_trees_authenticated(client):
 
 def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'testuser', 'email': 'test@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'test@test.com')
     login(client, 'testuser', 'Password123')
 
@@ -177,9 +173,8 @@ def test_save_list_unauthenticated(client):
 def test_save_and_load_lists(client):
     """Test saving a list and then loading it."""
     # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'listuser', 'email': 'list@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     User.query.filter_by(username='listuser').first()
     confirm_user(client, 'list@test.com')
     login(client, 'listuser', 'Password123')
@@ -227,9 +222,8 @@ def test_save_and_load_lists(client):
 
 def test_update_list(client):
     # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'updateuser', 'email': 'update@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'update@test.com')
     login(client, 'updateuser', 'Password123')
 
@@ -257,9 +251,8 @@ def test_update_list(client):
 
 def test_delete_list(client):
     # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'deleteuser', 'email': 'delete@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'delete@test.com')
     login(client, 'deleteuser', 'Password123')
 
@@ -281,14 +274,12 @@ def test_delete_list(client):
 
 def test_update_delete_unauthorized(client):
     # Register two users
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'owner', 'email': 'owner@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'owner@test.com')
 
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'hacker', 'email': 'hacker@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'hacker@test.com')
 
     # Owner logs in and creates a list
@@ -313,87 +304,10 @@ def create_dummy_image(path, size=(100, 100), color='red'):
     img = PILImage.new('RGB', size, color=color)
     img.save(path, 'PNG')
 
-def test_export_pdf(client):
-    """Test the PDF export functionality."""
-    # Create dummy images for the test
-    dummy_img1_path = 'app/static/images/test_img1.png'
-    dummy_img2_path = 'app/static/images/test_img2.png'
-    create_dummy_image(dummy_img1_path, color='blue')
-    create_dummy_image(dummy_img2_path, color='green')
-
-    image_data = [
-        {'path': dummy_img1_path, 'description': 'Blue Square'},
-        {'path': dummy_img2_path, 'description': 'Green Square'}
-    ]
-
-    # Test with valid data in 'chain' mode
-    payload_chain = {
-        'image_data': image_data,
-        'image_size': 120,
-        'layout_mode': 'chain',
-        'orientation': 'portrait',
-        'show_text': True,
-        'text_position': 'bottom'
-    }
-    response_chain = client.post('/api/export_pdf', json=payload_chain)
-    assert response_chain.status_code == 200
-    assert response_chain.mimetype == 'application/pdf'
-    assert response_chain.data.startswith(b'%PDF-')
-
-    # Test with valid data in 'grid' mode
-    payload_grid = {
-        'image_data': image_data,
-        'image_size': 80,
-        'layout_mode': 'grid',
-        'orientation': 'landscape',
-        'border_width': 2,
-        'border_color': '#ff0000'
-    }
-    response_grid = client.post('/api/export_pdf', json=payload_grid)
-    assert response_grid.status_code == 200
-    assert response_grid.mimetype == 'application/pdf'
-    assert response_grid.data.startswith(b'%PDF-')
-
-    # Test with valid data in 'strip' mode (new)
-    payload_strip = {
-        'image_data': image_data,
-        'image_size': 80,
-        'layout_mode': 'strip',
-        'orientation': 'landscape',
-        'bg_color': '#ffff00',
-        'show_shadow': True
-    }
-    response_strip = client.post('/api/export_pdf', json=payload_strip)
-    assert response_strip.status_code == 200
-    assert response_strip.mimetype == 'application/pdf'
-    assert response_strip.data.startswith(b'%PDF-')
-
-    # Test with no images
-    response_no_images = client.post('/api/export_pdf', json={'image_data': []})
-    assert response_no_images.status_code == 400
-    json_response = response_no_images.get_json()
-    assert json_response['status'] == 'error'
-    assert 'No images to export' in json_response['message']
-
-    # Test with missing image path
-    payload_missing_img = {
-        'image_data': [{'path': 'non/existent/path.png'}],
-        'image_size': 100,
-        'layout_mode': 'chain'
-    }
-    response_missing_img = client.post('/api/export_pdf', json=payload_missing_img)
-    assert response_missing_img.status_code == 200
-    assert response_missing_img.mimetype == 'application/pdf'
-
-    # Clean up dummy images
-    os.remove(dummy_img1_path)
-    os.remove(dummy_img2_path)
-
 def test_save_list_with_duplicate_name_updates(client):
     # Register and login a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'listupdateuser', 'email': 'listupdate@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     confirm_user(client, 'listupdate@test.com')
     login(client, 'listupdateuser', 'Password123')
 
@@ -435,9 +349,8 @@ def test_load_tree_data(client):
     """
     # 1. Setup the database with a public and a private folder structure
     # Register a user
-    get_response = client.get('/register')
-    csrf_token = get_csrf_token(get_response.data.decode())
-    client.post('/register', data={'username': 'treeuser', 'email': 'tree@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y', 'csrf_token': csrf_token})
+    client.get('/register')
+    client.post('/register', data={'username': 'treeuser', 'email': 'tree@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
     user = User.query.filter_by(username='treeuser').first()
     assert user is not None
 

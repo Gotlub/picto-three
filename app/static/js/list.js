@@ -208,6 +208,11 @@ class ListBuilder {
         this.exportPdfBtn = document.getElementById('export-pdf-btn');
         this.pdfImageSizeSlider = document.getElementById('pdf-image-size');
         this.pdfImageSizeValue = document.getElementById('pdf-image-size-value');
+        
+        // Quick Themes
+        this.themePecsBtn = document.getElementById('theme-pecs');
+        this.themeStripBtn = document.getElementById('theme-strip');
+        this.themeFlashcardBtn = document.getElementById('theme-flashcard');
 
         this.initEventListeners();
         this.loadSavedLists();
@@ -239,6 +244,11 @@ class ListBuilder {
                 this.pdfImageSizeValue.textContent = this.pdfImageSizeSlider.value;
             }
         });
+
+        // Quick Themes
+        this.themePecsBtn?.addEventListener('click', () => this.applyPdfTheme('pecs'));
+        this.themeStripBtn?.addEventListener('click', () => this.applyPdfTheme('strip'));
+        this.themeFlashcardBtn?.addEventListener('click', () => this.applyPdfTheme('flashcard'));
 
         // Left Panel - List
         this.saveBtn?.addEventListener('click', () => this.saveList());
@@ -279,6 +289,10 @@ class ListBuilder {
         // Add scroll event listener to update button visibility dynamically
         this.chainedListContainer?.addEventListener('scroll', () => this.updateScrollButtonsVisibility());
         window.addEventListener('resize', () => this.updateScrollButtonsVisibility());
+
+        // Add class to body during drag to disable scroll arrow pointer events
+        document.addEventListener('dragstart', () => document.body.classList.add('is-dragging-list-item'));
+        document.addEventListener('dragend', () => document.body.classList.remove('is-dragging-list-item'));
 
         document.addEventListener('click', (e) => {
             const isClickInsideTree = this.treeDisplay.contains(e.target);
@@ -648,10 +662,12 @@ class ListBuilder {
         });
         const isPublic = this.isPublicCheckbox.checked;
 
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/lists', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify({
                 list_name: listName,
@@ -1022,71 +1038,204 @@ class ListBuilder {
         });
     }
 
+    applyPdfTheme(themeName) {
+        const setLayout = (mode, orient, size, padX, padY) => {
+            document.getElementById('pdf-layout-mode').value = mode;
+            document.querySelector(`input[name="pdf-orientation"][value="${orient}"]`).checked = true;
+            document.getElementById('pdf-image-size').value = size;
+            document.getElementById('pdf-image-size-value').textContent = size;
+            document.getElementById('pdf-padding-x').value = padX;
+            document.getElementById('pdf-padding-y').value = padY;
+        };
+        const setStyle = (bColor, bWidth, bRadius, bg, shadow) => {
+            document.getElementById('pdf-border-color').value = bColor;
+            document.getElementById('pdf-border-width').value = bWidth;
+            document.getElementById('pdf-border-radius').value = bRadius;
+            document.getElementById('pdf-bg-color').value = bg;
+            document.getElementById('pdf-show-shadow').checked = shadow;
+        };
+        const setText = (show, pos, align, font, size, color) => {
+            document.getElementById('pdf-show-text').checked = show;
+            document.getElementById('pdf-text-position').value = pos;
+            document.getElementById('pdf-font-family').value = font;
+            document.getElementById('pdf-font-size').value = size;
+            document.getElementById('pdf-text-color').value = color;
+        };
+
+        if (themeName === 'pecs') {
+            setLayout('grid', 'portrait', 120, 2, 2);
+            setStyle('#cccccc', 1, 0, '#ffffff', false);
+            setText(true, 'bottom', 'center', 'Helvetica', 10, '#000000');
+        } else if (themeName === 'strip') {
+            setLayout('strip', 'landscape', 150, 15, 10);
+            setStyle('#000000', 2, 10, '#ffffff', false);
+            setText(true, 'bottom', 'center', 'Helvetica', 12, '#000000');
+        } else if (themeName === 'flashcard') {
+            setLayout('grid', 'portrait', 400, 20, 20);
+            setStyle('#000000', 1, 15, '#f8f9fa', true);
+            setText(true, 'bottom', 'center', 'Helvetica', 24, '#000000');
+        }
+    }
+
     async exportToPdf() {
         if (this.chainedListItems.length === 0) {
             alert('The list is empty. Add images to the list before exporting.');
             return;
         }
 
-        const imageData = this.chainedListItems.map(item => ({
-            path: item.data.path,
-            description: item.data.description
-        }));
-
-        // Collect all export options
-        const exportOptions = {
-            image_data: imageData,
-            // Layout
-            layout_mode: document.getElementById('pdf-layout-mode').value,
-            orientation: document.querySelector('input[name="pdf-orientation"]:checked').value,
-            image_size: parseInt(document.getElementById('pdf-image-size').value, 10),
-            padding_x: parseInt(document.getElementById('pdf-padding-x').value, 10),
-            padding_y: parseInt(document.getElementById('pdf-padding-y').value, 10),
-
-            // Style
-            border_color: document.getElementById('pdf-border-color').value,
-            border_width: parseInt(document.getElementById('pdf-border-width').value, 10),
-            border_radius: parseInt(document.getElementById('pdf-border-radius').value, 10),
-            bg_color: document.getElementById('pdf-bg-color').value,
-            show_shadow: document.getElementById('pdf-show-shadow').checked,
-
-            // Text
-            show_text: document.getElementById('pdf-show-text').checked,
-            text_position: document.getElementById('pdf-text-position').value,
-            font_family: document.getElementById('pdf-font-family').value,
-            font_size: parseInt(document.getElementById('pdf-font-size').value, 10),
-            text_color: document.getElementById('pdf-text-color').value
-        };
-
         const originalBtnText = this.exportPdfBtn.innerHTML;
         this.exportPdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
         this.exportPdfBtn.disabled = true;
 
         try {
-            const response = await fetch('/api/export_pdf', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(exportOptions)
+            const { jsPDF } = window.jspdf;
+            
+            // Extract options
+            const layoutMode = document.getElementById('pdf-layout-mode').value;
+            const orientation = document.querySelector('input[name="pdf-orientation"]:checked').value;
+            const imageSize = parseInt(document.getElementById('pdf-image-size').value, 10);
+            const paddingX = parseInt(document.getElementById('pdf-padding-x').value, 10);
+            const paddingY = parseInt(document.getElementById('pdf-padding-y').value, 10);
+            
+            const borderColor = document.getElementById('pdf-border-color').value;
+            const borderWidth = parseInt(document.getElementById('pdf-border-width').value, 10);
+            const borderRadius = parseInt(document.getElementById('pdf-border-radius').value, 10);
+            const bgColor = document.getElementById('pdf-bg-color').value;
+            const showShadow = document.getElementById('pdf-show-shadow').checked;
+
+            const showText = document.getElementById('pdf-show-text').checked;
+            const textPosition = document.getElementById('pdf-text-position').value;
+            const fontFamily = document.getElementById('pdf-font-family').value;
+            const fontSize = parseInt(document.getElementById('pdf-font-size').value, 10);
+            const textColor = document.getElementById('pdf-text-color').value;
+
+            // Initialize document
+            const doc = new jsPDF({
+                orientation: orientation,
+                unit: 'pt',
+                format: 'a4'
             });
 
-            if (!response.ok) {
-                const errorResult = await response.json().catch(() => null);
-                const errorMessage = errorResult ? errorResult.message : 'PDF generation failed on the server.';
-                throw new Error(errorMessage);
+            const margin = 50;
+            const itemSpacing = 10;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            const textAllowance = showText ? (fontSize + 5) : 0;
+            const boxWidth = imageSize + (paddingX * 2);
+            const boxHeight = imageSize + (paddingY * 2) + textAllowance;
+
+            let cursorX = margin;
+            let cursorY = margin; // Note: jsPDF runs top-down unlike reportlab
+
+            // Helper to elegantly load images respecting CORS and relative path resolution
+            const loadImage = (src) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => resolve(img);
+                    img.onerror = () => resolve(null);
+                    
+                    let fullSrc = src;
+                    if (!src.startsWith('http') && !src.startsWith('/')) {
+                        fullSrc = '/pictograms/' + src;
+                    }
+                    img.src = fullSrc;
+                });
+            };
+
+            for (const item of this.chainedListItems) {
+                const imgElement = await loadImage(item.data.path);
+                if (!imgElement) continue;
+
+                // Pagination & Row wrapping
+                if (layoutMode === 'chain') {
+                    if (cursorY + boxHeight > pageHeight - margin) {
+                        doc.addPage();
+                        cursorY = margin;
+                    }
+                    cursorX = (pageWidth - boxWidth) / 2; // Fixed centering
+                } else if (layoutMode === 'strip') {
+                    if (item === this.chainedListItems[0]) cursorY = (pageHeight - boxHeight) / 2;
+                    if (cursorX + boxWidth > pageWidth - margin) {
+                        doc.addPage();
+                        cursorX = margin;
+                    }
+                } else { 
+                    if (cursorX + boxWidth > pageWidth - margin) {
+                        cursorX = margin;
+                        cursorY += boxHeight + itemSpacing;
+                    }
+                    if (cursorY + boxHeight > pageHeight - margin) {
+                        doc.addPage();
+                        cursorX = margin;
+                        cursorY = margin;
+                    }
+                }
+
+                // 1. Draw Shadow
+                if (showShadow) {
+                    doc.setFillColor('#cccccc');
+                    doc.roundedRect(cursorX + 3, cursorY + 3, boxWidth, boxHeight, borderRadius, borderRadius, 'F');
+                }
+
+                // 2. Draw Background and Border
+                doc.setFillColor(bgColor);
+                let rectStyle = 'F';
+                if (borderWidth > 0) {
+                    doc.setDrawColor(borderColor);
+                    doc.setLineWidth(borderWidth);
+                    rectStyle = 'FD'; // Fill and stroke
+                }
+                doc.roundedRect(cursorX, cursorY, boxWidth, boxHeight, borderRadius, borderRadius, rectStyle);
+
+                // 3. Draw Image
+                const imgAreaWidth = boxWidth - (paddingX * 2);
+                const imgAreaHeight = boxHeight - (paddingY * 2) - textAllowance;
+                
+                if (imgAreaWidth > 0 && imgAreaHeight > 0) {
+                    const iw = imgElement.naturalWidth || imgElement.width || 1;
+                    const ih = imgElement.naturalHeight || imgElement.height || 1;
+                    const scale = Math.min(imgAreaWidth / iw, imgAreaHeight / ih);
+                    const w = iw * scale;
+                    const h = ih * scale;
+                    
+                    const ix = cursorX + paddingX + (imgAreaWidth - w) / 2;
+                    let iy = cursorY + paddingY;
+                    if (showText && textPosition === 'top') {
+                        iy += textAllowance; 
+                    }
+                    
+                    // Always try 'PNG' or 'JPEG' fallback is done by jsPDF
+                    doc.addImage(imgElement, 'PNG', ix, iy, w, h);
+                }
+
+                // 4. Draw Text
+                if (showText && item.data.description) {
+                    doc.setFont(fontFamily);
+                    doc.setFontSize(fontSize);
+                    doc.setTextColor(textColor);
+                    
+                    const tx = cursorX + boxWidth / 2;
+                    let ty = cursorY + paddingY; 
+                    if (textPosition === 'top') {
+                        ty += fontSize;
+                    } else {
+                        ty = cursorY + boxHeight - paddingY - 2; 
+                    }
+                    doc.text(item.data.description, tx, ty, { align: 'center' });
+                }
+
+                // Advance cursor for next item
+                if (layoutMode === 'chain') {
+                    cursorY += boxHeight + itemSpacing;
+                } else {
+                    cursorX += boxWidth + itemSpacing;
+                }
             }
 
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'pictogram_list.pdf';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            // Save straight to browser avoiding the backend
+            doc.save('pictogram_list.pdf');
 
         } catch (error) {
             console.error('Error exporting to PDF:', error);

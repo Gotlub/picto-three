@@ -421,12 +421,13 @@ class TreeBuilder {
             // To include the description in the node, we can use innerHTML
             // The 'name' from the text property will be the title attribute of the container div
             const description = builderNode.description || builderNode.image.name;
-            treantNode.innerHTML = `
+            const rawHTML = `
                 <div class="node-content-wrapper">
                     <img src="${treantNode.image}" />
                     <p class="node-name">${description}</p>
                 </div>
             `;
+            treantNode.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(rawHTML) : rawHTML;
 
 
             builderNode.children.forEach(child => {
@@ -606,7 +607,7 @@ class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
-                if (targetNode.image.id === 'root') {
+                if (targetNode.image.id === 'root' && !this.draggedNode) {
                     targetContent.classList.add('drag-over-root');
                 } else {
                     targetContent.classList.add('drag-over-add');
@@ -887,10 +888,12 @@ class TreeBuilder {
             return; // Stop if the user cancels
         }
 
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/tree/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify({
                 name: treeName,

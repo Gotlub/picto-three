@@ -117,6 +117,17 @@
                         data-bs-parent="#exportAccordion">
                         <div class="accordion-body p-2">
 
+                            <!-- Quick Themes -->
+                            <div class="mb-3">
+                                <label class="form-label form-label-sm fw-bold w-100 text-center">{{ _('Quick Themes') }}</label>
+                                <div class="d-flex flex-column gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" id="theme-pecs" title="{{ _('Grid without margins, with border') }}">✂️ {{ _('Planche à découper (PECS)') }}</button>
+                                    <button class="btn btn-sm btn-outline-success" id="theme-strip" title="{{ _('Single horizontal line') }}">📏 {{ _('Bandelette de Routine') }}</button>
+                                    <button class="btn btn-sm btn-outline-warning" id="theme-flashcard" title="{{ _('Large images') }}">🖼️ {{ _('Flashcards (A4)') }}</button>
+                                </div>
+                            </div>
+                            <hr class="my-2">
+
                             <!-- Tabs for Export Options -->
                             <ul class="nav nav-tabs mb-3" id="exportTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
@@ -384,5 +395,6 @@
     {{ all_images_json | safe }}
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/list.js', v='1.2') }}"></script>
 {% endblock %}
