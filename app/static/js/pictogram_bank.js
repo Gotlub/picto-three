@@ -182,8 +182,9 @@ class PictogramBank {
     async createFolder() {
         const totalItems = this.countItems(this.rootNode);
         console.log(`Total items before creation: ${totalItems}`);
-        if (totalItems >= 500) {
-            alert('You have reached the maximum limit of 500 items (folders and images).');
+        const maxItems = window.MAX_ITEMS_LIMIT || 500;
+        if (totalItems >= maxItems) {
+            alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
             return;
         }
 
@@ -228,8 +229,9 @@ class PictogramBank {
     async uploadImage() {
         const totalItems = this.countItems(this.rootNode);
         console.log(`Total items before upload: ${totalItems}`);
-        if (totalItems >= 500) {
-            alert('You have reached the maximum limit of 500 items (folders and images).');
+        const maxItems = window.MAX_ITEMS_LIMIT || 500;
+        if (totalItems >= maxItems) {
+            alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
             return;
         }
 
@@ -240,8 +242,9 @@ class PictogramBank {
             return;
         }
 
-        if (file.size > 500 * 1024) {
-            alert('The image size cannot exceed 500 KB.');
+        const maxKb = window.MAX_IMAGE_SIZE_KB || 500;
+        if (file.size > maxKb * 1024) {
+            alert(`The image size cannot exceed ${maxKb} KB.`);
             return;
         }
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app, json
+from flask import Blueprint, jsonify, request, current_app, json, abort
 from flask_login import current_user, login_required
 from flask_babel import _
 from werkzeug.utils import secure_filename
@@ -228,7 +228,6 @@ def load_tree_data():
 
 @bp.route('/folder_images/<int:folder_id>', methods=['GET'])
 def folder_images(folder_id):
-    from flask import abort
     folder = db.session.get(Folder, folder_id)
     if folder is None:
         abort(404)

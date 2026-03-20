@@ -13,7 +13,7 @@ export default class ArasaacSearch {
             <div class="arasaac-search-box mb-2 flex-shrink-0">
                 <input type="text" class="form-control" placeholder="Search Arasaac..." id="arasaac-input-${this.container.id}">
             </div>
-            <div class="arasaac-results flex-grow-1" id="arasaac-results-${this.container.id}" style="overflow-y: auto; display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; min-height: 0;">
+            <div class="arasaac-results flex-grow-1" id="arasaac-results-${this.container.id}" style="overflow-y: auto; display: flex; flex-direction: column; gap: 5px; align-content: flex-start; min-height: 0; padding-right: 5px;">
                 <!-- Results will appear here -->
                 <div class="text-muted small text-center w-100 mt-3">Type to search symbols from Arasaac...</div>
             </div>
@@ -59,16 +59,24 @@ export default class ArasaacSearch {
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'arasaac-item';
-                itemDiv.style.width = '60px';
-                itemDiv.style.height = '60px';
+                itemDiv.style.width = '100%';
                 itemDiv.style.border = '1px solid #ddd';
                 itemDiv.style.borderRadius = '4px';
                 itemDiv.style.cursor = 'grab';
                 itemDiv.style.display = 'flex';
                 itemDiv.style.alignItems = 'center';
-                itemDiv.style.justifyContent = 'center';
-                itemDiv.style.padding = '2px';
+                itemDiv.style.padding = '5px';
+                itemDiv.style.position = 'relative'; // For absolute DL button
+                itemDiv.style.background = '#fff';
                 itemDiv.setAttribute('draggable', 'true');
+
+                const imageContainer = document.createElement('div');
+                imageContainer.style.width = '50px';
+                imageContainer.style.height = '50px';
+                imageContainer.style.flexShrink = '0';
+                imageContainer.style.display = 'flex';
+                imageContainer.style.justifyContent = 'center';
+                imageContainer.style.alignItems = 'center';
 
                 const img = document.createElement('img');
                 img.src = imgUrl;
@@ -76,18 +84,57 @@ export default class ArasaacSearch {
                 img.style.maxWidth = '100%';
                 img.style.maxHeight = '100%';
 
-                itemDiv.appendChild(img);
+                imageContainer.appendChild(img);
+                itemDiv.appendChild(imageContainer);
+
+                const textSpan = document.createElement('span');
+                textSpan.style.marginLeft = '12px';
+                textSpan.style.flexGrow = '1';
+                textSpan.style.fontSize = '14px';
+                textSpan.style.color = '#333';
+                textSpan.textContent = picto.keywords[0].keyword; // Description
+                itemDiv.appendChild(textSpan);
 
                 // Setup Tooltip
                 // Use the global 'tooltip' object defined in tooltip.js
                 if (typeof tooltip !== 'undefined') {
                     itemDiv.addEventListener('mouseover', (e) => {
-                        tooltip.show(e, imgUrl);
+                        // Pass image, name is empty, description is keyword
+                        tooltip.show(e, imgUrl, '', picto.keywords[0].keyword);
                     });
                     itemDiv.addEventListener('mouseout', (e) => {
                         tooltip.hide(e);
                     });
                 }
+
+                // Setup Hover Download Button
+                const dlBtn = document.createElement('a');
+                dlBtn.href = imgUrl;
+                dlBtn.target = '_blank'; // Arasaac is cross-origin, standard download attribute fails CORS without header
+                dlBtn.download = picto.keywords[0].keyword + '.png';
+                dlBtn.innerHTML = '&#128229;'; // Inbox tray emoji
+                dlBtn.style.position = 'absolute';
+                dlBtn.style.top = '50%';
+                dlBtn.style.transform = 'translateY(-50%)';
+                dlBtn.style.right = '8px';
+                dlBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                dlBtn.style.border = '1px solid #ddd';
+                dlBtn.style.borderRadius = '4px';
+                dlBtn.style.padding = '4px 8px';
+                dlBtn.style.fontSize = '16px';
+                dlBtn.style.color = '#333';
+                dlBtn.style.textDecoration = 'none';
+                dlBtn.style.display = 'none';
+                dlBtn.style.cursor = 'pointer';
+                dlBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+                dlBtn.title = 'Download';
+
+                dlBtn.addEventListener('mousedown', (e) => e.stopPropagation()); // Prevent node drag
+
+                itemDiv.addEventListener('mouseenter', () => dlBtn.style.display = 'block');
+                itemDiv.addEventListener('mouseleave', () => dlBtn.style.display = 'none');
+
+                itemDiv.appendChild(dlBtn);
 
                 // Setup Drag
                 itemDiv.addEventListener('dragstart', (e) => {

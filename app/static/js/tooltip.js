@@ -4,7 +4,7 @@ class Tooltip {
         this.timer = null;
     }
 
-    show(event, imageUrl) {
+    show(event, imageUrl, name, description) {
         // Clear any existing timer
         if (this.timer) {
             clearTimeout(this.timer);
@@ -16,17 +16,50 @@ class Tooltip {
             if (!this.tooltipElement) {
                 this.tooltipElement = document.createElement('div');
                 this.tooltipElement.className = 'image-tooltip';
+                this.tooltipElement.style.padding = '8px';
+                this.tooltipElement.style.background = 'white';
+                this.tooltipElement.style.border = '1px solid #ddd';
+                this.tooltipElement.style.borderRadius = '5px';
+                this.tooltipElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                this.tooltipElement.style.zIndex = '1000';
+                this.tooltipElement.style.pointerEvents = 'none'; // prevent interacting with tooltip
                 document.body.appendChild(this.tooltipElement);
             }
 
             // Set the content securely
+            const container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.alignItems = 'center';
+            container.style.gap = '5px';
+
             const img = document.createElement('img');
             img.src = imageUrl;
-            img.style.maxWidth = '300px';
-            img.style.maxHeight = '300px';
+            img.style.maxWidth = '350px';
+            img.style.maxHeight = '350px';
             img.style.objectFit = 'contain';
             
-            this.tooltipElement.replaceChildren(img);
+            container.appendChild(img);
+
+            if (name) {
+                const nameEl = document.createElement('div');
+                nameEl.textContent = name;
+                nameEl.style.fontWeight = 'bold';
+                nameEl.style.fontSize = '13px';
+                container.appendChild(nameEl);
+            }
+
+            if (description && description.trim() !== "") {
+                const descEl = document.createElement('div');
+                descEl.textContent = description;
+                descEl.style.fontSize = '12px';
+                descEl.style.color = '#666';
+                descEl.style.maxWidth = '300px';
+                descEl.style.textAlign = 'center';
+                container.appendChild(descEl);
+            }
+
+            this.tooltipElement.replaceChildren(container);
 
             // Position the tooltip
             this.updatePosition(event);

@@ -22,6 +22,11 @@ class Config:
     # Path for storing uploaded pictograms
     PICTOGRAMS_PATH = data_dir / "pictograms"
     PICTOGRAMS_PATH_MIN = data_dir / "pictogramsmin"
+    
+    # Upload limits
+    MAX_IMAGE_SIZE_KB = int(os.environ.get('MAX_IMAGE_SIZE_KB', 2048)) # Default to 2MB
+    MAX_ITEMS_LIMIT = int(os.environ.get('MAX_ITEMS_LIMIT', 5000)) # Default to 5000 items
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl']
 
