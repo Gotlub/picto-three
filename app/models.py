@@ -6,7 +6,9 @@ from datetime import datetime, UTC
 @login.user_loader
 def load_user(id):
     try:
-        return User.query.get(int(id))
+        if id == 'None':
+            return None
+        return db.session.get(User, int(id))
     except (ValueError, TypeError):
         return None
 

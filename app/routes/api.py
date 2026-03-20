@@ -226,9 +226,12 @@ def load_tree_data():
                 tree_roots.append(user_tree)
     return jsonify(tree_roots)
 
-@bp.route('/folder_images/<int:folder_id>')
+@bp.route('/folder_images/<int:folder_id>', methods=['GET'])
 def folder_images(folder_id):
-    folder = Folder.query.get_or_404(folder_id)
+    from flask import abort
+    folder = db.session.get(Folder, folder_id)
+    if folder is None:
+        abort(404)
     # Vérification des droits : dossier public ou appartenant à l'utilisateur
     if folder.user_id is not None:
         if not current_user.is_authenticated or folder.user_id != current_user.id:
