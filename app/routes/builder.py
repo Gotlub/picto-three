@@ -1,8 +1,7 @@
 from flask import render_template, Blueprint, request, flash, json
 from flask_babel import _
 from flask_login import current_user, login_required
-from sqlalchemy import or_
-from app.models import Folder, Image
+from app.models import Folder
 
 bp = Blueprint('builder', __name__)
 
@@ -34,23 +33,10 @@ def builder():
     # The initial data for the right sidebar tree
     initial_tree_data_json = json.dumps(initial_folders)
 
-    # Load only images that are public or owned by the current user.
-    conditions = [
-        Image.user_id.is_(None),  # Global public images
-        Image.is_public.is_(True)   # User-owned but public images
-    ]
-    if current_user.is_authenticated:
-        conditions.append(Image.user_id == current_user.id)
-
-    visible_images = Image.query.filter(or_(*conditions)).all()
-    images_json = json.dumps([image.to_dict() for image in visible_images])
-
-
     return render_template(
         'builder.html',
         title='Tree Builder',
         initial_tree_data_json=initial_tree_data_json,
-        images_json=images_json,
         tree_data_from_post=tree_data_from_post
     )
 
@@ -84,20 +70,8 @@ def list_page():
 
     initial_tree_data_json = json.dumps(initial_folders)
 
-    # Load only images that are public or owned by the current user.
-    conditions = [
-        Image.user_id.is_(None),  # Global public images
-        Image.is_public.is_(True)   # User-owned but public images
-    ]
-    if current_user.is_authenticated:
-        conditions.append(Image.user_id == current_user.id)
-
-    visible_images = Image.query.filter(or_(*conditions)).all()
-    all_images_json = json.dumps([image.to_dict() for image in visible_images])
-
     return render_template(
         'list.html',
         title='List Builder',
-        initial_tree_data_json=initial_tree_data_json,
-        all_images_json=all_images_json
+        initial_tree_data_json=initial_tree_data_json
     )

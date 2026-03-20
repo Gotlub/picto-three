@@ -7,6 +7,7 @@ from app.models import Tree, PictogramList, Folder, Image
 from pathlib import Path
 import shutil
 from PIL import Image as PILImage
+from sqlalchemy import or_
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -198,14 +199,7 @@ def build_forest(folder):
         if child_node:
             folder_node['children'].append(child_node)
 
-    # Add child images, sorted by name
-    child_images = folder.images.order_by(Image.name).all()
-    for image in child_images:
-        image_node = {
-            'type': 'image',
-            'data': image.to_dict()
-        }
-        folder_node['children'].append(image_node)
+
 
     return folder_node
 
@@ -232,7 +226,37 @@ def load_tree_data():
                 tree_roots.append(user_tree)
     return jsonify(tree_roots)
 
+@bp.route('/folder_images/<int:folder_id>', methods=['GET'])
+def folder_images(folder_id):
+    from flask import abort
+    folder = db.session.get(Folder, folder_id)
+    if folder is None:
+        abort(404)
+    # Vérification des droits : dossier public ou appartenant à l'utilisateur
+    if folder.user_id is not None:
+        if not current_user.is_authenticated or folder.user_id != current_user.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+            
+    images = folder.images.order_by(Image.name).all()
+    results = [{'type': 'image', 'data': img.to_dict()} for img in images]
+    return jsonify(results)
 
+@bp.route('/search_local_images')
+def search_local_images():
+    q = request.args.get('q', '').strip()
+    if len(q) < 1:
+        return jsonify([])
+        
+    conditions = [
+        Image.user_id.is_(None),
+        Image.is_public.is_(True)
+    ]
+    if current_user.is_authenticated:
+        conditions.append(Image.user_id == current_user.id)
+        
+    images = Image.query.filter(or_(*conditions)).filter(Image.name.ilike(f'%{q}%')).limit(100).all()
+    results = [{'type': 'image', 'data': img.to_dict()} for img in images]
+    return jsonify(results)
 @bp.route('/pictograms', methods=['GET'])
 @login_required
 def get_pictograms():

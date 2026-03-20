@@ -45,11 +45,49 @@ export default class ImageTreeFolderNode extends ImageTreeNode {
     }
 
 
-    toggle() {
+    async toggle() {
         this.expanded = !this.expanded;
         if (this.expanded) {
             this.icon.src = '/static/images/folder-open-bold.png';
             this.childrenContainer.style.display = '';
+
+            // Lazy load images on first expand
+            if (!this.imagesLoaded) {
+                const loadingInfo = document.createElement('div');
+                loadingInfo.classList.add('image-tree-node', 'info');
+                loadingInfo.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                this.childrenContainer.appendChild(loadingInfo);
+
+                this.imagesLoaded = true;
+                try {
+                    const response = await fetch('/api/folder_images/' + this.data.id);
+                    if (response.ok) {
+                        const imagesData = await response.json();
+                        loadingInfo.remove();
+
+                        imagesData.forEach(childData => {
+                            if (childData.type === 'image') {
+                                const childNode = new this.nodeTypes.IMAGE(childData.data, this.imageTree);
+                                childNode.parent = this;
+                                this.children.push(childNode);
+                                this.childrenContainer.appendChild(childNode.element);
+                            }
+                        });
+
+                        if (this.children.length === 0) {
+                            const noItems = document.createElement('div');
+                            noItems.classList.add('image-tree-node', 'info');
+                            noItems.textContent = 'Empty folder';
+                            this.childrenContainer.appendChild(noItems);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to lazy load images:", e);
+                    loadingInfo.remove();
+                    this.imagesLoaded = false; // allow retry
+                }
+            }
+
             // Lazy load images
             this.children.forEach(child => {
                 if (child instanceof this.nodeTypes.IMAGE) {
@@ -65,12 +103,7 @@ export default class ImageTreeFolderNode extends ImageTreeNode {
     buildChildrenFromData() {
         if (this.children.length > 0) return; // Already built
 
-        if (this.childrenData.length === 0) {
-            const noItems = document.createElement('div');
-            noItems.classList.add('image-tree-node', 'info');
-            noItems.textContent = 'Empty folder';
-            this.childrenContainer.appendChild(noItems);
-        } else {
+        if (this.childrenData && this.childrenData.length > 0) {
             this.childrenData.forEach(childData => {
                 let childNode;
                 if (childData.type === 'folder') {

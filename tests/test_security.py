@@ -1,4 +1,3 @@
-import json
 import pytest
 from app import db
 from app.models import User, Image
@@ -115,21 +114,14 @@ def test_save_public_list_with_global_image_succeeds(seeded_db):
     assert response.status_code == 201 # 201 Created
     assert response.get_json()['status'] == 'success'
 
-def test_builder_image_loading_unauthenticated(seeded_db):
-    """Unauthenticated users should only see global and user-public images."""
+def test_search_local_images_unauthenticated(seeded_db):
+    """Unauthenticated users should only find global and user-public images via search."""
     client = seeded_db
-    response = client.get('/builder')
+    response = client.get('/api/search_local_images?q=png')
     assert response.status_code == 200
 
-    html_content = response.data.decode()
-    start_str = '<script id="images-data" type="application/json">'
-    end_str = '</script>'
-    start_idx = html_content.find(start_str) + len(start_str)
-    end_idx = html_content.find(end_str, start_idx)
-    json_str = html_content[start_idx:end_idx]
-
-    images = json.loads(json_str)
-    image_ids = {img['id'] for img in images}
+    images = response.get_json()
+    image_ids = {img['data']['id'] for img in images}
 
     # Should see: global (100), user1's public (102), user2's public (202)
     assert 100 in image_ids
@@ -140,23 +132,16 @@ def test_builder_image_loading_unauthenticated(seeded_db):
     assert 101 not in image_ids
     assert 201 not in image_ids
 
-def test_builder_image_loading_authenticated(seeded_db):
-    """Authenticated users should see public images + all their own images."""
+def test_search_local_images_authenticated(seeded_db):
+    """Authenticated users should find public images + all their own images."""
     client = seeded_db
     login(client, 'user1', 'password')
 
-    response = client.get('/builder')
+    response = client.get('/api/search_local_images?q=png')
     assert response.status_code == 200
 
-    html_content = response.data.decode()
-    start_str = '<script id="images-data" type="application/json">'
-    end_str = '</script>'
-    start_idx = html_content.find(start_str) + len(start_str)
-    end_idx = html_content.find(end_str, start_idx)
-    json_str = html_content[start_idx:end_idx]
-
-    images = json.loads(json_str)
-    image_ids = {img['id'] for img in images}
+    images = response.get_json()
+    image_ids = {img['data']['id'] for img in images}
 
     # User 1 should see:
     # - Global public (100)

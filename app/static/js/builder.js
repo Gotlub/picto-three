@@ -138,7 +138,6 @@ class TreeBuilder {
         this.closeVisualizeBtn = document.getElementById('close-visualizer-btn');
         this.closeVisualizeXBtn = document.getElementById('close-visualizer-x-btn');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
-        this.images = JSON.parse(document.getElementById('images-data').textContent);
         this.savedTrees = [];
         this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
         this.treeDisplay.appendChild(this.rootNode.element);
@@ -1048,7 +1047,7 @@ class TreeBuilder {
                 description: nodeData.description || nodeData.name
             };
         } else {
-            image = this.images.find(img => img.id === nodeData.id);
+            image = null;
         }
 
         if (!image) {

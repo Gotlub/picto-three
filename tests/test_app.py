@@ -8,15 +8,12 @@ def test_builder_page_unauthenticated_public_access(client):
     assert response.status_code == 200
     assert b'Tree Builder' in response.data
 
-def test_builder_page_loads_public_images_only(client):
+def test_builder_page_loads_safely(client):
     """
-    Les images visibles sans auth sont uniquement les publiques.
-    Vérifie qu'aucune donnée d'un autre utilisateur privé ne fuite.
+    Vérifie le chargement basique. Les images ne sont plus chargées ici (Lazy Load).
     """
     response = client.get('/builder')
     assert response.status_code == 200
-    assert b'images-data' in response.data
-    assert b'acorn-bold' in response.data
     # Vérification défensive : pas d'attributs censés être cachés
     # ou les noms d'utilisateurs
     assert b'"user_id": 999' not in response.data # S'assure qu'un id spécifique fictif n'y est pas
