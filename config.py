@@ -7,6 +7,13 @@ basedir = Path(__file__).parent.resolve()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    
+    import hashlib
+    # Derivation of a distinct token secret key to prevent exposing SECRET_KEY weaknesses
+    TOKEN_SECRET_KEY = os.environ.get(
+        'TOKEN_SECRET_KEY',
+        hashlib.sha256((SECRET_KEY + 'tokens').encode()).hexdigest()
+    )
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'you-will-never-guess'
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')

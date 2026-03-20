@@ -378,17 +378,23 @@ class TreeBuilder {
             treeContainer.style.cursor = 'grabbing';
         });
 
-        window.addEventListener('mouseup', () => {
-            this.panning = false;
-            treeContainer.style.cursor = 'grab';
-        });
+        if (!this._onMouseUp) {
+            this._onMouseUp = () => {
+                this.panning = false;
+                treeContainer.style.cursor = 'grab';
+            };
+            window.addEventListener('mouseup', this._onMouseUp);
+        }
 
-        window.addEventListener('mousemove', (e) => {
-            if (!this.panning) return;
-            this.pointX = (e.clientX - this.start.x);
-            this.pointY = (e.clientY - this.start.y);
-            setTransform();
-        });
+        if (!this._onMouseMove) {
+            this._onMouseMove = (e) => {
+                if (!this.panning) return;
+                this.pointX = (e.clientX - this.start.x);
+                this.pointY = (e.clientY - this.start.y);
+                setTransform();
+            };
+            window.addEventListener('mousemove', this._onMouseMove);
+        }
 
         // Set initial cursor
         treeContainer.style.cursor = 'grab';
@@ -426,7 +432,12 @@ class TreeBuilder {
                     <p class="node-name">${description}</p>
                 </div>
             `;
-            treantNode.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(rawHTML) : rawHTML;
+            if (window.DOMPurify) {
+                treantNode.innerHTML = window.DOMPurify.sanitize(rawHTML);
+            } else {
+                console.error("DOMPurify not loaded, preventing potential XSS.");
+                treantNode.innerHTML = "<div style='color:red;'>Secure Rendering Failed</div>";
+            }
 
 
             builderNode.children.forEach(child => {
@@ -456,7 +467,12 @@ class TreeBuilder {
 
         const treeData = this.getTreeAsJSON();
         const treeDataString = JSON.stringify(treeData);
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        const csrfTokenNode = document.querySelector('input[name="csrf_token"]');
+        if (!csrfTokenNode) {
+            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
+            return;
+        }
+        const csrfToken = csrfTokenNode.value;
 
         const form = document.createElement('form');
         form.method = 'POST';
@@ -887,36 +903,50 @@ class TreeBuilder {
             return; // Stop if the user cancels
         }
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-        const response = await fetch('/api/tree/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                name: treeName,
-                is_public: isPublic,
-                root_id: root_id,
-                root_url: root_url,
-                json_data: jsonData,
-            }),
-        });
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        if (!csrfToken) {
+            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
+            return;
+        }
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            const message = existingTree ? 'Updated' : 'Created';
-            alert(message);
+        try {
+            const response = await fetch('/api/tree/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    name: treeName,
+                    is_public: isPublic,
+                    root_id: root_id,
+                    root_url: root_url,
+                    json_data: jsonData,
+                }),
+            });
 
-            // Clear the existing tree before reloading from save
-            this.rootNode.children = [];
-            // Reload the builder with the saved tree data
-            this.rebuildTreeFromJSON(result.tree_data);
-            // Refresh the list of saved trees
-            this.loadSavedTrees();
-        } else {
-            // Display specific error messages
-            alert(`Error saving tree: ${result.message}`);
+            if (!response.ok) {
+                throw new Error(`Erreur serveur: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                const message = existingTree ? 'Updated' : 'Created';
+                alert(message);
+
+                // Clear the existing tree before reloading from save
+                this.rootNode.children = [];
+                // Reload the builder with the saved tree data
+                this.rebuildTreeFromJSON(result.tree_data);
+                // Refresh the list of saved trees
+                this.loadSavedTrees();
+            } else {
+                // Display specific error messages
+                alert(`Error saving tree: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur sauvegarde:', e);
+            alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
         }
     }
 
@@ -944,10 +974,21 @@ class TreeBuilder {
     }
 
     async loadSavedTrees() {
-        const response = await fetch('/api/trees/load');
-        const data = await response.json();
-        this.publicTrees = data.public_trees || [];
-        this.userTrees = data.user_trees || [];
+        try {
+            const response = await fetch('/api/trees/load');
+            if (!response.ok) {
+                console.error(`Erreur HTTP: ${response.status}`);
+                return;
+            }
+            const data = await response.json();
+            this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
+            this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
+        } catch (e) {
+            console.error('Impossible de charger les arbres:', e);
+            alert('Impossible de charger les arbres sauvegardés.');
+            this.publicTrees = [];
+            this.userTrees = [];
+        }
         this.renderTreeList();
     }
 
@@ -1158,9 +1199,28 @@ class TreeBuilder {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
+
+                const validateNodeData = (node, depth = 0) => {
+                    if (depth > 50) return false;
+                    if (typeof node !== 'object' || node === null) return false;
+                    if (node.url && !/^(https?:\/\/|\/pictograms\/|\/static\/)/.test(node.url)) {
+                        node.url = '';
+                    }
+                    if (Array.isArray(node.children)) {
+                        node.children = node.children.filter(child => validateNodeData(child, depth + 1));
+                    }
+                    return true;
+                };
+
                 reader.onload = (event) => {
                     try {
                         const importedData = JSON.parse(event.target.result);
+                        if (!importedData?.roots || !Array.isArray(importedData.roots)) {
+                            alert('Format de fichier invalide.');
+                            return;
+                        }
+                        importedData.roots.forEach(root => validateNodeData(root));
+
                         const importMode = document.querySelector('input[name="import_mode"]:checked').value;
 
                         if (importMode === 'replace') {

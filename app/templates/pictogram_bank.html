@@ -70,8 +70,8 @@
     {{ pictograms_json | safe }}
 </script>
 <script>
-    window.MAX_IMAGE_SIZE_KB = {{ config.MAX_IMAGE_SIZE_KB }};
-    window.MAX_ITEMS_LIMIT = {{ config.MAX_ITEMS_LIMIT }};
+    window.MAX_IMAGE_SIZE_KB = parseInt("{{ config.MAX_IMAGE_SIZE_KB }}", 10);
+    window.MAX_ITEMS_LIMIT = parseInt("{{ config.MAX_ITEMS_LIMIT }}", 10);
 </script>
 <script src="{{ url_for('static', filename='js/pictogram_bank.js') }}"></script>
 {% endblock %}
