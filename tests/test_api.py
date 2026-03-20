@@ -389,10 +389,9 @@ def test_load_tree_data(client):
     public_tree = data_unauth[0]
     assert public_tree['data']['name'] == 'Public'
     assert public_tree['type'] == 'folder'
-    assert len(public_tree['children']) == 2
+    assert len(public_tree['children']) == 1
 
     child_names_unauth = {child['data']['name'] for child in public_tree['children']}
-    assert 'public_img.png' in child_names_unauth
     assert 'Public Sub' in child_names_unauth
 
     # 3. Test Case 2: Authenticated user
@@ -411,10 +410,49 @@ def test_load_tree_data(client):
     assert user_tree_auth is not None
 
     # Check public tree for authenticated user
-    assert len(public_tree_auth['children']) == 2
+    assert len(public_tree_auth['children']) == 1
 
     # Check user tree
     assert user_tree_auth['type'] == 'folder'
-    assert len(user_tree_auth['children']) == 1
-    assert user_tree_auth['children'][0]['type'] == 'image'
-    assert user_tree_auth['children'][0]['data']['name'] == 'private_img.png'
+    assert len(user_tree_auth['children']) == 0
+
+def test_folder_images_endpoint(client):
+    """
+    Tests the lazy loading endpoint /api/folder_images/<folder_id>
+    """
+    client.get('/register')
+    client.post('/register', data={'username': 'lazyuser', 'email': 'lazy@test.com', 'password': 'Password123', 'password2': 'Password123', 'accept_terms': 'y'})
+    user = User.query.filter_by(username='lazyuser').first()
+    confirm_user(client, 'lazy@test.com')
+
+    public_root = Folder(name='PublicLazy', user_id=None, parent_id=None, path='public_lazy')
+    db.session.add(public_root)
+    db.session.commit()
+    
+    public_root = Folder.query.filter_by(name='PublicLazy', user_id=None, parent_id=None).first()
+    user_root = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    public_img = Image(name='public_img_lazy.png', path='public_lazy/public_img.png', folder_id=public_root.id, is_public=True)
+    private_img = Image(name='private_img_lazy.png', path=f'{user.username}/private_img.png', user_id=user.id, folder_id=user_root.id, is_public=False)
+    db.session.add_all([public_img, private_img])
+    db.session.commit()
+
+    # 1. Unauthenticated reading public folder
+    logout(client)
+    res = client.get(f'/api/folder_images/{public_root.id}')
+    assert res.status_code == 200
+    data = res.get_json()
+    assert len(data) == 1
+    assert data[0]['data']['name'] == 'public_img_lazy.png'
+
+    # Unauthenticated reading private folder = Empty / Hidden
+    res2 = client.get(f'/api/folder_images/{user_root.id}')
+    assert res2.status_code == 403
+
+    # 2. Authenticated reading private folder
+    login(client, 'lazyuser', 'Password123')
+    res3 = client.get(f'/api/folder_images/{user_root.id}')
+    assert res3.status_code == 200
+    data3 = res3.get_json()
+    assert len(data3) == 1
+    assert data3[0]['data']['name'] == 'private_img_lazy.png'

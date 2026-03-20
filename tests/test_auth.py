@@ -1,4 +1,3 @@
-import pytest
 from app.models import User
 from app import db
 from tests.conftest import login, confirm_user, create_user
@@ -246,23 +245,3 @@ def test_resend_confirmation_request(client, monkeypatch):
     assert sent_emails[0]['to'] == 'resendrequest@test.com'
     assert 'A new confirmation email has been sent.' in response.data.decode('utf-8')
 
-@pytest.mark.skip(reason="CSRF protection is handled by WTF_CSRF_ENABLED=False during tests")
-def test_csrf_protection(client):
-    """Vérifie que les POST sans CSRF token sont rejetés (400 ou 403)"""
-    # Test sans token
-    response = client.post('/register', data={
-        'username': 'hacker',
-        'email': 'hack@evil.com',
-        'password': 'Password123',
-        'password2': 'Password123',
-        'accept_terms': 'y'
-    }, follow_redirects=False)
-    assert response.status_code in (400, 403), "Le POST sans CSRF token doit être rejeté"
-
-    # Test avec token invalide
-    response = client.post('/login', data={
-        'username': 'anyone',
-        'password': 'Password123',
-        'csrf_token': 'token_invalide_forge'
-    }, follow_redirects=False)
-    assert response.status_code in (400, 403), "Le POST avec CSRF token forgé doit être rejeté"

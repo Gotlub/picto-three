@@ -147,8 +147,6 @@ class ChainedListItem {
 class ListBuilder {
     constructor() {
         // General
-        this.allImages = JSON.parse(document.getElementById('images-data').textContent);
-
         // Left Panel - List Section
         this.importBtn = document.getElementById('import-list-json-btn');
         this.exportBtn = document.getElementById('export-list-json-btn');
@@ -756,7 +754,7 @@ class ListBuilder {
                 };
             } else {
                 // Legacy format (fallback to ID lookup)
-                imageInfo = this.allImages.find(img => img.id === itemData.image_id);
+                imageInfo = null;
             }
 
             if (!imageInfo) {
@@ -966,16 +964,17 @@ class ListBuilder {
                     description: nodeData.description || nodeData.name
                 };
             } else {
-                image = this.allImages.find(img => img.id === nodeData.id);
-                if (!image) {
-                    console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
-                    image = {
-                        id: nodeData.id !== undefined ? nodeData.id : -1,
-                        name: 'Image inaccessible',
-                        path: '/static/images/prohibit-bold.png',
-                        description: 'This image is private or has been deleted.'
-                    };
-                }
+                image = null;
+            }
+            
+            if (!image) {
+                console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
+                image = {
+                    id: nodeData.id !== undefined ? nodeData.id : -1,
+                    name: 'Image inaccessible',
+                    path: '/static/images/prohibit-bold.png',
+                    description: 'This image is private or has been deleted.'
+                };
             }
 
             const newNode = new ReadOnlyNode(nodeData, image, this);

@@ -391,9 +391,7 @@
 <script id="initial-tree-data" type="application/json">
     {{ initial_tree_data_json | safe }}
 </script>
-<script id="images-data" type="application/json">
-    {{ all_images_json | safe }}
-</script>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/list.js', v='1.2') }}"></script>
