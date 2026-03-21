@@ -44,6 +44,10 @@ export default class ArasaacSearch {
             const response = await fetch(`https://api.arasaac.org/api/pictograms/${locale}/search/${encodeURIComponent(query)}`);
             const data = await response.json();
 
+            // Clear any active tooltip before destroying the DOM nodes
+            if (typeof tooltip !== 'undefined' && tooltip.hide) {
+                tooltip.hide();
+            }
             this.resultsContainer.innerHTML = '';
 
             if (data.length === 0) {
