@@ -55,6 +55,13 @@ export default class ArasaacSearch {
                 return;
             }
 
+            // Filtrer et trier par ordre alphabétique sur la description (keyword)
+            data.sort((a, b) => {
+                const keywordA = (a.keywords && a.keywords.length > 0) ? a.keywords[0].keyword.toLowerCase() : '';
+                const keywordB = (b.keywords && b.keywords.length > 0) ? b.keywords[0].keyword.toLowerCase() : '';
+                return keywordA.localeCompare(keywordB);
+            });
+
             // Limit results to 50 to avoid performance issues
             const results = data.slice(0, 50);
 
