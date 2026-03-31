@@ -891,12 +891,14 @@ class TreeBuilder {
             }
         }
 
-        // Check if a tree with the same name exists for the current user
-        const existingTree = this.userTrees.find(tree => tree.name === treeName);
+        // Check if a tree with the same name exists for the current user among both private and public lists
+        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        const existingTree = allTrees.find(tree => tree.name === treeName && tree.user_id === this.currentUserId);
+        
         let proceed = true;
 
         if (existingTree) {
-            proceed = confirm("A tree with this name already exists. Do you want to overwrite it?");
+            proceed = confirm("A tree with this name already exists. Are you sure you want to overwrite it?");
         }
 
         if (!proceed) {
@@ -983,6 +985,7 @@ class TreeBuilder {
             const data = await response.json();
             this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
             this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
+            this.currentUserId = data.current_user_id;
         } catch (e) {
             console.error('Impossible de charger les arbres:', e);
             alert('Impossible de charger les arbres sauvegardés.');

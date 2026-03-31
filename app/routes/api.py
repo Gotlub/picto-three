@@ -23,7 +23,8 @@ def load_trees():
 
     return jsonify({
         'public_trees': [tree.to_dict() for tree in public_trees],
-        'user_trees': [tree.to_dict() for tree in user_trees]
+        'user_trees': [tree.to_dict() for tree in user_trees],
+        'current_user_id': current_user.id if current_user.is_authenticated else None
     })
 
 
