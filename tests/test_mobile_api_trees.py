@@ -1,4 +1,3 @@
-import pytest
 import json
 from app import db
 from app.models import Tree, User

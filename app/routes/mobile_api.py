@@ -55,9 +55,9 @@ def list_trees():
     query = Tree.query
     
     if is_public_param:
-        query = query.filter(Tree.is_public == True)
+        query = query.filter(Tree.is_public)
     else:
-        query = query.filter(Tree.user_id == current_user_id, Tree.is_public == False)
+        query = query.filter(Tree.user_id == current_user_id, Tree.is_public.is_(False))
         
     if search_query:
         search_pattern = f"%{search_query.lower()}%"

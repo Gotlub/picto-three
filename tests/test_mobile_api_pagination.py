@@ -1,5 +1,3 @@
-import pytest
-import json
 from app import db
 from app.models import Tree, User
 from tests.conftest import create_user, confirm_user

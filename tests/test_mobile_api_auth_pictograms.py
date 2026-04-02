@@ -1,8 +1,4 @@
-import pytest
-import os
 from pathlib import Path
-from app import db
-from app.models import User
 from tests.conftest import create_user, confirm_user
 
 def test_mobile_pictograms_auth(client, app):
