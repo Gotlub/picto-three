@@ -542,58 +542,12 @@ class TreeBuilder {
     addNewNodeFromDrop(imageData, position) {
         const newNode = new BuilderNode(imageData, this);
 
-        // If the tree is empty, add as the first child of root.
-        if (this.rootNode.children.length === 0) {
-            this.rootNode.addChild(newNode);
-        } else {
-            // Otherwise, find the closest node to the drop position and add the new node as its child.
-            const closestNode = this.findClosestNode(position);
-            if (closestNode) {
-                closestNode.addChild(newNode);
-            } else {
-                // As a fallback, add to the root node.
-                this.rootNode.addChild(newNode);
-            }
-        }
+        // Always add to root instead of trying to be "smart" and finding closest element.
+        // This avoids confusion when dropping into the void.
+        this.rootNode.addChild(newNode);
 
         this.selectNode(newNode); // Select the newly added node.
         this.renderTree(); // Update the tree display.
-    }
-
-    findClosestNode(position) {
-        let allNodes = [];
-        const traverse = (node) => {
-            node.children.forEach(child => {
-                // Ensure the child node has a rendered element.
-                if (child.element) {
-                    allNodes.push(child);
-                    traverse(child);
-                }
-            });
-        };
-        traverse(this.rootNode);
-
-        // If there are no children nodes, the root is the only possible parent.
-        if (allNodes.length === 0) {
-            return this.rootNode;
-        }
-
-        let closestNode = null;
-        let minDistance = Infinity;
-
-        allNodes.forEach(node => {
-            const rect = node.element.getBoundingClientRect();
-            const nodeCenterX = rect.left + rect.width / 2;
-            const nodeCenterY = rect.top + rect.height / 2;
-            const distance = Math.sqrt(Math.pow(position.x - nodeCenterX, 2) + Math.pow(position.y - nodeCenterY, 2));
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestNode = node;
-            }
-        });
-
-        return closestNode;
     }
 
     isDescendant(potentialDescendant, potentialAncestor) {
@@ -622,10 +576,26 @@ class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
-                if (targetNode.image.id === 'root' && !this.draggedNode) {
-                    targetContent.classList.add('drag-over-root');
+                targetContent.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
+
+                const rect = targetContent.getBoundingClientRect();
+                const offsetY = e.clientY - rect.top;
+                const height = rect.height;
+
+                if (targetNode.image.id === 'root') {
+                    if (offsetY < height / 2) {
+                        targetContent.classList.add('drag-over-replace');
+                    } else {
+                        targetContent.classList.add('drag-over-child');
+                    }
                 } else {
-                    targetContent.classList.add('drag-over-add');
+                    if (offsetY < height * 0.25) {
+                        targetContent.classList.add('drag-over-before');
+                    } else if (offsetY > height * 0.75) {
+                        targetContent.classList.add('drag-over-after');
+                    } else {
+                        targetContent.classList.add('drag-over-child');
+                    }
                 }
             }
         }
@@ -634,12 +604,30 @@ class TreeBuilder {
     handleDragLeave(e, targetNode) {
         const targetContent = targetNode.element.querySelector('.node-content');
         if (targetContent) {
-            targetContent.classList.remove('drag-over-root');
-            targetContent.classList.remove('drag-over-add');
+            targetContent.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
         }
     }
 
     handleDrop(e, targetNode) {
+        let zone = 'child';
+        const targetContent = targetNode.element.querySelector('.node-content');
+        if (targetContent) {
+            const rect = targetContent.getBoundingClientRect();
+            const offsetY = e.clientY - rect.top;
+            const height = rect.height;
+            if (targetNode.image.id === 'root') {
+                zone = offsetY < height / 2 ? 'replace' : 'child';
+            } else {
+                if (offsetY < height * 0.25) {
+                    zone = 'before';
+                } else if (offsetY > height * 0.75) {
+                    zone = 'after';
+                } else {
+                    zone = 'child';
+                }
+            }
+        }
+
         this.handleDragLeave(e, targetNode); // Clean up highlight
 
         // Case 1: Reordering an existing node from within the builder
@@ -657,7 +645,18 @@ class TreeBuilder {
                 oldParent.children = oldParent.children.filter(child => child !== draggedNode);
             }
 
-            targetNode.addChild(draggedNode);
+            if (zone === 'before' || zone === 'after') {
+                const parent = targetNode.parent;
+                const index = parent.children.indexOf(targetNode);
+                if (index > -1) {
+                    const insertIndex = zone === 'before' ? index : index + 1;
+                    parent.children.splice(insertIndex, 0, draggedNode);
+                    draggedNode.parent = parent;
+                }
+            } else {
+                targetNode.addChild(draggedNode);
+            }
+
             this.renderTree();
             return; // End execution here for internal drops
         }
@@ -669,14 +668,25 @@ class TreeBuilder {
                 const dragData = JSON.parse(dragDataString);
                 if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
 
-                    if (targetNode.image.id === 'root') {
-                        // If dropping on root, change the root's image instead of adding a child
+                    if (targetNode.image.id === 'root' && zone === 'replace') {
+                        // If dropping on root top half, change the root's image
                         this.updateRootImage(dragData.data);
                         return;
                     }
 
                     const newNode = new BuilderNode(dragData.data, this);
-                    targetNode.addChild(newNode);
+                    if (zone === 'before' || zone === 'after') {
+                        const parent = targetNode.parent;
+                        const index = parent.children.indexOf(targetNode);
+                        if (index > -1) {
+                            const insertIndex = zone === 'before' ? index : index + 1;
+                            parent.children.splice(insertIndex, 0, newNode);
+                            newNode.parent = parent;
+                        }
+                    } else {
+                        targetNode.addChild(newNode);
+                    }
+
                     this.selectNode(newNode);
                     this.renderTree();
                 }
@@ -722,9 +732,8 @@ class TreeBuilder {
             this.draggedNode.element.classList.remove('dragging');
         }
         this.draggedNode = null;
-        document.querySelectorAll('.node-content.drag-over-add, .node-content.drag-over-root').forEach(el => {
-            el.classList.remove('drag-over-add');
-            el.classList.remove('drag-over-root');
+        document.querySelectorAll('.node-content').forEach(el => {
+            el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
         });
     }
 

@@ -117,14 +117,38 @@
     opacity: 0.4;
 }
 
-.node-content.drag-over-add {
-    background-color: #d4edda; /* Light green for adding */
+.node-content.drag-over-child {
+    background-color: #d4edda; /* Light green */
     border: 2px dashed #28a745;
+    position: relative;
 }
 
-.node-content.drag-over-root {
-    background-color: #cce5ff; /* Light blue for root replacement */
+.node-content.drag-over-child::after {
+    content: "\21B3"; /* Unicode Down-Right Arrow ↳ */
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.node-content.drag-over-replace {
+    background-color: #cce5ff; /* Light blue */
     border: 2px dashed #007bff;
+}
+
+.node-content.drag-over-before {
+    background-color: #f8f9fa;
+    border-top: 5px solid #28a745;
+    border-bottom: 2px solid transparent; /* Maintain size parity */
+}
+
+.node-content.drag-over-after {
+    background-color: #f8f9fa;
+    border-bottom: 5px solid #28a745;
+    border-top: 2px solid transparent;
 }
 
 /* Style for the T-connector of the selected node */
