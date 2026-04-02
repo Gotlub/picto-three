@@ -95,7 +95,12 @@ class ImageNode extends BaseNode {
 class PictogramBank {
     constructor() {
         this.display = document.getElementById('pictogram-display');
-        this.initialData = JSON.parse(document.getElementById('pictogram-data').textContent);
+        try {
+            this.initialData = JSON.parse(document.getElementById('pictogram-data').textContent);
+        } catch (e) {
+            console.error("Erreur de parsing des données initiales:", e);
+            this.initialData = { id: 1, name: "Root", type: "folder", children: [] };
+        }
         const fileChosen = document.getElementById('file-chosen');
         fileChosen.dataset.defaultText = fileChosen.textContent;
 
@@ -182,8 +187,9 @@ class PictogramBank {
     async createFolder() {
         const totalItems = this.countItems(this.rootNode);
         console.log(`Total items before creation: ${totalItems}`);
-        if (totalItems >= 500) {
-            alert('You have reached the maximum limit of 500 items (folders and images).');
+        const maxItems = window.MAX_ITEMS_LIMIT || 500;
+        if (totalItems >= maxItems) {
+            alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
             return;
         }
 
@@ -206,30 +212,38 @@ class PictogramBank {
         }
 
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-        const response = await fetch('/api/folder/create', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ name, parent_id: parentId }),
-        });
+        try {
+            const response = await fetch('/api/folder/create', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ name, parent_id: parentId }),
+            });
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            const newFolderNode = new FolderNode(result.folder, this);
-            this.addNodeToTree(newFolderNode, parentId);
-            folderNameInput.value = '';
-        } else {
-            alert(`Error creating folder: ${result.message}`);
+            if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                const newFolderNode = new FolderNode(result.folder, this);
+                this.addNodeToTree(newFolderNode, parentId);
+                folderNameInput.value = '';
+            } else {
+                alert(`Error creating folder: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur création de dossier:', e);
+            alert('La création a échoué. Vérifiez votre connexion.');
         }
     }
 
     async uploadImage() {
         const totalItems = this.countItems(this.rootNode);
         console.log(`Total items before upload: ${totalItems}`);
-        if (totalItems >= 500) {
-            alert('You have reached the maximum limit of 500 items (folders and images).');
+        const maxItems = window.MAX_ITEMS_LIMIT || 500;
+        if (totalItems >= maxItems) {
+            alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
             return;
         }
 
@@ -240,8 +254,9 @@ class PictogramBank {
             return;
         }
 
-        if (file.size > 500 * 1024) {
-            alert('The image size cannot exceed 500 KB.');
+        const maxKb = window.MAX_IMAGE_SIZE_KB || 500;
+        if (file.size > maxKb * 1024) {
+            alert(`The image size cannot exceed ${maxKb} KB.`);
             return;
         }
 
@@ -270,21 +285,28 @@ class PictogramBank {
         formData.append('description', description);
 
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-        const response = await fetch('/api/image/upload', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken
-            },
-            body: formData,
-        });
+        try {
+            const response = await fetch('/api/image/upload', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData,
+            });
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            const newImageNode = new ImageNode(result.image, this);
-            this.addNodeToTree(newImageNode, parentId);
-            fileInput.value = '';
-        } else {
-            alert(`Error uploading image: ${result.message}`);
+            if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                const newImageNode = new ImageNode(result.image, this);
+                this.addNodeToTree(newImageNode, parentId);
+                fileInput.value = '';
+            } else {
+                alert(`Error uploading image: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur upload:', e);
+            alert('Le téléchargement a échoué. Vérifiez votre connexion.');
         }
     }
 
@@ -296,20 +318,27 @@ class PictogramBank {
 
         if (confirm('Are you sure you want to delete the selected item? This action cannot be undone.')) {
             const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-            const response = await fetch('/api/item/delete', {
-                method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ id: this.selectedNode.data.id, type: this.selectedNode.data.type }),
-            });
+            try {
+                const response = await fetch('/api/item/delete', {
+                    method: 'DELETE',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ id: this.selectedNode.data.id, type: this.selectedNode.data.type }),
+                });
 
-            const result = await response.json();
-            if (result.status === 'success') {
-                window.location.href = '/pictogram-bank';
-            } else {
-                alert(`Error deleting item: ${result.message}`);
+                if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    window.location.href = '/pictogram-bank';
+                } else {
+                    alert(`Error deleting item: ${result.message}`);
+                }
+            } catch (e) {
+                console.error('Erreur suppression:', e);
+                alert('La suppression a échoué. Vérifiez votre connexion.');
             }
         }
     }
@@ -326,9 +355,8 @@ class PictogramBank {
 
         const link = document.createElement('a');
         link.href = imageUrl;
-        // The download attribute suggests a filename to the browser.
-        // We can extract the filename from the relative path.
-        link.download = relativePath.split('/').pop();
+        const rawFilename = relativePath.split('/').pop() || 'image.png';
+        link.download = rawFilename.replace(/[^a-zA-Z0-9.\-_]/g, ''); // Fix: Prevent malicious filename setups
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -345,26 +373,32 @@ class PictogramBank {
         const isPublic = document.getElementById('edit-image-public').checked;
 
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-        const response = await fetch(`/api/image/${imageId}`, {
-            method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                description: description,
-                is_public: isPublic,
-            }),
-        });
+        try {
+            const response = await fetch(`/api/image/${imageId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    description: description,
+                    is_public: isPublic,
+                }),
+            });
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            // Update the local data so the UI is in sync
-            this.selectedNode.data.description = result.image.description;
-            this.selectedNode.data.is_public = result.image.is_public;
-            alert('Image updated successfully!');
-        } else {
-            alert(`Error updating image: ${result.message}`);
+            if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                this.selectedNode.data.description = result.image.description;
+                this.selectedNode.data.is_public = result.image.is_public;
+                alert('Image updated successfully!');
+            } else {
+                alert(`Error updating image: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur modification:', e);
+            alert('La modification a échoué. Vérifiez votre connexion.');
         }
     }
 
@@ -404,6 +438,12 @@ class PictogramBank {
     }
 
     renderChildren(node) {
+        // Fix: Clean up old DOM element references before appending to avoid memory/DOM duplication
+        const oldContainer = node.element.querySelector('.children');
+        if (oldContainer) {
+            oldContainer.remove();
+        }
+
         const childrenContainer = document.createElement('div');
         childrenContainer.classList.add('children');
         node.children.forEach(child => {

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app, json
+from flask import Blueprint, jsonify, request, current_app, json, abort
 from flask_login import current_user, login_required
 from flask_babel import _
 from werkzeug.utils import secure_filename
@@ -23,7 +23,8 @@ def load_trees():
 
     return jsonify({
         'public_trees': [tree.to_dict() for tree in public_trees],
-        'user_trees': [tree.to_dict() for tree in user_trees]
+        'user_trees': [tree.to_dict() for tree in user_trees],
+        'current_user_id': current_user.id if current_user.is_authenticated else None
     })
 
 
@@ -228,7 +229,6 @@ def load_tree_data():
 
 @bp.route('/folder_images/<int:folder_id>', methods=['GET'])
 def folder_images(folder_id):
-    from flask import abort
     folder = db.session.get(Folder, folder_id)
     if folder is None:
         abort(404)
@@ -266,9 +266,18 @@ def get_pictograms():
 
     return jsonify(root_folder.to_dict(include_children=True))
 
+def check_user_quota():
+    max_items = current_app.config.get('MAX_ITEMS_LIMIT', 5000)
+    user_folders = Folder.query.filter_by(user_id=current_user.id).count()
+    user_images = Image.query.filter_by(user_id=current_user.id).count()
+    return (user_folders + user_images) < max_items
+
 @bp.route('/folder/create', methods=['POST'])
 @login_required
 def create_folder():
+    if not check_user_quota():
+        return jsonify({'status': 'error', 'message': _('L\'espace de stockage maximal est atteint pour ce compte.')}), 429
+
     data = request.get_json()
     if not data or 'name' not in data or 'parent_id' not in data or not data.get('name').strip():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
@@ -331,6 +340,9 @@ def create_thumbnail_for_upload(filepath_relative):
 @bp.route('/image/upload', methods=['POST'])
 @login_required
 def upload_image():
+    if not check_user_quota():
+        return jsonify({'status': 'error', 'message': _('L\'espace de stockage maximal est atteint pour ce compte.')}), 429
+
     if 'file' not in request.files:
         return jsonify({'status': 'error', 'message': _('No file part')}), 400
 
@@ -356,7 +368,18 @@ def upload_image():
         # The new path for the DB is also relative.
         relative_path = Path(folder.path) / filename
 
-        # Check for file type/extension here if needed
+        # Validate MIME and Extension
+        allowed_mimetypes = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
+        if file.mimetype not in allowed_mimetypes:
+            return jsonify({'status': 'error', 'message': _('Format de fichier non autorisé.')}), 400
+
+        # Deep magic-byte verification (Defense in depth vs Fake Extensions)
+        try:
+            pil_img = PILImage.open(file)
+            pil_img.verify()
+            file.seek(0) # Reset stream after reading
+        except Exception:
+            return jsonify({'status': 'error', 'message': _('Fichier image invalide ou potentiellement malveillant.')}), 400
 
         file.save(physical_path)
 

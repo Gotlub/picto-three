@@ -7,6 +7,13 @@ basedir = Path(__file__).parent.resolve()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    
+    import hashlib
+    # Derivation of a distinct token secret key to prevent exposing SECRET_KEY weaknesses
+    TOKEN_SECRET_KEY = os.environ.get(
+        'TOKEN_SECRET_KEY',
+        hashlib.sha256((SECRET_KEY + 'tokens').encode()).hexdigest()
+    )
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'you-will-never-guess'
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
@@ -22,6 +29,11 @@ class Config:
     # Path for storing uploaded pictograms
     PICTOGRAMS_PATH = data_dir / "pictograms"
     PICTOGRAMS_PATH_MIN = data_dir / "pictogramsmin"
+    
+    # Upload limits
+    MAX_IMAGE_SIZE_KB = int(os.environ.get('MAX_IMAGE_SIZE_KB', 2048)) # Default to 2MB
+    MAX_ITEMS_LIMIT = int(os.environ.get('MAX_ITEMS_LIMIT', 5000)) # Default to 5000 items
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl']
 

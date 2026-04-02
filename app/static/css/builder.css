@@ -42,6 +42,7 @@
     display: flex;
     align-items: center;
     cursor: pointer;
+    transition: margin-bottom 0.2s ease-out;
 }
 
 .node-content:hover {
@@ -117,14 +118,42 @@
     opacity: 0.4;
 }
 
-.node-content.drag-over-add {
-    background-color: #d4edda; /* Light green for adding */
+.node-content.drag-over-child {
+    background-color: #d4edda; /* Light green */
     border: 2px dashed #28a745;
+    position: relative;
+    margin-bottom: 35px; /* Décalage pour faire glisser le reste de l'arbre vers le bas */
 }
 
-.node-content.drag-over-root {
-    background-color: #cce5ff; /* Light blue for root replacement */
+/* L-shaped branch connector for a single child └ */
+.node-content.drag-over-child::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 100%;
+    width: 30px;
+    height: 25px;
+    border-left: 4px solid #28a745;
+    border-bottom: 4px solid #28a745;
+    border-bottom-left-radius: 8px; /* Smooth curve */
+    z-index: 10;
+}
+
+.node-content.drag-over-replace {
+    background-color: #cce5ff; /* Light blue */
     border: 2px dashed #007bff;
+}
+
+.node-content.drag-over-before {
+    background-color: #f8f9fa;
+    border-top: 5px solid #28a745;
+    border-bottom: 2px solid transparent; /* Maintain size parity */
+}
+
+.node-content.drag-over-after {
+    background-color: #f8f9fa;
+    border-bottom: 5px solid #28a745;
+    border-top: 2px solid transparent;
 }
 
 /* Style for the T-connector of the selected node */

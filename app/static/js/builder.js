@@ -41,6 +41,13 @@ class BuilderNode {
         }
         imgElement.alt = this.image.name;
 
+        // Fallback for missing or broken images
+        imgElement.addEventListener('error', function() {
+            const fallbackSrc = '/static/images/folder-open-bold.png';
+            if (!this.src.endsWith(fallbackSrc)) {
+                this.src = fallbackSrc;
+            }
+        });
 
         // Add tooltip events
         imgElement.addEventListener('mouseover', (e) => {
@@ -378,17 +385,23 @@ class TreeBuilder {
             treeContainer.style.cursor = 'grabbing';
         });
 
-        window.addEventListener('mouseup', () => {
-            this.panning = false;
-            treeContainer.style.cursor = 'grab';
-        });
+        if (!this._onMouseUp) {
+            this._onMouseUp = () => {
+                this.panning = false;
+                treeContainer.style.cursor = 'grab';
+            };
+            window.addEventListener('mouseup', this._onMouseUp);
+        }
 
-        window.addEventListener('mousemove', (e) => {
-            if (!this.panning) return;
-            this.pointX = (e.clientX - this.start.x);
-            this.pointY = (e.clientY - this.start.y);
-            setTransform();
-        });
+        if (!this._onMouseMove) {
+            this._onMouseMove = (e) => {
+                if (!this.panning) return;
+                this.pointX = (e.clientX - this.start.x);
+                this.pointY = (e.clientY - this.start.y);
+                setTransform();
+            };
+            window.addEventListener('mousemove', this._onMouseMove);
+        }
 
         // Set initial cursor
         treeContainer.style.cursor = 'grab';
@@ -426,7 +439,12 @@ class TreeBuilder {
                     <p class="node-name">${description}</p>
                 </div>
             `;
-            treantNode.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(rawHTML) : rawHTML;
+            if (window.DOMPurify) {
+                treantNode.innerHTML = window.DOMPurify.sanitize(rawHTML);
+            } else {
+                console.error("DOMPurify not loaded, preventing potential XSS.");
+                treantNode.innerHTML = "<div style='color:red;'>Secure Rendering Failed</div>";
+            }
 
 
             builderNode.children.forEach(child => {
@@ -456,7 +474,12 @@ class TreeBuilder {
 
         const treeData = this.getTreeAsJSON();
         const treeDataString = JSON.stringify(treeData);
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        const csrfTokenNode = document.querySelector('input[name="csrf_token"]');
+        if (!csrfTokenNode) {
+            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
+            return;
+        }
+        const csrfToken = csrfTokenNode.value;
 
         const form = document.createElement('form');
         form.method = 'POST';
@@ -526,58 +549,12 @@ class TreeBuilder {
     addNewNodeFromDrop(imageData, position) {
         const newNode = new BuilderNode(imageData, this);
 
-        // If the tree is empty, add as the first child of root.
-        if (this.rootNode.children.length === 0) {
-            this.rootNode.addChild(newNode);
-        } else {
-            // Otherwise, find the closest node to the drop position and add the new node as its child.
-            const closestNode = this.findClosestNode(position);
-            if (closestNode) {
-                closestNode.addChild(newNode);
-            } else {
-                // As a fallback, add to the root node.
-                this.rootNode.addChild(newNode);
-            }
-        }
+        // Always add to root instead of trying to be "smart" and finding closest element.
+        // This avoids confusion when dropping into the void.
+        this.rootNode.addChild(newNode);
 
         this.selectNode(newNode); // Select the newly added node.
         this.renderTree(); // Update the tree display.
-    }
-
-    findClosestNode(position) {
-        let allNodes = [];
-        const traverse = (node) => {
-            node.children.forEach(child => {
-                // Ensure the child node has a rendered element.
-                if (child.element) {
-                    allNodes.push(child);
-                    traverse(child);
-                }
-            });
-        };
-        traverse(this.rootNode);
-
-        // If there are no children nodes, the root is the only possible parent.
-        if (allNodes.length === 0) {
-            return this.rootNode;
-        }
-
-        let closestNode = null;
-        let minDistance = Infinity;
-
-        allNodes.forEach(node => {
-            const rect = node.element.getBoundingClientRect();
-            const nodeCenterX = rect.left + rect.width / 2;
-            const nodeCenterY = rect.top + rect.height / 2;
-            const distance = Math.sqrt(Math.pow(position.x - nodeCenterX, 2) + Math.pow(position.y - nodeCenterY, 2));
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestNode = node;
-            }
-        });
-
-        return closestNode;
     }
 
     isDescendant(potentialDescendant, potentialAncestor) {
@@ -606,10 +583,26 @@ class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
-                if (targetNode.image.id === 'root' && !this.draggedNode) {
-                    targetContent.classList.add('drag-over-root');
+                targetContent.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
+
+                const rect = targetContent.getBoundingClientRect();
+                const offsetY = e.clientY - rect.top;
+                const height = rect.height;
+
+                if (targetNode.image.id === 'root') {
+                    if (offsetY < height / 2) {
+                        targetContent.classList.add('drag-over-replace');
+                    } else {
+                        targetContent.classList.add('drag-over-child');
+                    }
                 } else {
-                    targetContent.classList.add('drag-over-add');
+                    if (offsetY < height * 0.25) {
+                        targetContent.classList.add('drag-over-before');
+                    } else if (offsetY > height * 0.75) {
+                        targetContent.classList.add('drag-over-after');
+                    } else {
+                        targetContent.classList.add('drag-over-child');
+                    }
                 }
             }
         }
@@ -618,12 +611,30 @@ class TreeBuilder {
     handleDragLeave(e, targetNode) {
         const targetContent = targetNode.element.querySelector('.node-content');
         if (targetContent) {
-            targetContent.classList.remove('drag-over-root');
-            targetContent.classList.remove('drag-over-add');
+            targetContent.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
         }
     }
 
     handleDrop(e, targetNode) {
+        let zone = 'child';
+        const targetContent = targetNode.element.querySelector('.node-content');
+        if (targetContent) {
+            const rect = targetContent.getBoundingClientRect();
+            const offsetY = e.clientY - rect.top;
+            const height = rect.height;
+            if (targetNode.image.id === 'root') {
+                zone = offsetY < height / 2 ? 'replace' : 'child';
+            } else {
+                if (offsetY < height * 0.25) {
+                    zone = 'before';
+                } else if (offsetY > height * 0.75) {
+                    zone = 'after';
+                } else {
+                    zone = 'child';
+                }
+            }
+        }
+
         this.handleDragLeave(e, targetNode); // Clean up highlight
 
         // Case 1: Reordering an existing node from within the builder
@@ -641,7 +652,18 @@ class TreeBuilder {
                 oldParent.children = oldParent.children.filter(child => child !== draggedNode);
             }
 
-            targetNode.addChild(draggedNode);
+            if (zone === 'before' || zone === 'after') {
+                const parent = targetNode.parent;
+                const index = parent.children.indexOf(targetNode);
+                if (index > -1) {
+                    const insertIndex = zone === 'before' ? index : index + 1;
+                    parent.children.splice(insertIndex, 0, draggedNode);
+                    draggedNode.parent = parent;
+                }
+            } else {
+                targetNode.addChild(draggedNode);
+            }
+
             this.renderTree();
             return; // End execution here for internal drops
         }
@@ -653,14 +675,25 @@ class TreeBuilder {
                 const dragData = JSON.parse(dragDataString);
                 if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
 
-                    if (targetNode.image.id === 'root') {
-                        // If dropping on root, change the root's image instead of adding a child
+                    if (targetNode.image.id === 'root' && zone === 'replace') {
+                        // If dropping on root top half, change the root's image
                         this.updateRootImage(dragData.data);
                         return;
                     }
 
                     const newNode = new BuilderNode(dragData.data, this);
-                    targetNode.addChild(newNode);
+                    if (zone === 'before' || zone === 'after') {
+                        const parent = targetNode.parent;
+                        const index = parent.children.indexOf(targetNode);
+                        if (index > -1) {
+                            const insertIndex = zone === 'before' ? index : index + 1;
+                            parent.children.splice(insertIndex, 0, newNode);
+                            newNode.parent = parent;
+                        }
+                    } else {
+                        targetNode.addChild(newNode);
+                    }
+
                     this.selectNode(newNode);
                     this.renderTree();
                 }
@@ -706,9 +739,8 @@ class TreeBuilder {
             this.draggedNode.element.classList.remove('dragging');
         }
         this.draggedNode = null;
-        document.querySelectorAll('.node-content.drag-over-add, .node-content.drag-over-root').forEach(el => {
-            el.classList.remove('drag-over-add');
-            el.classList.remove('drag-over-root');
+        document.querySelectorAll('.node-content').forEach(el => {
+            el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
         });
     }
 
@@ -875,48 +907,64 @@ class TreeBuilder {
             }
         }
 
-        // Check if a tree with the same name exists for the current user
-        const existingTree = this.userTrees.find(tree => tree.name === treeName);
+        // Check if a tree with the same name exists for the current user among both private and public lists
+        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        const existingTree = allTrees.find(tree => tree.name === treeName && tree.user_id === this.currentUserId);
+        
         let proceed = true;
 
         if (existingTree) {
-            proceed = confirm("A tree with this name already exists. Do you want to overwrite it?");
+            proceed = confirm("A tree with this name already exists. Are you sure you want to overwrite it?");
         }
 
         if (!proceed) {
             return; // Stop if the user cancels
         }
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-        const response = await fetch('/api/tree/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                name: treeName,
-                is_public: isPublic,
-                root_id: root_id,
-                root_url: root_url,
-                json_data: jsonData,
-            }),
-        });
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        if (!csrfToken) {
+            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
+            return;
+        }
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            const message = existingTree ? 'Updated' : 'Created';
-            alert(message);
+        try {
+            const response = await fetch('/api/tree/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    name: treeName,
+                    is_public: isPublic,
+                    root_id: root_id,
+                    root_url: root_url,
+                    json_data: jsonData,
+                }),
+            });
 
-            // Clear the existing tree before reloading from save
-            this.rootNode.children = [];
-            // Reload the builder with the saved tree data
-            this.rebuildTreeFromJSON(result.tree_data);
-            // Refresh the list of saved trees
-            this.loadSavedTrees();
-        } else {
-            // Display specific error messages
-            alert(`Error saving tree: ${result.message}`);
+            if (!response.ok) {
+                throw new Error(`Erreur serveur: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                const message = existingTree ? 'Updated' : 'Created';
+                alert(message);
+
+                // Clear the existing tree before reloading from save
+                this.rootNode.children = [];
+                // Reload the builder with the saved tree data
+                this.rebuildTreeFromJSON(result.tree_data);
+                // Refresh the list of saved trees
+                this.loadSavedTrees();
+            } else {
+                // Display specific error messages
+                alert(`Error saving tree: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur sauvegarde:', e);
+            alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
         }
     }
 
@@ -944,10 +992,22 @@ class TreeBuilder {
     }
 
     async loadSavedTrees() {
-        const response = await fetch('/api/trees/load');
-        const data = await response.json();
-        this.publicTrees = data.public_trees || [];
-        this.userTrees = data.user_trees || [];
+        try {
+            const response = await fetch('/api/trees/load');
+            if (!response.ok) {
+                console.error(`Erreur HTTP: ${response.status}`);
+                return;
+            }
+            const data = await response.json();
+            this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
+            this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
+            this.currentUserId = data.current_user_id;
+        } catch (e) {
+            console.error('Impossible de charger les arbres:', e);
+            alert('Impossible de charger les arbres sauvegardés.');
+            this.publicTrees = [];
+            this.userTrees = [];
+        }
         this.renderTreeList();
     }
 
@@ -1158,9 +1218,29 @@ class TreeBuilder {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
+
+                const validateNodeData = (node, depth = 0) => {
+                    if (depth > 50) return false;
+                    if (typeof node !== 'object' || node === null) return false;
+                    // Allow external https, absolute /pictograms/ or /static/, and relative public/ or users/
+                    if (node.url && !/^(https?:\/\/|\/pictograms\/|\/static\/|public\/|users\/)/.test(node.url)) {
+                        node.url = '';
+                    }
+                    if (Array.isArray(node.children)) {
+                        node.children = node.children.filter(child => validateNodeData(child, depth + 1));
+                    }
+                    return true;
+                };
+
                 reader.onload = (event) => {
                     try {
                         const importedData = JSON.parse(event.target.result);
+                        if (!importedData?.roots || !Array.isArray(importedData.roots)) {
+                            alert('Format de fichier invalide.');
+                            return;
+                        }
+                        importedData.roots.forEach(root => validateNodeData(root));
+
                         const importMode = document.querySelector('input[name="import_mode"]:checked').value;
 
                         if (importMode === 'replace') {

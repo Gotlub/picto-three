@@ -4,6 +4,15 @@ from pathlib import Path
 from app.models import Folder, Image
 from app import db
 from tests.conftest import create_user, login, confirm_user
+
+def create_test_image_io():
+    """Helper to create a valid in-memory JPEG image for upload tests."""
+    img = PILImage.new('RGB', (10, 10), color='white')
+    img_io = BytesIO()
+    img.save(img_io, 'JPEG')
+    img_io.seek(0)
+    return img_io
+
 def test_pictogram_bank_authenticated(client):
     """Test that an authenticated user can access the pictogram bank."""
     user = create_user(client, 'testuser_pictogram', 'Password123')
@@ -106,7 +115,7 @@ def test_upload_image_success(client, app):
 
     data = {
         'folder_id': root_folder.id,
-        'file': (BytesIO(b"test_image_content"), 'test.jpg')
+        'file': (create_test_image_io(), 'test.jpg')
     }
     response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
 
@@ -139,7 +148,7 @@ def test_upload_image_to_invalid_folder(client):
 
     data = {
         'folder_id': 999,
-        'file': (BytesIO(b"test_image_content"), 'test.jpg')
+        'file': (create_test_image_io(), 'test.jpg')
     }
     response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     assert response.status_code == 404
@@ -154,11 +163,7 @@ def test_delete_image_success(client, app):
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     # First, upload an image
-    img = PILImage.new('RGB', (10, 10))
-    img_io = BytesIO()
-    img.save(img_io, 'JPEG')
-    img_io.seek(0)
-    data = {'folder_id': root_folder.id, 'file': (img_io, 'delete_me.jpg')}
+    data = {'folder_id': root_folder.id, 'file': (create_test_image_io(), 'delete_me.jpg')}
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
     image = db.session.get(Image, image_id)
@@ -189,7 +194,7 @@ def test_delete_folder_success(client, app):
     assert subfolder_path.exists()
 
     # Upload an image into the subfolder
-    data = {'folder_id': subfolder_id, 'file': (BytesIO(b"content"), 'image_in_sub.jpg')}
+    data = {'folder_id': subfolder_id, 'file': (create_test_image_io(), 'image_in_sub.jpg')}
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
     image = db.session.get(Image, image_id)
@@ -228,7 +233,7 @@ def test_update_image_details_success(client):
     root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
 
     # Upload an image to get an ID
-    data = {'folder_id': root_folder.id, 'file': (BytesIO(b"content"), 'image_to_update.jpg')}
+    data = {'folder_id': root_folder.id, 'file': (create_test_image_io(), 'image_to_update.jpg')}
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
 
@@ -261,7 +266,7 @@ def test_update_image_details_unauthorized(client):
     # Owner logs in and uploads an image
     login(client, 'owner', 'Password123')
     root_folder_owner = Folder.query.filter_by(user_id=owner.id).first()
-    data = {'folder_id': root_folder_owner.id, 'file': (BytesIO(b"content"), 'owned_image.jpg')}
+    data = {'folder_id': root_folder_owner.id, 'file': (create_test_image_io(), 'owned_image.jpg')}
     upload_response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
     image_id = upload_response.get_json()['image']['id']
     client.get('/logout') # Logout owner

@@ -30,15 +30,44 @@ export default class ImageTreeImageNode extends ImageTreeNode {
         imgElement.src = '/static/images/loading.gif'; // Placeholder
         imgElement.alt = this.data.name;
 
-        // Add tooltip events
+        // Add tooltip events targeting full resolution image
         imgElement.addEventListener('mouseover', (e) => {
-            tooltip.show(e, imgElement.src);
+            tooltip.show(e, `/pictograms/${this.data.path}`, this.data.name, this.data.description);
         });
         imgElement.addEventListener('mouseout', (e) => {
             tooltip.hide(e);
         });
 
         contentElement.appendChild(imgElement);
+
+        // Hover Download Button Overlay
+        const dlBtn = document.createElement('a');
+        dlBtn.href = `/pictograms/${this.data.path}`;
+        dlBtn.download = this.data.name || 'download.png';
+        dlBtn.innerHTML = '&#128229;'; // Inbox tray emoji
+        dlBtn.style.position = 'absolute';
+        dlBtn.style.top = '4px';
+        dlBtn.style.right = '4px';
+        dlBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+        dlBtn.style.border = '1px solid #ddd';
+        dlBtn.style.borderRadius = '4px';
+        dlBtn.style.padding = '2px 5px';
+        dlBtn.style.fontSize = '14px';
+        dlBtn.style.color = '#333';
+        dlBtn.style.textDecoration = 'none';
+        dlBtn.style.display = 'none';
+        dlBtn.style.cursor = 'pointer';
+        dlBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+        dlBtn.title = 'Download';
+
+        dlBtn.addEventListener('mousedown', (e) => e.stopPropagation()); // Prevent node drag
+        dlBtn.addEventListener('click', (e) => e.stopPropagation()); // Prevent node select toggle
+
+        nodeElement.style.position = 'relative'; // Required for absolute dlBtn
+        nodeElement.addEventListener('mouseenter', () => dlBtn.style.display = 'block');
+        nodeElement.addEventListener('mouseleave', () => dlBtn.style.display = 'none');
+
+        nodeElement.appendChild(dlBtn);
 
         const nameElement = document.createElement('span');
         nameElement.textContent = this.data.name;

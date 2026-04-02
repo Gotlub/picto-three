@@ -1,0 +1,21 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.4, pytest-9.0.2, pluggy-1.6.0
+rootdir: D:\picto\picto-three
+plugins: cov-7.1.0
+collected 3 items
+
+tests\test_mobile_api_pagination.py .                                    [ 33%]
+tests\test_mobile_api_auth_pictograms.py .                               [ 66%]
+tests\test_mobile_api_trees.py .D:\picto\picto-three\venv\Lib\site-packages\coverage\inorout.py:561: CoverageWarning: Module app\routes\mobile_api was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.5/messages.html#warning-module-not-imported
+  self.warn(f"Module {pkg} was never imported.", slug="module-not-imported")
+D:\picto\picto-three\venv\Lib\site-packages\coverage\control.py:958: CoverageWarning: No data was collected. (no-data-collected); see https://coverage.readthedocs.io/en/7.13.5/messages.html#warning-no-data-collected
+  self._warn("No data was collected.", slug="no-data-collected")
+D:\picto\picto-three\venv\Lib\site-packages\pytest_cov\plugin.py:366: CovReportWarning: Failed to generate report: No data to report.
+
+  warnings.warn(CovReportWarning(message), stacklevel=1)
+
+WARNING: Failed to generate report: No data to report.
+
+                                                                         [100%]
+
+============================== 3 passed in 1.87s ==============================

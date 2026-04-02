@@ -660,35 +660,58 @@ class ListBuilder {
         });
         const isPublic = this.isPublicCheckbox.checked;
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
-        const response = await fetch('/api/lists', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                list_name: listName,
-                is_public: isPublic,
-                payload: payload
-            })
-        });
+        const csrfTokenNode = document.querySelector('input[name="csrf_token"]');
+        if (!csrfTokenNode) {
+            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
+            return;
+        }
+        const csrfToken = csrfTokenNode.value;
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            const message = existingList ? 'Updated' : 'Created';
-            alert(message);
-            this.loadSavedLists(); // Refresh the list
-        } else {
-            alert(`Error: ${result.message}`);
+        try {
+            const response = await fetch('/api/lists', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    list_name: listName,
+                    is_public: isPublic,
+                    payload: payload
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur serveur: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                const message = existingList ? 'Updated' : 'Created';
+                alert(message);
+                this.loadSavedLists(); // Refresh the list
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur sauvegarde:', e);
+            alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
         }
     }
 
     async loadSavedLists() {
-        const response = await fetch('/api/lists');
-        const data = await response.json();
-        this.publicLists = data.public_lists || [];
-        this.userLists = data.user_lists || [];
+        try {
+            const response = await fetch('/api/lists');
+            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+            const data = await response.json();
+            this.publicLists = Array.isArray(data.public_lists) ? data.public_lists : [];
+            this.userLists = Array.isArray(data.user_lists) ? data.user_lists : [];
+        } catch (e) {
+            console.error('Impossible de charger les listes:', e);
+            alert('Impossible de charger les listes sauvegardées.');
+            this.publicLists = [];
+            this.userLists = [];
+        }
         this.renderLoadableLists();
     }
 
@@ -734,8 +757,13 @@ class ListBuilder {
             alert('Please select a list to load.');
             return;
         }
-        const listData = JSON.parse(selectedOption.dataset.listData);
-        this.rebuildListFromData(listData);
+        try {
+            const listData = JSON.parse(selectedOption.dataset.listData);
+            this.rebuildListFromData(listData);
+        } catch (e) {
+            console.error('Erreur de lecture de la liste:', e);
+            alert('Données de liste corrompues.');
+        }
     }
 
     rebuildListFromData(listData) {
@@ -828,6 +856,10 @@ class ListBuilder {
                 reader.onload = (event) => {
                     try {
                         const payload = JSON.parse(event.target.result);
+                        if (!Array.isArray(payload)) {
+                            alert('Format de fichier invalide (doit être un tableau).');
+                            return;
+                        }
                         this.rebuildListFromData({ payload: JSON.stringify(payload) });
                     } catch {
                         alert('Error parsing JSON file.');
@@ -842,10 +874,18 @@ class ListBuilder {
 
     // --- Tree Viewer Loading (Center Panel) ---
     async loadSavedTrees() {
-        const response = await fetch('/api/trees/load');
-        const data = await response.json();
-        this.publicTrees = data.public_trees || [];
-        this.userTrees = data.user_trees || [];
+        try {
+            const response = await fetch('/api/trees/load');
+            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+            const data = await response.json();
+            this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
+            this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
+        } catch (e) {
+            console.error('Impossible de charger les arbres:', e);
+            alert('Impossible de charger les arbres sauvegardés.');
+            this.publicTrees = [];
+            this.userTrees = [];
+        }
         this.renderLoadableTrees();
     }
 
@@ -923,8 +963,13 @@ class ListBuilder {
             alert('Please select a tree to load.');
             return;
         }
-        const treeData = JSON.parse(selectedOption.dataset.treeData);
-        this.rebuildTreeViewer(treeData);
+        try {
+            const treeData = JSON.parse(selectedOption.dataset.treeData);
+            this.rebuildTreeViewer(treeData);
+        } catch (e) {
+            console.error('Erreur de chargement de l\'arbre:', e);
+            alert("Données corrompues.");
+        }
     }
 
     importTreeFromJSON() {
