@@ -41,6 +41,13 @@ class BuilderNode {
         }
         imgElement.alt = this.image.name;
 
+        // Fallback for missing or broken images
+        imgElement.addEventListener('error', function() {
+            const fallbackSrc = '/static/images/folder-open-bold.png';
+            if (!this.src.endsWith(fallbackSrc)) {
+                this.src = fallbackSrc;
+            }
+        });
 
         // Add tooltip events
         imgElement.addEventListener('mouseover', (e) => {
@@ -1215,7 +1222,8 @@ class TreeBuilder {
                 const validateNodeData = (node, depth = 0) => {
                     if (depth > 50) return false;
                     if (typeof node !== 'object' || node === null) return false;
-                    if (node.url && !/^(https?:\/\/|\/pictograms\/|\/static\/)/.test(node.url)) {
+                    // Allow external https, absolute /pictograms/ or /static/, and relative public/ or users/
+                    if (node.url && !/^(https?:\/\/|\/pictograms\/|\/static\/|public\/|users\/)/.test(node.url)) {
                         node.url = '';
                     }
                     if (Array.isArray(node.children)) {

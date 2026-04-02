@@ -42,6 +42,7 @@
     display: flex;
     align-items: center;
     cursor: pointer;
+    transition: margin-bottom 0.2s ease-out;
 }
 
 .node-content:hover {
@@ -121,17 +122,21 @@
     background-color: #d4edda; /* Light green */
     border: 2px dashed #28a745;
     position: relative;
+    margin-bottom: 35px; /* Décalage pour faire glisser le reste de l'arbre vers le bas */
 }
 
+/* L-shaped branch connector for a single child └ */
 .node-content.drag-over-child::after {
-    content: "\21B3"; /* Unicode Down-Right Arrow ↳ */
+    content: "";
     position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 24px;
-    color: #28a745;
-    font-weight: bold;
+    left: -10px;
+    top: 100%;
+    width: 30px;
+    height: 25px;
+    border-left: 4px solid #28a745;
+    border-bottom: 4px solid #28a745;
+    border-bottom-left-radius: 8px; /* Smooth curve */
+    z-index: 10;
 }
 
 .node-content.drag-over-replace {
