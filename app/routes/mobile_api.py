@@ -49,8 +49,8 @@ def list_trees():
     
     is_public_param = request.args.get('is_public', 'true').lower() == 'true'
     search_query = request.args.get('search', '').strip()
-    limit_param = request.args.get('limit', 50, type=int)
-    page_param = request.args.get('page', 1, type=int)
+    limit_param = max(1, min(100, request.args.get('limit', 50, type=int)))
+    page_param = max(1, request.args.get('page', 1, type=int))
 
     query = Tree.query
     
@@ -134,6 +134,10 @@ def get_tree(tree_id):
     """Renvoie le composite structuré d'un Arbre précis."""
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User, current_user_id)
+    
+    if not current_user:
+        return jsonify({'error': 'Utilisateur non trouvé'}), 404
+
     tree = db.session.get(Tree, tree_id)
     
     if not tree:
@@ -156,25 +160,33 @@ def get_tree(tree_id):
             'root_node': root_node
         }), 200
     except Exception as e:
-        return jsonify({'error': f'Erreur de formatage: {str(e)}'}), 500
+        current_app.logger.error(f"Erreur de formatage dans get_tree (ID: {tree_id}): {str(e)}")
+        return jsonify({'error': "Une erreur interne est survenue lors du formatage de l'arbre."}), 500
 
 
 
 @bp.route('/pictograms/<path:filepath>', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def serve_mobile_pictogram(filepath):
     """
     Route ultra-rapide pour Android : On vérifie juste les dossiers !
     """
+    from flask import abort
+    filepath = posixpath.normpath(filepath)
+    if filepath.startswith('..') or posixpath.isabs(filepath):
+        return abort(400)
+
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
     
-    # 1. Accès public = On envoie direct
-    if filepath.startswith("public/"):
+    # 1. Image Commune (public/) ?
+    if filepath.startswith('public/'):
         return send_from_directory(pictograms_path, filepath)
         
-    # 2. Récupération de l'utilisateur mobile via son Token JWT
-    current_user_id = int(get_jwt_identity())
-    current_user = db.session.get(User, current_user_id)
+    current_user_id = get_jwt_identity()
+    if not current_user_id:
+        return jsonify({'error': 'Non autorisé. Token manquant ou invalide.'}), 401
+        
+    current_user = db.session.get(User, int(current_user_id))
     
     if not current_user:
         return jsonify({"error": "Utilisateur introuvable"}), 404

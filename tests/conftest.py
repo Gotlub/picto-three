@@ -10,8 +10,8 @@ def app():
     # A temporary directory for test-generated pictograms
     test_pictos_path = Path(__file__).parent / 'test_pictos'
     if test_pictos_path.exists():
-        shutil.rmtree(test_pictos_path)
-    test_pictos_path.mkdir()
+        shutil.rmtree(test_pictos_path, ignore_errors=True)
+    test_pictos_path.mkdir(exist_ok=True)
 
     app = create_app({
         "TESTING": True,
@@ -26,7 +26,7 @@ def app():
         db.drop_all()
 
     # Cleanup the test pictograms directory
-    shutil.rmtree(test_pictos_path)
+    shutil.rmtree(test_pictos_path, ignore_errors=True)
 
 
 @pytest.fixture

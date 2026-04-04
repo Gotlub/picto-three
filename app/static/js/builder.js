@@ -218,7 +218,7 @@ class TreeBuilder {
             if (dragDataString) {
                 const dragData = JSON.parse(dragDataString);
                 if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
-                    this.addNewNodeFromDrop(dragData.data, { x: e.clientX, y: e.clientY });
+                    this.addNewNodeFromDrop(dragData.data);
                 }
             }
         });
@@ -390,7 +390,8 @@ class TreeBuilder {
                 this.panning = false;
                 treeContainer.style.cursor = 'grab';
             };
-            window.addEventListener('mouseup', this._onMouseUp);
+            treeContainer.addEventListener('mouseup', this._onMouseUp);
+            treeContainer.addEventListener('mouseleave', this._onMouseUp);
         }
 
         if (!this._onMouseMove) {
@@ -400,7 +401,7 @@ class TreeBuilder {
                 this.pointY = (e.clientY - this.start.y);
                 setTransform();
             };
-            window.addEventListener('mousemove', this._onMouseMove);
+            treeContainer.addEventListener('mousemove', this._onMouseMove);
         }
 
         // Set initial cursor
@@ -546,7 +547,7 @@ class TreeBuilder {
     //     this.renderTree();
     // }
 
-    addNewNodeFromDrop(imageData, position) {
+    addNewNodeFromDrop(imageData) {
         const newNode = new BuilderNode(imageData, this);
 
         // Always add to root instead of trying to be "smart" and finding closest element.

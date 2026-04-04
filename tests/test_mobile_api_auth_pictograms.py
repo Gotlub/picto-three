@@ -51,4 +51,4 @@ def test_mobile_pictograms_auth(client, app):
     
     # TEST: Path traversal attack (Secured via posix normalization on send_from_directory usually, but explicitly verified)
     r4 = client.get('/api/v1/mobile/pictograms/../config.py', headers=headers)
-    assert r4.status_code in [403, 404] 
+    assert r4.status_code in [400, 403, 404] 
