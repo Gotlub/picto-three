@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models import User, Tree
-from app import db # Seulement besoin de db pour User et Tree maintenant
+from app import db 
 import json
 from pathlib import Path
 import posixpath
 import urllib.parse
+import re
 
 # Création du Blueprint dédié au mobile
 bp = Blueprint('mobile_api', __name__, url_prefix='/api/v1/mobile')
@@ -61,7 +62,6 @@ def list_trees():
         
     if search_query:
         search_pattern = f"%{search_query.lower()}%"
-        # Outer join pour sécuriser l'accès au User.username même si manquant
         query = query.join(User, Tree.user_id == User.id, isouter=True)
         query = query.filter(
             db.or_(
@@ -77,12 +77,9 @@ def list_trees():
     for t in trees:
         thumbnail_url = t.root_url or ""
         if thumbnail_url and not thumbnail_url.startswith('http'):
-            # On nettoie le chemin pour garder juste "public/..." ou "username/..."
             norm_path = posixpath.normpath(urllib.parse.urlparse(thumbnail_url).path).lstrip('/')
             if norm_path.startswith('pictograms/'):
                 norm_path = norm_path[len('pictograms/'):]
-                
-            # ON POINTE VERS LA NOUVELLE ROUTE MOBILE
             thumbnail_url = f"{request.host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
             
         result.append({
@@ -99,7 +96,11 @@ def list_trees():
 def _map_node_to_android_structure(web_node, host_url, current_username):
     """Transcripteur de noeuds pour Android avec injection de la bonne URL."""
     image_url = web_node.get('image') or web_node.get('url') or ''
-    label = web_node.get('text') or web_node.get('name') or ''
+    web_label = web_node.get('text') or web_node.get('name') or ''
+    description = web_node.get('description') or web_label
+    
+    # On utilise la description comme label principal pour l'affichage Android (Demande utilisateur)
+    label = description
     
     if image_url:
         if image_url.startswith(('http://', 'https://')):
@@ -114,7 +115,6 @@ def _map_node_to_android_structure(web_node, host_url, current_username):
             if not (norm_path.startswith('public/') or norm_path.startswith(f"{current_username}/")):
                 image_url = "" 
             else:
-                # ON POINTE VERS LA NOUVELLE ROUTE MOBILE ICI AUSSI !
                 image_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
         
     children = web_node.get('children', [])
@@ -123,6 +123,7 @@ def _map_node_to_android_structure(web_node, host_url, current_username):
     return {
         'node_id': str(web_node.get('id', 'unsaved')),
         'label': label,
+        'description': description,
         'image_url': image_url,
         'children': mapped_children
     }
@@ -149,7 +150,6 @@ def get_tree(tree_id):
     try:
         raw_json_data = json.loads(tree.json_data)
         roots = raw_json_data.get('roots', [])
-        
         root_node = None
         if roots:
             root_node = _map_node_to_android_structure(roots[0], request.host_url, current_user.username)
@@ -168,9 +168,7 @@ def get_tree(tree_id):
 @bp.route('/pictograms/<path:filepath>', methods=['GET'])
 @jwt_required(optional=True)
 def serve_mobile_pictogram(filepath):
-    """
-    Route ultra-rapide pour Android : On vérifie juste les dossiers !
-    """
+    """Route ultra-rapide pour Android."""
     from flask import abort
     filepath = posixpath.normpath(filepath)
     if filepath.startswith('..') or posixpath.isabs(filepath):
@@ -178,7 +176,6 @@ def serve_mobile_pictogram(filepath):
 
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
     
-    # 1. Image Commune (public/) ?
     if filepath.startswith('public/'):
         return send_from_directory(pictograms_path, filepath)
         
@@ -191,9 +188,48 @@ def serve_mobile_pictogram(filepath):
     if not current_user:
         return jsonify({"error": "Utilisateur introuvable"}), 404
     
-    # 3. Vérification magique : Si le fichier demandé est dans le dossier qui porte son pseudo, c'est bon !
     if filepath.startswith(f"{current_user.username}/"):
         return send_from_directory(pictograms_path, filepath)
         
-    # 4. Blocage pour tout le reste
     return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png'), 403
+
+
+@bp.route('/pictograms/search', methods=['GET'])
+@jwt_required()
+def search_pictograms():
+    """Recherche des pictogrammes (Public + Perso) pour l'application mobile."""
+    from app.models import Image
+    from sqlalchemy import or_
+    
+    current_user_id = int(get_jwt_identity())
+    current_user = db.session.get(User, current_user_id)
+    if not current_user:
+        return jsonify({'error': 'User not found'}), 404
+
+    q = request.args.get('q', '').strip()
+    if len(q) < 1:
+        return jsonify([])
+        
+    conditions = [
+        Image.user_id.is_(None),
+        Image.is_public.is_(True),
+        Image.user_id == current_user_id
+    ]
+        
+    images = Image.query.filter(or_(*conditions)).filter(Image.name.ilike(f'%{q}%')).limit(100).all()
+    
+    results = []
+    for img in images:
+        raw_url = img.path
+        # Nettoyage et formatage URL Mobile
+        norm_path = re.sub(r'^/+', '', raw_url)
+        norm_path = re.sub(r'^(pictograms/|images/)', '', norm_path)
+        full_url = f"{request.host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+        
+        results.append({
+            'id': img.id,
+            'name': img.name,
+            'image_url': full_url
+        })
+        
+    return jsonify(results), 200
