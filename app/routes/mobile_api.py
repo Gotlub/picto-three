@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from app.models import User, Tree
+from app.models import User, Tree, Image
 from app import db 
 import json
 from pathlib import Path
@@ -93,6 +93,30 @@ def list_trees():
     return jsonify(result), 200
 
 
+def _extract_description_from_path(filepath):
+    """
+    Système évolutif pour extraire la description d'une image selon sa banque d'origine,
+    si celle-ci n'est pas répertoriée dans la base de données relationnelle.
+    """
+    import os
+    basename = os.path.basename(filepath)
+    name_without_ext = os.path.splitext(basename)[0]
+    
+    # Stratégie pour la banque Arasaac
+    if "public/arasaac/" in filepath:
+        # Ex: '1234_manger_du_pain.png' -> 'manger du pain'
+        clean_name = re.sub(r'^\d+_', '', name_without_ext)
+        clean_name = clean_name.replace('_', ' ').replace('-', ' ')
+        return clean_name.capitalize()
+        
+    # [Placeholder] Stratégie pour une future banque
+    # elif "public/sclera/" in filepath:
+    #     ...
+        
+    # Stratégie par défaut (nettoyage simple)
+    return name_without_ext.replace('_', ' ').capitalize()
+
+
 def _map_node_to_android_structure(web_node, host_url, current_username):
     """Transcripteur de noeuds pour Android avec injection de la bonne URL."""
     image_url = web_node.get('image') or web_node.get('url') or ''
@@ -168,7 +192,7 @@ def get_tree(tree_id):
 @bp.route('/pictograms/<path:filepath>', methods=['GET'])
 @jwt_required(optional=True)
 def serve_mobile_pictogram(filepath):
-    """Route ultra-rapide pour Android."""
+    """Distribution des images."""
     from flask import abort
     filepath = posixpath.normpath(filepath)
     if filepath.startswith('..') or posixpath.isabs(filepath):
@@ -176,22 +200,40 @@ def serve_mobile_pictogram(filepath):
 
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
     
+    response = None
+    
     if filepath.startswith('public/'):
-        return send_from_directory(pictograms_path, filepath)
+        response = send_from_directory(pictograms_path, filepath)
+    else:
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            return jsonify({'error': 'Non autorisé. Token manquant ou invalide.'}), 401
+            
+        current_user = db.session.get(User, int(current_user_id))
         
-    current_user_id = get_jwt_identity()
-    if not current_user_id:
-        return jsonify({'error': 'Non autorisé. Token manquant ou invalide.'}), 401
+        if not current_user:
+            return jsonify({"error": "Utilisateur introuvable"}), 404
         
-    current_user = db.session.get(User, int(current_user_id))
-    
-    if not current_user:
-        return jsonify({"error": "Utilisateur introuvable"}), 404
-    
-    if filepath.startswith(f"{current_user.username}/"):
-        return send_from_directory(pictograms_path, filepath)
+        if filepath.startswith(f"{current_user.username}/"):
+            response = send_from_directory(pictograms_path, filepath)
+        else:
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png'), 403
+
+    if response:
+        # Récupération de la description ou du nom depuis la base de données
+        img = Image.query.filter(Image.path.endswith(filepath)).first()
         
-    return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png'), 403
+        real_desc = None
+        if img:
+            real_desc = img.description if img.description and img.description.strip() else img.name
+            
+        # Fallback évolutif selon les banques (Arasaac, etc.) si absente ou vide de la DB
+        if not real_desc or not str(real_desc).strip():
+            real_desc = _extract_description_from_path(filepath)
+            
+        if real_desc:
+            response.headers['X-Image-Description'] = urllib.parse.quote(str(real_desc).encode('utf-8'))
+        return response
 
 
 @bp.route('/pictograms/search', methods=['GET'])
