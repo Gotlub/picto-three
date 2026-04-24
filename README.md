@@ -1,76 +1,97 @@
-# Pictogram-Tree Builder
+# [👉 Visit PictoTree.eu](https://pictotree.eu)
 
-## Projet Pictogram-Tree Builder
-Ce projet est un site web permettant de créer des arbres composites de pictogrammes. Il est conçu pour être simple d'utilisation, notamment pour des publics spécifiques comme les personnes avec TSA. L'application est développée et maintenue principalement par des agents IA.
+## 🌟 Overview
+**PictoTree** is a comprehensive and flexible platform designed for **Augmentative and Alternative Communication (AAC)**. Aiming to foster connection, it empowers communication partners to build personalized pictogram trees, supporting individuals with diverse communication and accessibility needs.
 
-## Description
+More information here 👉 [PictoTree.eu](https://pictotree.eu) 
 
-L'application permet aux utilisateurs de s'inscrire, de se connecter et de construire des arborescences visuelles où chaque nœud est une image. Ces arbres peuvent être sauvegardés, partagés publiquement, ou exportés au format JSON.
+This repository contains the **Web Backend & Dashboard** (built with Flask). It works in tandem with our **Native Android App**, which provides a unique spatial navigation interface for the end-user:
 
-![Pictogram-Tree Builder](app/static/images/capture01.png)
-## Pile Technologique
+### 📱 [Get the Android App here (PictoTreeApp)](https://github.com/Gotlub/pictotreeApp)
 
-*   **Backend:** Python 3.10+ avec [Flask](https://flask.palletsprojects.com/)
-*   **Base de Données:** SQLite gérée via [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/)
-*   **Frontend:** HTML5, CSS3, et JavaScript (ES6 Modules)
-*   **Tests:** [Pytest](https://docs.pytest.org/)
-*   **Dépendances Python:** Voir `requirements.txt`
+---
 
-## Initialisation et Lancement
+### ⚠️ Project Status: Alpha
+This project is currently in the **Alpha stage** and under active development. Features are subject to change. Contributions and feedback are highly welcome!
 
-1.  **Cloner le dépôt :**
-    ```bash
-    git clone <URL_DU_DEPOT>
-    cd <NOM_DU_DEPOT>
-    ```
+**License:** GNU AGPL v3 (See [LICENSE](LICENSE) file for details).
 
-2.  **Créer un environnement virtuel et l'activer :**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Sur Windows: venv\Scripts\activate
-    ```
+---
 
-3.  **Installer les dépendances :**
-    ```bash
-    pip install -r requirements.txt
-    ```
+## 🛠 Technical Stack
+- **Backend:** Python 3.10+ / [Flask](https://flask.palletsprojects.com/)
+- **Database:** SQLite (SQLAlchemy) - Default path: `../data/app.db`
+- **Frontend:** HTML5 / Bootstrap 5 / Treant.js / Vanilla JS
+- **Internationalization (i18n):** [Flask-Babel](https://python-babel.github.io/flask-babel/)
+- **Testing:** [Pytest](https://docs.pytest.org/)
 
-4.  **Configurer l'application Flask :**
-    - Sur Windows (cmd) :
-      ```
-      set FLASK_APP=pictogram.py
-      ```
-    - Sur Windows (PowerShell) :
-      ```
-      $env:FLASK_APP="pictogram.py"
-      ```
-    - Sur macOS/Linux :
-      ```
-      export FLASK_APP=pictogram.py
-      ```
+---
 
-5.  **Initialiser la base de données :**
-    *Note : La commande `flask db init` ne doit être exécutée qu'une seule fois pour le projet.*
-    ```bash
-    flask db init
-    flask db migrate -m "Initial migration."
-    flask db upgrade
-    ```
+## 🚀 Installation & Setup
 
-6.  **Lancer l'application :**
-    ```bash
-    flask run
-    ```
-L'application sera accessible à l'adresse `http://127.0.0.1:5000`.
+### 1. Create Virtual Environment
+```bash
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
 
-## Ajout des pictogrammes à la base de données
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-Pour scanner le dossier `app/static/images/pictograms` et ajouter toutes les images trouvées à la base de données, exécutez la commande suivante à la racine du projet :
+### 3. Database Setup
+The database is expected to be located at `../data/app.db`.
+```bash
+flask db upgrade
+```
 
+### 4. Run the Application
+```bash
+flask run
+# or
+python -m flask run
+```
+The dashboard will be available at `http://127.0.0.1:5000`.
+
+---
+
+## 🔧 Developer Tools & Workarounds
+
+### Creating an Admin User
+Since the registration flow requires SMTP (Email) and Google reCAPTCHA secrets, you can use the following script to create a user manually:
+```bash
+python create_admin.py <username> <email> "<password>"
+# Example:
+python create_admin.py test teste@teste.com "Password123!"
+```
+
+### Importing Pictograms
+To scan and add images to the database, place your images in `../data/pictograms/public` and run:
 ```bash
 python add_test_images.py
 ```
 
-## Contribution via Agents IA
+---
 
-Ce projet est piloté par des agents. Veuillez vous référer aux fichiers `AGENTS.md` et `GEMINI.md` pour les instructions et le workflow de développement.
+## 🌐 Internationalization & Testing
+
+### Running Tests
+We use Pytest for backend and API coverage:
+```bash
+pytest -v
+```
+
+### Managing Translations
+The project supports multiple languages (de, es, fr, it, nl, pl). To update translations after modifying templates:
+```bash
+# Extract strings
+pybabel extract -F babel.cfg -k _l -o messages.pot .
+# Update existing catalogs
+pybabel update -i messages.pot -d app/translations
+# Compile binary catalogs
+pybabel compile -d app/translations
+```

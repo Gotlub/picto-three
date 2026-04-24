@@ -2,28 +2,73 @@
 {% from 'macros.html' import render_field %}
 
 {% block content %}
+<style>
+    .watermark-bg {
+        position: fixed;
+        bottom: -50px;
+        right: -50px;
+        width: 45%;
+        max-width: 600px;
+        opacity: 0.1;
+        z-index: -1;
+        pointer-events: none;
+        transform: rotate(-5deg);
+    }
+    .legal-container {
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(5px);
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-top: 2rem;
+        margin-bottom: 4rem;
+    }
+</style>
+
+<img src="{{ url_for('static', filename='images/homepage_tree.jpeg') }}" class="watermark-bg" alt="">
+
 <div class="container">
-    <h1>{{ _('About & Contact') }}</h1>
-    <hr>
+    <div class="legal-container">
+        <h1 class="display-4 text-primary fw-bold">{{ _('About & Contact') }}</h1>
+        <hr class="mb-5">
 
-    <h2>{{ _('Open Source') }}</h2>
-    <p>{{ _('This project is open source and proudly hosted on GitHub. You are free to view the source code, contribute, or reuse it for any non-commercial purposes.') }}</p>
-    <p><a href="https://github.com/Gotlub/picto-three" target="_blank" class="btn btn-secondary">{{ _('View Source Code on GitHub') }}</a></p>
+        <section class="mb-5">
+            <h2 class="h3 text-dark fw-bold mb-3">{{ _('Open Source') }}</h2>
+            <p class="lead text-secondary">
+                {{ _('This project is open source and proudly hosted on GitHub. You are free to view the source code, contribute, or reuse it under the terms of the GNU AGPL v3 license.') }}
+            </p>
+            <div class="mt-4">
+                <a href="https://github.com/Gotlub/picto-three" target="_blank" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-github me-2"></i>{{ _('View Source Code on GitHub') }}
+                </a>
+            </div>
+        </section>
 
-    <hr>
+        <hr class="my-5">
 
-    <h2>{{ _('Contact Us') }}</h2>
-    <div class="row">
-        <div class="col-md-6">
-            <form method="POST" action="{{ url_for('main.about') }}">
-                {{ form.hidden_tag() }}
-                {{ render_field(form.name, class="form-control") }}
-                {{ render_field(form.email, class="form-control") }}
-                {{ render_field(form.message, class="form-control", rows=5) }}
-                {{ render_field(form.recaptcha) }}
-                {{ render_field(form.submit, class="btn btn-primary") }}
-            </form>
-        </div>
+        <section>
+            <h2 class="h3 text-dark fw-bold mb-4">{{ _('Contact Us') }}</h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <form method="POST" action="{{ url_for('main.about') }}" class="bg-white p-4 rounded shadow-sm border">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ render_field(form.name, class="form-control form-control-lg", placeholder=_('Your Name')) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ render_field(form.email, class="form-control form-control-lg", placeholder=_('Your Email')) }}
+                        </div>
+                        <div class="mb-4">
+                            {{ render_field(form.message, class="form-control form-control-lg", rows=5, placeholder=_('How can we help?')) }}
+                        </div>
+                        <div class="mb-4">
+                            {{ render_field(form.recaptcha) }}
+                        </div>
+                        {{ render_field(form.submit, class="btn btn-primary btn-lg w-100") }}
+                    </form>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}

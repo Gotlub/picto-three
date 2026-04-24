@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-24 03:26+0200\n"
+"POT-Creation-Date: 2026-04-25 01:02+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -410,12 +410,12 @@ msgstr "Open Source"
 #: app/templates/about.html:10
 msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
-" view the source code, contribute, or reuse it for any non-commercial "
-"purposes."
+" view the source code, contribute, or reuse it under the terms of the GNU"
+" AGPL v3 license."
 msgstr ""
-"Dieses Projekt ist Open Source und wird mit Stolz auf GitHub gehostet. "
-"Sie können den Quellcode einsehen, dazu beitragen oder ihn für nicht-"
-"kommerzielle Zwecke wiederverwenden."
+"Dieses Projekt ist Open Source und wird stolz auf GitHub gehostet. Es "
+"steht Ihnen frei, den Quellcode einzusehen, beizutragen oder ihn gemäß "
+"den Bedingungen der GNU AGPL v3-Lizenz weiterzuverwenden."
 
 #: app/templates/about.html:11
 msgid "View Source Code on GitHub"
@@ -633,11 +633,11 @@ msgstr "Ausgewählten Zweig löschen"
 msgid "New tree"
 msgstr "Neuer Baum"
 
-#: app/templates/index.html:7
+#: app/templates/index.html:8
 msgid "PictoTree AAC Platform"
 msgstr "PictoTree AAC-Plattform"
 
-#: app/templates/index.html:9
+#: app/templates/index.html:10
 msgid ""
 "PictoTree is a comprehensive platform (Web Backend + Native Mobile App) "
 "designed for Augmentative and Alternative Communication (AAC). Our goal "
@@ -647,98 +647,101 @@ msgid ""
 "Currently under development, the system is hosted in production and "
 "accessible at pictotree.eu."
 msgstr ""
-"PictoTree ist eine umfassende Plattform (Web-Backend + Native Mobile"
-"App), die für Unterstützte Kommunikation (UK) entwickelt wurde. Unser"
-"Ziel ist es, Nutzer – Betreuer, Logopäden und Eltern – zu befähigen,"
-"personalisierte Kommunikations-„Bäume“ mithilfe von Piktogrammen"
-"(unter Nutzung der Open-Source-ARASAAC-Bibliothek oder eigener"
-"Importe) zu erstellen, zu verwalten und anzuzeigen. Das System"
-"befindet sich derzeit in der Entwicklung, wird in der Produktion"
-"gehostet und ist unter pictotree.eu erreichbar."
+"PictoTree ist eine umfassende Plattform (Web-Backend + Native MobileApp),"
+" die für Unterstützte Kommunikation (UK) entwickelt wurde. UnserZiel ist "
+"es, Nutzer – Betreuer, Logopäden und Eltern – zu "
+"befähigen,personalisierte Kommunikations-„Bäume“ mithilfe von "
+"Piktogrammen(unter Nutzung der Open-Source-ARASAAC-Bibliothek oder "
+"eigenerImporte) zu erstellen, zu verwalten und anzuzeigen. Das "
+"Systembefindet sich derzeit in der Entwicklung, wird in der "
+"Produktiongehostet und ist unter pictotree.eu erreichbar."
 
-#: app/templates/index.html:13
+#: app/templates/index.html:14
 msgid "Login / Register"
 msgstr "Anmelden / Registrieren"
 
-#: app/templates/index.html:24
-msgid "1. The Tree Builder (Web)"
+#: app/templates/index.html:30
+#, fuzzy
+msgid "The Tree Builder (Web)"
 msgstr "1. Der Baum-Editor (Web)"
 
-#: app/templates/index.html:26
+#: app/templates/index.html:33
 msgid ""
 "Construct and organize your communication structures using a hierarchical"
 " interface. Drag and drop pictograms to build logical paths tailored to "
 "the user's specific needs. Once saved, these trees can be easily imported"
 " into the mobile application."
 msgstr ""
-"Konstruieren und organisieren Sie Ihre Kommunikationsstrukturen über"
-"eine hierarchische Benutzeroberfläche. Ziehen Sie Piktogramme per"
-"Drag-and-Drop, um logische Pfade zu erstellen, die auf die"
-"spezifischen Bedürfnisse des Nutzers zugeschnitten sind. Einmal"
-"gespeichert, können diese Bäume einfach in die mobile Anwendung"
-"importiert werden."
+"Konstruieren und organisieren Sie Ihre Kommunikationsstrukturen übereine "
+"hierarchische Benutzeroberfläche. Ziehen Sie Piktogramme perDrag-and-"
+"Drop, um logische Pfade zu erstellen, die auf diespezifischen Bedürfnisse"
+" des Nutzers zugeschnitten sind. Einmalgespeichert, können diese Bäume "
+"einfach in die mobile Anwendungimportiert werden."
 
-#: app/templates/index.html:36
-msgid "2. PictoTree Mobile App (Android)"
+#: app/templates/index.html:48
+#, fuzzy
+msgid "PictoTree Mobile App (Android)"
 msgstr "2. PictoTree Mobile App (Android)"
 
-#: app/templates/index.html:38
+#: app/templates/index.html:51
 msgid ""
 "The native mobile application uses a spatial navigation system (View 4) "
 "to browse through imported trees. It includes integrated Text-to-Speech "
 "(TTS) for vocal feedback and works fully offline to ensure communication "
 "is always available."
 msgstr ""
-"Die native mobile Anwendung nutzt ein räumliches Navigationssystem"
-"(Ansicht 4), um durch importierte Bäume zu blättern. Sie verfügt über"
-"eine integrierte Text-zu-Sprache-Funktion (TTS) für akustisches"
-"Feedback und arbeitet vollständig offline, um sicherzustellen, dass"
-"die Kommunikation jederzeit möglich ist."
+"Die native mobile Anwendung nutzt ein räumliches "
+"Navigationssystem(Ansicht 4), um durch importierte Bäume zu blättern. Sie"
+" verfügt übereine integrierte Text-zu-Sprache-Funktion (TTS) für "
+"akustischesFeedback und arbeitet vollständig offline, um sicherzustellen,"
+" dassdie Kommunikation jederzeit möglich ist."
 
-#: app/templates/index.html:48
-msgid "3. Pictogram Bank (Management)"
+#: app/templates/index.html:66
+#, fuzzy
+msgid "Pictogram Bank (Management)"
 msgstr "3. Piktogramm-Datenbank (Verwaltung)"
 
-#: app/templates/index.html:50
+#: app/templates/index.html:69
 msgid ""
 "Centralize your visual vocabulary. Search and import icons from the "
 "ARASAAC database or upload your own personal images. Organize them into "
 "folders to keep your library structured and ready for use in your trees "
 "or lists."
 msgstr ""
-"Zentralisieren Sie Ihr visuelles Vokabular. Suchen und importieren Sie"
-"Symbole aus der ARASAAC-Datenbank oder laden Sie Ihre eigenen"
-"persönlichen Bilder hoch. Organisieren Sie diese in Ordnern, um Ihre"
-"Bibliothek strukturiert und bereit für den Einsatz in Ihren Bäumen"
-"oder Listen zu halten."
+"Zentralisieren Sie Ihr visuelles Vokabular. Suchen und importieren "
+"SieSymbole aus der ARASAAC-Datenbank oder laden Sie Ihre "
+"eigenenpersönlichen Bilder hoch. Organisieren Sie diese in Ordnern, um "
+"IhreBibliothek strukturiert und bereit für den Einsatz in Ihren "
+"Bäumenoder Listen zu halten."
 
-#: app/templates/index.html:60
-msgid "4. List & Print Tool (Paper Support)"
+#: app/templates/index.html:84
+#, fuzzy
+msgid "List & Print Tool (Paper Support)"
 msgstr "4. Listen- & Druckwerkzeug (Papierunterstützung)"
 
-#: app/templates/index.html:62
+#: app/templates/index.html:87
 msgid ""
 "Generate customizable pictogram lists designed for printing. This tool "
 "provides various layout options to create physical communication boards, "
 "schedules, or educational materials directly from your digital "
 "collection."
 msgstr ""
-"Erstellen Sie anpassbare Piktogrammlisten für den Druck. Dieses Tool"
-"bietet verschiedene Layout-Optionen zur Erstellung physischer"
-"Kommunikationstafeln, Zeitpläne oder Lernmaterialien direkt aus Ihrer"
-"digitalen Sammlung."
+"Erstellen Sie anpassbare Piktogrammlisten für den Druck. Dieses "
+"Toolbietet verschiedene Layout-Optionen zur Erstellung "
+"physischerKommunikationstafeln, Zeitpläne oder Lernmaterialien direkt aus"
+" Ihrerdigitalen Sammlung."
 
 #: app/templates/legal.html:8
 msgid "TERMS OF SERVICE"
 msgstr "NUTZUNGSBEDINGUNGEN"
 
-#: app/templates/legal.html:9 app/templates/legal.html:38
+#: app/templates/legal.html:9 app/templates/legal.html:41
 msgid "Last Revision:"
 msgstr "Letzte Überarbeitung:"
 
-#: app/templates/legal.html:9 app/templates/legal.html:38
-msgid "September 18, 2025"
-msgstr "18. September 2025"
+#: app/templates/legal.html:9 app/templates/legal.html:41
+msgid "April 25, 2026"
+msgstr "25. April 2026"
 
 #: app/templates/legal.html:10
 msgid ""
@@ -870,15 +873,23 @@ msgstr ""
 "übernehmen keine Gewähr dafür, dass der Dienst ununterbrochen, "
 "zeitgerecht oder fehlerfrei ist."
 
-#: app/templates/legal.html:37
+#: app/templates/legal.html:35
+msgid "7. License"
+msgstr "7. Lizenz"
+
+#: app/templates/legal.html:36
+msgid "This software is open source and licensed under the GNU AGPL v3."
+msgstr "Diese Software ist Open Source und unter der GNU AGPL v3 lizenziert."
+
+#: app/templates/legal.html:40
 msgid "PRIVACY POLICY"
 msgstr "DATENSCHUTZERKLÄRUNG"
 
-#: app/templates/legal.html:40
+#: app/templates/legal.html:43
 msgid "1. Introduction"
 msgstr "1. Einleitung"
 
-#: app/templates/legal.html:41
+#: app/templates/legal.html:44
 msgid ""
 "This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
 " uses, and protects your personal data. We are committed to protecting "
@@ -892,19 +903,19 @@ msgstr ""
 " (DSGVO) zu schützen. Der Datenverantwortliche für diesen Dienst ist das "
 "Team von Pictotree.eu, das über das Kontaktformular erreichbar ist."
 
-#: app/templates/legal.html:43
+#: app/templates/legal.html:46
 msgid "2. Personal Data We Collect"
 msgstr "2. Personenbezogene Daten, die wir erheben"
 
-#: app/templates/legal.html:44
+#: app/templates/legal.html:47
 msgid "We collect the following types of personal data:"
 msgstr "Wir erheben die folgenden Arten von personenbezogenen Daten:"
 
-#: app/templates/legal.html:46
+#: app/templates/legal.html:49
 msgid "Account Data:"
 msgstr "Kontodaten:"
 
-#: app/templates/legal.html:46
+#: app/templates/legal.html:49
 msgid ""
 "Information you provide upon registration, such as username and email "
 "address. The lawful basis for this processing is the performance of a "
@@ -915,11 +926,11 @@ msgstr ""
 "Verarbeitung ist die Erfüllung eines Vertrags (unsere "
 "Nutzungsbedingungen)."
 
-#: app/templates/legal.html:47
+#: app/templates/legal.html:50
 msgid "User-Generated Content:"
 msgstr "Benutzergenerierte Inhalte:"
 
-#: app/templates/legal.html:47
+#: app/templates/legal.html:50
 msgid ""
 "Images and other data you voluntarily upload to the Service. The lawful "
 "basis is your consent and our legitimate interest in providing the "
@@ -929,11 +940,11 @@ msgstr ""
 " Rechtsgrundlage ist Ihre Einwilligung und unser berechtigtes Interesse "
 "an der Bereitstellung der Kernfunktionalität des Dienstes."
 
-#: app/templates/legal.html:48 app/templates/legal.html:54
+#: app/templates/legal.html:51 app/templates/legal.html:57
 msgid "Technical Log Data:"
 msgstr "Technische Protokolldaten:"
 
-#: app/templates/legal.html:48
+#: app/templates/legal.html:51
 msgid ""
 "For the purpose of maintaining the security and integrity of our systems,"
 " we process server logs which may include your IP address, user-agent "
@@ -946,15 +957,15 @@ msgstr ""
 "Rechtsgrundlage für diese Verarbeitung ist unser berechtigtes Interesse "
 "an der Betrugsprävention und der Sicherung unseres Dienstes."
 
-#: app/templates/legal.html:51
+#: app/templates/legal.html:54
 msgid "3. Data Retention"
 msgstr "3. Datenspeicherung"
 
-#: app/templates/legal.html:53
+#: app/templates/legal.html:56
 msgid "Account and User-Generated Content:"
 msgstr "Konto- und benutzergenerierte Inhalte:"
 
-#: app/templates/legal.html:53
+#: app/templates/legal.html:56
 msgid ""
 "This data is retained for the duration of your account's existence. It is"
 " permanently and irrevocably deleted upon your request to terminate the "
@@ -964,17 +975,17 @@ msgstr ""
 "Sie werden auf Ihre Anfrage zur Kündigung des Kontos dauerhaft und "
 "unwiderruflich gelöscht."
 
-#: app/templates/legal.html:54
+#: app/templates/legal.html:57
 msgid "Server logs are automatically purged after a period of six (6) months."
 msgstr ""
 "Serverprotokolle werden nach einem Zeitraum von sechs (6) Monaten "
 "automatisch gelöscht."
 
-#: app/templates/legal.html:57
+#: app/templates/legal.html:60
 msgid "4. Your Rights as a Data Subject"
 msgstr "4. Ihre Rechte als betroffene Person"
 
-#: app/templates/legal.html:58
+#: app/templates/legal.html:61
 msgid ""
 "Under the GDPR, you have the following rights regarding your personal "
 "data:"
@@ -982,13 +993,13 @@ msgstr ""
 "Gemäß der DSGVO haben Sie die folgenden Rechte in Bezug auf Ihre "
 "personenbezogenen Daten:"
 
-#: app/templates/legal.html:60
+#: app/templates/legal.html:63
 msgid "The right to access: You can request copies of your personal data."
 msgstr ""
 "Das Recht auf Auskunft: Sie können Kopien Ihrer personenbezogenen Daten "
 "anfordern."
 
-#: app/templates/legal.html:61
+#: app/templates/legal.html:64
 msgid ""
 "The right to rectification: You can request that we correct any "
 "information you believe is inaccurate."
@@ -996,7 +1007,7 @@ msgstr ""
 "Das Recht auf Berichtigung: Sie können verlangen, dass wir Informationen "
 "korrigieren, die Sie für unrichtig halten."
 
-#: app/templates/legal.html:62
+#: app/templates/legal.html:65
 msgid ""
 "The right to erasure (right to be forgotten): You can request the erasure"
 " of your personal data. This is actioned by deleting your account."
@@ -1005,7 +1016,7 @@ msgstr ""
 "Löschung Ihrer personenbezogenen Daten verlangen. Dies geschieht durch "
 "Löschen Ihres Kontos."
 
-#: app/templates/legal.html:63
+#: app/templates/legal.html:66
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
@@ -1014,7 +1025,7 @@ msgstr ""
 "wir die Verarbeitung Ihrer personenbezogenen Daten unter bestimmten "
 "Bedingungen einschränken."
 
-#: app/templates/legal.html:64
+#: app/templates/legal.html:67
 msgid ""
 "The right to object to processing: You can object to our processing of "
 "your personal data."
@@ -1022,7 +1033,7 @@ msgstr ""
 "Das Recht auf Widerspruch gegen die Verarbeitung: Sie können der "
 "Verarbeitung Ihrer personenbezogenen Daten durch uns widersprechen."
 
-#: app/templates/legal.html:65
+#: app/templates/legal.html:68
 msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
@@ -1031,7 +1042,7 @@ msgstr ""
 "von uns erhobenen Daten an eine andere Organisation oder direkt an Sie "
 "übertragen."
 
-#: app/templates/legal.html:67
+#: app/templates/legal.html:70
 msgid ""
 "To exercise any of these rights, please contact us with the form contact."
 " You also have the right to lodge a complaint with a supervisory "
@@ -1041,11 +1052,11 @@ msgstr ""
 "Kontaktformular. Sie haben auch das Recht, eine Beschwerde bei einer "
 "Aufsichtsbehörde (wie der CNIL in Frankreich) einzureichen."
 
-#: app/templates/legal.html:69
+#: app/templates/legal.html:72
 msgid "5. Data Security & Transfer"
 msgstr "5. Datensicherheit & -übertragung"
 
-#: app/templates/legal.html:70
+#: app/templates/legal.html:73
 msgid ""
 "We implement appropriate technical and organizational measures to ensure "
 "a level of security appropriate to the risk. Your data is stored on "
@@ -2033,4 +2044,7 @@ msgstr ""
 
 #~ msgid "Chain Mode"
 #~ msgstr "Kettenmodus"
+
+#~ msgid "September 18, 2025"
+#~ msgstr "18. September 2025"
 

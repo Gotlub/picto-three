@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-24 03:26+0200\n"
+"POT-Creation-Date: 2026-04-25 01:02+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: nl\n"
@@ -408,10 +408,11 @@ msgid "Open Source"
 msgstr "Open Source"
 
 #: app/templates/about.html:10
+#, fuzzy
 msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
-" view the source code, contribute, or reuse it for any non-commercial "
-"purposes."
+" view the source code, contribute, or reuse it under the terms of the GNU"
+" AGPL v3 license."
 msgstr ""
 "Dit project is open source en wordt met trots gehost op GitHub. U bent "
 "vrij om de broncode te bekijken, bij te dragen of opnieuw te gebruiken "
@@ -631,11 +632,11 @@ msgstr "Geselecteerde tak verwijderen"
 msgid "New tree"
 msgstr "Nieuwe boom"
 
-#: app/templates/index.html:7
+#: app/templates/index.html:8
 msgid "PictoTree AAC Platform"
 msgstr "PictoTree OC-platform"
 
-#: app/templates/index.html:9
+#: app/templates/index.html:10
 msgid ""
 "PictoTree is a comprehensive platform (Web Backend + Native Mobile App) "
 "designed for Augmentative and Alternative Communication (AAC). Our goal "
@@ -645,96 +646,99 @@ msgid ""
 "Currently under development, the system is hosted in production and "
 "accessible at pictotree.eu."
 msgstr ""
-"PictoTree is een veelzijdig platform (Web Backend + Native Mobiele"
-"App) ontworpen voor Ondersteunde Communicatie (OC). Ons doel is om"
-"gebruikers — zorgverleners, logopedisten en ouders — in staat te"
-"stellen gepersonaliseerde communicatie-'bomen' te maken, te beheren en"
-"weer te geven met behulp van pictogrammen (gebruikmakend van de"
-"open-source ARASAAC-bibliotheek of persoonlijke importen). Het systeem"
-"is momenteel in ontwikkeling, wordt in productie gehost en is"
-"toegankelijk op pictotree.eu."
+"PictoTree is een veelzijdig platform (Web Backend + Native MobieleApp) "
+"ontworpen voor Ondersteunde Communicatie (OC). Ons doel is omgebruikers —"
+" zorgverleners, logopedisten en ouders — in staat testellen "
+"gepersonaliseerde communicatie-'bomen' te maken, te beheren enweer te "
+"geven met behulp van pictogrammen (gebruikmakend van deopen-source "
+"ARASAAC-bibliotheek of persoonlijke importen). Het systeemis momenteel in"
+" ontwikkeling, wordt in productie gehost en istoegankelijk op "
+"pictotree.eu."
 
-#: app/templates/index.html:13
+#: app/templates/index.html:14
 msgid "Login / Register"
 msgstr "Inloggen / Registreren"
 
-#: app/templates/index.html:24
-msgid "1. The Tree Builder (Web)"
+#: app/templates/index.html:30
+#, fuzzy
+msgid "The Tree Builder (Web)"
 msgstr "1. De Tree Builder (Web)"
 
-#: app/templates/index.html:26
+#: app/templates/index.html:33
 msgid ""
 "Construct and organize your communication structures using a hierarchical"
 " interface. Drag and drop pictograms to build logical paths tailored to "
 "the user's specific needs. Once saved, these trees can be easily imported"
 " into the mobile application."
 msgstr ""
-"Bouw en organiseer uw communicatiestructuren met behulp van een"
-"hiërarchische interface. Sleep pictogrammen om logische paden te"
-"bouwen die zijn afgestemd op de specifieke behoeften van de gebruiker."
-"Eenmaal opgeslagen, kunnen deze bomen eenvoudig in de mobiele"
-"applicatie worden geïmporteerd."
+"Bouw en organiseer uw communicatiestructuren met behulp van "
+"eenhiërarchische interface. Sleep pictogrammen om logische paden tebouwen"
+" die zijn afgestemd op de specifieke behoeften van de gebruiker.Eenmaal "
+"opgeslagen, kunnen deze bomen eenvoudig in de mobieleapplicatie worden "
+"geïmporteerd."
 
-#: app/templates/index.html:36
-msgid "2. PictoTree Mobile App (Android)"
+#: app/templates/index.html:48
+#, fuzzy
+msgid "PictoTree Mobile App (Android)"
 msgstr "2. PictoTree Mobiele App (Android)"
 
-#: app/templates/index.html:38
+#: app/templates/index.html:51
 msgid ""
 "The native mobile application uses a spatial navigation system (View 4) "
 "to browse through imported trees. It includes integrated Text-to-Speech "
 "(TTS) for vocal feedback and works fully offline to ensure communication "
 "is always available."
 msgstr ""
-"De native mobiele applicatie maakt gebruik van een ruimtelijk"
-"navigatiesysteem (View 4) om door geïmporteerde bomen te bladeren. Het"
-"bevat geïntegreerde Text-to-Speech (TTS) for vocale feedback en werkt"
-"volledig offline om ervoor te zorgen dat communicatie altijd"
-"beschikbaar is."
+"De native mobiele applicatie maakt gebruik van een "
+"ruimtelijknavigatiesysteem (View 4) om door geïmporteerde bomen te "
+"bladeren. Hetbevat geïntegreerde Text-to-Speech (TTS) for vocale feedback"
+" en werktvolledig offline om ervoor te zorgen dat communicatie "
+"altijdbeschikbaar is."
 
-#: app/templates/index.html:48
-msgid "3. Pictogram Bank (Management)"
+#: app/templates/index.html:66
+#, fuzzy
+msgid "Pictogram Bank (Management)"
 msgstr "3. Pictogrammenbank (Beheer)"
 
-#: app/templates/index.html:50
+#: app/templates/index.html:69
 msgid ""
 "Centralize your visual vocabulary. Search and import icons from the "
 "ARASAAC database or upload your own personal images. Organize them into "
 "folders to keep your library structured and ready for use in your trees "
 "or lists."
 msgstr ""
-"Centraliseer uw visuele woordenschat. Zoek en importeer iconen uit de"
-"ARASAAC-database of upload uw eigen persoonlijke afbeeldingen."
-"Organiseer ze in mappen om uw bibliotheek gestructureerd en klaar voor"
-"gebruik in uw bomen of lijsten te houden."
+"Centraliseer uw visuele woordenschat. Zoek en importeer iconen uit "
+"deARASAAC-database of upload uw eigen persoonlijke "
+"afbeeldingen.Organiseer ze in mappen om uw bibliotheek gestructureerd en "
+"klaar voorgebruik in uw bomen of lijsten te houden."
 
-#: app/templates/index.html:60
-msgid "4. List & Print Tool (Paper Support)"
+#: app/templates/index.html:84
+#, fuzzy
+msgid "List & Print Tool (Paper Support)"
 msgstr "4. Lijst- & Printtool (Papieren ondersteuning)"
 
-#: app/templates/index.html:62
+#: app/templates/index.html:87
 msgid ""
 "Generate customizable pictogram lists designed for printing. This tool "
 "provides various layout options to create physical communication boards, "
 "schedules, or educational materials directly from your digital "
 "collection."
 msgstr ""
-"Genereer aanpasbare pictogrammenlijsten ontworpen om te printen. Deze"
-"tool biedt verschillende lay-outopties om fysieke communicatieborden,"
-"schema's of educatief materiaal rechtstreeks uit uw digitale collectie"
-"te maken."
+"Genereer aanpasbare pictogrammenlijsten ontworpen om te printen. Dezetool"
+" biedt verschillende lay-outopties om fysieke communicatieborden,schema's"
+" of educatief materiaal rechtstreeks uit uw digitale collectiete maken."
 
 #: app/templates/legal.html:8
 msgid "TERMS OF SERVICE"
 msgstr "SERVICEVOORWAARDEN"
 
-#: app/templates/legal.html:9 app/templates/legal.html:38
+#: app/templates/legal.html:9 app/templates/legal.html:41
 msgid "Last Revision:"
 msgstr "Laatste revisie:"
 
-#: app/templates/legal.html:9 app/templates/legal.html:38
-msgid "September 18, 2025"
-msgstr "18 september 2025"
+#: app/templates/legal.html:9 app/templates/legal.html:41
+msgid "April 25, 2026"
+msgstr "25 april 2026"
 
 #: app/templates/legal.html:10
 msgid ""
@@ -864,15 +868,23 @@ msgstr ""
 " geven geen garantie dat de Service ononderbroken, tijdig of foutloos zal"
 " zijn."
 
-#: app/templates/legal.html:37
+#: app/templates/legal.html:35
+msgid "7. License"
+msgstr "7. Licentie"
+
+#: app/templates/legal.html:36
+msgid "This software is open source and licensed under the GNU AGPL v3."
+msgstr "Deze software is open source en gelicentieerd onder de GNU AGPL v3."
+
+#: app/templates/legal.html:40
 msgid "PRIVACY POLICY"
 msgstr "PRIVACYBELEID"
 
-#: app/templates/legal.html:40
+#: app/templates/legal.html:43
 msgid "1. Introduction"
 msgstr "1. Inleiding"
 
-#: app/templates/legal.html:41
+#: app/templates/legal.html:44
 msgid ""
 "This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
 " uses, and protects your personal data. We are committed to protecting "
@@ -886,19 +898,19 @@ msgstr ""
 "Verordening Gegevensbescherming (AVG). De gegevensbeheerder voor deze "
 "service is het Pictotree.eu-team, bereikbaar via het contactformulier."
 
-#: app/templates/legal.html:43
+#: app/templates/legal.html:46
 msgid "2. Personal Data We Collect"
 msgstr "2. Persoonlijke gegevens die we verzamelen"
 
-#: app/templates/legal.html:44
+#: app/templates/legal.html:47
 msgid "We collect the following types of personal data:"
 msgstr "We verzamelen de volgende soorten persoonlijke gegevens:"
 
-#: app/templates/legal.html:46
+#: app/templates/legal.html:49
 msgid "Account Data:"
 msgstr "Accountgegevens:"
 
-#: app/templates/legal.html:46
+#: app/templates/legal.html:49
 msgid ""
 "Information you provide upon registration, such as username and email "
 "address. The lawful basis for this processing is the performance of a "
@@ -908,11 +920,11 @@ msgstr ""
 "e-mailadres. De wettelijke basis voor deze verwerking is de uitvoering "
 "van een contract (onze Servicevoorwaarden)."
 
-#: app/templates/legal.html:47
+#: app/templates/legal.html:50
 msgid "User-Generated Content:"
 msgstr "Door de gebruiker gegenereerde inhoud:"
 
-#: app/templates/legal.html:47
+#: app/templates/legal.html:50
 msgid ""
 "Images and other data you voluntarily upload to the Service. The lawful "
 "basis is your consent and our legitimate interest in providing the "
@@ -922,11 +934,11 @@ msgstr ""
 " De wettelijke basis is uw toestemming en ons legitieme belang bij het "
 "leveren van de kernfunctionaliteit van de Service."
 
-#: app/templates/legal.html:48 app/templates/legal.html:54
+#: app/templates/legal.html:51 app/templates/legal.html:57
 msgid "Technical Log Data:"
 msgstr "Technische loggegevens:"
 
-#: app/templates/legal.html:48
+#: app/templates/legal.html:51
 msgid ""
 "For the purpose of maintaining the security and integrity of our systems,"
 " we process server logs which may include your IP address, user-agent "
@@ -939,15 +951,15 @@ msgstr ""
 "deze verwerking is ons legitieme belang bij het voorkomen van fraude en "
 "het beveiligen van onze Service."
 
-#: app/templates/legal.html:51
+#: app/templates/legal.html:54
 msgid "3. Data Retention"
 msgstr "3. Gegevensbewaring"
 
-#: app/templates/legal.html:53
+#: app/templates/legal.html:56
 msgid "Account and User-Generated Content:"
 msgstr "Account- en door gebruikers gegenereerde inhoud:"
 
-#: app/templates/legal.html:53
+#: app/templates/legal.html:56
 msgid ""
 "This data is retained for the duration of your account's existence. It is"
 " permanently and irrevocably deleted upon your request to terminate the "
@@ -957,17 +969,17 @@ msgstr ""
 " Ze worden permanent en onherroepelijk verwijderd op uw verzoek om het "
 "account te beëindigen."
 
-#: app/templates/legal.html:54
+#: app/templates/legal.html:57
 msgid "Server logs are automatically purged after a period of six (6) months."
 msgstr ""
 "Serverlogboeken worden automatisch verwijderd na een periode van zes (6) "
 "maanden."
 
-#: app/templates/legal.html:57
+#: app/templates/legal.html:60
 msgid "4. Your Rights as a Data Subject"
 msgstr "4. Uw rechten als betrokkene"
 
-#: app/templates/legal.html:58
+#: app/templates/legal.html:61
 msgid ""
 "Under the GDPR, you have the following rights regarding your personal "
 "data:"
@@ -975,13 +987,13 @@ msgstr ""
 "Onder de AVG heeft u de volgende rechten met betrekking tot uw "
 "persoonlijke gegevens:"
 
-#: app/templates/legal.html:60
+#: app/templates/legal.html:63
 msgid "The right to access: You can request copies of your personal data."
 msgstr ""
 "Het recht op toegang: u kunt kopieën van uw persoonlijke gegevens "
 "opvragen."
 
-#: app/templates/legal.html:61
+#: app/templates/legal.html:64
 msgid ""
 "The right to rectification: You can request that we correct any "
 "information you believe is inaccurate."
@@ -989,7 +1001,7 @@ msgstr ""
 "Het recht op rectificatie: u kunt ons verzoeken om alle informatie te "
 "corrigeren die volgens u onjuist is."
 
-#: app/templates/legal.html:62
+#: app/templates/legal.html:65
 msgid ""
 "The right to erasure (right to be forgotten): You can request the erasure"
 " of your personal data. This is actioned by deleting your account."
@@ -998,7 +1010,7 @@ msgstr ""
 "verwijdering van uw persoonlijke gegevens aanvragen. Dit wordt gedaan "
 "door uw account te verwijderen."
 
-#: app/templates/legal.html:63
+#: app/templates/legal.html:66
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
@@ -1007,7 +1019,7 @@ msgstr ""
 "verwerking van uw persoonlijke gegevens onder bepaalde voorwaarden te "
 "beperken."
 
-#: app/templates/legal.html:64
+#: app/templates/legal.html:67
 msgid ""
 "The right to object to processing: You can object to our processing of "
 "your personal data."
@@ -1015,7 +1027,7 @@ msgstr ""
 "Het recht om bezwaar te maken tegen de verwerking: u kunt bezwaar maken "
 "tegen onze verwerking van uw persoonlijke gegevens."
 
-#: app/templates/legal.html:65
+#: app/templates/legal.html:68
 msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
@@ -1024,7 +1036,7 @@ msgstr ""
 "gegevens die we hebben verzameld over te dragen aan een andere "
 "organisatie, of rechtstreeks aan u."
 
-#: app/templates/legal.html:67
+#: app/templates/legal.html:70
 msgid ""
 "To exercise any of these rights, please contact us with the form contact."
 " You also have the right to lodge a complaint with a supervisory "
@@ -1034,11 +1046,11 @@ msgstr ""
 "via het contactformulier. U heeft ook het recht om een klacht in te "
 "dienen bij een toezichthoudende autoriteit (zoals de CNIL in Frankrijk)."
 
-#: app/templates/legal.html:69
+#: app/templates/legal.html:72
 msgid "5. Data Security & Transfer"
 msgstr "5. Gegevensbeveiliging en -overdracht"
 
-#: app/templates/legal.html:70
+#: app/templates/legal.html:73
 msgid ""
 "We implement appropriate technical and organizational measures to ensure "
 "a level of security appropriate to the risk. Your data is stored on "
@@ -2017,4 +2029,7 @@ msgstr ""
 
 #~ msgid "Chain Mode"
 #~ msgstr "Ketenmodus"
+
+#~ msgid "September 18, 2025"
+#~ msgstr "18 september 2025"
 
