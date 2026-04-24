@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-09-29 02:42+0000\n"
+"POT-Creation-Date: 2026-04-24 03:26+0200\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,128 +18,130 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:35 app/templates/legal.html:5
-msgid "Legal Information"
-msgstr "Informations légales"
-
-#: app/routes.py:52
-msgid "Your message has been sent successfully!"
-msgstr "Votre message a été envoyé avec succès !"
-
-#: app/routes.py:54 app/templates/about.html:6 app/templates/base.html:111
-msgid "About & Contact"
-msgstr "À propos & Contact"
-
-#: app/routes.py:65
-msgid "Invalid username or password"
-msgstr "Nom d'utilisateur ou mot de passe invalide"
-
-#: app/routes.py:69
-#, python-format
-msgid ""
-"Your account is not confirmed. Please check your emails. <a "
-"href=\"%(url)s\">Resend confirmation email?</a>"
+#: app/forms.py:16
+msgid "be at least 9 characters long"
 msgstr ""
-"Votre compte n'est pas confirmé. Veuillez consulter vos e-mails. <a "
-"href=\"%(url)s\">Renvoyer l'e-mail de confirmation ?</a>"
 
-#: app/routes.py:87
-msgid "An email with instructions to reset your password has been sent."
+#: app/forms.py:18
+msgid "contain at least one uppercase letter"
 msgstr ""
-"Un e-mail avec des instructions pour réinitialiser votre mot de passe a "
-"été envoyé."
 
-#: app/routes.py:89
-msgid "No account found with that email address."
-msgstr "Aucun compte trouvé avec cette adresse e-mail."
+#: app/forms.py:20
+msgid "contain at least one digit"
+msgstr ""
 
-#: app/routes.py:99
-msgid "The reset link is invalid or has expired."
-msgstr "Le lien de réinitialisation est invalide ou a expiré."
+#: app/forms.py:23
+msgid "Password must"
+msgstr ""
 
-#: app/routes.py:107
-msgid "Your password has been reset successfully."
-msgstr "Votre mot de passe a été réinitialisé avec succès."
+#: app/forms.py:27 app/forms.py:33 app/forms.py:60
+#, fuzzy
+msgid "Username"
+msgstr "Votre nom d'utilisateur"
 
-#: app/routes.py:135
-msgid "Your password has been changed successfully."
-msgstr "Votre mot de passe a été changé avec succès."
+#: app/forms.py:28 app/forms.py:35 app/forms.py:68
+#, fuzzy
+msgid "Password"
+msgstr "Réinitialiser le mot de passe"
 
-#: app/routes.py:137
-msgid "Invalid current password."
-msgstr "Mot de passe actuel invalide."
+#: app/forms.py:29
+msgid "Remember Me"
+msgstr ""
 
-#: app/routes.py:141 app/routes.py:218
-#, python-format
-msgid "Error in %(field)s: %(error)s"
-msgstr "Erreur dans %(field)s : %(error)s"
+#: app/forms.py:30 app/templates/login.html:8
+msgid "Sign In"
+msgstr "Se connecter"
 
-#: app/routes.py:170
-msgid "Your account has been successfully deleted."
-msgstr "Votre compte a été supprimé avec succès."
+#: app/forms.py:34 app/forms.py:64 app/forms.py:74 app/forms.py:79
+msgid "Email"
+msgstr ""
 
-#: app/routes.py:173
-msgid "Invalid username confirmation. Account deletion cancelled."
-msgstr "Confirmation du nom d'utilisateur invalide. Suppression du compte annulée."
+#: app/forms.py:37 app/forms.py:70
+#, fuzzy
+msgid "Repeat Password"
+msgstr "Réinitialiser le mot de passe"
 
-#: app/routes.py:176
-msgid "Invalid form submission."
-msgstr "Soumission de formulaire invalide."
+#: app/forms.py:38
+#, fuzzy
+msgid "I accept the Terms & Privacy Policy"
+msgstr "Conditions d'utilisation et politique de confidentialité"
 
-#: app/routes.py:212
-msgid "A confirmation email has been sent to your email address."
-msgstr "Un e-mail de confirmation a été envoyé à votre adresse e-mail."
+#: app/forms.py:38
+msgid "You must accept the terms and privacy policy to continue."
+msgstr ""
 
-#: app/routes.py:215
-msgid "Registration failed. Please check the errors below."
-msgstr "L'inscription a échoué. Veuillez vérifier les erreurs ci-dessous."
+#: app/forms.py:40 app/templates/register.html:8
+msgid "Register"
+msgstr "S'inscrire"
 
-#: app/routes.py:225
-msgid "The confirmation link is invalid or has expired."
-msgstr "Le lien de confirmation est invalide ou a expiré."
+#: app/forms.py:45
+msgid "Please use a different username."
+msgstr ""
 
-#: app/routes.py:230
-msgid "Account already confirmed. Please login."
-msgstr "Compte déjà confirmé. Veuillez vous connecter."
+#: app/forms.py:50
+msgid "Please use a different email address."
+msgstr ""
 
-#: app/routes.py:235
-msgid "Your account has been confirmed successfully!"
-msgstr "Votre compte a été confirmé avec succès !"
+#: app/forms.py:53
+#, fuzzy
+msgid "Current Password"
+msgstr "Réinitialiser le mot de passe"
 
-#: app/routes.py:247
-msgid "This account is already confirmed. Please login."
-msgstr "Ce compte est déjà confirmé. Veuillez vous connecter."
+#: app/forms.py:54
+#, fuzzy
+msgid "New Password"
+msgstr "Changer le mot de passe"
 
-#: app/routes.py:253
-msgid "A new confirmation email has been sent."
-msgstr "Un nouvel e-mail de confirmation a été envoyé."
+#: app/forms.py:56
+#, fuzzy
+msgid "Repeat New Password"
+msgstr "Réinitialiser le mot de passe"
 
-#: app/routes.py:256
-msgid "No account found with that email address. Please register."
-msgstr "Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire."
+#: app/forms.py:57 app/templates/account.html:10
+msgid "Change Password"
+msgstr "Changer le mot de passe"
 
-#: app/routes.py:270
-msgid "Invalid tree data received."
-msgstr "Données d'arbre reçues non valides."
+#: app/forms.py:61 app/templates/account.html:60
+msgid "Delete My Account"
+msgstr "Supprimer mon compte"
 
-#: app/routes.py:371
-msgid "Your language has been updated."
-msgstr "Votre langue a été mise à jour."
+#: app/forms.py:65
+#, fuzzy
+msgid "Request Password Reset"
+msgstr "Réinitialiser le mot de passe"
 
-#: app/routes.py:375
-msgid "The language has been updated for this session."
-msgstr "La langue a été mise à jour pour cette session."
+#: app/forms.py:71 app/templates/forgot_password.html:5
+msgid "Reset Password"
+msgstr "Réinitialiser le mot de passe"
 
-#: app/routes.py:460 app/routes.py:529 app/routes.py:656 app/routes.py:817
-#: app/routes.py:913
+#: app/forms.py:75 app/templates/resend_confirmation_request.html:5
+msgid "Resend Confirmation Email"
+msgstr "Renvoyer l'e-mail de confirmation"
+
+#: app/forms.py:78
+#, fuzzy
+msgid "Name"
+msgstr "Nom de l'arbre"
+
+#: app/forms.py:80
+#, fuzzy
+msgid "Message"
+msgstr "Images"
+
+#: app/forms.py:82
+msgid "Send"
+msgstr ""
+
+#: app/routes/api.py:53 app/routes/api.py:125 app/routes/api.py:283
+#: app/routes/api.py:457 app/routes/api.py:562
 msgid "Invalid data"
 msgstr "Données invalides"
 
-#: app/routes.py:467
+#: app/routes/api.py:60
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Champs obligatoires manquants : nom de la liste et charge utile requis."
 
-#: app/routes.py:483
+#: app/routes/api.py:79
 msgid ""
 "Public lists can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -148,92 +150,104 @@ msgstr ""
 "globales. Veuillez retirer les images appartenant à des utilisateurs "
 "avant de sauvegarder publiquement."
 
-#: app/routes.py:495 app/routes.py:541
+#: app/routes/api.py:91 app/routes/api.py:137
 msgid "List updated successfully"
 msgstr "Liste mise à jour avec succès"
 
-#: app/routes.py:506
+#: app/routes/api.py:102
 msgid "List saved successfully"
 msgstr "Liste enregistrée avec succès"
 
-#: app/routes.py:523 app/routes.py:550
+#: app/routes/api.py:119 app/routes/api.py:146
 msgid "List not found"
 msgstr "Liste non trouvée"
 
-#: app/routes.py:525 app/routes.py:552 app/routes.py:572
+#: app/routes/api.py:121 app/routes/api.py:148 app/routes/api.py:168
 msgid "Unauthorized"
 msgstr "Non autorisé"
 
-#: app/routes.py:557
+#: app/routes/api.py:153
 msgid "List deleted successfully"
 msgstr "Liste supprimée avec succès"
 
-#: app/routes.py:563
+#: app/routes/api.py:159
 msgid "parent_id is required"
 msgstr "parent_id est requis"
 
-#: app/routes.py:567
+#: app/routes/api.py:163
 msgid "Folder not found"
 msgstr "Dossier non trouvé"
 
-#: app/routes.py:647
+#: app/routes/api.py:265
 msgid "Root folder not found"
 msgstr "Dossier racine non trouvé"
 
-#: app/routes.py:663
+#: app/routes/api.py:279 app/routes/api.py:344
+msgid "L'espace de stockage maximal est atteint pour ce compte."
+msgstr ""
+
+#: app/routes/api.py:290
 msgid "Parent folder not found or not owned by user"
 msgstr "Dossier parent non trouvé ou n'appartenant pas à l'utilisateur"
 
-#: app/routes.py:674
+#: app/routes/api.py:301
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Impossible de créer le répertoire : %(error)s"
 
-#: app/routes.py:717
+#: app/routes/api.py:347
 msgid "No file part"
 msgstr "Aucune partie de fichier"
 
-#: app/routes.py:721
+#: app/routes/api.py:351
 msgid "No selected file"
 msgstr "Aucun fichier sélectionné"
 
-#: app/routes.py:725
+#: app/routes/api.py:355
 msgid "No folder_id specified"
 msgstr "Aucun folder_id spécifié"
 
-#: app/routes.py:729 app/routes.py:921
+#: app/routes/api.py:359 app/routes/api.py:570
 msgid "Folder not found or not owned by user"
 msgstr "Dossier non trouvé ou n'appartenant pas à l'utilisateur"
 
-#: app/routes.py:764
+#: app/routes/api.py:374
+msgid "Format de fichier non autorisé."
+msgstr ""
+
+#: app/routes/api.py:382
+msgid "Fichier image invalide ou potentiellement malveillant."
+msgstr ""
+
+#: app/routes/api.py:405
 msgid "File upload failed"
 msgstr "Échec du téléchargement du fichier"
 
-#: app/routes.py:775
+#: app/routes/api.py:416
 msgid "Image not found"
 msgstr "Image non trouvée"
 
-#: app/routes.py:779
+#: app/routes/api.py:420
 msgid "Unauthorized to edit this image"
 msgstr "Non autorisé à modifier cette image"
 
-#: app/routes.py:783
+#: app/routes/api.py:424
 msgid "Invalid JSON data"
 msgstr "Données JSON non valides"
 
-#: app/routes.py:796
+#: app/routes/api.py:437
 msgid "Image updated successfully"
 msgstr "Image mise à jour avec succès"
 
-#: app/routes.py:824
+#: app/routes/api.py:466
 msgid "Missing required fields"
 msgstr "Champs obligatoires manquants"
 
-#: app/routes.py:829
+#: app/routes/api.py:471
 msgid "Cannot save an empty tree as public."
 msgstr "Impossible d'enregistrer un arbre vide en tant que public."
 
-#: app/routes.py:838
+#: app/routes/api.py:483
 msgid ""
 "Public trees can only contain global public images. Please remove any "
 "user-owned images before saving publicly."
@@ -242,42 +256,150 @@ msgstr ""
 " Veuillez retirer les images appartenant à des utilisateurs avant de "
 "sauvegarder publiquement."
 
-#: app/routes.py:848
+#: app/routes/api.py:495
 msgid "Tree updated successfully"
 msgstr "Arbre mis à jour avec succès"
 
-#: app/routes.py:858
+#: app/routes/api.py:507
 msgid "Tree saved successfully"
 msgstr "Arbre enregistré avec succès"
 
-#: app/routes.py:924
+#: app/routes/api.py:573
 msgid "Cannot delete root folder"
 msgstr "Impossible de supprimer le dossier racine"
 
-#: app/routes.py:928
+#: app/routes/api.py:577
 msgid "Folder and all its contents deleted"
 msgstr "Le dossier et tout son contenu ont été supprimés"
 
-#: app/routes.py:933
+#: app/routes/api.py:582
 msgid "Image not found or not owned by user"
 msgstr "Image non trouvée ou n'appartenant pas à l'utilisateur"
 
-#: app/routes.py:944
+#: app/routes/api.py:593
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Impossible de supprimer le fichier : %(error)s"
 
-#: app/routes.py:948
+#: app/routes/api.py:597
 msgid "Image deleted"
 msgstr "Image supprimée"
 
-#: app/routes.py:950
+#: app/routes/api.py:599
 msgid "Invalid item type"
 msgstr "Type d'élément non valide"
 
-#: app/routes.py:965
-msgid "No images to export"
-msgstr "Aucune image à exporter"
+#: app/routes/auth.py:23
+msgid "Invalid username or password"
+msgstr "Nom d'utilisateur ou mot de passe invalide"
+
+#: app/routes/auth.py:27
+#, python-format
+msgid ""
+"Your account is not confirmed. Please check your emails. <a "
+"href=\"%(url)s\">Resend confirmation email?</a>"
+msgstr ""
+"Votre compte n'est pas confirmé. Veuillez consulter vos e-mails. <a "
+"href=\"%(url)s\">Renvoyer l'e-mail de confirmation ?</a>"
+
+#: app/routes/auth.py:56
+msgid "A confirmation email has been sent to your email address."
+msgstr "Un e-mail de confirmation a été envoyé à votre adresse e-mail."
+
+#: app/routes/auth.py:59
+msgid "Registration failed. Please check the errors below."
+msgstr "L'inscription a échoué. Veuillez vérifier les erreurs ci-dessous."
+
+#: app/routes/auth.py:62 app/routes/auth.py:180
+#, python-format
+msgid "Error in %(field)s: %(error)s"
+msgstr "Erreur dans %(field)s : %(error)s"
+
+#: app/routes/auth.py:69
+msgid "The confirmation link is invalid or has expired."
+msgstr "Le lien de confirmation est invalide ou a expiré."
+
+#: app/routes/auth.py:74
+msgid "Account already confirmed. Please login."
+msgstr "Compte déjà confirmé. Veuillez vous connecter."
+
+#: app/routes/auth.py:96
+msgid "Your account has been confirmed successfully!"
+msgstr "Votre compte a été confirmé avec succès !"
+
+#: app/routes/auth.py:108
+msgid "This account is already confirmed. Please login."
+msgstr "Ce compte est déjà confirmé. Veuillez vous connecter."
+
+#: app/routes/auth.py:114
+msgid "A new confirmation email has been sent."
+msgstr "Un nouvel e-mail de confirmation a été envoyé."
+
+#: app/routes/auth.py:117
+msgid "No account found with that email address. Please register."
+msgstr "Aucun compte trouvé avec cette adresse e-mail. Veuillez vous inscrire."
+
+#: app/routes/auth.py:131
+msgid "An email with instructions to reset your password has been sent."
+msgstr ""
+"Un e-mail avec des instructions pour réinitialiser votre mot de passe a "
+"été envoyé."
+
+#: app/routes/auth.py:133
+msgid "No account found with that email address."
+msgstr "Aucun compte trouvé avec cette adresse e-mail."
+
+#: app/routes/auth.py:143
+msgid "The reset link is invalid or has expired."
+msgstr "Le lien de réinitialisation est invalide ou a expiré."
+
+#: app/routes/auth.py:151
+msgid "Your password has been reset successfully."
+msgstr "Votre mot de passe a été réinitialisé avec succès."
+
+#: app/routes/auth.py:174
+msgid "Your password has been changed successfully."
+msgstr "Votre mot de passe a été changé avec succès."
+
+#: app/routes/auth.py:176
+msgid "Invalid current password."
+msgstr "Mot de passe actuel invalide."
+
+#: app/routes/auth.py:209
+msgid "Your account has been successfully deleted."
+msgstr "Votre compte a été supprimé avec succès."
+
+#: app/routes/auth.py:212
+msgid "Invalid username confirmation. Account deletion cancelled."
+msgstr "Confirmation du nom d'utilisateur invalide. Suppression du compte annulée."
+
+#: app/routes/auth.py:215
+msgid "Invalid form submission."
+msgstr "Soumission de formulaire invalide."
+
+#: app/routes/builder.py:19
+msgid "Invalid tree data received."
+msgstr "Données d'arbre reçues non valides."
+
+#: app/routes/main.py:16 app/templates/legal.html:5
+msgid "Legal Information"
+msgstr "Informations légales"
+
+#: app/routes/main.py:33
+msgid "Your message has been sent successfully!"
+msgstr "Votre message a été envoyé avec succès !"
+
+#: app/routes/main.py:35 app/templates/about.html:6 app/templates/base.html:129
+msgid "About & Contact"
+msgstr "À propos & Contact"
+
+#: app/routes/main.py:53
+msgid "Your language has been updated."
+msgstr "Votre langue a été mise à jour."
+
+#: app/routes/main.py:57
+msgid "The language has been updated for this session."
+msgstr "La langue a été mise à jour pour cette session."
 
 #: app/templates/about.html:9
 msgid "Open Source"
@@ -305,10 +427,6 @@ msgstr "Contactez-nous"
 msgid "Account Management"
 msgstr "Gestion du compte"
 
-#: app/templates/account.html:10
-msgid "Change Password"
-msgstr "Changer le mot de passe"
-
 #: app/templates/account.html:29 app/templates/account.html:32
 msgid "Delete Account"
 msgstr "Supprimer le compte"
@@ -319,78 +437,78 @@ msgstr ""
 "Une fois que vous supprimez votre compte, il n'y a pas de retour en "
 "arrière. Soyez certain."
 
-#: app/templates/account.html:43
+#: app/templates/account.html:44
 msgid "Confirm Account Deletion"
 msgstr "Confirmer la suppression du compte"
 
-#: app/templates/account.html:47
+#: app/templates/account.html:48
+#, fuzzy
 msgid ""
 "Are you sure you want to delete your account? This action cannot be "
-"undone. All your data will be permanently lost."
+"undone. All your data will\n"
+"                    be permanently lost."
 msgstr ""
 "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action ne peut "
 "pas être annulée. Toutes vos données seront perdues de façon permanente."
 
-#: app/templates/account.html:48
+#: app/templates/account.html:50
 msgid "To confirm, please type your username below:"
 msgstr "Pour confirmer, veuillez taper votre nom d'utilisateur ci-dessous :"
 
-#: app/templates/account.html:51
+#: app/templates/account.html:54
 msgid "Your username"
 msgstr "Votre nom d'utilisateur"
 
-#: app/templates/account.html:55
+#: app/templates/account.html:59
 msgid "Cancel"
 msgstr "Annuler"
 
-#: app/templates/account.html:56
-msgid "Delete My Account"
-msgstr "Supprimer mon compte"
-
-#: app/templates/base.html:6 app/templates/base.html:29
-#: app/templates/base.html:108
+#: app/templates/base.html:7 app/templates/base.html:35
+#: app/templates/base.html:126
 msgid "Pictogram-Tree Builder"
 msgstr "Constructeur d'arbres de pictogrammes"
 
-#: app/templates/base.html:30
+#: app/templates/base.html:37
 msgid "Toggle navigation"
 msgstr "Basculer la navigation"
 
-#: app/templates/base.html:36
+#: app/templates/base.html:43
 msgid "Home"
 msgstr "Accueil"
 
-#: app/templates/base.html:39 app/templates/builder.html:59
+#: app/templates/base.html:46 app/templates/builder.html:60
 msgid "Tree Builder"
 msgstr "Constructeur d'arbres"
 
-#: app/templates/base.html:42
+#: app/templates/base.html:49
 msgid "List Builder"
 msgstr "Constructeur de listes"
 
-#: app/templates/base.html:46
+#: app/templates/base.html:53
 msgid "Pictogram Bank"
 msgstr "Banque de pictogrammes"
 
-#: app/templates/base.html:67
+#: app/templates/base.html:82
 msgid "Login"
 msgstr "Connexion"
 
-#: app/templates/base.html:71
+#: app/templates/base.html:86
 msgid "Account"
 msgstr "Compte"
 
-#: app/templates/base.html:74
+#: app/templates/base.html:89
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: app/templates/base.html:98
-#, python-format
+#: app/templates/base.html:113
+#, fuzzy, python-format
 msgid ""
-"This site uses only connection data (server logs) for security and "
-"maintenance purposes. No personal information is collected via tracking "
-"or advertising cookies. By continuing your navigation, you accept our <a "
-"href=\"%(href)s\">privacy policy</a>."
+"This site uses only connection\n"
+"            data (server logs) for security and maintenance purposes. No "
+"personal information is collected via tracking\n"
+"            or advertising cookies. By continuing your navigation, you "
+"accept our <a href=\"%(href)s\">privacy\n"
+"                policy</a>."
 msgstr ""
 "Ce site utilise uniquement des données de connexion (journaux de serveur)"
 " à des fins de sécurité et de maintenance. Aucune information personnelle"
@@ -398,165 +516,211 @@ msgstr ""
 " votre navigation, vous acceptez notre <a href=\"%(href)s\">politique de "
 "confidentialité</a>."
 
-#: app/templates/base.html:100
+#: app/templates/base.html:118
 msgid "I understand"
 msgstr "J'ai compris"
 
-#: app/templates/base.html:106
+#: app/templates/base.html:124
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Connecté en tant que : %(username)s"
 
-#: app/templates/base.html:110
+#: app/templates/base.html:128
 msgid "Terms & Privacy"
 msgstr "Conditions et confidentialité"
 
-#: app/templates/builder.html:10
+#: app/templates/builder.html:11
 msgid "Import Options"
 msgstr "Options d'importation"
 
-#: app/templates/builder.html:13
+#: app/templates/builder.html:14
 msgid "Replace existing tree"
 msgstr "Remplacer l'arbre existant"
 
-#: app/templates/builder.html:18
+#: app/templates/builder.html:19
 msgid "Add to existing tree"
 msgstr "Ajouter à l'arbre existant"
 
-#: app/templates/builder.html:24
+#: app/templates/builder.html:25
 msgid "File Operations"
 msgstr "Opérations sur les fichiers"
 
-#: app/templates/builder.html:26
+#: app/templates/builder.html:27
 msgid "Import from JSON"
 msgstr "Importer depuis JSON"
 
-#: app/templates/builder.html:27
+#: app/templates/builder.html:28
 msgid "Export to JSON"
 msgstr "Exporter vers JSON"
 
-#: app/templates/builder.html:33
+#: app/templates/builder.html:34
 msgid "Database Operations"
 msgstr "Opérations sur la base de données"
 
-#: app/templates/builder.html:35 app/templates/builder.html:44
+#: app/templates/builder.html:36 app/templates/builder.html:45
 msgid "Save Tree"
 msgstr "Enregistrer l'arbre"
 
-#: app/templates/builder.html:37
+#: app/templates/builder.html:38
 msgid "Tree Name"
 msgstr "Nom de l'arbre"
 
-#: app/templates/builder.html:38
+#: app/templates/builder.html:39
 msgid "Enter tree name"
 msgstr "Entrez le nom de l'arbre"
 
-#: app/templates/builder.html:42 app/templates/list.html:65
+#: app/templates/builder.html:43 app/templates/list.html:74
 msgid "Make Public"
 msgstr "Rendre public"
 
-#: app/templates/builder.html:49
+#: app/templates/builder.html:50
 msgid "Load Tree from database"
 msgstr "Charger l'arbre depuis la base de données"
 
-#: app/templates/builder.html:50 app/templates/list.html:30
+#: app/templates/builder.html:51 app/templates/list.html:33
 msgid "Search trees..."
 msgstr "Rechercher des arbres..."
 
-#: app/templates/builder.html:52
+#: app/templates/builder.html:53
 msgid "Load Tree"
 msgstr "Charger l'arbre"
 
-#: app/templates/builder.html:60
+#: app/templates/builder.html:61
 msgid "Visualize Tree"
 msgstr "Visualiser l'arbre"
 
-#: app/templates/builder.html:72
+#: app/templates/builder.html:74
 msgid "Interactive Tree Visualization"
 msgstr "Visualisation interactive de l'arbre"
 
-#: app/templates/builder.html:79
+#: app/templates/builder.html:84
 msgid "Close"
 msgstr "Fermer"
 
-#: app/templates/builder.html:80 app/templates/list.html:98
+#: app/templates/builder.html:85 app/templates/list.html:113
 msgid "Export to PDF"
 msgstr "Exporter en PDF"
 
-#: app/templates/builder.html:89
+#: app/templates/builder.html:96
 msgid "Node Description"
 msgstr "Description du nœud"
 
-#: app/templates/builder.html:91
+#: app/templates/builder.html:99
 msgid "Enter node description..."
 msgstr "Entrez la description du nœud..."
 
-#: app/templates/builder.html:96
+#: app/templates/builder.html:104
 msgid "Images"
 msgstr "Images"
 
-#: app/templates/builder.html:97 app/templates/list.html:156
-msgid "Search images..."
+#: app/templates/builder.html:109 app/templates/list.html:322
+msgid "Local"
+msgstr ""
+
+#: app/templates/builder.html:125 app/templates/list.html:338
+#, fuzzy
+msgid "Search local images..."
 msgstr "Rechercher des images..."
 
-#: app/templates/builder.html:103
+#: app/templates/builder.html:144
 msgid "Delete selected branch"
 msgstr "Supprimer la branche sélectionnée"
 
-#: app/templates/builder.html:104
+#: app/templates/builder.html:145
 msgid "New tree"
 msgstr "Nouvel arbre"
 
-#: app/templates/forgot_password.html:5
-msgid "Reset Password"
-msgstr "Réinitialiser le mot de passe"
-
-#: app/templates/index.html:8
-msgid "Welcome to Pictogram-Tree Builder"
-msgstr "Bienvenue dans le Constructeur d'arbres de pictogrammes"
+#: app/templates/index.html:7
+msgid "PictoTree AAC Platform"
+msgstr "Plateforme CAA PictoTree"
 
 #: app/templates/index.html:9
-msgid "Create and share your own pictogram trees."
-msgstr "Créez et partagez vos propres arbres de pictogrammes."
-
-#: app/templates/index.html:11
-#, python-format
-msgid "Hi, %(username)s!"
-msgstr "Salut, %(username)s !"
+msgid ""
+"PictoTree is a comprehensive platform (Web Backend + Native Mobile App) "
+"designed for Augmentative and Alternative Communication (AAC). Our goal "
+"is to empower users—caregivers, speech therapists, and parents—to create,"
+" manage, and display personalized communication 'trees' using pictograms "
+"(leveraging the open-source ARASAAC library or personal imports). "
+"Currently under development, the system is hosted in production and "
+"accessible at pictotree.eu."
+msgstr ""
+"PictoTree est une plateforme complète (Backend Web + Application Mobile "
+"Native) conçue pour l'Aide à la Communication Alternative et Améliorée "
+"(CAA). L'objectif est de permettre aux utilisateurs (aidants, "
+"orthophonistes, parents) de créer, gérer et afficher des 'arbres' de "
+"communication personnalisés à l'aide de pictogrammes (notamment via la "
+"banque open source ARASAAC ou via des imports personnels). Le système, en "
+"cours de développement, est actuellement hébergé en production et "
+"accessible sur pictotree.eu."
 
 #: app/templates/index.html:13
-msgid "Get Started"
-msgstr "Commencer"
+msgid "Login / Register"
+msgstr "Connexion / Inscription"
 
-#: app/templates/index.html:27 app/templates/pictogram_bank.html:24
-msgid "Create"
-msgstr "Créer"
+#: app/templates/index.html:24
+msgid "1. The Tree Builder (Web)"
+msgstr "1. Le Constructeur d'Arbres (Web)"
 
-#: app/templates/index.html:28
+#: app/templates/index.html:26
 msgid ""
-"Easily build your own pictogram trees with our intuitive drag-and-drop "
-"interface."
+"Construct and organize your communication structures using a hierarchical"
+" interface. Drag and drop pictograms to build logical paths tailored to "
+"the user's specific needs. Once saved, these trees can be easily imported"
+" into the mobile application."
 msgstr ""
-"Construisez facilement vos propres arbres de pictogrammes avec notre "
-"interface intuitive de glisser-déposer."
-
-#: app/templates/index.html:35
-msgid "Share"
-msgstr "Partager"
+"Construisez et organisez vos structures de communication via une "
+"interface hiérarchique. Utilisez le 'glisser-déposer' pour créer des "
+"parcours logiques adaptés aux besoins spécifiques de l'utilisateur. Une "
+"fois sauvegardés, les arbres sont facilement importables dans "
+"l'application mobile."
 
 #: app/templates/index.html:36
-msgid "Share your creations with others by making them public."
-msgstr "Partagez vos créations avec d'autres en les rendant publiques."
+msgid "2. PictoTree Mobile App (Android)"
+msgstr "2. L'Application Mobile PictoTree (Android)"
 
-#: app/templates/index.html:43 app/templates/list.html:122
-msgid "Export"
-msgstr "Exporter"
-
-#: app/templates/index.html:44
-msgid "Export your trees as JSON files to use them anywhere."
+#: app/templates/index.html:38
+msgid ""
+"The native mobile application uses a spatial navigation system (View 4) "
+"to browse through imported trees. It includes integrated Text-to-Speech "
+"(TTS) for vocal feedback and works fully offline to ensure communication "
+"is always available."
 msgstr ""
-"Exportez vos arbres sous forme de fichiers JSON pour les utiliser "
-"n'importe où."
+"L'application mobile native utilise un système de navigation spatiale "
+"(Vue 4) pour parcourir les arbres importés. Elle intègre un moteur de "
+"synthèse vocale (TTS) et fonctionne entièrement hors-ligne pour garantir "
+"une communication constante."
+
+#: app/templates/index.html:48
+msgid "3. Pictogram Bank (Management)"
+msgstr "3. La Banque de Pictogrammes (Gestion)"
+
+#: app/templates/index.html:50
+msgid ""
+"Centralize your visual vocabulary. Search and import icons from the "
+"ARASAAC database or upload your own personal images. Organize them into "
+"folders to keep your library structured and ready for use in your trees "
+"or lists."
+msgstr ""
+"Centralisez votre vocabulaire visuel. Recherchez et importez des icônes "
+"depuis la base de données ARASAAC ou téléversez vos propres images "
+"personnelles. Organisez-les en dossiers pour garder votre bibliothèque "
+"structurée et prête à l'emploi."
+
+#: app/templates/index.html:60
+msgid "4. List & Print Tool (Paper Support)"
+msgstr "4. Outil de Listes et d'Impression (Support Papier)"
+
+#: app/templates/index.html:62
+msgid ""
+"Generate customizable pictogram lists designed for printing. This tool "
+"provides various layout options to create physical communication boards, "
+"schedules, or educational materials directly from your digital "
+"collection."
+msgstr ""
+"Générez des listes de pictogrammes personnalisables pour l'impression. "
+"Cet outil propose différentes options de mise en page pour créer des "
+"tableaux de communication physiques, des emplois du temps ou des supports "
+"éducatifs directement depuis votre collection."
 
 #: app/templates/legal.html:8
 msgid "TERMS OF SERVICE"
@@ -894,117 +1058,245 @@ msgstr "Source de l'arbre"
 msgid "Import Tree from JSON"
 msgstr "Importer un arbre depuis JSON"
 
-#: app/templates/list.html:25
+#: app/templates/list.html:26
 msgid "Load Tree from Database"
 msgstr "Charger un arbre depuis la base de données"
 
-#: app/templates/list.html:34
-msgid "Load Selected Tree"
-msgstr "Charger l'arbre sélectionné"
+#: app/templates/list.html:37
+msgid ""
+"Load Selected\n"
+"                                Tree"
+msgstr ""
 
-#: app/templates/list.html:43
+#: app/templates/list.html:47
 msgid "List Operations"
 msgstr "Opérations sur la liste"
 
-#: app/templates/list.html:45
+#: app/templates/list.html:49
 msgid "Import List from JSON"
 msgstr "Importer une liste depuis JSON"
 
-#: app/templates/list.html:46
+#: app/templates/list.html:51
 msgid "Export List to JSON"
 msgstr "Exporter la liste vers JSON"
 
-#: app/templates/list.html:54
+#: app/templates/list.html:61
 msgid "Save List to Database"
 msgstr "Enregistrer la liste dans la base de données"
 
-#: app/templates/list.html:60
+#: app/templates/list.html:68
 msgid "List Name"
 msgstr "Nom de la liste"
 
-#: app/templates/list.html:61
+#: app/templates/list.html:70
 msgid "Enter list name"
 msgstr "Entrez le nom de la liste"
 
-#: app/templates/list.html:67
+#: app/templates/list.html:76
 msgid "Save List"
 msgstr "Enregistrer la liste"
 
-#: app/templates/list.html:75
+#: app/templates/list.html:86
 msgid "Load List from Database"
 msgstr "Charger la liste depuis la base de données"
 
-#: app/templates/list.html:80
+#: app/templates/list.html:93
 msgid "Search lists..."
 msgstr "Rechercher des listes..."
 
-#: app/templates/list.html:84
-msgid "Load Selected List"
-msgstr "Charger la liste sélectionnée"
+#: app/templates/list.html:97
+msgid ""
+"Load Selected\n"
+"                                List"
+msgstr ""
 
-#: app/templates/list.html:93
+#: app/templates/list.html:107
 msgid "Export Operations"
 msgstr "Opérations d'exportation"
 
-#: app/templates/list.html:104
-msgid "Image Size"
-msgstr "Taille de l'image"
+#: app/templates/list.html:122
+msgid "Quick Themes"
+msgstr ""
 
-#: app/templates/list.html:108
+#: app/templates/list.html:124
+msgid "Grid without margins, with border"
+msgstr ""
+
+#: app/templates/list.html:124
+msgid "Planche à découper (PECS)"
+msgstr ""
+
+#: app/templates/list.html:125
+msgid "Single horizontal line"
+msgstr ""
+
+#: app/templates/list.html:125
+msgid "Bandelette de Routine"
+msgstr ""
+
+#: app/templates/list.html:126
+#, fuzzy
+msgid "Large images"
+msgstr "Images"
+
+#: app/templates/list.html:126
+msgid "Flashcards (A4)"
+msgstr ""
+
+#: app/templates/list.html:136
+#, fuzzy
+msgid "Layout"
+msgstr "Mode de mise en page"
+
+#: app/templates/list.html:141
+msgid "Style"
+msgstr ""
+
+#: app/templates/list.html:146
+#, fuzzy
+msgid "Text"
+msgstr "Exporter"
+
+#: app/templates/list.html:156
 msgid "Layout Mode"
 msgstr "Mode de mise en page"
 
-#: app/templates/list.html:112
-msgid "Chain Mode"
-msgstr "Mode chaîne"
+#: app/templates/list.html:158
+#, fuzzy
+msgid "Vertical Chain"
+msgstr "Nouvelle chaîne"
 
-#: app/templates/list.html:118
-msgid "Grid Mode"
+#: app/templates/list.html:159
+msgid "Horizontal Strip"
+msgstr ""
+
+#: app/templates/list.html:160
+#, fuzzy
+msgid "Grid"
 msgstr "Mode grille"
 
-#: app/templates/list.html:132
+#: app/templates/list.html:164
+msgid "Page Orientation"
+msgstr ""
+
+#: app/templates/list.html:170
+msgid "Portrait"
+msgstr ""
+
+#: app/templates/list.html:174
+msgid "Landscape"
+msgstr ""
+
+#: app/templates/list.html:178
+msgid ""
+"Image\n"
+"                                            Size"
+msgstr ""
+
+#: app/templates/list.html:186
+msgid "Lateral Padding"
+msgstr ""
+
+#: app/templates/list.html:195
+msgid "Vertical Padding"
+msgstr ""
+
+#: app/templates/list.html:208
+msgid "Border"
+msgstr ""
+
+#: app/templates/list.html:210 app/templates/list.html:230
+#: app/templates/list.html:270
+#, fuzzy
+msgid "Color"
+msgstr "Fermer"
+
+#: app/templates/list.html:215
+msgid "Width"
+msgstr ""
+
+#: app/templates/list.html:221
+msgid "Radius"
+msgstr ""
+
+#: app/templates/list.html:228
+msgid "Background"
+msgstr ""
+
+#: app/templates/list.html:237
+msgid ""
+"Show\n"
+"                                            Shadow"
+msgstr ""
+
+#: app/templates/list.html:247
+msgid "Show Text"
+msgstr ""
+
+#: app/templates/list.html:250
+#, fuzzy
+msgid "Position"
+msgstr "Description"
+
+#: app/templates/list.html:252
+msgid "Bottom"
+msgstr ""
+
+#: app/templates/list.html:253
+msgid "Top"
+msgstr ""
+
+#: app/templates/list.html:257
+msgid "Font"
+msgstr ""
+
+#: app/templates/list.html:264
+msgid "Size"
+msgstr ""
+
+#: app/templates/list.html:280
+msgid "Generate PDF"
+msgstr ""
+
+#: app/templates/list.html:291
 msgid "Select from Tree"
 msgstr "Sélectionner depuis l'arbre"
 
-#: app/templates/list.html:136
+#: app/templates/list.html:296
 msgid "Element"
 msgstr "Élément"
 
-#: app/templates/list.html:140
+#: app/templates/list.html:301
 msgid "Branch"
 msgstr "Branche"
 
-#: app/templates/list.html:143 app/templates/list.html:154
+#: app/templates/list.html:304 app/templates/list.html:315
 msgid "Drag to copy to list"
 msgstr "Glisser pour copier dans la liste"
 
-#: app/templates/list.html:153
+#: app/templates/list.html:314
 msgid "Select from Images"
 msgstr "Sélectionner parmi les images"
 
-#: app/templates/list.html:161
+#: app/templates/list.html:354
 msgid "Selected Link Description"
 msgstr "Description du lien sélectionné"
 
-#: app/templates/list.html:162
+#: app/templates/list.html:356
 msgid "Select a link from the bottom list to edit its description..."
 msgstr "Sélectionnez un lien dans la liste du bas pour modifier sa description..."
 
-#: app/templates/list.html:171
+#: app/templates/list.html:365
 msgid "Chained List Builder"
 msgstr "Constructeur de listes chaînées"
 
-#: app/templates/list.html:173
+#: app/templates/list.html:367
 msgid "Delete Selected Link"
 msgstr "Supprimer le lien sélectionné"
 
-#: app/templates/list.html:174
+#: app/templates/list.html:368
 msgid "New Chain"
 msgstr "Nouvelle chaîne"
-
-#: app/templates/login.html:8
-msgid "Sign In"
-msgstr "Se connecter"
 
 #: app/templates/login.html:31
 msgid "New User?"
@@ -1014,7 +1306,7 @@ msgstr "Nouvel utilisateur ?"
 msgid "Click to Register!"
 msgstr "Cliquez pour vous inscrire !"
 
-#: app/templates/login.html:32
+#: app/templates/login.html:33
 msgid "Forgot Your Password?"
 msgstr "Mot de passe oublié ?"
 
@@ -1037,6 +1329,10 @@ msgstr "Créer un dossier"
 #: app/templates/pictogram_bank.html:23
 msgid "Folder name"
 msgstr "Nom du dossier"
+
+#: app/templates/pictogram_bank.html:24
+msgid "Create"
+msgstr "Créer"
 
 #: app/templates/pictogram_bank.html:29
 msgid "Import Image"
@@ -1086,10 +1382,6 @@ msgstr "Exporter l'image"
 msgid "Download Selected Image"
 msgstr "Télécharger l'image sélectionnée"
 
-#: app/templates/register.html:8
-msgid "Register"
-msgstr "S'inscrire"
-
 #: app/templates/register.html:48
 msgid "I accept the"
 msgstr "J'accepte les"
@@ -1097,10 +1389,6 @@ msgstr "J'accepte les"
 #: app/templates/register.html:48
 msgid "Terms & Privacy Policy"
 msgstr "Conditions d'utilisation et politique de confidentialité"
-
-#: app/templates/resend_confirmation_request.html:5
-msgid "Resend Confirmation Email"
-msgstr "Renvoyer l'e-mail de confirmation"
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""
@@ -1137,6 +1425,497 @@ msgstr ""
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Si vous n'avez pas fait cette demande, veuillez ignorer cet e-mail."
+
+#: venv/Lib/site-packages/click/_termui_impl.py:613
+#, python-brace-format
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/Lib/site-packages/click/_termui_impl.py:617
+#, python-brace-format
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1114
+#: venv/Lib/site-packages/click/core.py:1151
+#, python-brace-format
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1170
+#, fuzzy
+msgid "Options"
+msgstr "Options d'importation"
+
+#: venv/Lib/site-packages/click/core.py:1245
+#, python-brace-format
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:1264
+#, python-brace-format
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1448
+msgid "Aborted!"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1822
+msgid "Commands"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1853
+msgid "Missing command."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1931
+#, python-brace-format
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2355
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2378
+#, python-brace-format
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:2567
+#, python-brace-format
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3015
+#, python-brace-format
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3018
+#, python-brace-format
+msgid "default: {default}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3022
+msgid "required"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3082
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:50
+#: venv/Lib/site-packages/click/exceptions.py:89
+#, python-brace-format
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:81
+#, python-brace-format
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:130
+#, python-brace-format
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:132
+#, python-brace-format
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:192
+#, fuzzy
+msgid "Missing option"
+msgstr "Opérations sur la liste"
+
+#: venv/Lib/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:196
+#, python-brace-format
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:203
+#, python-brace-format
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:223
+#, python-brace-format
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:235
+#, python-brace-format
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:289
+#, python-brace-format
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:199
+#, python-brace-format
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:381
+#, python-brace-format
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:444
+#, python-brace-format
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:332
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:339
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:165
+#, fuzzy
+msgid "Repeat for confirmation"
+msgstr "Renvoyer l'e-mail de confirmation"
+
+#: venv/Lib/site-packages/click/termui.py:181
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:183
+#, python-brace-format
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:194
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:253
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:872
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:332
+#, python-brace-format
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:369
+#, python-brace-format
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:460
+#, python-brace-format
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:482
+#, python-brace-format
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:538
+#, python-brace-format
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:719
+#, python-brace-format
+msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:747
+#, python-brace-format
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:937
+msgid "file"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:939
+msgid "directory"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:941
+msgid "path"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:988
+#, python-brace-format
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:997
+#, python-brace-format
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1005
+#, python-brace-format
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1014
+#, python-brace-format
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1023
+#, python-brace-format
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1032
+#, python-brace-format
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1099
+#, python-brace-format
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/flask_wtf/file.py:55
+#: venv/Lib/site-packages/wtforms/validators.py:293
+#: venv/Lib/site-packages/wtforms/validators.py:323
+#, fuzzy
+msgid "This field is required."
+msgstr "parent_id est requis"
+
+#: venv/Lib/site-packages/flask_wtf/file.py:94
+#, python-brace-format
+msgid "File does not have an approved extension: {extensions}"
+msgstr ""
+
+#: venv/Lib/site-packages/flask_wtf/file.py:101
+msgid "File does not have an approved extension."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:86
+#, python-format
+msgid "Invalid field name '%s'."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:99
+#, python-format
+msgid "Field must be equal to %(other_name)s."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:146
+#, python-format
+msgid "Field must be at least %(min)d character long."
+msgid_plural "Field must be at least %(min)d characters long."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:152
+#, python-format
+msgid "Field cannot be longer than %(max)d character."
+msgid_plural "Field cannot be longer than %(max)d characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:158
+#, python-format
+msgid "Field must be exactly %(max)d character long."
+msgid_plural "Field must be exactly %(max)d characters long."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:164
+#, python-format
+msgid "Field must be between %(min)d and %(max)d characters long."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:216
+#, python-format
+msgid "Number must be at least %(min)s."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:219
+#, python-format
+msgid "Number must be at most %(max)s."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:222
+#, python-format
+msgid "Number must be between %(min)s and %(max)s."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:358
+#, fuzzy
+msgid "Invalid input."
+msgstr "Données invalides"
+
+#: venv/Lib/site-packages/wtforms/validators.py:422
+#, fuzzy
+msgid "Invalid email address."
+msgstr "Type d'élément non valide"
+
+#: venv/Lib/site-packages/wtforms/validators.py:460
+msgid "Invalid IP address."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:503
+#, fuzzy
+msgid "Invalid Mac address."
+msgstr "Mot de passe actuel invalide."
+
+#: venv/Lib/site-packages/wtforms/validators.py:540
+#, fuzzy
+msgid "Invalid URL."
+msgstr "Données invalides"
+
+#: venv/Lib/site-packages/wtforms/validators.py:561
+#, fuzzy
+msgid "Invalid UUID."
+msgstr "Données invalides"
+
+#: venv/Lib/site-packages/wtforms/validators.py:595
+#, python-format
+msgid "Invalid value, must be one of: %(values)s."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:631
+#, python-format
+msgid "Invalid value, can't be any of: %(values)s."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:700
+msgid "This field cannot be edited."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/validators.py:716
+msgid "This field is disabled and cannot have a value."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/csrf/core.py:96
+#, fuzzy
+msgid "Invalid CSRF Token."
+msgstr "Données JSON non valides"
+
+#: venv/Lib/site-packages/wtforms/csrf/session.py:64
+msgid "CSRF token missing."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/csrf/session.py:72
+#, fuzzy
+msgid "CSRF failed."
+msgstr "Choisir un fichier"
+
+#: venv/Lib/site-packages/wtforms/csrf/session.py:77
+msgid "CSRF token expired."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/choices.py:142
+msgid "Invalid Choice: could not coerce."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/choices.py:149
+#: venv/Lib/site-packages/wtforms/fields/choices.py:203
+msgid "Choices cannot be None."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/choices.py:155
+msgid "Not a valid choice."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/choices.py:194
+msgid "Invalid choice(s): one or more data inputs could not be coerced."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/choices.py:212
+#, python-format
+msgid "'%(value)s' is not a valid choice for this field."
+msgid_plural "'%(value)s' are not valid choices for this field."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/wtforms/fields/datetime.py:52
+msgid "Not a valid datetime value."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/datetime.py:78
+#, fuzzy
+msgid "Not a valid date value."
+msgstr "Données invalides"
+
+#: venv/Lib/site-packages/wtforms/fields/datetime.py:104
+msgid "Not a valid time value."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/datetime.py:149
+msgid "Not a valid week value."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/numeric.py:82
+#: venv/Lib/site-packages/wtforms/fields/numeric.py:92
+msgid "Not a valid integer value."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/numeric.py:168
+msgid "Not a valid decimal value."
+msgstr ""
+
+#: venv/Lib/site-packages/wtforms/fields/numeric.py:197
+msgid "Not a valid float value."
+msgstr ""
 
 #~ msgid "privacy policy"
 #~ msgstr "politique de confidentialité"
@@ -1196,3 +1975,52 @@ msgstr "Si vous n'avez pas fait cette demande, veuillez ignorer cet e-mail."
 #~ "Vous devez accepter les conditions "
 #~ "d'utilisation et la politique de "
 #~ "confidentialité pour continuer."
+
+#~ msgid "No images to export"
+#~ msgstr "Aucune image à exporter"
+
+#~ msgid "Welcome to Pictogram-Tree Builder"
+#~ msgstr "Bienvenue dans le Constructeur d'arbres de pictogrammes"
+
+#~ msgid "Create and share your own pictogram trees."
+#~ msgstr "Créez et partagez vos propres arbres de pictogrammes."
+
+#~ msgid "Hi, %(username)s!"
+#~ msgstr "Salut, %(username)s !"
+
+#~ msgid "Get Started"
+#~ msgstr "Commencer"
+
+#~ msgid ""
+#~ "Easily build your own pictogram trees"
+#~ " with our intuitive drag-and-drop "
+#~ "interface."
+#~ msgstr ""
+#~ "Construisez facilement vos propres arbres "
+#~ "de pictogrammes avec notre interface "
+#~ "intuitive de glisser-déposer."
+
+#~ msgid "Share"
+#~ msgstr "Partager"
+
+#~ msgid "Share your creations with others by making them public."
+#~ msgstr "Partagez vos créations avec d'autres en les rendant publiques."
+
+#~ msgid "Export your trees as JSON files to use them anywhere."
+#~ msgstr ""
+#~ "Exportez vos arbres sous forme de "
+#~ "fichiers JSON pour les utiliser "
+#~ "n'importe où."
+
+#~ msgid "Load Selected Tree"
+#~ msgstr "Charger l'arbre sélectionné"
+
+#~ msgid "Load Selected List"
+#~ msgstr "Charger la liste sélectionnée"
+
+#~ msgid "Image Size"
+#~ msgstr "Taille de l'image"
+
+#~ msgid "Chain Mode"
+#~ msgstr "Mode chaîne"
+

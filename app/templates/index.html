@@ -1,52 +1,117 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row align-items-center">
-    <div class="col-md-6">
-        <div class="p-5 mb-4 bg-light rounded-3">
-            <div class="container-fluid py-5">
-                <h1 class="display-5 fw-bold">{{ _('Welcome to Pictogram-Tree Builder') }}</h1>
-                <p class="col-md-8 fs-4">{{ _('Create and share your own pictogram trees.') }}</p>
-                {% if current_user.is_authenticated %}
-                <p>{{ _('Hi, %(username)s!', username=current_user.username) }}</p>
-                {% else %}
-                <a class="btn btn-primary btn-lg" href="{{ url_for('auth.login') }}" role="button">{{ _('Get Started')
-                    }}</a>
-                {% endif %}
-            </div>
+<!-- Intro / Hero Section with Background Image -->
+<div class="intro-header p-5 mb-5 rounded-3 shadow-sm position-relative overflow-hidden text-white">
+    <div class="background-overlay"></div>
+    <div class="container-fluid py-2 position-relative" style="z-index: 2;">
+        <h1 class="display-5 fw-bold">{{ _('PictoTree AAC Platform') }}</h1>
+        <p class="fs-5 mt-4" style="max-width: 900px; line-height: 1.6; opacity: 0.95;">
+            {{ _("PictoTree is a comprehensive platform (Web Backend + Native Mobile App) designed for Augmentative and Alternative Communication (AAC). Our goal is to empower users—caregivers, speech therapists, and parents—to create, manage, and display personalized communication 'trees' using pictograms (leveraging the open-source ARASAAC library or personal imports). Currently under development, the system is hosted in production and accessible at pictotree.eu.") }}
+        </p>
+        {% if not current_user.is_authenticated %}
+        <div class="mt-4">
+            <a class="btn btn-primary btn-lg px-5 shadow border-0" style="background-color: #6200EE;" href="{{ url_for('auth.login') }}">{{ _('Login / Register') }}</a>
         </div>
-    </div>
-    <div class="col-md-6">
-        <img src="{{ url_for('static', filename='images/homepage_tree.jpeg') }}" class="img-fluid rounded"
-            alt="Tree image">
+        {% endif %}
     </div>
 </div>
 
-<div class="row mt-5">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Create') }}</h5>
-                <p class="card-text">{{ _('Easily build your own pictogram trees with our intuitive drag-and-drop
-                    interface.') }}</p>
+<div class="row g-5">
+    <!-- 1. The Tree Builder -->
+    <div class="col-lg-6">
+        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
+                <iframe src="https://www.youtube.com/embed/qkd-dN8ngwA" title="Tree Builder Demo" allowfullscreen class="border-0"></iframe>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">1</div>
+                    <h3 class="card-title h4 text-primary m-0">{{ _('The Tree Builder (Web)') }}</h3>
+                </div>
+                <p class="card-text text-secondary">
+                    {{ _("Construct and organize your communication structures using a hierarchical interface. Drag and drop pictograms to build logical paths tailored to the user's specific needs. Once saved, these trees can be easily imported into the mobile application.") }}
+                </p>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Share') }}</h5>
-                <p class="card-text">{{ _('Share your creations with others by making them public.') }}</p>
+
+    <!-- 2. PictoTree Mobile App (Video swapped with 4) -->
+    <div class="col-lg-6">
+        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
+                <iframe src="https://www.youtube.com/embed/vUW_iqguNBg" title="Mobile App Demo" allowfullscreen class="border-0"></iframe>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">2</div>
+                    <h3 class="card-title h4 text-primary m-0">{{ _('PictoTree Mobile App (Android)') }}</h3>
+                </div>
+                <p class="card-text text-secondary">
+                    {{ _("The native mobile application uses a spatial navigation system (View 4) to browse through imported trees. It includes integrated Text-to-Speech (TTS) for vocal feedback and works fully offline to ensure communication is always available.") }}
+                </p>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Export') }}</h5>
-                <p class="card-text">{{ _('Export your trees as JSON files to use them anywhere.') }}</p>
+
+    <!-- 3. Pictogram Bank -->
+    <div class="col-lg-6">
+        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
+                <iframe src="https://www.youtube.com/embed/rmOlZieS948" title="Pictogram Bank Demo" allowfullscreen class="border-0"></iframe>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">3</div>
+                    <h3 class="card-title h4 text-primary m-0">{{ _('Pictogram Bank (Management)') }}</h3>
+                </div>
+                <p class="card-text text-secondary">
+                    {{ _("Centralize your visual vocabulary. Search and import icons from the ARASAAC database or upload your own personal images. Organize them into folders to keep your library structured and ready for use in your trees or lists.") }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. List & Print Tool (Video swapped with 2) -->
+    <div class="col-lg-6">
+        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
+                <iframe src="https://www.youtube.com/embed/Ff0TDFh9q64" title="List Builder Demo" allowfullscreen class="border-0"></iframe>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">4</div>
+                    <h3 class="card-title h4 text-primary m-0">{{ _('List & Print Tool (Paper Support)') }}</h3>
+                </div>
+                <p class="card-text text-secondary">
+                    {{ _("Generate customizable pictogram lists designed for printing. This tool provides various layout options to create physical communication boards, schedules, or educational materials directly from your digital collection.") }}
+                </p>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .intro-header {
+        background: url("{{ url_for('static', filename='images/homepage_tree.jpeg') }}") no-repeat center center;
+        background-size: cover;
+        min-height: 300px;
+    }
+    .background-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6); /* Sombre pour faire ressortir le texte blanc */
+        z-index: 1;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+</style>
 {% endblock %}
