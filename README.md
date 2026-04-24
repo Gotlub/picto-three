@@ -77,6 +77,30 @@ python add_test_images.py
 
 ---
 
+## 🛠 Development Workflow
+
+To maintain code quality and avoid CI failures, please run the following commands before committing your changes:
+
+### 1. Quality Control (Linting)
+We use **Ruff** for Python and **ESLint** for JavaScript.
+```bash
+# Python linting
+ruff check .
+
+# JavaScript linting
+npm run lint
+# or
+npx eslint .
+```
+
+### 2. Running Tests
+Ensure all backend tests pass using **Pytest**:
+```bash
+pytest -v
+```
+
+---
+
 ## 🌐 Internationalization & Testing
 
 ### Running Tests

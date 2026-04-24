@@ -17,6 +17,12 @@ Ce fichier contient les commandes et workflows exacts à utiliser avec `gemini-c
     # Expected execution: pytest -v
     ```
 
+*   **Vérifier la qualité du code (Linting) :**
+    ```bash
+    gemini -p "Vérifie la qualité du code avec ruff et eslint."
+    # Expected execution: ruff check . && npx eslint .
+    ```
+
 *   **Lancer l'application localement :**
     ```bash
     gemini -p "Démarre le serveur de développement Flask."
