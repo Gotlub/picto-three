@@ -52,14 +52,14 @@ def test_login_logout(client):
             'password': 'Password123'
         }, follow_redirects=True)
         assert response.status_code == 200
-        assert b'Hi, testuser!' in response.data
+        assert b'Logged in as: testuser' in response.data
         User.query.filter_by(username='testuser').first()
         assert b'Logout' in response.data
 
         # Logout
         response = client.get('/logout', follow_redirects=True)
         assert response.status_code == 200
-        assert b'Hi, testuser!' not in response.data
+        assert b'Logged in as: testuser' not in response.data
         assert b'Login' in response.data
 
 def test_login_unconfirmed_user(client):
@@ -75,7 +75,7 @@ def test_login_unconfirmed_user(client):
 
     assert response.status_code == 200
     assert 'Your account is not confirmed.' in response.data.decode('utf-8')
-    assert b'Hi, unconfirmedlogin!' not in response.data
+    assert b'Logged in as: unconfirmedlogin' not in response.data
 
 def test_password_strength_and_account_deletion(client):
     # 1. Test registration with a weak password
