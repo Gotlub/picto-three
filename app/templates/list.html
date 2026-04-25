@@ -7,9 +7,9 @@
 
 
 {% block content %}
-<div id="list-page-container" class="container-fluid d-flex flex-column">
-    <!-- Top panels row -->
-    <div class="row" style="height: 70%;">
+<div id="list-page-container" class="container-fluid d-flex flex-column" style="height: 92vh; min-height: 700px;">
+    <!-- Top panels row: Main Workspace (65% of viewport height) -->
+    <div class="row" style="height: 65%;">
         <!-- Left Sidebar: Load/Save Menu -->
         <div class="col-md-3 sidebar d-flex flex-column h-100">
 
@@ -358,8 +358,8 @@
         </div>
     </div>
 
-    <!-- Bottom panel row -->
-    <div class="row mt-2" style="height: 30%;">
+    <!-- Bottom panel row: Chained List Builder (27% of viewport height) -->
+    <div class="row mt-2" style="height: 27%;">
         <div class="col-12 d-flex flex-column h-100">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>{{ _('Chained List Builder') }}</h4>
