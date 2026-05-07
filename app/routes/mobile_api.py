@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from app.models import User, Tree, Image
 from app import db 
 import json
