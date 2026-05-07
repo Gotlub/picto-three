@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-25 01:02+0200\n"
+"POT-Creation-Date: 2026-04-28 23:26+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -18,120 +18,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
-
-#: app/forms.py:16
-msgid "be at least 9 characters long"
-msgstr ""
-
-#: app/forms.py:18
-msgid "contain at least one uppercase letter"
-msgstr ""
-
-#: app/forms.py:20
-msgid "contain at least one digit"
-msgstr ""
-
-#: app/forms.py:23
-msgid "Password must"
-msgstr ""
-
-#: app/forms.py:27 app/forms.py:33 app/forms.py:60
-#, fuzzy
-msgid "Username"
-msgstr "Twoja nazwa użytkownika"
-
-#: app/forms.py:28 app/forms.py:35 app/forms.py:68
-#, fuzzy
-msgid "Password"
-msgstr "Zresetuj hasło"
-
-#: app/forms.py:29
-msgid "Remember Me"
-msgstr ""
-
-#: app/forms.py:30 app/templates/login.html:8
-msgid "Sign In"
-msgstr "Zaloguj się"
-
-#: app/forms.py:34 app/forms.py:64 app/forms.py:74 app/forms.py:79
-msgid "Email"
-msgstr ""
-
-#: app/forms.py:37 app/forms.py:70
-#, fuzzy
-msgid "Repeat Password"
-msgstr "Zresetuj hasło"
-
-#: app/forms.py:38
-#, fuzzy
-msgid "I accept the Terms & Privacy Policy"
-msgstr "Warunki korzystania z usługi i Politykę prywatności"
-
-#: app/forms.py:38
-msgid "You must accept the terms and privacy policy to continue."
-msgstr ""
-
-#: app/forms.py:40 app/templates/register.html:8
-msgid "Register"
-msgstr "Zarejestruj się"
-
-#: app/forms.py:45
-msgid "Please use a different username."
-msgstr ""
-
-#: app/forms.py:50
-msgid "Please use a different email address."
-msgstr ""
-
-#: app/forms.py:53
-#, fuzzy
-msgid "Current Password"
-msgstr "Zresetuj hasło"
-
-#: app/forms.py:54
-#, fuzzy
-msgid "New Password"
-msgstr "Zmień hasło"
-
-#: app/forms.py:56
-#, fuzzy
-msgid "Repeat New Password"
-msgstr "Zresetuj hasło"
-
-#: app/forms.py:57 app/templates/account.html:10
-msgid "Change Password"
-msgstr "Zmień hasło"
-
-#: app/forms.py:61 app/templates/account.html:60
-msgid "Delete My Account"
-msgstr "Usuń moje konto"
-
-#: app/forms.py:65
-#, fuzzy
-msgid "Request Password Reset"
-msgstr "Zresetuj hasło"
-
-#: app/forms.py:71 app/templates/forgot_password.html:5
-msgid "Reset Password"
-msgstr "Zresetuj hasło"
-
-#: app/forms.py:75 app/templates/resend_confirmation_request.html:5
-msgid "Resend Confirmation Email"
-msgstr "Wyślij ponownie e-mail z potwierdzeniem"
-
-#: app/forms.py:78
-#, fuzzy
-msgid "Name"
-msgstr "Nazwa drzewa"
-
-#: app/forms.py:80
-#, fuzzy
-msgid "Message"
-msgstr "Obrazy"
-
-#: app/forms.py:82
-msgid "Send"
-msgstr ""
 
 #: app/routes/api.py:53 app/routes/api.py:125 app/routes/api.py:283
 #: app/routes/api.py:457 app/routes/api.py:562
@@ -378,7 +264,7 @@ msgstr "Nieprawidłowe przesłanie formularza."
 msgid "Invalid tree data received."
 msgstr "Otrzymano nieprawidłowe dane drzewa."
 
-#: app/routes/main.py:16 app/templates/legal.html:5
+#: app/routes/main.py:16 app/templates/legal.html:34
 msgid "Legal Information"
 msgstr "Informacje Prawne"
 
@@ -386,7 +272,8 @@ msgstr "Informacje Prawne"
 msgid "Your message has been sent successfully!"
 msgstr "Twoja wiadomość została pomyślnie wysłana!"
 
-#: app/routes/main.py:35 app/templates/about.html:6 app/templates/base.html:129
+#: app/routes/main.py:35 app/templates/about.html:32
+#: app/templates/base.html:146
 msgid "About & Contact"
 msgstr "O nas i Kontakt"
 
@@ -398,11 +285,11 @@ msgstr "Twój język został zaktualizowany."
 msgid "The language has been updated for this session."
 msgstr "Język został zaktualizowany dla tej sesji."
 
-#: app/templates/about.html:9
+#: app/templates/about.html:36
 msgid "Open Source"
 msgstr "Open Source"
 
-#: app/templates/about.html:10
+#: app/templates/about.html:38
 #, fuzzy
 msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
@@ -413,17 +300,35 @@ msgstr ""
 "przeglądać kod źródłowy, wnosić wkład lub ponownie go wykorzystywać w "
 "celach niekomercyjnych."
 
-#: app/templates/about.html:11
+#: app/templates/about.html:42
 msgid "View Source Code on GitHub"
 msgstr "Zobacz kod źródłowy na GitHub"
 
-#: app/templates/about.html:15
+#: app/templates/about.html:50
 msgid "Contact Us"
 msgstr "Skontaktuj się z nami"
+
+#: app/templates/about.html:56
+#, fuzzy
+msgid "Your Name"
+msgstr "Twoja nazwa użytkownika"
+
+#: app/templates/about.html:59
+#, fuzzy
+msgid "Your Email"
+msgstr "Twoja nazwa użytkownika"
+
+#: app/templates/about.html:62
+msgid "How can we help?"
+msgstr ""
 
 #: app/templates/account.html:5
 msgid "Account Management"
 msgstr "Zarządzanie kontem"
+
+#: app/templates/account.html:10
+msgid "Change Password"
+msgstr "Zmień hasło"
 
 #: app/templates/account.html:29 app/templates/account.html:32
 msgid "Delete Account"
@@ -459,44 +364,48 @@ msgstr "Twoja nazwa użytkownika"
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: app/templates/base.html:7 app/templates/base.html:35
-#: app/templates/base.html:126
+#: app/templates/account.html:60
+msgid "Delete My Account"
+msgstr "Usuń moje konto"
+
+#: app/templates/base.html:7 app/templates/base.html:51
+#: app/templates/base.html:143
 msgid "Pictogram-Tree Builder"
 msgstr "Konstruktor drzewa piktogramów"
 
-#: app/templates/base.html:37
+#: app/templates/base.html:54
 msgid "Toggle navigation"
 msgstr "Przełącz nawigację"
 
-#: app/templates/base.html:43
+#: app/templates/base.html:60
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/templates/base.html:46 app/templates/builder.html:60
+#: app/templates/base.html:63 app/templates/builder.html:60
 msgid "Tree Builder"
 msgstr "Konstruktor drzewa"
 
-#: app/templates/base.html:49
+#: app/templates/base.html:66
 msgid "List Builder"
 msgstr "Konstruktor listy"
 
-#: app/templates/base.html:53
+#: app/templates/base.html:70
 msgid "Pictogram Bank"
 msgstr "Bank piktogramów"
 
-#: app/templates/base.html:82
+#: app/templates/base.html:99
 msgid "Login"
 msgstr "Zaloguj się"
 
-#: app/templates/base.html:86
+#: app/templates/base.html:103
 msgid "Account"
 msgstr "Konto"
 
-#: app/templates/base.html:89
+#: app/templates/base.html:106
 msgid "Logout"
 msgstr "Wyloguj się"
 
-#: app/templates/base.html:113
+#: app/templates/base.html:130
 #, fuzzy, python-format
 msgid ""
 "This site uses only connection\n"
@@ -511,16 +420,16 @@ msgstr ""
 "pomocą plików cookie śledzących lub reklamowych. Kontynuując nawigację, "
 "akceptujesz naszą <a href=\"%(href)s\">politykę prywatności</a>."
 
-#: app/templates/base.html:118
+#: app/templates/base.html:135
 msgid "I understand"
 msgstr "Rozumiem"
 
-#: app/templates/base.html:124
+#: app/templates/base.html:141
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Zalogowany jako: %(username)s"
 
-#: app/templates/base.html:128
+#: app/templates/base.html:145
 msgid "Terms & Privacy"
 msgstr "Warunki i Prywatność"
 
@@ -625,6 +534,10 @@ msgstr "Usuń wybraną gałąź"
 msgid "New tree"
 msgstr "Nowe drzewo"
 
+#: app/templates/forgot_password.html:5
+msgid "Reset Password"
+msgstr "Zresetuj hasło"
+
 #: app/templates/index.html:8
 msgid "PictoTree AAC Platform"
 msgstr "Platforma AAC PictoTree"
@@ -633,16 +546,15 @@ msgstr "Platforma AAC PictoTree"
 msgid ""
 "PictoTree is a comprehensive platform (Web Backend + Native Mobile App) "
 "designed for Augmentative and Alternative Communication (AAC). Our goal "
-"is to empower users—caregivers, speech therapists, and parents—to create,"
-" manage, and display personalized communication 'trees' using pictograms "
-"(leveraging the open-source ARASAAC library or personal imports). "
-"Currently under development, the system is hosted in production and "
-"accessible at pictotree.eu."
+"is to empower users to create, manage, and display personalized "
+"communication 'trees' using pictograms (leveraging the open-source "
+"ARASAAC library or personal imports). Currently under development, the "
+"system is hosted in production and accessible at pictotree.eu."
 msgstr ""
 "PictoTree to kompleksowa platforma (backend internetowy + "
 "natywnaaplikacja mobilna) zaprojektowana do komunikacji wspomagającej "
 "ialternatywnej (AAC). Naszym celem jest umożliwienie użytkownikom "
-"—opiekunom, logopedom i rodzicom — tworzenia, zarządzania iwyświetlania "
+"tworzenia, zarządzania iwyświetlania "
 "spersonalizowanych „drzew” komunikacyjnych przy użyciupiktogramów "
 "(korzystając z biblioteki open-source ARASAAC lub własnychobrazów). "
 "System jest obecnie w fazie rozwoju, znajduje się naserwerze produkcyjnym"
@@ -720,19 +632,19 @@ msgstr ""
 "komunikacyjnych, harmonogramów lub materiałów edukacyjnychbezpośrednio z "
 "Twojej cyfrowej kolekcji."
 
-#: app/templates/legal.html:8
+#: app/templates/legal.html:38
 msgid "TERMS OF SERVICE"
 msgstr "WARUNKI ŚWIADCZENIA USŁUG"
 
-#: app/templates/legal.html:9 app/templates/legal.html:41
+#: app/templates/legal.html:39 app/templates/legal.html:73
 msgid "Last Revision:"
 msgstr "Ostatnia aktualizacja:"
 
-#: app/templates/legal.html:9 app/templates/legal.html:41
+#: app/templates/legal.html:39 app/templates/legal.html:73
 msgid "April 25, 2026"
 msgstr "25 kwietnia 2026"
 
-#: app/templates/legal.html:10
+#: app/templates/legal.html:40
 msgid ""
 "Please read these Terms of Service (\"Terms\") carefully before using the"
 " https://pictotree.eu website (the \"Service\") operated by the "
@@ -743,11 +655,11 @@ msgstr ""
 "https://pictotree.eu (\"Serwis\") obsługiwanej przez zespół Pictotree.eu "
 "(\"nas\", \"my\" lub \"nasz\")."
 
-#: app/templates/legal.html:12
+#: app/templates/legal.html:42
 msgid "1. Acceptance of Terms"
 msgstr "1. Akceptacja warunków"
 
-#: app/templates/legal.html:13
+#: app/templates/legal.html:43
 msgid ""
 "By accessing or using the Service, you agree to be bound by these Terms. "
 "If you disagree with any part of the terms, then you may not access the "
@@ -757,11 +669,11 @@ msgstr ""
 "Warunków. Jeśli nie zgadzasz się z jakąkolwiek częścią warunków, nie "
 "możesz korzystać z Serwisu."
 
-#: app/templates/legal.html:15
+#: app/templates/legal.html:45
 msgid "2. User Accounts"
 msgstr "2. Konta użytkowników"
 
-#: app/templates/legal.html:16
+#: app/templates/legal.html:46
 msgid ""
 "To access certain features of the Service, you must register for an "
 "account. You are responsible for safeguarding your password and for all "
@@ -779,11 +691,11 @@ msgstr ""
 "Twojego konta, wszystkie przesłane przez Ciebie obrazy i wszelkie "
 "powiązane wpisy w bazie danych."
 
-#: app/templates/legal.html:18
+#: app/templates/legal.html:48
 msgid "3. User-Generated Content"
 msgstr "3. Treści generowane przez użytkowników"
 
-#: app/templates/legal.html:19
+#: app/templates/legal.html:49
 msgid ""
 "You retain all ownership rights to the content you submit to the Service "
 "(\"/pictogram-bank\")."
@@ -791,11 +703,11 @@ msgstr ""
 "Zachowujesz wszelkie prawa własności do treści przesyłanych do Serwisu "
 "(\"/pictogram-bank\")."
 
-#: app/templates/legal.html:20
+#: app/templates/legal.html:50
 msgid "You agree not to post User Content that:"
 msgstr "Zgadzasz się nie publikować Treści użytkownika, które:"
 
-#: app/templates/legal.html:22
+#: app/templates/legal.html:52
 msgid ""
 "Is unlawful, defamatory, libelous, obscene, pornographic, harassing, "
 "threatening, or promotes discrimination, bigotry, racism, or hatred."
@@ -804,7 +716,7 @@ msgstr ""
 "pornograficzne, nękające, zagrażające lub promujące dyskryminację, "
 "bigoterię, rasizm lub nienawiść."
 
-#: app/templates/legal.html:23
+#: app/templates/legal.html:53
 msgid ""
 "Violates any third-party's right, including any intellectual property "
 "rights or rights of privacy."
@@ -812,11 +724,11 @@ msgstr ""
 "Narusza prawa osób trzecich, w tym wszelkie prawa własności "
 "intelektualnej lub prawa do prywatności."
 
-#: app/templates/legal.html:26
+#: app/templates/legal.html:56
 msgid "4. Prohibited Conduct"
 msgstr "4. Zabronione postępowanie"
 
-#: app/templates/legal.html:27
+#: app/templates/legal.html:57
 msgid ""
 "You agree not to misuse the Service or help anyone else to do so. This "
 "includes, but is not limited to, interfering with our Service, uploading "
@@ -826,11 +738,11 @@ msgstr ""
 "Obejmuje to między innymi ingerowanie w nasz Serwis, przesyłanie "
 "złośliwego kodu lub próby naruszenia środków bezpieczeństwa."
 
-#: app/templates/legal.html:29
+#: app/templates/legal.html:59
 msgid "5. Moderation and Enforcement"
 msgstr "5. Moderacja i egzekwowanie"
 
-#: app/templates/legal.html:30
+#: app/templates/legal.html:60
 msgid ""
 "We reserve the right, but are not obligated, to review and remove any "
 "User Content or terminate user accounts that, in our sole judgment, "
@@ -845,11 +757,11 @@ msgstr ""
 "nielegalnych działań odpowiednim organom ścigania i podejmowanie kroków "
 "prawnych przeciwko naruszycielom."
 
-#: app/templates/legal.html:32
+#: app/templates/legal.html:62
 msgid "6. Disclaimer of Warranties"
 msgstr "6. Wyłączenie gwarancji"
 
-#: app/templates/legal.html:33
+#: app/templates/legal.html:63
 msgid ""
 "The Service is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. We "
 "make no warranty that the Service will be uninterrupted, timely, or "
@@ -859,25 +771,25 @@ msgstr ""
 "DOSTĘPNOŚCI”. Nie gwarantujemy, że Serwis będzie działał nieprzerwanie, "
 "terminowo i bez błędów."
 
-#: app/templates/legal.html:35
+#: app/templates/legal.html:65
 msgid "7. License"
 msgstr "7. Licencja"
 
-#: app/templates/legal.html:36
+#: app/templates/legal.html:66
 msgid "This software is open source and licensed under the GNU AGPL v3."
 msgstr ""
 "To oprogramowanie jest typu open source i jest licencjonowane na "
 "podstawie GNU AGPL v3."
 
-#: app/templates/legal.html:40
+#: app/templates/legal.html:72
 msgid "PRIVACY POLICY"
 msgstr "POLITYKA PRYWATNOŚCI"
 
-#: app/templates/legal.html:43
+#: app/templates/legal.html:75
 msgid "1. Introduction"
 msgstr "1. Wprowadzenie"
 
-#: app/templates/legal.html:44
+#: app/templates/legal.html:76
 msgid ""
 "This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
 " uses, and protects your personal data. We are committed to protecting "
@@ -892,19 +804,19 @@ msgstr ""
 " tego Serwisu jest zespół Pictotree.eu, dostępny za pośrednictwem "
 "formularza kontaktowego."
 
-#: app/templates/legal.html:46
+#: app/templates/legal.html:78
 msgid "2. Personal Data We Collect"
 msgstr "2. Dane osobowe, które gromadzimy"
 
-#: app/templates/legal.html:47
+#: app/templates/legal.html:79
 msgid "We collect the following types of personal data:"
 msgstr "Gromadzimy następujące rodzaje danych osobowych:"
 
-#: app/templates/legal.html:49
+#: app/templates/legal.html:81
 msgid "Account Data:"
 msgstr "Dane konta:"
 
-#: app/templates/legal.html:49
+#: app/templates/legal.html:81
 msgid ""
 "Information you provide upon registration, such as username and email "
 "address. The lawful basis for this processing is the performance of a "
@@ -914,11 +826,11 @@ msgstr ""
 "adres e-mail. Podstawą prawną tego przetwarzania jest wykonanie umowy "
 "(nasze Warunki świadczenia usług)."
 
-#: app/templates/legal.html:50
+#: app/templates/legal.html:82
 msgid "User-Generated Content:"
 msgstr "Treści generowane przez użytkowników:"
 
-#: app/templates/legal.html:50
+#: app/templates/legal.html:82
 msgid ""
 "Images and other data you voluntarily upload to the Service. The lawful "
 "basis is your consent and our legitimate interest in providing the "
@@ -928,11 +840,11 @@ msgstr ""
 "prawną jest Twoja zgoda i nasz uzasadniony interes w zapewnieniu "
 "podstawowej funkcjonalności Serwisu."
 
-#: app/templates/legal.html:51 app/templates/legal.html:57
+#: app/templates/legal.html:83 app/templates/legal.html:89
 msgid "Technical Log Data:"
 msgstr "Dane dziennika technicznego:"
 
-#: app/templates/legal.html:51
+#: app/templates/legal.html:83
 msgid ""
 "For the purpose of maintaining the security and integrity of our systems,"
 " we process server logs which may include your IP address, user-agent "
@@ -945,15 +857,15 @@ msgstr ""
 "nasz uzasadniony interes w zapobieganiu oszustwom i zabezpieczaniu "
 "naszego Serwisu."
 
-#: app/templates/legal.html:54
+#: app/templates/legal.html:86
 msgid "3. Data Retention"
 msgstr "3. Przechowywanie danych"
 
-#: app/templates/legal.html:56
+#: app/templates/legal.html:88
 msgid "Account and User-Generated Content:"
 msgstr "Konto i treści generowane przez użytkowników:"
 
-#: app/templates/legal.html:56
+#: app/templates/legal.html:88
 msgid ""
 "This data is retained for the duration of your account's existence. It is"
 " permanently and irrevocably deleted upon your request to terminate the "
@@ -962,15 +874,15 @@ msgstr ""
 "Dane te są przechowywane przez cały okres istnienia Twojego konta. Są one"
 " trwale i nieodwracalnie usuwane na Twoją prośbę o zamknięcie konta."
 
-#: app/templates/legal.html:57
+#: app/templates/legal.html:89
 msgid "Server logs are automatically purged after a period of six (6) months."
 msgstr "Logi serwera są automatycznie usuwane po okresie sześciu (6) miesięcy."
 
-#: app/templates/legal.html:60
+#: app/templates/legal.html:92
 msgid "4. Your Rights as a Data Subject"
 msgstr "4. Twoje prawa jako osoby, której dane dotyczą"
 
-#: app/templates/legal.html:61
+#: app/templates/legal.html:93
 msgid ""
 "Under the GDPR, you have the following rights regarding your personal "
 "data:"
@@ -978,11 +890,11 @@ msgstr ""
 "Zgodnie z RODO przysługują Ci następujące prawa dotyczące Twoich danych "
 "osobowych:"
 
-#: app/templates/legal.html:63
+#: app/templates/legal.html:95
 msgid "The right to access: You can request copies of your personal data."
 msgstr "Prawo dostępu: możesz zażądać kopii swoich danych osobowych."
 
-#: app/templates/legal.html:64
+#: app/templates/legal.html:96
 msgid ""
 "The right to rectification: You can request that we correct any "
 "information you believe is inaccurate."
@@ -990,7 +902,7 @@ msgstr ""
 "Prawo do sprostowania: możesz zażądać, abyśmy poprawili wszelkie "
 "informacje, które Twoim zdaniem są niedokładne."
 
-#: app/templates/legal.html:65
+#: app/templates/legal.html:97
 msgid ""
 "The right to erasure (right to be forgotten): You can request the erasure"
 " of your personal data. This is actioned by deleting your account."
@@ -998,7 +910,7 @@ msgstr ""
 "Prawo do usunięcia danych (prawo do bycia zapomnianym): możesz zażądać "
 "usunięcia swoich danych osobowych. Odbywa się to poprzez usunięcie konta."
 
-#: app/templates/legal.html:66
+#: app/templates/legal.html:98
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
@@ -1006,7 +918,7 @@ msgstr ""
 "Prawo do ograniczenia przetwarzania: możesz zażądać, abyśmy ograniczyli "
 "przetwarzanie Twoich danych osobowych pod pewnymi warunkami."
 
-#: app/templates/legal.html:67
+#: app/templates/legal.html:99
 msgid ""
 "The right to object to processing: You can object to our processing of "
 "your personal data."
@@ -1014,7 +926,7 @@ msgstr ""
 "Prawo do sprzeciwu wobec przetwarzania: możesz sprzeciwić się "
 "przetwarzaniu przez nas Twoich danych osobowych."
 
-#: app/templates/legal.html:68
+#: app/templates/legal.html:100
 msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
@@ -1022,7 +934,7 @@ msgstr ""
 "Prawo do przenoszenia danych: możesz zażądać, abyśmy przenieśli zebrane "
 "przez nas dane do innej organizacji lub bezpośrednio do Ciebie."
 
-#: app/templates/legal.html:70
+#: app/templates/legal.html:102
 msgid ""
 "To exercise any of these rights, please contact us with the form contact."
 " You also have the right to lodge a complaint with a supervisory "
@@ -1032,11 +944,11 @@ msgstr ""
 "pomocą formularza kontaktowego. Masz również prawo do wniesienia skargi "
 "do organu nadzorczego (takiego jak CNIL we Francji)."
 
-#: app/templates/legal.html:72
+#: app/templates/legal.html:104
 msgid "5. Data Security & Transfer"
 msgstr "5. Bezpieczeństwo i transfer danych"
 
-#: app/templates/legal.html:73
+#: app/templates/legal.html:105
 msgid ""
 "We implement appropriate technical and organizational measures to ensure "
 "a level of security appropriate to the risk. Your data is stored on "
@@ -1297,15 +1209,19 @@ msgstr "Usuń wybrany link"
 msgid "New Chain"
 msgstr "Nowy łańcuch"
 
-#: app/templates/login.html:31
+#: app/templates/login.html:32 app/templates/register.html:84
+msgid "Sign In"
+msgstr "Zaloguj się"
+
+#: app/templates/login.html:58
 msgid "New User?"
 msgstr "Nowy użytkownik?"
 
-#: app/templates/login.html:31
+#: app/templates/login.html:58
 msgid "Click to Register!"
 msgstr "Kliknij, aby się zarejestrować!"
 
-#: app/templates/login.html:33
+#: app/templates/login.html:59
 msgid "Forgot Your Password?"
 msgstr "Zapomniałeś hasła?"
 
@@ -1381,13 +1297,25 @@ msgstr "Eksportuj obraz"
 msgid "Download Selected Image"
 msgstr "Pobierz wybrany obraz"
 
-#: app/templates/register.html:48
+#: app/templates/register.html:33
+msgid "Register"
+msgstr "Zarejestruj się"
+
+#: app/templates/register.html:73
 msgid "I accept the"
 msgstr "Akceptuję"
 
-#: app/templates/register.html:48
+#: app/templates/register.html:73
 msgid "Terms & Privacy Policy"
 msgstr "Warunki korzystania z usługi i Politykę prywatności"
+
+#: app/templates/register.html:84
+msgid "Already have an account?"
+msgstr ""
+
+#: app/templates/resend_confirmation_request.html:5
+msgid "Resend Confirmation Email"
+msgstr "Wyślij ponownie e-mail z potwierdzeniem"
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""
@@ -1973,10 +1901,10 @@ msgstr ""
 #~ msgstr "Zalogowany jako: %(username)s"
 
 #~ msgid "I accept the Terms & Privacy Policy"
-#~ msgstr "Akceptuję Warunki korzystania z usługi i Politykę prywatności"
+#~ msgstr "Warunki korzystania z usługi i Politykę prywatności"
 
 #~ msgid "You must accept the terms and privacy policy to continue."
-#~ msgstr "Aby kontynuować, musisz zaakceptować warunki i politykę prywatności."
+#~ msgstr ""
 
 #~ msgid "No images to export"
 #~ msgstr "Brak obrazów do wyeksportowania"
@@ -2027,4 +1955,58 @@ msgstr ""
 
 #~ msgid "September 18, 2025"
 #~ msgstr "18 września 2025 r."
+
+#~ msgid "be at least 9 characters long"
+#~ msgstr ""
+
+#~ msgid "contain at least one uppercase letter"
+#~ msgstr ""
+
+#~ msgid "contain at least one digit"
+#~ msgstr ""
+
+#~ msgid "Password must"
+#~ msgstr ""
+
+#~ msgid "Username"
+#~ msgstr "Twoja nazwa użytkownika"
+
+#~ msgid "Password"
+#~ msgstr "Zresetuj hasło"
+
+#~ msgid "Remember Me"
+#~ msgstr ""
+
+#~ msgid "Email"
+#~ msgstr ""
+
+#~ msgid "Repeat Password"
+#~ msgstr "Zresetuj hasło"
+
+#~ msgid "Please use a different username."
+#~ msgstr ""
+
+#~ msgid "Please use a different email address."
+#~ msgstr ""
+
+#~ msgid "Current Password"
+#~ msgstr "Zresetuj hasło"
+
+#~ msgid "New Password"
+#~ msgstr "Zmień hasło"
+
+#~ msgid "Repeat New Password"
+#~ msgstr "Zresetuj hasło"
+
+#~ msgid "Request Password Reset"
+#~ msgstr "Zresetuj hasło"
+
+#~ msgid "Name"
+#~ msgstr "Nazwa drzewa"
+
+#~ msgid "Message"
+#~ msgstr "Obrazy"
+
+#~ msgid "Send"
+#~ msgstr ""
 

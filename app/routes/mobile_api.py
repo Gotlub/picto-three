@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
 from app.models import User, Tree, Image
 from app import db 
 import json
@@ -30,16 +30,27 @@ def login():
         }), 403
 
     access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
 
     return jsonify({
         "message": "Connexion réussie",
         "access_token": access_token,
+        "refresh_token": refresh_token,
         "user": {
             "id": user.id,
             "username": user.username,
             "email": user.email
         }
     }), 200
+
+
+@bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    """Renouvellement du access_token via un refresh_token valide."""
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    return jsonify(access_token=access_token), 200
 
 
 @bp.route('/trees', methods=['GET'])

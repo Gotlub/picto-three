@@ -44,3 +44,9 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'you-will-never-guess'
     ADMIN_EMAIL = "contact@pictotree.eu"
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'contact@pictotree.eu'
+
+    # JWT Configuration
+    from datetime import timedelta
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or TOKEN_SECRET_KEY
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
