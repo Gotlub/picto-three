@@ -294,7 +294,8 @@ def serve_mobile_pictogram_min(filepath):
 
 def _get_thumb_url(raw_path, host_url):
     """Calcule l'URL de la miniature mobile à partir d'un chemin brut."""
-    if not raw_path: return ""
+    if not raw_path:
+        return ""
     
     # SI c'est déjà une URL absolue (Arasaac par exemple), on ne touche à rien
     if raw_path.startswith(('http://', 'https://')):
