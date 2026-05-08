@@ -85,20 +85,30 @@ def list_trees():
     trees = query.offset(offset_param).limit(limit_param).all()
     
     result = []
+    host_url = request.host_url
     for t in trees:
-        thumbnail_url = t.root_url or ""
-        if thumbnail_url and not thumbnail_url.startswith('http'):
-            norm_path = posixpath.normpath(urllib.parse.urlparse(thumbnail_url).path).lstrip('/')
-            if norm_path.startswith('pictograms/'):
-                norm_path = norm_path[len('pictograms/'):]
-            thumbnail_url = f"{request.host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+        raw_url = t.root_url or ""
+        # URL Image Pleine
+        full_url = ""
+        if raw_url:
+            if raw_url.startswith('http'):
+                full_url = raw_url
+            else:
+                norm_path = posixpath.normpath(urllib.parse.urlparse(raw_url).path).lstrip('/')
+                if norm_path.startswith('pictograms/'):
+                    norm_path = norm_path[len('pictograms/'):]
+                full_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+        
+        # URL Miniature
+        thumb_url = _get_thumb_url(raw_url, host_url) if raw_url else ""
             
         result.append({
             'id': t.id,
             'name': t.name,
             'owner': t.user.username if t.user else 'System',
             'is_public': t.is_public,
-            'root_image_url': thumbnail_url
+            'root_image_url': full_url,
+            'root_thumbnail_url': thumb_url
         })
         
     return jsonify(result), 200
@@ -245,6 +255,54 @@ def serve_mobile_pictogram(filepath):
         if real_desc:
             response.headers['X-Image-Description'] = urllib.parse.quote(str(real_desc).encode('utf-8'))
         return response
+    return abort(404)
+
+
+@bp.route('/pictogramsmin/<path:filepath>', methods=['GET'])
+@jwt_required(optional=True)
+def serve_mobile_pictogram_min(filepath):
+    """Distribution des miniatures pour mobile."""
+    from flask import abort, send_from_directory
+    import os
+    
+    filepath = posixpath.normpath(filepath)
+    if filepath.startswith('..') or posixpath.isabs(filepath):
+        return abort(400)
+
+    # Conversion forcée vers .png (format des miniatures)
+    thumb_filename, _ = os.path.splitext(filepath)
+    thumb_path_relative = thumb_filename + ".png"
+    
+    pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+    
+    if filepath.startswith('public/'):
+        return send_from_directory(pictograms_min_path, thumb_path_relative)
+    else:
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            return jsonify({'error': 'Non autorisé. Token manquant ou invalide.'}), 401
+            
+        current_user = db.session.get(User, int(current_user_id))
+        if not current_user:
+            return jsonify({"error": "Utilisateur introuvable"}), 404
+        
+        if filepath.startswith(f"{current_user.username}/"):
+            return send_from_directory(pictograms_min_path, thumb_path_relative)
+        else:
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png'), 403
+
+
+def _get_thumb_url(raw_path, host_url):
+    """Calcule l'URL de la miniature mobile à partir d'un chemin brut."""
+    if not raw_path: return ""
+    
+    # SI c'est déjà une URL absolue (Arasaac par exemple), on ne touche à rien
+    if raw_path.startswith(('http://', 'https://')):
+        return raw_path
+        
+    norm_path = re.sub(r'^/+', '', raw_path)
+    norm_path = re.sub(r'^(pictograms/|images/|pictogramsmin/)', '', norm_path)
+    return f"{host_url.rstrip('/')}/api/v1/mobile/pictogramsmin/{norm_path}"
 
 
 @bp.route('/pictograms/search', methods=['GET'])
@@ -272,17 +330,22 @@ def search_pictograms():
     images = Image.query.filter(or_(*conditions)).filter(Image.name.ilike(f'%{q}%')).limit(100).all()
     
     results = []
+    host_url = request.host_url
     for img in images:
         raw_url = img.path
-        # Nettoyage et formatage URL Mobile
+        # Nettoyage et formatage URL Mobile (Image Pleine)
         norm_path = re.sub(r'^/+', '', raw_url)
         norm_path = re.sub(r'^(pictograms/|images/)', '', norm_path)
-        full_url = f"{request.host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+        full_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+        
+        # URL de la miniature
+        thumb_url = _get_thumb_url(raw_url, host_url)
         
         results.append({
             'id': img.id,
             'name': img.name,
-            'image_url': full_url
+            'image_url': full_url,
+            'thumbnail_url': thumb_url
         })
         
     return jsonify(results), 200

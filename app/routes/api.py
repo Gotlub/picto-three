@@ -316,7 +316,7 @@ def create_folder():
     return jsonify({'status': 'success', 'folder': new_folder.to_dict(include_children=False)})
 
 # --- Helper pour la création de miniatures ---
-THUMB_SIZE = (48, 48)
+THUMB_SIZE = (300, 300)
 
 def create_thumbnail_for_upload(filepath_relative):
     """Génère une miniature pour une image uploadée."""
