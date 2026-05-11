@@ -5,10 +5,19 @@
 <div class="intro-header p-5 mb-5 rounded-3 shadow-sm position-relative overflow-hidden text-white">
     <div class="background-overlay"></div>
     <div class="container-fluid py-2 position-relative" style="z-index: 2;">
-        <h1 class="display-5 fw-bold">{{ _('PictoTree AAC Platform') }}</h1>
-        <p class="fs-5 mt-4" style="max-width: 900px; line-height: 1.6; opacity: 0.95;">
-            {{ _("PictoTree is a comprehensive platform (Web Backend + Native Mobile App) designed for Augmentative and Alternative Communication (AAC). Our goal is to empower users to create, manage, and display personalized communication 'trees' using pictograms (leveraging the open-source ARASAAC library or personal imports). Currently under development, the system is hosted in production and accessible at pictotree.eu.") }}
-        </p>
+        <h1 class="display-5 fw-bold">{{ _('PictoTree: A free, digital pictogram binder.') }}</h1>
+        <h2 class="h5 text-warning mb-4">{{ _('(Currently under development)') }}</h2>
+        <div class="fs-5 mt-4" style="max-width: 900px; line-height: 1.6; opacity: 0.95;">
+            <p>{{ _('PictoTree is a tool designed to simplify the daily use of communication binders (like PECS). The goal is not to replace paper, but to offer a practical mobile alternative that is completely free and respects your privacy.') }}</p>
+            
+            <h3 class="h4 mt-4 mb-3 fw-bold">{{ _('What the app offers:') }}</h3>
+            <ul class="list-unstyled ps-4">
+                <li class="mb-3"><strong>📱 {{ _('Pocket-sized (offline):') }}</strong> {{ _('Always have your binder on your phone to communicate outside (in stores, on walks), without needing an internet connection.') }}</li>
+                <li class="mb-3"><strong>🔍 {{ _('Built-in Arasaac search:') }}</strong> {{ _('A search engine to directly find and add pictograms from the official Arasaac database.') }}</li>
+                <li class="mb-3"><strong>🔒 {{ _('Your own photos:') }}</strong> {{ _('A secure import system to use photos of your surroundings or objects as private pictograms.') }}</li>
+                <li class="mb-3"><strong>🖨️ {{ _('PDF Generator:') }}</strong> {{ _('A tool to easily create and print pictogram boards to update your actual physical binder.') }}</li>
+            </ul>
+        </div>
         {% if not current_user.is_authenticated %}
         <div class="mt-4">
             <a class="btn btn-primary btn-lg px-5 shadow border-0" style="background-color: #6200EE;" href="{{ url_for('auth.login') }}">{{ _('Login / Register') }}</a>
