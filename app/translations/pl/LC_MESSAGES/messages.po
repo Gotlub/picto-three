@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-11 04:43+0200\n"
+"POT-Creation-Date: 2026-05-11 22:31+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -478,8 +478,8 @@ msgstr "Anuluj"
 
 #: app/templates/base.html:7 app/templates/base.html:51
 #: app/templates/base.html:143
-msgid "Pictogram-Tree Builder"
-msgstr "Konstruktor drzewa piktogramów"
+msgid "PictoTree.eu"
+msgstr ""
 
 #: app/templates/base.html:54
 msgid "Toggle navigation"

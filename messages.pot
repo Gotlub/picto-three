@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-11 04:43+0200\n"
+"POT-Creation-Date: 2026-05-11 22:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -449,7 +449,7 @@ msgstr ""
 
 #: app/templates/base.html:7 app/templates/base.html:51
 #: app/templates/base.html:143
-msgid "Pictogram-Tree Builder"
+msgid "PictoTree.eu"
 msgstr ""
 
 #: app/templates/base.html:54
