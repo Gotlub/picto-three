@@ -35,7 +35,7 @@ def builder():
 
     return render_template(
         'builder.html',
-        title='Tree Builder',
+        title='Mobile Setup',
         initial_tree_data_json=initial_tree_data_json,
         tree_data_from_post=tree_data_from_post
     )
@@ -49,7 +49,7 @@ def pictogram_bank():
     else:
         pictograms_json = json.dumps(root_folder.to_dict(include_children=True))
 
-    return render_template('pictogram_bank.html', title='Pictogram Bank', pictograms_json=pictograms_json)
+    return render_template('pictogram_bank.html', title='My Resources', pictograms_json=pictograms_json)
 
 
 @bp.route('/list')

@@ -147,3 +147,52 @@ class PictogramList(db.Model):
 
     def __repr__(self):
         return f'<PictogramList {self.list_name}>'
+
+class Profile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    name = db.Column(db.String(64), nullable=False)
+    remote_avatar_url = db.Column(db.String(256), nullable=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+
+    user = db.relationship('User', backref=db.backref('profiles', lazy=True))
+    profile_trees = db.relationship('ProfileTree', backref='profile', cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'remote_avatar_url': self.remote_avatar_url,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<Profile {self.name}>'
+
+class ProfileTree(db.Model):
+    __tablename__ = 'profile_tree_cross_ref'
+    id = db.Column(db.Integer, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False, index=True)
+    tree_id = db.Column(db.Integer, db.ForeignKey('tree.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    display_order = db.Column(db.Integer, default=0)
+    colorCode = db.Column(db.String(32), nullable=True)
+
+    tree = db.relationship('Tree')
+    user = db.relationship('User')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'profile_id': self.profile_id,
+            'tree_id': self.tree_id,
+            'user_id': self.user_id,
+            'display_order': self.display_order,
+            'colorCode': self.colorCode
+        }
+
+    def __repr__(self):
+        return f'<ProfileTree profile_id={self.profile_id} tree_id={self.tree_id}>'

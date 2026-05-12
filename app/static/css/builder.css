@@ -161,3 +161,12 @@
     height: 3px;
     background-color: #007bff;
 }
+
+/* Profile Builder Drop Targets */
+.profile-dropped-tree-item.drop-above {
+    border-top: 3px solid #0d6efd !important;
+}
+
+.profile-dropped-tree-item.drop-below {
+    border-bottom: 3px solid #0d6efd !important;
+}

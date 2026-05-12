@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from app.models import User, Tree, Image
+from app.models import User, Tree, Image, Profile, ProfileTree
 from app import db 
 import json
 from pathlib import Path
@@ -59,7 +59,8 @@ def list_trees():
     """Retourne la liste simplifiée des arbres accessibles (Métadonnées) avec pagination et recherche."""
     current_user_id = int(get_jwt_identity())
     
-    is_public_param = request.args.get('is_public', 'true').lower() == 'true'
+    # On force is_public à False par défaut car la fonctionnalité de partage public est supprimée
+    is_public_param = request.args.get('is_public', 'false').lower() == 'true'
     search_query = request.args.get('search', '').strip()
     limit_param = max(1, min(100, request.args.get('limit', 50, type=int)))
     page_param = max(1, request.args.get('page', 1, type=int))
@@ -69,7 +70,8 @@ def list_trees():
     if is_public_param:
         query = query.filter(Tree.is_public)
     else:
-        query = query.filter(Tree.user_id == current_user_id, Tree.is_public.is_(False))
+        # On ne cherche que dans MES arbres privés
+        query = query.filter(Tree.user_id == current_user_id)
         
     if search_query:
         search_pattern = f"%{search_query.lower()}%"
@@ -88,7 +90,6 @@ def list_trees():
     host_url = request.host_url
     for t in trees:
         raw_url = t.root_url or ""
-        # URL Image Pleine
         full_url = ""
         if raw_url:
             if raw_url.startswith('http'):
@@ -99,7 +100,6 @@ def list_trees():
                     norm_path = norm_path[len('pictograms/'):]
                 full_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
         
-        # URL Miniature
         thumb_url = _get_thumb_url(raw_url, host_url) if raw_url else ""
             
         result.append({
@@ -114,64 +114,39 @@ def list_trees():
     return jsonify(result), 200
 
 
-def _extract_description_from_path(filepath):
-    """
-    Système évolutif pour extraire la description d'une image selon sa banque d'origine,
-    si celle-ci n'est pas répertoriée dans la base de données relationnelle.
-    """
-    import os
-    basename = os.path.basename(filepath)
-    name_without_ext = os.path.splitext(basename)[0]
-    
-    # Stratégie pour la banque Arasaac
-    if "public/arasaac/" in filepath:
-        # Ex: '1234_manger_du_pain.png' -> 'manger du pain'
-        clean_name = re.sub(r'^\d+_', '', name_without_ext)
-        clean_name = clean_name.replace('_', ' ').replace('-', ' ')
-        return clean_name.capitalize()
-        
-    # [Placeholder] Stratégie pour une future banque
-    # elif "public/sclera/" in filepath:
-    #     ...
-        
-    # Stratégie par défaut (nettoyage simple)
-    return name_without_ext.replace('_', ' ').capitalize()
+@bp.route('/profiles', methods=['GET'])
+@jwt_required()
+def list_profiles():
+    """Liste les profils de l'utilisateur pour synchronisation."""
+    current_user_id = int(get_jwt_identity())
+    profiles = Profile.query.filter_by(user_id=current_user_id).all()
+    return jsonify([p.to_dict() for p in profiles]), 200
 
 
-def _map_node_to_android_structure(web_node, host_url, current_username):
-    """Transcripteur de noeuds pour Android avec injection de la bonne URL."""
-    image_url = web_node.get('image') or web_node.get('url') or ''
-    web_label = web_node.get('text') or web_node.get('name') or ''
-    description = web_node.get('description') or web_label
+@bp.route('/profiles/<int:profile_id>', methods=['GET'])
+@jwt_required()
+def get_profile_details(profile_id):
+    """Renvoie les détails d'un profil incluant la configuration des arbres (IDs + Couleurs)."""
+    current_user_id = int(get_jwt_identity())
+    profile = Profile.query.filter_by(id=profile_id, user_id=current_user_id).first()
     
-    # On utilise la description comme label principal pour l'affichage Android (Demande utilisateur)
-    label = description
-    
-    if image_url:
-        if image_url.startswith(('http://', 'https://')):
-            pass
-        else:
-            norm_path = posixpath.normpath(urllib.parse.urlparse(image_url).path).lstrip('/')
-            if norm_path.startswith('pictograms/'):
-                norm_path = norm_path[len('pictograms/'):]
-            elif norm_path.startswith('images/'):
-                norm_path = norm_path[len('images/'):]
-                
-            if not (norm_path.startswith('public/') or norm_path.startswith(f"{current_username}/")):
-                image_url = "" 
-            else:
-                image_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+    if not profile:
+        return jsonify({"error": "Profil introuvable"}), 404
         
-    children = web_node.get('children', [])
-    mapped_children = [_map_node_to_android_structure(c, host_url, current_username) for c in children]
+    tree_refs = ProfileTree.query.filter_by(profile_id=profile_id).order_by(ProfileTree.display_order).all()
     
-    return {
-        'node_id': str(web_node.get('id', 'unsaved')),
-        'label': label,
-        'description': description,
-        'image_url': image_url,
-        'children': mapped_children
-    }
+    # On renvoie une liste d'objets structurés pour conserver les couleurs
+    trees_config = []
+    for ref in tree_refs:
+        trees_config.append({
+            'tree_id': ref.tree_id,
+            'colorCode': ref.colorCode or '#000000'
+        })
+    
+    result = profile.to_dict()
+    result['trees'] = trees_config
+    
+    return jsonify(result), 200
 
 
 @bp.route('/trees/<int:tree_id>', methods=['GET'])
@@ -209,7 +184,6 @@ def get_tree(tree_id):
         return jsonify({'error': "Une erreur interne est survenue lors du formatage de l'arbre."}), 500
 
 
-
 @bp.route('/pictograms/<path:filepath>', methods=['GET'])
 @jwt_required(optional=True)
 def serve_mobile_pictogram(filepath):
@@ -241,14 +215,12 @@ def serve_mobile_pictogram(filepath):
             return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png'), 403
 
     if response:
-        # Récupération de la description ou du nom depuis la base de données
         img = Image.query.filter(Image.path.endswith(filepath)).first()
         
         real_desc = None
         if img:
             real_desc = img.description if img.description and img.description.strip() else img.name
             
-        # Fallback évolutif selon les banques (Arasaac, etc.) si absente ou vide de la DB
         if not real_desc or not str(real_desc).strip():
             real_desc = _extract_description_from_path(filepath)
             
@@ -269,7 +241,6 @@ def serve_mobile_pictogram_min(filepath):
     if filepath.startswith('..') or posixpath.isabs(filepath):
         return abort(400)
 
-    # Conversion forcée vers .png (format des miniatures)
     thumb_filename, _ = os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
     
@@ -292,25 +263,10 @@ def serve_mobile_pictogram_min(filepath):
             return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png'), 403
 
 
-def _get_thumb_url(raw_path, host_url):
-    """Calcule l'URL de la miniature mobile à partir d'un chemin brut."""
-    if not raw_path:
-        return ""
-    
-    # SI c'est déjà une URL absolue (Arasaac par exemple), on ne touche à rien
-    if raw_path.startswith(('http://', 'https://')):
-        return raw_path
-        
-    norm_path = re.sub(r'^/+', '', raw_path)
-    norm_path = re.sub(r'^(pictograms/|images/|pictogramsmin/)', '', norm_path)
-    return f"{host_url.rstrip('/')}/api/v1/mobile/pictogramsmin/{norm_path}"
-
-
 @bp.route('/pictograms/search', methods=['GET'])
 @jwt_required()
 def search_pictograms():
     """Recherche des pictogrammes (Public + Perso) pour l'application mobile."""
-    from app.models import Image
     from sqlalchemy import or_
     
     current_user_id = int(get_jwt_identity())
@@ -334,12 +290,9 @@ def search_pictograms():
     host_url = request.host_url
     for img in images:
         raw_url = img.path
-        # Nettoyage et formatage URL Mobile (Image Pleine)
         norm_path = re.sub(r'^/+', '', raw_url)
         norm_path = re.sub(r'^(pictograms/|images/)', '', norm_path)
         full_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
-        
-        # URL de la miniature
         thumb_url = _get_thumb_url(raw_url, host_url)
         
         results.append({
@@ -350,3 +303,54 @@ def search_pictograms():
         })
         
     return jsonify(results), 200
+
+
+def _get_thumb_url(raw_path, host_url):
+    """Calcule l'URL de la miniature mobile à partir d'un chemin brut."""
+    if not raw_path:
+        return ""
+    if raw_path.startswith(('http://', 'https://')):
+        return raw_path
+    norm_path = re.sub(r'^/+', '', raw_path)
+    norm_path = re.sub(r'^(pictograms/|images/|pictogramsmin/)', '', norm_path)
+    return f"{host_url.rstrip('/')}/api/v1/mobile/pictogramsmin/{norm_path}"
+
+
+def _extract_description_from_path(filepath):
+    import os
+    basename = os.path.basename(filepath)
+    name_without_ext = os.path.splitext(basename)[0]
+    if "public/arasaac/" in filepath:
+        clean_name = re.sub(r'^\d+_', '', name_without_ext)
+        clean_name = clean_name.replace('_', ' ').replace('-', ' ')
+        return clean_name.capitalize()
+    return name_without_ext.replace('_', ' ').capitalize()
+
+
+def _map_node_to_android_structure(web_node, host_url, current_username):
+    image_url = web_node.get('image') or web_node.get('url') or ''
+    web_label = web_node.get('text') or web_node.get('name') or ''
+    description = web_node.get('description') or web_label
+    label = description
+    if image_url:
+        if image_url.startswith(('http://', 'https://')):
+            pass
+        else:
+            norm_path = posixpath.normpath(urllib.parse.urlparse(image_url).path).lstrip('/')
+            if norm_path.startswith('pictograms/'):
+                norm_path = norm_path[len('pictograms/'):]
+            elif norm_path.startswith('images/'):
+                norm_path = norm_path[len('images/'):]
+            if not (norm_path.startswith('public/') or norm_path.startswith(f"{current_username}/")):
+                image_url = "" 
+            else:
+                image_url = f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{norm_path}"
+    children = web_node.get('children', [])
+    mapped_children = [_map_node_to_android_structure(c, host_url, current_username) for c in children]
+    return {
+        'node_id': str(web_node.get('id', 'unsaved')),
+        'label': label,
+        'description': description,
+        'image_url': image_url,
+        'children': mapped_children
+    }

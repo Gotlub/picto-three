@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from flask_babel import _
 from werkzeug.utils import secure_filename
 from app import db
-from app.models import Tree, PictogramList, Folder, Image
+from app.models import Tree, PictogramList, Folder, Image, Profile, ProfileTree
 from pathlib import Path
 import shutil
 from PIL import Image as PILImage
@@ -506,6 +506,89 @@ def delete_tree(tree_id):
     db.session.commit()
 
     return jsonify({'status': 'success', 'message': _('Tree deleted successfully')})
+
+@bp.route('/profiles/load', methods=['GET'])
+@login_required
+def load_profiles():
+    profiles = Profile.query.filter_by(user_id=current_user.id).order_by(Profile.name).all()
+    profiles_data = []
+    for profile in profiles:
+        profile_dict = {
+            'id': profile.id,
+            'name': profile.name,
+            'remote_avatar_url': profile.remote_avatar_url,
+            'trees': []
+        }
+        # Order by display_order
+        trees_assoc = sorted(profile.profile_trees, key=lambda x: x.display_order)
+        for assoc in trees_assoc:
+            tree_dict = assoc.tree.to_dict()
+            tree_dict['colorCode'] = assoc.colorCode
+            tree_dict['display_order'] = assoc.display_order
+            profile_dict['trees'].append(tree_dict)
+        profiles_data.append(profile_dict)
+    
+    return jsonify({
+        'profiles': profiles_data
+    })
+
+@bp.route('/profile/save', methods=['POST'])
+@login_required
+def save_profile():
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
+
+    profile_name = data.get('name')
+    trees_data = data.get('trees', [])
+
+    if not profile_name:
+        return jsonify({'status': 'error', 'message': _('Missing profile name')}), 400
+
+    profile = Profile.query.filter_by(user_id=current_user.id, name=profile_name).first()
+
+    if profile:
+        # Update existing
+        ProfileTree.query.filter_by(profile_id=profile.id).delete()
+        message = _('Profile updated successfully')
+    else:
+        # Create new
+        profile = Profile(user_id=current_user.id, name=profile_name)
+        db.session.add(profile)
+        db.session.flush() # To get the profile.id
+        message = _('Profile saved successfully')
+
+    for index, t_data in enumerate(trees_data):
+        tree_assoc = ProfileTree(
+            profile_id=profile.id,
+            tree_id=t_data.get('treeId'),
+            user_id=current_user.id,
+            display_order=index + 1,
+            colorCode=t_data.get('colorCode', '#000000')
+        )
+        db.session.add(tree_assoc)
+
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': message,
+        'profile_id': profile.id
+    })
+
+@bp.route('/profile/<int:profile_id>', methods=['DELETE'])
+@login_required
+def delete_profile(profile_id):
+    profile = db.session.get(Profile, profile_id)
+    if profile is None:
+        return jsonify({'status': 'error', 'message': _('Profile not found')}), 404
+    if profile.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    db.session.delete(profile)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': _('Profile deleted successfully')})
 
 def delete_folder_recursive(folder):
     # The path from DB is relative. Combine it with the base path for physical operations.

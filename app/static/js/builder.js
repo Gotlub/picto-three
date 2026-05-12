@@ -336,6 +336,8 @@ class TreeBuilder {
             }
         }
 
+        this.initProfileBuilder();
+
         // Use event delegation for the export button, as it's in a modal
         $(document).on('click', '#export-pdf-vectoriel', async function () {
             const btn = $(this);
@@ -972,21 +974,6 @@ class TreeBuilder {
     }
 
     filterTrees() {
-        const searchTerm = this.treeSearch.value.toLowerCase();
-        const treeLists = document.querySelectorAll('.tree-select-list');
-
-        treeLists.forEach(select => {
-            const options = select.options;
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                const optionText = option.textContent.toLowerCase();
-                if (optionText.includes(searchTerm)) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
-                }
-            }
-        });
     }
 
     async loadSavedTrees() {
@@ -1005,6 +992,318 @@ class TreeBuilder {
             this.userTrees = [];
         }
         this.renderTreeList();
+        this.renderProfileBuilderTreeList();
+        this.loadSavedProfiles();
+        this.initProfileEvents();
+    }
+
+    initProfileEvents() {
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        if (saveProfileBtn) {
+            saveProfileBtn.addEventListener('click', () => this.saveProfile());
+        }
+
+        const loadProfileBtn = document.getElementById('load-profile-btn');
+        if (loadProfileBtn) {
+            loadProfileBtn.addEventListener('click', () => this.loadSelectedProfile());
+        }
+
+        const deleteProfileBtn = document.getElementById('delete-profile-btn');
+        if (deleteProfileBtn) {
+            deleteProfileBtn.addEventListener('click', () => this.deleteSelectedProfile());
+        }
+
+        const profileSearch = document.getElementById('profile-search');
+        if (profileSearch) {
+            profileSearch.addEventListener('input', () => this.filterProfiles());
+        }
+    }
+
+    initProfileBuilder() {
+        const profileArea = document.getElementById('profile-builder-area');
+        const profileTreesList = document.getElementById('profile-trees-list');
+        const emptyMsg = document.getElementById('profile-builder-empty-msg');
+        
+        if (!profileArea || !profileTreesList) return;
+
+        // Drag events for dropping items into the profile area
+        profileArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            // Allow dropping from right sidebar OR reordering
+            e.dataTransfer.dropEffect = 'copy';
+            profileArea.classList.add('border-primary'); // Highlight dropzone
+            
+            // Visual feedback for reordering
+            const y = e.clientY;
+            const target = e.target.closest('.profile-dropped-tree-item');
+            if (target && !target.classList.contains('dragging')) {
+                const box = target.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                // Clear previous indicators
+                profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
+                    el.classList.remove('drop-above', 'drop-below');
+                });
+                
+                if (offset < 0) {
+                    target.classList.add('drop-above');
+                } else {
+                    target.classList.add('drop-below');
+                }
+            }
+        });
+
+        profileArea.addEventListener('dragleave', (e) => {
+            profileArea.classList.remove('border-primary');
+            // We shouldn't remove drop-above/below here unconditionally because dragleave fires when entering child elements
+        });
+
+        profileArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            profileArea.classList.remove('border-primary');
+            profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
+                el.classList.remove('drop-above', 'drop-below');
+            });
+            
+            let dragData = null;
+            try {
+                const dataString = e.dataTransfer.getData('application/json');
+                if (dataString) {
+                    dragData = JSON.parse(dataString);
+                }
+            } catch (err) {
+                console.error('Failed to parse drag data', err);
+            }
+
+            if (dragData && dragData.type === 'profile-tree-item') {
+                // Determine insertion point if reordering
+                const y = e.clientY;
+                const afterElement = this.getDragAfterElement(profileTreesList, y);
+                
+                // Need to find full tree data to pass to addTreeToProfile
+                const treeData = this.userTrees.find(t => t.id === dragData.treeId);
+                
+                if (treeData) {
+                    // Check if tree is already in the list
+                    const existingNode = profileTreesList.querySelector(`[data-tree-id="${treeData.id}"]`);
+                    if (existingNode && dragData.isReorder) {
+                        // We are just reordering an existing element
+                        if (afterElement == null) {
+                            profileTreesList.appendChild(existingNode);
+                        } else {
+                            profileTreesList.insertBefore(existingNode, afterElement);
+                        }
+                    } else if (!existingNode) {
+                        // Adding a new tree
+                        const newElement = this.createProfileTreeElement(treeData);
+                        if (afterElement == null) {
+                            profileTreesList.appendChild(newElement);
+                        } else {
+                            profileTreesList.insertBefore(newElement, afterElement);
+                        }
+                        if (emptyMsg) emptyMsg.style.display = 'none';
+                    } else {
+                        // Already in list, do not add duplicates
+                    }
+                    this.updateProfileTreeNumbers();
+                }
+            }
+        });
+    }
+
+    updateProfileTreeNumbers() {
+        const profileTreesList = document.getElementById('profile-trees-list');
+        if (!profileTreesList) return;
+        const items = profileTreesList.querySelectorAll('.profile-dropped-tree-item');
+        items.forEach((item, index) => {
+            const numberSpan = item.querySelector('.tree-number');
+            if (numberSpan) {
+                numberSpan.textContent = `${index + 1}.`;
+            }
+        });
+    }
+
+    getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.profile-dropped-tree-item:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    createProfileTreeElement(treeData) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center profile-dropped-tree-item mb-2 shadow-sm rounded';
+        li.setAttribute('draggable', 'true');
+        li.dataset.treeId = treeData.id;
+
+        // Drag events for reordering
+        li.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('application/json', JSON.stringify({
+                type: 'profile-tree-item',
+                treeId: treeData.id,
+                isReorder: true
+            }));
+            li.classList.add('dragging');
+            li.style.opacity = '0.5';
+        });
+
+        li.addEventListener('dragend', () => {
+            li.classList.remove('dragging');
+            li.style.opacity = '1';
+            const profileTreesList = document.getElementById('profile-trees-list');
+            if (profileTreesList) {
+                profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
+                    el.classList.remove('drop-above', 'drop-below');
+                });
+            }
+        });
+
+        // Left section: Handle, Number, Image, Name
+        const leftSection = document.createElement('div');
+        leftSection.className = 'd-flex align-items-center flex-grow-1';
+
+        const dragHandle = document.createElement('span');
+        dragHandle.innerHTML = '&#8942;&#8942;';
+        dragHandle.style.cursor = 'grab';
+        dragHandle.className = 'text-muted me-2 fs-5';
+        leftSection.appendChild(dragHandle);
+
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'tree-number fw-bold text-muted me-3 fs-5';
+        numberSpan.textContent = '1.';
+        leftSection.appendChild(numberSpan);
+
+        const imgContainer = document.createElement('div');
+        imgContainer.style.width = '40px';
+        imgContainer.style.height = '40px';
+        imgContainer.className = 'me-3';
+        const img = document.createElement('img');
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        let thumbUrl = '/static/images/folder-bold.png';
+        if (treeData.root_url) {
+            if (treeData.root_url.startsWith('http')) {
+                thumbUrl = treeData.root_url.replace(/_500\.png$/, '_300.png');
+            } else if (treeData.root_url.startsWith('/pictograms/')) {
+                thumbUrl = treeData.root_url.replace('/pictograms/', '/pictogramsmin/');
+            } else if (treeData.root_url.startsWith('/')) {
+                thumbUrl = treeData.root_url;
+            } else {
+                thumbUrl = `/pictogramsmin/${treeData.root_url}`;
+            }
+        }
+        img.src = thumbUrl;
+        img.onerror = function() { this.src = '/static/images/folder-bold.png'; };
+        imgContainer.appendChild(img);
+        leftSection.appendChild(imgContainer);
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'fw-bold';
+        nameSpan.textContent = treeData.name;
+        leftSection.appendChild(nameSpan);
+
+        li.appendChild(leftSection);
+
+        // Right section: Colors and Delete
+        const rightSection = document.createElement('div');
+        rightSection.className = 'd-flex align-items-center';
+
+        // Color options Dropdown - Unified with Mobile (Hex codes)
+        const colors = [
+            { hex: '#000000', label: 'Black' },
+            { hex: '#FFEB3B', label: 'Yellow' },
+            { hex: '#4CAF50', label: 'Green' },
+            { hex: '#FF9800', label: 'Orange' },
+            { hex: '#2196F3', label: 'Blue' },
+            { hex: '#E91E63', label: 'Pink' }
+        ];
+
+        const dropdownDiv = document.createElement('div');
+        dropdownDiv.className = 'dropdown me-3 profile-tree-color-dropdown';
+        
+        const dropdownBtn = document.createElement('button');
+        dropdownBtn.className = 'btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center';
+        dropdownBtn.type = 'button';
+        dropdownBtn.dataset.bsToggle = 'dropdown';
+        
+        const selectedColorSpan = document.createElement('span');
+        selectedColorSpan.className = 'rounded-circle me-2 color-indicator border';
+        selectedColorSpan.style.width = '14px';
+        selectedColorSpan.style.height = '14px';
+        
+        const selectedText = document.createElement('span');
+        
+        dropdownBtn.appendChild(selectedColorSpan);
+        dropdownBtn.appendChild(selectedText);
+        dropdownDiv.appendChild(dropdownBtn);
+        
+        const dropdownMenu = document.createElement('ul');
+        dropdownMenu.className = 'dropdown-menu';
+        dropdownMenu.style.minWidth = 'unset';
+
+        // Set initial color state
+        let currentColor = treeData.colorCode || '#000000';
+        dropdownDiv.dataset.selectedColor = currentColor;
+
+        const updateBtnVisuals = (colorHex) => {
+            const cInfo = colors.find(c => c.hex === colorHex) || colors[0];
+            selectedColorSpan.style.backgroundColor = cInfo.hex;
+            selectedText.textContent = cInfo.label;
+            dropdownDiv.dataset.selectedColor = cInfo.hex;
+        };
+        updateBtnVisuals(currentColor);
+
+        colors.forEach(color => {
+            const optionLi = document.createElement('li');
+            const a = document.createElement('a');
+            a.className = 'dropdown-item d-flex align-items-center';
+            a.href = '#';
+            
+            const swatch = document.createElement('span');
+            swatch.className = 'rounded-circle me-2 border';
+            swatch.style.width = '14px';
+            swatch.style.height = '14px';
+            swatch.style.backgroundColor = color.hex;
+            
+            a.appendChild(swatch);
+            a.appendChild(document.createTextNode(color.label));
+            
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                updateBtnVisuals(color.hex);
+            });
+            
+            optionLi.appendChild(a);
+            dropdownMenu.appendChild(optionLi);
+        });
+
+        dropdownDiv.appendChild(dropdownMenu);
+        rightSection.appendChild(dropdownDiv);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-outline-danger border-0';
+        deleteBtn.innerHTML = '&#10005;'; // X mark
+        deleteBtn.addEventListener('click', () => {
+            li.remove();
+            this.updateProfileTreeNumbers();
+            const profileTreesList = document.getElementById('profile-trees-list');
+            const emptyMsg = document.getElementById('profile-builder-empty-msg');
+            if (profileTreesList && profileTreesList.children.length === 0 && emptyMsg) {
+                emptyMsg.style.display = 'block';
+            }
+        });
+
+        rightSection.appendChild(deleteBtn);
+        li.appendChild(rightSection);
+
+        return li;
     }
 
     renderTreeList() {
@@ -1048,6 +1347,116 @@ class TreeBuilder {
         // Set the default active list if it exists
         if (this.userTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
+        }
+    }
+
+    renderProfileBuilderTreeList() {
+        const profileTreeList = document.getElementById('profile-builder-tree-list');
+        if (!profileTreeList) return;
+        
+        profileTreeList.innerHTML = '';
+        
+        if (!this.userTrees || this.userTrees.length === 0) {
+            const emptyMsg = document.createElement('li');
+            emptyMsg.className = 'list-group-item text-muted text-center';
+            emptyMsg.textContent = 'No trees available.';
+            profileTreeList.appendChild(emptyMsg);
+            return;
+        }
+
+        this.userTrees.forEach(tree => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action d-flex align-items-center profile-tree-item';
+            li.setAttribute('draggable', 'true');
+            li.dataset.treeId = tree.id;
+            li.dataset.treeName = tree.name;
+            
+            // Icon to indicate draggability
+            const dragHandle = document.createElement('span');
+            dragHandle.innerHTML = '&#8942;&#8942;'; // vertical ellipsis (drag handle)
+            dragHandle.style.cursor = 'grab';
+            dragHandle.className = 'text-muted me-2 flex-shrink-0';
+
+            // Thumbnail Image
+            const imgContainer = document.createElement('div');
+            imgContainer.style.width = '40px';
+            imgContainer.style.height = '40px';
+            imgContainer.style.flexShrink = '0';
+            imgContainer.style.display = 'flex';
+            imgContainer.style.justifyContent = 'center';
+            imgContainer.style.alignItems = 'center';
+            imgContainer.className = 'me-2';
+
+            const img = document.createElement('img');
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            
+            let thumbUrl = '/static/images/folder-bold.png'; // default fallback
+            if (tree.root_url) {
+                if (tree.root_url.startsWith('http')) {
+                    // Arasaac: replace _500 with _300 if applicable
+                    thumbUrl = tree.root_url.replace(/_500\.png$/, '_300.png');
+                } else if (tree.root_url.startsWith('/pictograms/')) {
+                    thumbUrl = tree.root_url.replace('/pictograms/', '/pictogramsmin/');
+                } else if (tree.root_url.startsWith('/')) {
+                    thumbUrl = tree.root_url;
+                } else {
+                    thumbUrl = `/pictogramsmin/${tree.root_url}`;
+                }
+            }
+            img.src = thumbUrl;
+            img.alt = tree.name;
+            img.onerror = function() {
+                this.src = '/static/images/folder-bold.png';
+            };
+            
+            imgContainer.appendChild(img);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'flex-grow-1 tree-name text-truncate';
+            nameSpan.textContent = tree.name;
+
+            li.appendChild(dragHandle);
+            li.appendChild(imgContainer);
+            li.appendChild(nameSpan);
+
+            // Drag event listeners for future profile builder UI
+            li.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('application/json', JSON.stringify({
+                    type: 'profile-tree-item',
+                    treeId: tree.id,
+                    treeName: tree.name
+                }));
+                li.style.opacity = '0.5';
+            });
+            
+            li.addEventListener('dragend', () => {
+                li.style.opacity = '1';
+            });
+
+            profileTreeList.appendChild(li);
+        });
+
+        // Setup search functionality for profile trees
+        const searchInput = document.getElementById('profile-builder-tree-search');
+        if (searchInput) {
+            // Remove old listener to avoid duplicates
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            
+            newSearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const items = profileTreeList.querySelectorAll('.profile-tree-item');
+                
+                items.forEach(item => {
+                    const treeName = item.dataset.treeName.toLowerCase();
+                    if (treeName.includes(searchTerm)) {
+                        item.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        item.style.setProperty('display', 'none', 'important');
+                    }
+                });
+            });
         }
     }
 
@@ -1232,9 +1641,214 @@ class TreeBuilder {
         this.renderTree();
     }
 
+    // Profile Management Methods
+    async loadSavedProfiles() {
+        try {
+            const response = await fetch('/api/profiles/load');
+            const data = await response.json();
+            this.savedProfiles = data.profiles || [];
+            this.renderProfileList();
+        } catch (error) {
+            console.error('Error loading profiles:', error);
+            alert('Failed to load profiles');
+        }
+    }
 
+    renderProfileList() {
+        const profileList = document.getElementById('profile-list');
+        if (!profileList) return;
+        profileList.innerHTML = '';
+        
+        if (!this.savedProfiles || this.savedProfiles.length === 0) {
+            profileList.innerHTML = '<div class="text-muted small">No profiles saved yet.</div>';
+            return;
+        }
 
+        const select = document.createElement('select');
+        select.id = 'profile-select';
+        select.className = 'form-select form-select-sm mb-2 profile-select-list';
+        
+        this.savedProfiles.forEach(profile => {
+            const option = document.createElement('option');
+            option.value = profile.id;
+            option.textContent = profile.name;
+            select.appendChild(option);
+        });
 
+        profileList.appendChild(select);
+    }
+
+    filterProfiles() {
+        const profileSearch = document.getElementById('profile-search');
+        if (!profileSearch) return;
+        const query = profileSearch.value.toLowerCase();
+        
+        const select = document.getElementById('profile-select');
+        if (!select) return;
+
+        Array.from(select.options).forEach(option => {
+            const name = option.textContent.toLowerCase();
+            option.style.display = name.includes(query) ? '' : 'none';
+        });
+        
+        // Reset selection to the first visible option if the current one is hidden
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption && selectedOption.style.display === 'none') {
+            const firstVisible = Array.from(select.options).find(opt => opt.style.display !== 'none');
+            if (firstVisible) {
+                select.value = firstVisible.value;
+            }
+        }
+    }
+
+    async saveProfile() {
+        const profileNameInput = document.getElementById('profile-name');
+        if (!profileNameInput) return;
+        
+        const profileName = profileNameInput.value.trim();
+        if (!profileName) {
+            alert('Please enter a profile name.');
+            return;
+        }
+
+        const profileTreesList = document.getElementById('profile-trees-list');
+        const items = profileTreesList.querySelectorAll('.profile-dropped-tree-item');
+        if (items.length === 0) {
+            alert('Please add at least one tree to the profile.');
+            return;
+        }
+
+        const trees = [];
+        items.forEach((item, index) => {
+            const dropdown = item.querySelector('.profile-tree-color-dropdown');
+            const colorCode = dropdown ? dropdown.dataset.selectedColor : '#000000';
+            trees.push({
+                treeId: parseInt(item.dataset.treeId, 10),
+                colorCode: colorCode,
+                display_order: index + 1
+            });
+        });
+
+        const payload = {
+            name: profileName,
+            trees: trees
+        };
+
+        const saveBtn = document.getElementById('save-profile-btn');
+        const originalText = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+
+        try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+            
+            const response = await fetch('/api/profile/save', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert(data.message);
+                this.loadSavedProfiles(); // Refresh the list
+            } else {
+                alert(data.message || 'Error saving profile');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to save profile');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+    }
+
+    loadSelectedProfile() {
+        const select = document.getElementById('profile-select');
+        if (!select || !select.value) {
+            alert('Please select a profile to load.');
+            return;
+        }
+
+        const profileId = parseInt(select.value, 10);
+        const profile = this.savedProfiles.find(p => p.id === profileId);
+        
+        if (profile) {
+            this.loadProfileIntoBuilder(profile);
+        }
+    }
+
+    loadProfileIntoBuilder(profile) {
+        const profileNameInput = document.getElementById('profile-name');
+        if (profileNameInput) profileNameInput.value = profile.name;
+
+        const profileTreesList = document.getElementById('profile-trees-list');
+        const emptyMsg = document.getElementById('profile-builder-empty-msg');
+        
+        if (profileTreesList) profileTreesList.innerHTML = '';
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        if (profile.trees && profile.trees.length > 0) {
+            profile.trees.forEach(treeData => {
+                const element = this.createProfileTreeElement(treeData);
+                profileTreesList.appendChild(element);
+            });
+            this.updateProfileTreeNumbers();
+        } else {
+            if (emptyMsg) emptyMsg.style.display = 'block';
+        }
+    }
+
+    async deleteSelectedProfile() {
+        const select = document.getElementById('profile-select');
+        if (!select || !select.value) {
+            alert('Please select a profile to delete.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this profile?')) {
+            return;
+        }
+
+        const profileId = select.value;
+        const deleteBtn = document.getElementById('delete-profile-btn');
+        const originalText = deleteBtn.textContent;
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Deleting...';
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+
+        try {
+            const headers = {};
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+            const response = await fetch(`/api/profile/${profileId}`, { 
+                method: 'DELETE',
+                headers: headers
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message);
+                this.loadSavedProfiles();
+            } else {
+                alert(data.message || 'Error deleting profile');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to delete profile');
+        } finally {
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = originalText;
+        }
+    }
 }
 
 function imageToDataUrl(src) {

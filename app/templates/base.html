@@ -60,14 +60,14 @@
                         <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('builder.builder') }}">{{ _('Tree Builder') }}</a>
+                        <a class="nav-link" href="{{ url_for('builder.builder') }}">{{ _('Mobile Setup') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('builder.list_page') }}">{{ _('List Builder') }}</a>
+                        <a class="nav-link" href="{{ url_for('builder.list_page') }}">{{ _('Paper Tools') }}</a>
                     </li>
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('builder.pictogram_bank') }}">{{ _('Pictogram Bank') }}</a>
+                        <a class="nav-link" href="{{ url_for('builder.pictogram_bank') }}">{{ _('My Resources') }}</a>
                     </li>
                     {% endif %}
                 </ul>
