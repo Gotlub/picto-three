@@ -652,7 +652,13 @@ class TreeBuilder {
                 oldParent.children = oldParent.children.filter(child => child !== draggedNode);
             }
 
-            if (zone === 'before' || zone === 'after') {
+            if (targetNode.image.id === 'root' && zone === 'replace') {
+                this.updateRootImage(draggedNode.image);
+                // Reparent all children of the dragged node to the root node
+                draggedNode.children.forEach(child => {
+                    this.rootNode.addChild(child);
+                });
+            } else if (zone === 'before' || zone === 'after') {
                 const parent = targetNode.parent;
                 const index = parent.children.indexOf(targetNode);
                 if (index > -1) {
@@ -1016,6 +1022,11 @@ class TreeBuilder {
         const profileSearch = document.getElementById('profile-search');
         if (profileSearch) {
             profileSearch.addEventListener('input', () => this.filterProfiles());
+        }
+
+        const newProfileBtn = document.getElementById('new-profile-btn');
+        if (newProfileBtn) {
+            newProfileBtn.addEventListener('click', () => this.createNewProfile());
         }
     }
 
@@ -1477,16 +1488,17 @@ class TreeBuilder {
             if (importMode === 'replace') {
                 this.rebuildTreeFromJSON(importedData, true);
             } else { // 'add'
-                // For 'add', we want to keep the current root, and add the *children* of the imported roots
+                // For 'add', we want to keep the current root, and add the imported roots as children
                 if (importedData.roots && importedData.roots.length > 0) {
                     importedData.roots.forEach(importedRoot => {
-                        if (importedRoot.children) {
-                            importedRoot.children.forEach(childData => {
-                                const childNode = this.buildNodeFromJsonData(childData);
-                                if (childNode) {
-                                    this.rootNode.addChild(childNode);
-                                }
-                            });
+                        // If the imported root still has the 'root' identifier, remove it so it acts like a normal node
+                        if (importedRoot.id === 'root') {
+                            importedRoot.id = -1;
+                        }
+                        // The imported root itself becomes a child of our current root
+                        const childNode = this.buildNodeFromJsonData(importedRoot);
+                        if (childNode) {
+                            this.rootNode.addChild(childNode);
                         }
                     });
                     this.renderTree();
@@ -1847,6 +1859,36 @@ class TreeBuilder {
         } finally {
             deleteBtn.disabled = false;
             deleteBtn.textContent = originalText;
+        }
+    }
+
+    createNewProfile() {
+        if (!confirm('Are you sure you want to start a new profile? This will clear the current list.')) {
+            return;
+        }
+
+        // Clear the profile name input
+        const profileNameInput = document.getElementById('profile-name');
+        if (profileNameInput) {
+            profileNameInput.value = '';
+        }
+
+        // Clear the list
+        const profileTreesList = document.getElementById('profile-trees-list');
+        if (profileTreesList) {
+            profileTreesList.innerHTML = '';
+        }
+
+        // Show empty message
+        const emptyMsg = document.getElementById('profile-builder-empty-msg');
+        if (emptyMsg) {
+            emptyMsg.style.display = 'block';
+        }
+
+        // Deselect any selected profile in the list
+        const profileSelect = document.getElementById('profile-select');
+        if (profileSelect) {
+            profileSelect.value = '';
         }
     }
 }

@@ -44,7 +44,7 @@ def test_save_tree_authenticated(client):
     tree = db.session.get(Tree, data['tree_id'])
     assert tree is not None
     assert tree.name == "My Test Tree"
-    assert tree.is_public is True
+    assert tree.is_public is False
     assert tree.root_id == 10
     assert tree.root_url == "/test/url.png"
     saved_json_data = json.loads(tree.json_data)
@@ -69,9 +69,7 @@ def test_load_trees_unauthenticated(client):
     assert response.status_code == 200
     data = response.get_json()
     assert isinstance(data, dict)
-    assert 'public_trees' in data
     assert 'user_trees' in data
-    assert isinstance(data['public_trees'], list)
     assert isinstance(data['user_trees'], list)
     assert len(data['user_trees']) == 0 # No user logged in
 
@@ -100,20 +98,14 @@ def test_load_trees_authenticated(client):
     assert response.status_code == 200
     data = response.get_json()
 
-    assert 'public_trees' in data
     assert 'user_trees' in data
 
     # User trees should only contain the user's private trees
-    assert len(data['user_trees']) == 1
+    # (since public tree feature for saving is deprecated, they might still exist in DB but load_trees only fetches user_trees)
+    assert len(data['user_trees']) == 2
     user_tree_names = {t['name'] for t in data['user_trees']}
     assert "Private Tree" in user_tree_names
-    assert "User's Public Tree" not in user_tree_names
-
-    # Public trees should contain all public trees
-    assert len(data['public_trees']) >= 2
-    public_tree_names = {t['name'] for t in data['public_trees']}
-    assert "Anonymous Public Tree" in public_tree_names
-    assert "User's Public Tree" in public_tree_names
+    assert "User's Public Tree" in user_tree_names
 
 def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
@@ -154,7 +146,7 @@ def test_save_tree_with_duplicate_name_updates(client):
     # Verify the tree was updated in the database
     updated_tree = db.session.get(Tree, tree_id)
     assert updated_tree is not None
-    assert updated_tree.is_public is True
+    assert updated_tree.is_public is False
     assert updated_tree.root_id == 2
     assert updated_tree.root_url == '/test/2.png'
     saved_json_data = json.loads(updated_tree.json_data)
