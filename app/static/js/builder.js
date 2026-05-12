@@ -244,19 +244,16 @@ class TreeBuilder {
             saveBtn.addEventListener('click', () => this.saveTree());
         }
 
-        const importBtn = document.getElementById('import-json-btn');
-        if (importBtn) {
-            importBtn.addEventListener('click', () => this.importTreeFromJSON());
-        }
 
-        const exportBtn = document.getElementById('export-json-btn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportTreeToJSON());
-        }
 
         const loadBtn = document.getElementById('load-tree-btn');
         if (loadBtn) {
             loadBtn.addEventListener('click', () => this.loadTree());
+        }
+
+        const deleteTreeBtn = document.getElementById('delete-tree-btn');
+        if (deleteTreeBtn) {
+            deleteTreeBtn.addEventListener('click', () => this.deleteTree());
         }
 
         if (this.imageSearch) {
@@ -888,7 +885,7 @@ class TreeBuilder {
             return;
         }
 
-        const isPublic = document.getElementById('tree-is-public').checked;
+        const isPublic = false;
         const jsonData = this.getTreeAsJSON();
 
         if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
@@ -908,8 +905,8 @@ class TreeBuilder {
             }
         }
 
-        // Check if a tree with the same name exists for the current user among both private and public lists
-        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        // Check if a tree with the same name exists for the current user
+        const allTrees = this.userTrees || [];
         const existingTree = allTrees.find(tree => tree.name === treeName && tree.user_id === this.currentUserId);
         
         let proceed = true;
@@ -1000,13 +997,11 @@ class TreeBuilder {
                 return;
             }
             const data = await response.json();
-            this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
             this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
             this.currentUserId = data.current_user_id;
         } catch (e) {
             console.error('Impossible de charger les arbres:', e);
             alert('Impossible de charger les arbres sauvegardés.');
-            this.publicTrees = [];
             this.userTrees = [];
         }
         this.renderTreeList();
@@ -1048,14 +1043,11 @@ class TreeBuilder {
             }
         };
 
-        createSelectList(this.userTrees, 'My Private Trees', 'user-tree-select');
-        createSelectList(this.publicTrees, 'Public Trees', 'public-tree-select');
+        createSelectList(this.userTrees, 'My Trees', 'user-tree-select');
 
         // Set the default active list if it exists
         if (this.userTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
-        } else if (this.publicTrees.length > 0) {
-            this.activeTreeSelect = document.getElementById('public-tree-select');
         }
     }
 
@@ -1066,7 +1058,7 @@ class TreeBuilder {
         }
 
         const treeId = parseInt(this.activeTreeSelect.value, 10);
-        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        const allTrees = this.userTrees || [];
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {
@@ -1093,6 +1085,61 @@ class TreeBuilder {
             }
         } else {
             alert('Could not find the selected tree.');
+        }
+    }
+
+    async deleteTree() {
+        if (!this.activeTreeSelect || !this.activeTreeSelect.value) {
+            alert('Please select a tree to delete.');
+            return;
+        }
+
+        const treeId = parseInt(this.activeTreeSelect.value, 10);
+        const allTrees = this.userTrees || [];
+        const treeToDelete = allTrees.find(tree => tree.id === treeId);
+
+        if (!treeToDelete) {
+            alert('Could not find the selected tree.');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to delete the tree "${treeToDelete.name}"?`)) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        if (!csrfToken) {
+            alert('Security error: missing CSRF token. Please reload the page.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/tree/${treeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({}));
+                throw new Error(result.message || `Server error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert('Tree deleted successfully.');
+                await this.loadSavedTrees();
+                
+                // Clear the builder workspace just in case they deleted the active tree
+                this.rootNode.children = [];
+                this.renderTree();
+            } else {
+                alert(`Error deleting tree: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Delete error:', e);
+            alert('Failed to delete the tree. Please try again.');
         }
     }
 
@@ -1187,89 +1234,7 @@ class TreeBuilder {
 
 
 
-    exportTreeToJSON() {
-        const jsonData = this.getTreeAsJSON();
-        if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
-            alert('The tree is empty.');
-            return;
-        }
 
-        let filename = prompt("Enter a filename for your JSON export:", "tree.json");
-        if (!filename) {
-            return; // User cancelled
-        }
-        if (!filename.endsWith('.json')) {
-            filename += '.json';
-        }
-
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonData, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", filename);
-        document.body.appendChild(downloadAnchorNode); // required for firefox
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
-
-    importTreeFromJSON() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-
-                const validateNodeData = (node, depth = 0) => {
-                    if (depth > 50) return false;
-                    if (typeof node !== 'object' || node === null) return false;
-                    // Allow external https, absolute /pictograms/ or /static/, and relative public/ or users/
-                    if (node.url && !/^(https?:\/\/|\/pictograms\/|\/static\/|public\/|users\/)/.test(node.url)) {
-                        node.url = '';
-                    }
-                    if (Array.isArray(node.children)) {
-                        node.children = node.children.filter(child => validateNodeData(child, depth + 1));
-                    }
-                    return true;
-                };
-
-                reader.onload = (event) => {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        if (!importedData?.roots || !Array.isArray(importedData.roots)) {
-                            alert('Format de fichier invalide.');
-                            return;
-                        }
-                        importedData.roots.forEach(root => validateNodeData(root));
-
-                        const importMode = document.querySelector('input[name="import_mode"]:checked').value;
-
-                        if (importMode === 'replace') {
-                            this.rebuildTreeFromJSON(importedData, true);
-                        } else { // 'add'
-                            if (importedData.roots && importedData.roots.length > 0) {
-                                importedData.roots.forEach(importedRoot => {
-                                    if (importedRoot.children) {
-                                        importedRoot.children.forEach(childData => {
-                                            const childNode = this.buildNodeFromJsonData(childData);
-                                            if (childNode) {
-                                                this.rootNode.addChild(childNode);
-                                            }
-                                        });
-                                    }
-                                });
-                                this.renderTree();
-                            }
-                        }
-                    } catch {
-                        alert('Error parsing JSON file.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        };
-        input.click();
-    }
 }
 
 function imageToDataUrl(src) {
@@ -1377,4 +1342,55 @@ document.addEventListener('DOMContentLoaded', () => {
         new bootstrap.Dropdown(dropdownEl);
     }
     new TreeBuilder();
+
+    // Synchronization logic between Accordions and Tabs
+    let isSyncing = false;
+
+    const collapseManageTrees = document.getElementById('collapseManageTrees');
+    const collapseManageProfiles = document.getElementById('collapseManageProfiles');
+    const treeBuilderTabEl = document.getElementById('tree-builder-tab');
+    const profileBuilderTabEl = document.getElementById('profile-builder-tab');
+
+    if (collapseManageTrees && collapseManageProfiles && treeBuilderTabEl && profileBuilderTabEl) {
+        
+        // When 'Manage Trees' accordion opens, switch to 'Tree Builder' tab
+        collapseManageTrees.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const tab = new bootstrap.Tab(treeBuilderTabEl);
+            tab.show();
+            isSyncing = false;
+        });
+
+        // When 'Manage Profiles' accordion opens, switch to 'Profile Builder' tab
+        collapseManageProfiles.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const tab = new bootstrap.Tab(profileBuilderTabEl);
+            tab.show();
+            isSyncing = false;
+        });
+
+        // When 'Tree Builder' tab is shown, open 'Manage Trees' accordion
+        treeBuilderTabEl.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
+            const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
+            bsCollapseProfiles.hide();
+            bsCollapseTrees.show();
+            isSyncing = false;
+        });
+
+        // When 'Profile Builder' tab is shown, open 'Manage Profiles' accordion
+        profileBuilderTabEl.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
+            const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
+            bsCollapseTrees.hide();
+            bsCollapseProfiles.show();
+            isSyncing = false;
+        });
+    }
 });

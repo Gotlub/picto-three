@@ -13,16 +13,12 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 
 @bp.route('/trees/load', methods=['GET'])
 def load_trees():
-    # Public trees are all trees with is_public = True, ordered by name
-    public_trees = Tree.query.filter_by(is_public=True).order_by(Tree.name).all()
-
     user_trees = []
     if current_user.is_authenticated:
-        # Private trees are user-owned trees with is_public = False, ordered by name
-        user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).order_by(Tree.name).all()
+        # Fetch all user-owned trees, ignoring the deprecated is_public flag
+        user_trees = Tree.query.filter_by(user_id=current_user.id).order_by(Tree.name).all()
 
     return jsonify({
-        'public_trees': [tree.to_dict() for tree in public_trees],
         'user_trees': [tree.to_dict() for tree in user_trees],
         'current_user_id': current_user.id if current_user.is_authenticated else None
     })
@@ -457,31 +453,13 @@ def save_tree():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     tree_name = data.get('name')
-    is_public = data.get('is_public', False)
+    is_public = False
     root_id = data.get('root_id', -1)
     root_url = data.get('root_url')
     json_data = data.get('json_data')
 
     if not tree_name or not json_data:
         return jsonify({'status': 'error', 'message': _('Missing required fields')}), 400
-
-    # Validate images if saving a public tree
-    if is_public:
-        if not json_data.get('roots'):
-            return jsonify({'status': 'error', 'message': _('Cannot save an empty tree as public.')}), 400
-
-        image_ids = get_image_ids_from_tree(json_data['roots'])
-        if root_id != -1:
-             image_ids.add(root_id)
-             
-        if image_ids:
-            # Public trees cannot contain any user-owned images (user_id is not NULL)
-            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
-            if user_owned_images:
-                return jsonify({
-                    'status': 'error',
-                    'message': _('Public trees can only contain global public images. Please remove any user-owned images before saving publicly.')
-                }), 400
 
     # Check if a tree with the same name already exists for this user
     tree = Tree.query.filter_by(user_id=current_user.id, name=tree_name).first()
@@ -514,6 +492,20 @@ def save_tree():
         'tree_id': tree.id,
         'tree_data': json_data
     })
+
+@bp.route('/tree/<int:tree_id>', methods=['DELETE'])
+@login_required
+def delete_tree(tree_id):
+    tree = db.session.get(Tree, tree_id)
+    if tree is None:
+        return jsonify({'status': 'error', 'message': _('Tree not found')}), 404
+    if tree.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    db.session.delete(tree)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': _('Tree deleted successfully')})
 
 def delete_folder_recursive(folder):
     # The path from DB is relative. Combine it with the base path for physical operations.
