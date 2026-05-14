@@ -36,7 +36,7 @@ def serve_pictogram(filepath):
 def serve_pictogram_min(filepath):
     """Serves a pictogram from the external data directory."""
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
-    pictograms_path_min, old_extension= os.path.splitext(filepath)
+    pictograms_path_min, _ = os.path.splitext(filepath)
     pictograms_path_min = pictograms_path_min + ".png"
     if filepath.startswith("public/"):
     # send_from_directory is security-conscious and will prevent path traversal attacks.

@@ -537,14 +537,18 @@ def save_profile():
         message = _('Profile saved successfully')
 
     for index, t_data in enumerate(trees_data):
-        tree_assoc = ProfileTree(
-            profile_id=profile.id,
-            tree_id=t_data.get('treeId'),
-            user_id=current_user.id,
-            display_order=index + 1,
-            colorCode=t_data.get('colorCode', '#000000')
-        )
-        db.session.add(tree_assoc)
+        tid = t_data.get('treeId')
+        if tid:
+            tree = db.session.get(Tree, tid)
+            if tree and tree.user_id == current_user.id:
+                tree_assoc = ProfileTree(
+                    profile_id=profile.id,
+                    tree_id=tid,
+                    user_id=current_user.id,
+                    display_order=index + 1,
+                    colorCode=t_data.get('colorCode', '#000000')
+                )
+                db.session.add(tree_assoc)
 
     db.session.commit()
 

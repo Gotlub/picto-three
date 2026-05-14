@@ -154,7 +154,8 @@ def get_tree(tree_id):
             'root_node': root_node
         }), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        current_app.logger.error(f"Erreur de formatage dans get_tree (ID: {tree_id}): {e}")
+        return jsonify({'error': "Une erreur interne est survenue lors du formatage de l'arbre."}), 500
 
 
 @bp.route('/pictograms/<path:filepath>', methods=['GET'])
