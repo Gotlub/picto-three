@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-25 01:02+0200\n"
+"POT-Creation-Date: 2026-05-11 22:31+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -16,9 +16,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: app/forms.py:16
+#, fuzzy
 msgid "be at least 9 characters long"
 msgstr ""
 
@@ -48,13 +49,14 @@ msgstr "Reimposta password"
 msgid "Remember Me"
 msgstr ""
 
-#: app/forms.py:30 app/templates/login.html:8
+#: app/forms.py:30 app/templates/login.html:32 app/templates/register.html:84
 msgid "Sign In"
 msgstr "Accedi"
 
 #: app/forms.py:34 app/forms.py:64 app/forms.py:74 app/forms.py:79
+#, fuzzy
 msgid "Email"
-msgstr ""
+msgstr "Il tuo nome utente"
 
 #: app/forms.py:37 app/forms.py:70
 #, fuzzy
@@ -70,7 +72,7 @@ msgstr "Termini e Informativa sulla Privacy"
 msgid "You must accept the terms and privacy policy to continue."
 msgstr ""
 
-#: app/forms.py:40 app/templates/register.html:8
+#: app/forms.py:40 app/templates/register.html:33
 msgid "Register"
 msgstr "Registrati"
 
@@ -121,7 +123,7 @@ msgstr "Reinvia email di conferma"
 #: app/forms.py:78
 #, fuzzy
 msgid "Name"
-msgstr "Nome albero"
+msgstr "Il tuo nome utente"
 
 #: app/forms.py:80
 #, fuzzy
@@ -379,7 +381,7 @@ msgstr "Invio modulo non valido."
 msgid "Invalid tree data received."
 msgstr "Dati albero ricevuti non validi."
 
-#: app/routes/main.py:16 app/templates/legal.html:5
+#: app/routes/main.py:16 app/templates/legal.html:34
 msgid "Legal Information"
 msgstr "Informazioni Legali"
 
@@ -387,7 +389,8 @@ msgstr "Informazioni Legali"
 msgid "Your message has been sent successfully!"
 msgstr "Il tuo messaggio è stato inviato con successo!"
 
-#: app/routes/main.py:35 app/templates/about.html:6 app/templates/base.html:129
+#: app/routes/main.py:35 app/templates/about.html:32
+#: app/templates/base.html:146
 msgid "About & Contact"
 msgstr "Informazioni e Contatti"
 
@@ -399,11 +402,11 @@ msgstr "La tua lingua è stata aggiornata."
 msgid "The language has been updated for this session."
 msgstr "La lingua è stata aggiornata per questa sessione."
 
-#: app/templates/about.html:9
+#: app/templates/about.html:36
 msgid "Open Source"
 msgstr "Open Source"
 
-#: app/templates/about.html:10
+#: app/templates/about.html:38
 #, fuzzy
 msgid ""
 "This project is open source and proudly hosted on GitHub. You are free to"
@@ -417,13 +420,27 @@ msgstr ""
 "sorgente, contribuire o riutilizzarlo per qualsiasi scopo non "
 "commerciale."
 
-#: app/templates/about.html:11
+#: app/templates/about.html:42
 msgid "View Source Code on GitHub"
 msgstr "Visualizza il codice sorgente su GitHub"
 
-#: app/templates/about.html:15
+#: app/templates/about.html:50
 msgid "Contact Us"
 msgstr "Contattaci"
+
+#: app/templates/about.html:56
+#, fuzzy
+msgid "Your Name"
+msgstr "Il tuo nome utente"
+
+#: app/templates/about.html:59
+#, fuzzy
+msgid "Your Email"
+msgstr "Il tuo nome utente"
+
+#: app/templates/about.html:62
+msgid "How can we help?"
+msgstr ""
 
 #: app/templates/account.html:5
 msgid "Account Management"
@@ -465,44 +482,44 @@ msgstr "Il tuo nome utente"
 msgid "Cancel"
 msgstr "Annulla"
 
-#: app/templates/base.html:7 app/templates/base.html:35
-#: app/templates/base.html:126
-msgid "Pictogram-Tree Builder"
-msgstr "Costruttore di alberi di pittogrammi"
+#: app/templates/base.html:7 app/templates/base.html:51
+#: app/templates/base.html:143
+msgid "PictoTree.eu"
+msgstr ""
 
-#: app/templates/base.html:37
+#: app/templates/base.html:54
 msgid "Toggle navigation"
 msgstr "Attiva/disattiva navigazione"
 
-#: app/templates/base.html:43
+#: app/templates/base.html:60
 msgid "Home"
 msgstr "Home"
 
-#: app/templates/base.html:46 app/templates/builder.html:60
+#: app/templates/base.html:63 app/templates/builder.html:60
 msgid "Tree Builder"
 msgstr "Costruttore di alberi"
 
-#: app/templates/base.html:49
+#: app/templates/base.html:66
 msgid "List Builder"
 msgstr "Costruttore di liste"
 
-#: app/templates/base.html:53
+#: app/templates/base.html:70
 msgid "Pictogram Bank"
 msgstr "Banca dei pittogrammi"
 
-#: app/templates/base.html:82
+#: app/templates/base.html:99
 msgid "Login"
 msgstr "Accesso"
 
-#: app/templates/base.html:86
+#: app/templates/base.html:103
 msgid "Account"
 msgstr "Account"
 
-#: app/templates/base.html:89
+#: app/templates/base.html:106
 msgid "Logout"
 msgstr "Disconnessione"
 
-#: app/templates/base.html:113
+#: app/templates/base.html:130
 #, fuzzy, python-format
 msgid ""
 "This site uses only connection\n"
@@ -518,16 +535,16 @@ msgstr ""
 "navigazione, accetti la nostra <a href=\"%(href)s\">informativa sulla "
 "privacy</a>."
 
-#: app/templates/base.html:118
+#: app/templates/base.html:135
 msgid "I understand"
 msgstr "Ho capito"
 
-#: app/templates/base.html:124
+#: app/templates/base.html:141
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Accesso come: %(username)s"
 
-#: app/templates/base.html:128
+#: app/templates/base.html:145
 msgid "Terms & Privacy"
 msgstr "Termini e Privacy"
 
@@ -633,38 +650,87 @@ msgid "New tree"
 msgstr "Nuovo albero"
 
 #: app/templates/index.html:8
-msgid "PictoTree AAC Platform"
-msgstr "Piattaforma PictoTree CAA"
+msgid "PictoTree: A free, digital pictogram binder."
+msgstr "PictoTree: Un quaderno di pittogrammi digitale e gratuito."
 
-#: app/templates/index.html:10
+#: app/templates/index.html:9
+msgid "(Currently under development)"
+msgstr "(Attualmente in fase di sviluppo)"
+
+#: app/templates/index.html:11
 msgid ""
-"PictoTree is a comprehensive platform (Web Backend + Native Mobile App) "
-"designed for Augmentative and Alternative Communication (AAC). Our goal "
-"is to empower users—caregivers, speech therapists, and parents—to create,"
-" manage, and display personalized communication 'trees' using pictograms "
-"(leveraging the open-source ARASAAC library or personal imports). "
-"Currently under development, the system is hosted in production and "
-"accessible at pictotree.eu."
+"PictoTree is a tool designed to simplify the daily use of communication "
+"binders (like PECS). The goal is not to replace paper, but to offer a "
+"practical mobile alternative that is completely free and respects your "
+"privacy."
 msgstr ""
-"PictoTree è una piattaforma completa (Backend Web + App Mobile "
-"Nativa)progettata per la Comunicazione Aumentativa e Alternativa (CAA). "
-"Ilnostro obiettivo è consentire agli utenti (caregiver, logopedisti "
-"egenitori) di creare, gestire e visualizzare 'alberi' di "
-"comunicazionepersonalizzati utilizzando i pittogrammi (sfruttando la "
-"libreria opensource ARASAAC o importazioni personali). Attualmente in "
-"fase disviluppo, il sistema è ospitato in produzione e accessibile "
-"supictotree.eu."
+"PictoTree è uno strumento progettato per semplificare l'uso quotidiano "
+"dei quaderni di comunicazione (tipo PECS). L'obiettivo non è sostituire "
+"la carta, ma offrire una pratica alternativa mobile che è completamente "
+"gratuita e rispetta la tua privacy."
 
-#: app/templates/index.html:14
+#: app/templates/index.html:13
+msgid "What the app offers:"
+msgstr "Cosa offre l'applicazione:"
+
+#: app/templates/index.html:15
+msgid "Pocket-sized (offline):"
+msgstr "Formato tascabile (offline):"
+
+#: app/templates/index.html:15
+msgid ""
+"Always have your binder on your phone to communicate outside (in stores, "
+"on walks), without needing an internet connection."
+msgstr ""
+"Avere sempre il proprio quaderno sul telefono per comunicare all'esterno "
+"(nei negozi, in passeggiata), senza bisogno di una connessione internet."
+
+#: app/templates/index.html:16
+msgid "Built-in Arasaac search:"
+msgstr "Ricerca Arasaac integrata:"
+
+#: app/templates/index.html:16
+msgid ""
+"A search engine to directly find and add pictograms from the official "
+"Arasaac database."
+msgstr ""
+"Un motore di ricerca per trovare e aggiungere direttamente pittogrammi "
+"dal database ufficiale Arasaac."
+
+#: app/templates/index.html:17
+msgid "Your own photos:"
+msgstr "Le tue foto personali:"
+
+#: app/templates/index.html:17
+msgid ""
+"A secure import system to use photos of your surroundings or objects as "
+"private pictograms."
+msgstr ""
+"Un sistema di importazione sicuro per usare foto del tuo ambiente o di "
+"oggetti come pittogrammi privati."
+
+#: app/templates/index.html:18
+msgid "PDF Generator:"
+msgstr "Generatore di PDF:"
+
+#: app/templates/index.html:18
+msgid ""
+"A tool to easily create and print pictogram boards to update your actual "
+"physical binder."
+msgstr ""
+"Uno strumento per creare e stampare facilmente tavole di pittogrammi per "
+"aggiornare il tuo quaderno fisico reale."
+
+#: app/templates/index.html:23
 msgid "Login / Register"
 msgstr "Accedi / Registrati"
 
-#: app/templates/index.html:30
+#: app/templates/index.html:39
 #, fuzzy
 msgid "The Tree Builder (Web)"
 msgstr "1. Il Costruttore di Alberi (Web)"
 
-#: app/templates/index.html:33
+#: app/templates/index.html:42
 msgid ""
 "Construct and organize your communication structures using a hierarchical"
 " interface. Drag and drop pictograms to build logical paths tailored to "
@@ -677,12 +743,12 @@ msgstr ""
 "specifichedell'utente. Una volta salvati, questi alberi possono "
 "esserefacilmente importati nell'applicazione mobile."
 
-#: app/templates/index.html:48
+#: app/templates/index.html:57
 #, fuzzy
 msgid "PictoTree Mobile App (Android)"
 msgstr "2. App Mobile PictoTree (Android)"
 
-#: app/templates/index.html:51
+#: app/templates/index.html:60
 msgid ""
 "The native mobile application uses a spatial navigation system (View 4) "
 "to browse through imported trees. It includes integrated Text-to-Speech "
@@ -694,12 +760,12 @@ msgstr ""
 "(TTS) integrata per il feedback vocale e funzionacompletamente offline "
 "per garantire che la comunicazione sia sempredisponibile."
 
-#: app/templates/index.html:66
+#: app/templates/index.html:75
 #, fuzzy
 msgid "Pictogram Bank (Management)"
 msgstr "3. Banca dei Pittogrammi (Gestione)"
 
-#: app/templates/index.html:69
+#: app/templates/index.html:78
 msgid ""
 "Centralize your visual vocabulary. Search and import icons from the "
 "ARASAAC database or upload your own personal images. Organize them into "
@@ -711,12 +777,12 @@ msgstr ""
 "mantenere la tua libreria strutturata e pronta per l'usonei tuoi alberi o"
 " liste."
 
-#: app/templates/index.html:84
+#: app/templates/index.html:93
 #, fuzzy
 msgid "List & Print Tool (Paper Support)"
 msgstr "4. Strumento Lista e Stampa (Supporto Cartaceo)"
 
-#: app/templates/index.html:87
+#: app/templates/index.html:96
 msgid ""
 "Generate customizable pictogram lists designed for printing. This tool "
 "provides various layout options to create physical communication boards, "
@@ -728,19 +794,19 @@ msgstr ""
 "comunicazione fisiche, programmi o materiali didatticidirettamente dalla "
 "tua collezione digitale."
 
-#: app/templates/legal.html:8
+#: app/templates/legal.html:38
 msgid "TERMS OF SERVICE"
 msgstr "TERMINI DI SERVIZIO"
 
-#: app/templates/legal.html:9 app/templates/legal.html:41
+#: app/templates/legal.html:39 app/templates/legal.html:73
 msgid "Last Revision:"
 msgstr "Ultima revisione:"
 
-#: app/templates/legal.html:9 app/templates/legal.html:41
+#: app/templates/legal.html:39 app/templates/legal.html:73
 msgid "April 25, 2026"
 msgstr "25 aprile 2026"
 
-#: app/templates/legal.html:10
+#: app/templates/legal.html:40
 msgid ""
 "Please read these Terms of Service (\"Terms\") carefully before using the"
 " https://pictotree.eu website (the \"Service\") operated by the "
@@ -750,11 +816,11 @@ msgstr ""
 " prima di utilizzare il sito web https://pictotree.eu (il \"Servizio\") "
 "gestito dal team di Pictotree.eu (\"noi\", \"ci\" o \"nostro\")."
 
-#: app/templates/legal.html:12
+#: app/templates/legal.html:42
 msgid "1. Acceptance of Terms"
 msgstr "1. Accettazione dei termini"
 
-#: app/templates/legal.html:13
+#: app/templates/legal.html:43
 msgid ""
 "By accessing or using the Service, you agree to be bound by these Terms. "
 "If you disagree with any part of the terms, then you may not access the "
@@ -764,11 +830,11 @@ msgstr ""
 " da questi Termini. Se non si è d'accordo con una qualsiasi parte dei "
 "termini, non è possibile accedere al Servizio."
 
-#: app/templates/legal.html:15
+#: app/templates/legal.html:45
 msgid "2. User Accounts"
 msgstr "2. Account utente"
 
-#: app/templates/legal.html:16
+#: app/templates/legal.html:46
 msgid ""
 "To access certain features of the Service, you must register for an "
 "account. You are responsible for safeguarding your password and for all "
@@ -787,11 +853,11 @@ msgstr ""
 "dettagli dell'account, tutte le immagini caricate e qualsiasi voce di "
 "database associata."
 
-#: app/templates/legal.html:18
+#: app/templates/legal.html:48
 msgid "3. User-Generated Content"
 msgstr "3. Contenuti generati dagli utenti"
 
-#: app/templates/legal.html:19
+#: app/templates/legal.html:49
 msgid ""
 "You retain all ownership rights to the content you submit to the Service "
 "(\"/pictogram-bank\")."
@@ -799,11 +865,11 @@ msgstr ""
 "L'utente mantiene tutti i diritti di proprietà sui contenuti inviati al "
 "Servizio (\"/pictogram-bank\")."
 
-#: app/templates/legal.html:20
+#: app/templates/legal.html:50
 msgid "You agree not to post User Content that:"
 msgstr "L'utente si impegna a non pubblicare Contenuti utente che:"
 
-#: app/templates/legal.html:22
+#: app/templates/legal.html:52
 msgid ""
 "Is unlawful, defamatory, libelous, obscene, pornographic, harassing, "
 "threatening, or promotes discrimination, bigotry, racism, or hatred."
@@ -811,7 +877,7 @@ msgstr ""
 "Sia illegale, diffamatorio, calunnioso, osceno, pornografico, molesto, "
 "minaccioso o che promuova discriminazione, bigottismo, razzismo o odio."
 
-#: app/templates/legal.html:23
+#: app/templates/legal.html:53
 msgid ""
 "Violates any third-party's right, including any intellectual property "
 "rights or rights of privacy."
@@ -819,11 +885,11 @@ msgstr ""
 "Violare i diritti di terzi, inclusi i diritti di proprietà intellettuale "
 "o i diritti alla privacy."
 
-#: app/templates/legal.html:26
+#: app/templates/legal.html:56
 msgid "4. Prohibited Conduct"
 msgstr "4. Condotta proibita"
 
-#: app/templates/legal.html:27
+#: app/templates/legal.html:57
 msgid ""
 "You agree not to misuse the Service or help anyone else to do so. This "
 "includes, but is not limited to, interfering with our Service, uploading "
@@ -834,11 +900,11 @@ msgstr ""
 "il nostro Servizio, il caricamento di codice dannoso o il tentativo di "
 "violare le misure di sicurezza."
 
-#: app/templates/legal.html:29
+#: app/templates/legal.html:59
 msgid "5. Moderation and Enforcement"
 msgstr "5. Moderazione e applicazione"
 
-#: app/templates/legal.html:30
+#: app/templates/legal.html:60
 msgid ""
 "We reserve the right, but are not obligated, to review and remove any "
 "User Content or terminate user accounts that, in our sole judgment, "
@@ -853,11 +919,11 @@ msgstr ""
 "segnalazione di attività illegali alle autorità competenti e l'azione "
 "legale contro i trasgressori."
 
-#: app/templates/legal.html:32
+#: app/templates/legal.html:62
 msgid "6. Disclaimer of Warranties"
 msgstr "6. Esclusione di garanzie"
 
-#: app/templates/legal.html:33
+#: app/templates/legal.html:63
 msgid ""
 "The Service is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. We "
 "make no warranty that the Service will be uninterrupted, timely, or "
@@ -867,23 +933,23 @@ msgstr ""
 " alcuna garanzia che il Servizio sarà ininterrotto, tempestivo o privo di"
 " errori."
 
-#: app/templates/legal.html:35
+#: app/templates/legal.html:65
 msgid "7. License"
 msgstr "7. Licenza"
 
-#: app/templates/legal.html:36
+#: app/templates/legal.html:66
 msgid "This software is open source and licensed under the GNU AGPL v3."
 msgstr "Questo software è open source e concesso in licenza con la GNU AGPL v3."
 
-#: app/templates/legal.html:40
+#: app/templates/legal.html:72
 msgid "PRIVACY POLICY"
 msgstr "INFORMATIVA SULLA PRIVACY"
 
-#: app/templates/legal.html:43
+#: app/templates/legal.html:75
 msgid "1. Introduction"
 msgstr "1. Introduzione"
 
-#: app/templates/legal.html:44
+#: app/templates/legal.html:76
 msgid ""
 "This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
 " uses, and protects your personal data. We are committed to protecting "
@@ -898,19 +964,19 @@ msgstr ""
 "Il titolare del trattamento dei dati per questo servizio è il team di "
 "Pictotree.eu, raggiungibile tramite il modulo di contatto."
 
-#: app/templates/legal.html:46
+#: app/templates/legal.html:78
 msgid "2. Personal Data We Collect"
 msgstr "2. Dati personali che raccogliamo"
 
-#: app/templates/legal.html:47
+#: app/templates/legal.html:79
 msgid "We collect the following types of personal data:"
 msgstr "Raccogliamo i seguenti tipi di dati personali:"
 
-#: app/templates/legal.html:49
+#: app/templates/legal.html:81
 msgid "Account Data:"
 msgstr "Dati dell'account:"
 
-#: app/templates/legal.html:49
+#: app/templates/legal.html:81
 msgid ""
 "Information you provide upon registration, such as username and email "
 "address. The lawful basis for this processing is the performance of a "
@@ -920,11 +986,11 @@ msgstr ""
 "indirizzo e-mail. La base giuridica di questo trattamento è l'esecuzione "
 "di un contratto (i nostri Termini di servizio)."
 
-#: app/templates/legal.html:50
+#: app/templates/legal.html:82
 msgid "User-Generated Content:"
 msgstr "Contenuti generati dagli utenti:"
 
-#: app/templates/legal.html:50
+#: app/templates/legal.html:82
 msgid ""
 "Images and other data you voluntarily upload to the Service. The lawful "
 "basis is your consent and our legitimate interest in providing the "
@@ -934,11 +1000,11 @@ msgstr ""
 "La base giuridica è il consenso dell'utente e il nostro legittimo "
 "interesse a fornire la funzionalità principale del Servizio."
 
-#: app/templates/legal.html:51 app/templates/legal.html:57
+#: app/templates/legal.html:83 app/templates/legal.html:89
 msgid "Technical Log Data:"
 msgstr "Dati di registro tecnici:"
 
-#: app/templates/legal.html:51
+#: app/templates/legal.html:83
 msgid ""
 "For the purpose of maintaining the security and integrity of our systems,"
 " we process server logs which may include your IP address, user-agent "
@@ -951,15 +1017,15 @@ msgstr ""
 "giuridica di questo trattamento è il nostro legittimo interesse a "
 "prevenire le frodi e a proteggere il nostro Servizio."
 
-#: app/templates/legal.html:54
+#: app/templates/legal.html:86
 msgid "3. Data Retention"
 msgstr "3. Conservazione dei dati"
 
-#: app/templates/legal.html:56
+#: app/templates/legal.html:88
 msgid "Account and User-Generated Content:"
 msgstr "Account e contenuti generati dagli utenti:"
 
-#: app/templates/legal.html:56
+#: app/templates/legal.html:88
 msgid ""
 "This data is retained for the duration of your account's existence. It is"
 " permanently and irrevocably deleted upon your request to terminate the "
@@ -969,17 +1035,17 @@ msgstr ""
 "dell'account dell'utente. Vengono eliminati in modo permanente e "
 "irrevocabile su richiesta di chiusura dell'account."
 
-#: app/templates/legal.html:57
+#: app/templates/legal.html:89
 msgid "Server logs are automatically purged after a period of six (6) months."
 msgstr ""
 "I registri del server vengono eliminati automaticamente dopo un periodo "
 "di sei (6) mesi."
 
-#: app/templates/legal.html:60
+#: app/templates/legal.html:92
 msgid "4. Your Rights as a Data Subject"
 msgstr "4. I tuoi diritti come interessato"
 
-#: app/templates/legal.html:61
+#: app/templates/legal.html:93
 msgid ""
 "Under the GDPR, you have the following rights regarding your personal "
 "data:"
@@ -987,11 +1053,11 @@ msgstr ""
 "Ai sensi del GDPR, l'utente ha i seguenti diritti in merito ai propri "
 "dati personali:"
 
-#: app/templates/legal.html:63
+#: app/templates/legal.html:95
 msgid "The right to access: You can request copies of your personal data."
 msgstr "Il diritto di accesso: puoi richiedere copie dei tuoi dati personali."
 
-#: app/templates/legal.html:64
+#: app/templates/legal.html:96
 msgid ""
 "The right to rectification: You can request that we correct any "
 "information you believe is inaccurate."
@@ -999,7 +1065,7 @@ msgstr ""
 "Il diritto di rettifica: puoi richiedere la correzione di qualsiasi "
 "informazione che ritieni inesatta."
 
-#: app/templates/legal.html:65
+#: app/templates/legal.html:97
 msgid ""
 "The right to erasure (right to be forgotten): You can request the erasure"
 " of your personal data. This is actioned by deleting your account."
@@ -1008,7 +1074,7 @@ msgstr ""
 "cancellazione dei tuoi dati personali. Ciò avviene eliminando il tuo "
 "account."
 
-#: app/templates/legal.html:66
+#: app/templates/legal.html:98
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
@@ -1016,7 +1082,7 @@ msgstr ""
 "Il diritto di limitare il trattamento: puoi richiederci di limitare il "
 "trattamento dei tuoi dati personali a determinate condizioni."
 
-#: app/templates/legal.html:67
+#: app/templates/legal.html:99
 msgid ""
 "The right to object to processing: You can object to our processing of "
 "your personal data."
@@ -1024,7 +1090,7 @@ msgstr ""
 "Il diritto di opposizione al trattamento: puoi opporti al nostro "
 "trattamento dei tuoi dati personali."
 
-#: app/templates/legal.html:68
+#: app/templates/legal.html:100
 msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
@@ -1032,7 +1098,7 @@ msgstr ""
 "Il diritto alla portabilità dei dati: puoi richiedere che trasferiamo i "
 "dati che abbiamo raccolto a un'altra organizzazione o direttamente a te."
 
-#: app/templates/legal.html:70
+#: app/templates/legal.html:102
 msgid ""
 "To exercise any of these rights, please contact us with the form contact."
 " You also have the right to lodge a complaint with a supervisory "
@@ -1043,11 +1109,11 @@ msgstr ""
 "presentare un reclamo a un'autorità di controllo (come il CNIL in "
 "Francia)."
 
-#: app/templates/legal.html:72
+#: app/templates/legal.html:104
 msgid "5. Data Security & Transfer"
 msgstr "5. Sicurezza e trasferimento dei dati"
 
-#: app/templates/legal.html:73
+#: app/templates/legal.html:105
 msgid ""
 "We implement appropriate technical and organizational measures to ensure "
 "a level of security appropriate to the risk. Your data is stored on "
@@ -1308,15 +1374,15 @@ msgstr "Elimina link selezionato"
 msgid "New Chain"
 msgstr "Nuova catena"
 
-#: app/templates/login.html:31
+#: app/templates/login.html:58
 msgid "New User?"
 msgstr "Nuovo utente?"
 
-#: app/templates/login.html:31
+#: app/templates/login.html:58
 msgid "Click to Register!"
 msgstr "Clicca per registrarti!"
 
-#: app/templates/login.html:33
+#: app/templates/login.html:59
 msgid "Forgot Your Password?"
 msgstr "Password dimenticata?"
 
@@ -1392,13 +1458,17 @@ msgstr "Esporta immagine"
 msgid "Download Selected Image"
 msgstr "Scarica immagine selezionata"
 
-#: app/templates/register.html:48
+#: app/templates/register.html:73
 msgid "I accept the"
 msgstr "Accetto i"
 
-#: app/templates/register.html:48
+#: app/templates/register.html:73
 msgid "Terms & Privacy Policy"
 msgstr "Termini e Informativa sulla Privacy"
+
+#: app/templates/register.html:84
+msgid "Already have an account?"
+msgstr ""
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""
@@ -1435,497 +1505,6 @@ msgstr ""
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Se non hai effettuato questa richiesta, ignora questa email."
-
-#: venv/Lib/site-packages/click/_termui_impl.py:613
-#, python-brace-format
-msgid "{editor}: Editing failed"
-msgstr ""
-
-#: venv/Lib/site-packages/click/_termui_impl.py:617
-#, python-brace-format
-msgid "{editor}: Editing failed: {e}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1114
-#: venv/Lib/site-packages/click/core.py:1151
-#, python-brace-format
-msgid "{text} {deprecated_message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1170
-#, fuzzy
-msgid "Options"
-msgstr "Opzioni di importazione"
-
-#: venv/Lib/site-packages/click/core.py:1245
-#, python-brace-format
-msgid "Got unexpected extra argument ({args})"
-msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/core.py:1264
-#, python-brace-format
-msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1448
-msgid "Aborted!"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1822
-msgid "Commands"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1853
-msgid "Missing command."
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1931
-#, python-brace-format
-msgid "No such command {name!r}."
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:2355
-msgid "Value must be an iterable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:2378
-#, python-brace-format
-msgid "Takes {nargs} values but 1 was given."
-msgid_plural "Takes {nargs} values but {len} were given."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/core.py:2567
-#, python-brace-format
-msgid ""
-"DeprecationWarning: The {param_type} {name!r} is "
-"deprecated.{extra_message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3015
-#, python-brace-format
-msgid "env var: {var}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3018
-#, python-brace-format
-msgid "default: {default}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3022
-msgid "required"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3082
-msgid "(dynamic)"
-msgstr ""
-
-#: venv/Lib/site-packages/click/decorators.py:465
-#, python-format
-msgid "%(prog)s, version %(version)s"
-msgstr ""
-
-#: venv/Lib/site-packages/click/decorators.py:522
-msgid "Show the version and exit."
-msgstr ""
-
-#: venv/Lib/site-packages/click/decorators.py:548
-msgid "Show this message and exit."
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:50
-#: venv/Lib/site-packages/click/exceptions.py:89
-#, python-brace-format
-msgid "Error: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:81
-#, python-brace-format
-msgid "Try '{command} {option}' for help."
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:130
-#, python-brace-format
-msgid "Invalid value: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:132
-#, python-brace-format
-msgid "Invalid value for {param_hint}: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:190
-msgid "Missing argument"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:192
-#, fuzzy
-msgid "Missing option"
-msgstr "Operazioni su lista"
-
-#: venv/Lib/site-packages/click/exceptions.py:194
-msgid "Missing parameter"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:196
-#, python-brace-format
-msgid "Missing {param_type}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:203
-#, python-brace-format
-msgid "Missing parameter: {param_name}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:223
-#, python-brace-format
-msgid "No such option: {name}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:235
-#, python-brace-format
-msgid "Did you mean {possibility}?"
-msgid_plural "(Possible options: {possibilities})"
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/exceptions.py:282
-msgid "unknown error"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:289
-#, python-brace-format
-msgid "Could not open file {filename!r}: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/parser.py:199
-#, python-brace-format
-msgid "Argument {name!r} takes {nargs} values."
-msgstr ""
-
-#: venv/Lib/site-packages/click/parser.py:381
-#, python-brace-format
-msgid "Option {name!r} does not take a value."
-msgstr ""
-
-#: venv/Lib/site-packages/click/parser.py:444
-#, python-brace-format
-msgid "Option {name!r} requires an argument."
-msgid_plural "Option {name!r} requires {nargs} arguments."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/shell_completion.py:332
-msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr ""
-
-#: venv/Lib/site-packages/click/shell_completion.py:339
-msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:165
-#, fuzzy
-msgid "Repeat for confirmation"
-msgstr "Reinvia email di conferma"
-
-#: venv/Lib/site-packages/click/termui.py:181
-msgid "Error: The value you entered was invalid."
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:183
-#, python-brace-format
-msgid "Error: {e.message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:194
-msgid "Error: The two entered values do not match."
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:253
-msgid "Error: invalid input"
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:872
-msgid "Press any key to continue..."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:332
-#, python-brace-format
-msgid ""
-"Choose from:\n"
-"\t{choices}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:369
-#, python-brace-format
-msgid "{value!r} is not {choice}."
-msgid_plural "{value!r} is not one of {choices}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/types.py:460
-#, python-brace-format
-msgid "{value!r} does not match the format {format}."
-msgid_plural "{value!r} does not match the formats {formats}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/types.py:482
-#, python-brace-format
-msgid "{value!r} is not a valid {number_type}."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:538
-#, python-brace-format
-msgid "{value} is not in the range {range}."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:719
-#, python-brace-format
-msgid "{value!r} is not a valid boolean. Recognized values: {states}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:747
-#, python-brace-format
-msgid "{value!r} is not a valid UUID."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:937
-msgid "file"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:939
-msgid "directory"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:941
-msgid "path"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:988
-#, python-brace-format
-msgid "{name} {filename!r} does not exist."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:997
-#, python-brace-format
-msgid "{name} {filename!r} is a file."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1005
-#, python-brace-format
-msgid "{name} {filename!r} is a directory."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1014
-#, python-brace-format
-msgid "{name} {filename!r} is not readable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1023
-#, python-brace-format
-msgid "{name} {filename!r} is not writable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1032
-#, python-brace-format
-msgid "{name} {filename!r} is not executable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1099
-#, python-brace-format
-msgid "{len_type} values are required, but {len_value} was given."
-msgid_plural "{len_type} values are required, but {len_value} were given."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/flask_wtf/file.py:55
-#: venv/Lib/site-packages/wtforms/validators.py:293
-#: venv/Lib/site-packages/wtforms/validators.py:323
-#, fuzzy
-msgid "This field is required."
-msgstr "parent_id è obbligatorio"
-
-#: venv/Lib/site-packages/flask_wtf/file.py:94
-#, python-brace-format
-msgid "File does not have an approved extension: {extensions}"
-msgstr ""
-
-#: venv/Lib/site-packages/flask_wtf/file.py:101
-msgid "File does not have an approved extension."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:86
-#, python-format
-msgid "Invalid field name '%s'."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:99
-#, python-format
-msgid "Field must be equal to %(other_name)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:146
-#, python-format
-msgid "Field must be at least %(min)d character long."
-msgid_plural "Field must be at least %(min)d characters long."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:152
-#, python-format
-msgid "Field cannot be longer than %(max)d character."
-msgid_plural "Field cannot be longer than %(max)d characters."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:158
-#, python-format
-msgid "Field must be exactly %(max)d character long."
-msgid_plural "Field must be exactly %(max)d characters long."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:164
-#, python-format
-msgid "Field must be between %(min)d and %(max)d characters long."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:216
-#, python-format
-msgid "Number must be at least %(min)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:219
-#, python-format
-msgid "Number must be at most %(max)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:222
-#, python-format
-msgid "Number must be between %(min)s and %(max)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:358
-#, fuzzy
-msgid "Invalid input."
-msgstr "Dati non validi"
-
-#: venv/Lib/site-packages/wtforms/validators.py:422
-#, fuzzy
-msgid "Invalid email address."
-msgstr "Tipo di elemento non valido"
-
-#: venv/Lib/site-packages/wtforms/validators.py:460
-msgid "Invalid IP address."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:503
-#, fuzzy
-msgid "Invalid Mac address."
-msgstr "Password attuale non valida."
-
-#: venv/Lib/site-packages/wtforms/validators.py:540
-#, fuzzy
-msgid "Invalid URL."
-msgstr "Dati non validi"
-
-#: venv/Lib/site-packages/wtforms/validators.py:561
-#, fuzzy
-msgid "Invalid UUID."
-msgstr "Dati non validi"
-
-#: venv/Lib/site-packages/wtforms/validators.py:595
-#, python-format
-msgid "Invalid value, must be one of: %(values)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:631
-#, python-format
-msgid "Invalid value, can't be any of: %(values)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:700
-msgid "This field cannot be edited."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:716
-msgid "This field is disabled and cannot have a value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/csrf/core.py:96
-#, fuzzy
-msgid "Invalid CSRF Token."
-msgstr "Dati JSON non validi"
-
-#: venv/Lib/site-packages/wtforms/csrf/session.py:64
-msgid "CSRF token missing."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/csrf/session.py:72
-#, fuzzy
-msgid "CSRF failed."
-msgstr "Scegli file"
-
-#: venv/Lib/site-packages/wtforms/csrf/session.py:77
-msgid "CSRF token expired."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:142
-msgid "Invalid Choice: could not coerce."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:149
-#: venv/Lib/site-packages/wtforms/fields/choices.py:203
-msgid "Choices cannot be None."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:155
-msgid "Not a valid choice."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:194
-msgid "Invalid choice(s): one or more data inputs could not be coerced."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:212
-#, python-format
-msgid "'%(value)s' is not a valid choice for this field."
-msgid_plural "'%(value)s' are not valid choices for this field."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:52
-msgid "Not a valid datetime value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:78
-#, fuzzy
-msgid "Not a valid date value."
-msgstr "Dati non validi"
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:104
-msgid "Not a valid time value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:149
-msgid "Not a valid week value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:82
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:92
-msgid "Not a valid integer value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:168
-msgid "Not a valid decimal value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:197
-msgid "Not a valid float value."
-msgstr ""
 
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"
@@ -1976,10 +1555,10 @@ msgstr ""
 #~ msgstr "Accesso come: %(username)s"
 
 #~ msgid "I accept the Terms & Privacy Policy"
-#~ msgstr "Accetto i Termini e l'Informativa sulla Privacy"
+#~ msgstr "Termini e Informativa sulla Privacy"
 
 #~ msgid "You must accept the terms and privacy policy to continue."
-#~ msgstr "Devi accettare i termini e l'informativa sulla privacy per continuare."
+#~ msgstr ""
 
 #~ msgid "No images to export"
 #~ msgstr "Nessuna immagine da esportare"
@@ -2028,4 +1607,470 @@ msgstr ""
 
 #~ msgid "September 18, 2025"
 #~ msgstr "18 settembre 2025"
+
+#~ msgid "be at least 9 characters long"
+#~ msgstr ""
+
+#~ msgid "contain at least one uppercase letter"
+#~ msgstr ""
+
+#~ msgid "contain at least one digit"
+#~ msgstr ""
+
+#~ msgid "Password must"
+#~ msgstr ""
+
+#~ msgid "Username"
+#~ msgstr "Il tuo nome utente"
+
+#~ msgid "Password"
+#~ msgstr "Reimposta password"
+
+#~ msgid "Remember Me"
+#~ msgstr ""
+
+#~ msgid "Email"
+#~ msgstr ""
+
+#~ msgid "Repeat Password"
+#~ msgstr "Reimposta password"
+
+#~ msgid "Please use a different username."
+#~ msgstr ""
+
+#~ msgid "Please use a different email address."
+#~ msgstr ""
+
+#~ msgid "Current Password"
+#~ msgstr "Reimposta password"
+
+#~ msgid "New Password"
+#~ msgstr "Cambia password"
+
+#~ msgid "Repeat New Password"
+#~ msgstr "Reimposta password"
+
+#~ msgid "Request Password Reset"
+#~ msgstr "Reimposta password"
+
+#~ msgid "Name"
+#~ msgstr "Nome albero"
+
+#~ msgid "Message"
+#~ msgstr "Immagini"
+
+#~ msgid "Send"
+#~ msgstr ""
+
+#~ msgid "PictoTree AAC Platform"
+#~ msgstr "Piattaforma PictoTree CAA"
+
+#~ msgid ""
+#~ "PictoTree is a comprehensive platform "
+#~ "(Web Backend + Native Mobile App) "
+#~ "designed for Augmentative and Alternative "
+#~ "Communication (AAC). Our goal is to "
+#~ "empower users to create, manage, and "
+#~ "display personalized communication 'trees' "
+#~ "using pictograms (leveraging the open-"
+#~ "source ARASAAC library or personal "
+#~ "imports). Currently under development, the "
+#~ "system is hosted in production and "
+#~ "accessible at pictotree.eu."
+#~ msgstr ""
+#~ "PictoTree è una piattaforma completa "
+#~ "(Backend Web + App Mobile "
+#~ "Nativa)progettata per la Comunicazione "
+#~ "Aumentativa e Alternativa (CAA). Ilnostro "
+#~ "obiettivo è consentire agli utenti di"
+#~ " creare, gestire e visualizzare 'alberi'"
+#~ " di comunicazionepersonalizzati utilizzando i "
+#~ "pittogrammi (sfruttando la libreria opensource"
+#~ " ARASAAC o importazioni personali). "
+#~ "Attualmente in fase disviluppo, il "
+#~ "sistema è ospitato in produzione e "
+#~ "accessibile supictotree.eu."
+
+#~ msgid "{editor}: Editing failed"
+#~ msgstr ""
+
+#~ msgid "{editor}: Editing failed: {e}"
+#~ msgstr ""
+
+#~ msgid "{text} {deprecated_message}"
+#~ msgstr ""
+
+#~ msgid "Options"
+#~ msgstr "Opzioni di importazione"
+
+#~ msgid "Got unexpected extra argument ({args})"
+#~ msgid_plural "Got unexpected extra arguments ({args})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "Aborted!"
+#~ msgstr ""
+
+#~ msgid "Commands"
+#~ msgstr ""
+
+#~ msgid "Missing command."
+#~ msgstr ""
+
+#~ msgid "No such command {name!r}."
+#~ msgstr ""
+
+#~ msgid "Value must be an iterable."
+#~ msgstr ""
+
+#~ msgid "Takes {nargs} values but 1 was given."
+#~ msgid_plural "Takes {nargs} values but {len} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid ""
+#~ "DeprecationWarning: The {param_type} {name!r} "
+#~ "is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "env var: {var}"
+#~ msgstr ""
+
+#~ msgid "default: {default}"
+#~ msgstr ""
+
+#~ msgid "required"
+#~ msgstr ""
+
+#~ msgid "(dynamic)"
+#~ msgstr ""
+
+#~ msgid "%(prog)s, version %(version)s"
+#~ msgstr ""
+
+#~ msgid "Show the version and exit."
+#~ msgstr ""
+
+#~ msgid "Show this message and exit."
+#~ msgstr ""
+
+#~ msgid "Error: {message}"
+#~ msgstr ""
+
+#~ msgid "Try '{command} {option}' for help."
+#~ msgstr ""
+
+#~ msgid "Invalid value: {message}"
+#~ msgstr ""
+
+#~ msgid "Invalid value for {param_hint}: {message}"
+#~ msgstr ""
+
+#~ msgid "Missing argument"
+#~ msgstr ""
+
+#~ msgid "Missing option"
+#~ msgstr "Operazioni su lista"
+
+#~ msgid "Missing parameter"
+#~ msgstr ""
+
+#~ msgid "Missing {param_type}"
+#~ msgstr ""
+
+#~ msgid "Missing parameter: {param_name}"
+#~ msgstr ""
+
+#~ msgid "No such option: {name}"
+#~ msgstr ""
+
+#~ msgid "Did you mean {possibility}?"
+#~ msgid_plural "(Possible options: {possibilities})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "unknown error"
+#~ msgstr ""
+
+#~ msgid "Could not open file {filename!r}: {message}"
+#~ msgstr ""
+
+#~ msgid "Argument {name!r} takes {nargs} values."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} does not take a value."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} requires an argument."
+#~ msgid_plural "Option {name!r} requires {nargs} arguments."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Shell completion is not supported for Bash versions older than 4.4."
+#~ msgstr ""
+
+#~ msgid "Couldn't detect Bash version, shell completion is not supported."
+#~ msgstr ""
+
+#~ msgid "Repeat for confirmation"
+#~ msgstr "Reinvia email di conferma"
+
+#~ msgid "Error: The value you entered was invalid."
+#~ msgstr ""
+
+#~ msgid "Error: {e.message}"
+#~ msgstr ""
+
+#~ msgid "Error: The two entered values do not match."
+#~ msgstr ""
+
+#~ msgid "Error: invalid input"
+#~ msgstr ""
+
+#~ msgid "Press any key to continue..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Choose from:\n"
+#~ "\t{choices}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not {choice}."
+#~ msgid_plural "{value!r} is not one of {choices}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} does not match the format {format}."
+#~ msgid_plural "{value!r} does not match the formats {formats}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} is not a valid {number_type}."
+#~ msgstr ""
+
+#~ msgid "{value} is not in the range {range}."
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid UUID."
+#~ msgstr ""
+
+#~ msgid "file"
+#~ msgstr ""
+
+#~ msgid "directory"
+#~ msgstr ""
+
+#~ msgid "path"
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} does not exist."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a file."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a directory."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not readable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not writable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not executable."
+#~ msgstr ""
+
+#~ msgid "{len_type} values are required, but {len_value} was given."
+#~ msgid_plural "{len_type} values are required, but {len_value} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "This field is required."
+#~ msgstr "parent_id è obbligatorio"
+
+#~ msgid "File does not have an approved extension: {extensions}"
+#~ msgstr ""
+
+#~ msgid "File does not have an approved extension."
+#~ msgstr ""
+
+#~ msgid "Invalid field name '%s'."
+#~ msgstr ""
+
+#~ msgid "Field must be equal to %(other_name)s."
+#~ msgstr ""
+
+#~ msgid "Field cannot be longer than %(max)d character."
+#~ msgid_plural "Field cannot be longer than %(max)d characters."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field must be exactly %(max)d character long."
+#~ msgid_plural "Field must be exactly %(max)d characters long."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field must be between %(min)d and %(max)d characters long."
+#~ msgstr ""
+
+#~ msgid "Number must be at least %(min)s."
+#~ msgstr ""
+
+#~ msgid "Number must be at most %(max)s."
+#~ msgstr ""
+
+#~ msgid "Number must be between %(min)s and %(max)s."
+#~ msgstr ""
+
+#~ msgid "Invalid input."
+#~ msgstr "Dati non validi"
+
+#~ msgid "Invalid email address."
+#~ msgstr "Tipo di elemento non valido"
+
+#~ msgid "Invalid IP address."
+#~ msgstr ""
+
+#~ msgid "Invalid Mac address."
+#~ msgstr "Password attuale non valida."
+
+#~ msgid "Invalid URL."
+#~ msgstr "Dati non validi"
+
+#~ msgid "Invalid UUID."
+#~ msgstr "Dati non validi"
+
+#~ msgid "Invalid value, must be one of: %(values)s."
+#~ msgstr ""
+
+#~ msgid "Invalid value, can't be any of: %(values)s."
+#~ msgstr ""
+
+#~ msgid "This field cannot be edited."
+#~ msgstr ""
+
+#~ msgid "This field is disabled and cannot have a value."
+#~ msgstr ""
+
+#~ msgid "Invalid CSRF Token."
+#~ msgstr "Dati JSON non validi"
+
+#~ msgid "CSRF token missing."
+#~ msgstr ""
+
+#~ msgid "CSRF failed."
+#~ msgstr "Scegli file"
+
+#~ msgid "CSRF token expired."
+#~ msgstr ""
+
+#~ msgid "Invalid Choice: could not coerce."
+#~ msgstr ""
+
+#~ msgid "Choices cannot be None."
+#~ msgstr ""
+
+#~ msgid "Not a valid choice."
+#~ msgstr ""
+
+#~ msgid "Invalid choice(s): one or more data inputs could not be coerced."
+#~ msgstr ""
+
+#~ msgid "'%(value)s' is not a valid choice for this field."
+#~ msgid_plural "'%(value)s' are not valid choices for this field."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Not a valid datetime value."
+#~ msgstr ""
+
+#~ msgid "Not a valid date value."
+#~ msgstr "Dati non validi"
+
+#~ msgid "Not a valid time value."
+#~ msgstr ""
+
+#~ msgid "Not a valid week value."
+#~ msgstr ""
+
+#~ msgid "Not a valid integer value."
+#~ msgstr ""
+
+#~ msgid "Not a valid decimal value."
+#~ msgstr ""
+
+#~ msgid "Not a valid float value."
+#~ msgstr ""
+
+#~ msgid "PictoTree: Your communication binder, reimagined for daily life."
+#~ msgstr ""
+#~ "PictoTree: Il tuo quaderno di "
+#~ "comunicazione, reimmaginato per la vita "
+#~ "quotidiana."
+
+#~ msgid ""
+#~ "PictoTree is a free and secure "
+#~ "platform that puts your communication "
+#~ "binder right in your pocket. No "
+#~ "more lost icons, no more bulk—just "
+#~ "the essentials, always at hand."
+#~ msgstr ""
+#~ "PictoTree è una piattaforma gratuita e"
+#~ " sicura che mette il tuo quaderno "
+#~ "di comunicazione direttamente in tasca. "
+#~ "Niente più icone perse, niente più "
+#~ "ingombro — solo l'essenziale, sempre a"
+#~ " portata di mano."
+
+#~ msgid "Why use PictoTree?"
+#~ msgstr "Perché usare PictoTree?"
+
+#~ msgid "Always with you:"
+#~ msgstr "Sempre con te:"
+
+#~ msgid ""
+#~ "Your smartphone becomes your binder. "
+#~ "Perfect for outings, shopping, or "
+#~ "unexpected moments."
+#~ msgstr ""
+#~ "Il tuo smartphone diventa il tuo "
+#~ "quaderno. Perfetto per uscite, shopping "
+#~ "o momenti inaspettati."
+
+#~ msgid "Instant Import:"
+#~ msgstr "Importazione istantanea:"
+
+#~ msgid "100&#37; Customizable & Private:"
+#~ msgstr "100&#37; Personalizzabile e Privato:"
+
+#~ msgid "Securely upload your own photos to create personalized pictograms."
+#~ msgstr ""
+#~ "Carica in modo sicuro le tue foto"
+#~ " per creare pittogrammi personalizzati."
+
+#~ msgid "The bridge to paper:"
+#~ msgstr "Il ponte verso la carta:"
+
+#~ msgid "The Concept: A Powerful Ecosystem"
+#~ msgstr "Il Concetto: Un ecosistema potente"
+
+#~ msgid ""
+#~ "A dedicated web platform to build "
+#~ "your \"trees\" and manage your library"
+#~ " with ease, paired with a native "
+#~ "mobile app to take your communication"
+#~ " everywhere you go."
+#~ msgstr ""
+#~ "Una piattaforma web dedicata per "
+#~ "costruire i tuoi \"alberi\" e gestire"
+#~ " facilmente la tua libreria, associata "
+#~ "a un'app mobile nativa per portare "
+#~ "la tua comunicazione ovunque tu vada."
 

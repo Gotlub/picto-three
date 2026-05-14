@@ -29,26 +29,17 @@ def test_mobile_trees_pagination_and_search(client, app):
             
         db.session.commit()
 
-    # TEST: Alice requests public trees (limit=3, page=1) -> Should get 3 of Bob's
-    r = client.get('/api/v1/mobile/trees?is_public=true&limit=3&page=1', headers=headers_alice)
-    assert r.status_code == 200
-    data = r.get_json()
-    assert len(data) == 3
-    assert all(t['is_public'] for t in data)
-
     # TEST: Alice requests private trees (limit=10, page=1) -> Should get 10 of her trees
-    r = client.get('/api/v1/mobile/trees?is_public=false&limit=10&page=1', headers=headers_alice)
+    r = client.get('/api/v1/mobile/trees?limit=10&page=1', headers=headers_alice)
     assert r.status_code == 200
     data = r.get_json()
     assert len(data) == 10
-    assert all(not t['is_public'] for t in data)
-    assert all(t['owner'] == 'alice' for t in data)
     
     # TEST: Alice requests private trees (limit=10, page=2) -> Should get remaining 5
-    r = client.get('/api/v1/mobile/trees?is_public=false&limit=10&page=2', headers=headers_alice)
+    r = client.get('/api/v1/mobile/trees?limit=10&page=2', headers=headers_alice)
     assert len(r.get_json()) == 5
 
     # TEST: Alice searches 'Tree 1' in private -> Should match "Alice Tree 1", "10", "11", "12", "13", "14" (6 results)
-    r = client.get('/api/v1/mobile/trees?is_public=false&search=Tree%201', headers=headers_alice)
+    r = client.get('/api/v1/mobile/trees?search=Tree%201', headers=headers_alice)
     data = r.get_json()
     assert len(data) == 6

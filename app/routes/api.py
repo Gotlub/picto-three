@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from flask_babel import _
 from werkzeug.utils import secure_filename
 from app import db
-from app.models import Tree, PictogramList, Folder, Image
+from app.models import Tree, PictogramList, Folder, Image, Profile, ProfileTree
 from pathlib import Path
 import shutil
 from PIL import Image as PILImage
@@ -13,16 +13,12 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 
 @bp.route('/trees/load', methods=['GET'])
 def load_trees():
-    # Public trees are all trees with is_public = True, ordered by name
-    public_trees = Tree.query.filter_by(is_public=True).order_by(Tree.name).all()
-
     user_trees = []
     if current_user.is_authenticated:
-        # Private trees are user-owned trees with is_public = False, ordered by name
-        user_trees = Tree.query.filter_by(user_id=current_user.id, is_public=False).order_by(Tree.name).all()
+        # Fetch all user-owned trees, ignoring the deprecated is_public flag
+        user_trees = Tree.query.filter_by(user_id=current_user.id).order_by(Tree.name).all()
 
     return jsonify({
-        'public_trees': [tree.to_dict() for tree in public_trees],
         'user_trees': [tree.to_dict() for tree in user_trees],
         'current_user_id': current_user.id if current_user.is_authenticated else None
     })
@@ -30,9 +26,6 @@ def load_trees():
 
 @bp.route('/lists', methods=['GET'])
 def load_lists():
-    # Public lists are all lists with is_public = True, ordered by name
-    public_lists = PictogramList.query.filter_by(is_public=True).order_by(PictogramList.list_name).all()
-
     user_lists = []
     if current_user.is_authenticated:
         # Private lists are user-owned lists with is_public = False, ordered by name
@@ -41,7 +34,6 @@ def load_lists():
     # In to_dict(), the payload is already a string, but if it were an object, we'd need to handle it.
     # The current to_dict returns the payload as is, which is what we want.
     return jsonify({
-        'public_lists': [lst.to_dict() for lst in public_lists],
         'user_lists': [lst.to_dict() for lst in user_lists]
     })
 
@@ -53,36 +45,16 @@ def save_list():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     list_name = data.get('list_name')
-    is_public = data.get('is_public', False)
+    is_public = False
     payload = data.get('payload')
 
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': _('Missing required fields: list_name and payload are required.')}), 400
 
-    # Validate images if saving a public list
-    if is_public:
-        image_ids = set()
-        if isinstance(payload, list):
-            for item in payload:
-                if isinstance(item, dict) and 'image_id' in item:
-                    # Filter out Arasaac images (id = -1)
-                    # Filter out Arasaac images (id = -1)
-                    if item['image_id'] != -1:
-                        image_ids.add(item['image_id'])
-
-        if image_ids:
-            # Public lists cannot contain any user-owned images (user_id is not NULL)
-            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
-            if user_owned_images:
-                return jsonify({
-                    'status': 'error',
-                    'message': _('Public lists can only contain global public images. Please remove any user-owned images before saving publicly.')
-                }), 400
-
-    payload_str = json.dumps(payload)
-
     # Check if a list with the same name already exists for this user
     existing_list = PictogramList.query.filter_by(user_id=current_user.id, list_name=list_name).first()
+
+    payload_str = json.dumps(payload) if isinstance(payload, (dict, list)) else payload
 
     if existing_list:
         # If it exists, update it
@@ -125,7 +97,7 @@ def update_list(list_id):
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     plist.list_name = data.get('list_name', plist.list_name)
-    plist.is_public = data.get('is_public', plist.is_public)
+    plist.is_public = False
     payload = data.get('payload')
     if payload is not None:
         plist.payload = json.dumps(payload)
@@ -316,7 +288,7 @@ def create_folder():
     return jsonify({'status': 'success', 'folder': new_folder.to_dict(include_children=False)})
 
 # --- Helper pour la création de miniatures ---
-THUMB_SIZE = (48, 48)
+THUMB_SIZE = (300, 300)
 
 def create_thumbnail_for_upload(filepath_relative):
     """Génère une miniature pour une image uploadée."""
@@ -457,31 +429,13 @@ def save_tree():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     tree_name = data.get('name')
-    is_public = data.get('is_public', False)
+    is_public = False
     root_id = data.get('root_id', -1)
     root_url = data.get('root_url')
     json_data = data.get('json_data')
 
     if not tree_name or not json_data:
         return jsonify({'status': 'error', 'message': _('Missing required fields')}), 400
-
-    # Validate images if saving a public tree
-    if is_public:
-        if not json_data.get('roots'):
-            return jsonify({'status': 'error', 'message': _('Cannot save an empty tree as public.')}), 400
-
-        image_ids = get_image_ids_from_tree(json_data['roots'])
-        if root_id != -1:
-             image_ids.add(root_id)
-             
-        if image_ids:
-            # Public trees cannot contain any user-owned images (user_id is not NULL)
-            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
-            if user_owned_images:
-                return jsonify({
-                    'status': 'error',
-                    'message': _('Public trees can only contain global public images. Please remove any user-owned images before saving publicly.')
-                }), 400
 
     # Check if a tree with the same name already exists for this user
     tree = Tree.query.filter_by(user_id=current_user.id, name=tree_name).first()
@@ -514,6 +468,110 @@ def save_tree():
         'tree_id': tree.id,
         'tree_data': json_data
     })
+
+@bp.route('/tree/<int:tree_id>', methods=['DELETE'])
+@login_required
+def delete_tree(tree_id):
+    tree = db.session.get(Tree, tree_id)
+    if tree is None:
+        return jsonify({'status': 'error', 'message': _('Tree not found')}), 404
+    if tree.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    db.session.delete(tree)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': _('Tree deleted successfully')})
+
+@bp.route('/profiles/load', methods=['GET'])
+@login_required
+def load_profiles():
+    profiles = Profile.query.filter_by(user_id=current_user.id).order_by(Profile.name).all()
+    profiles_data = []
+    for profile in profiles:
+        profile_dict = {
+            'id': profile.id,
+            'name': profile.name,
+            'remote_avatar_url': profile.remote_avatar_url,
+            'trees': []
+        }
+        # Order by display_order
+        trees_assoc = sorted(profile.profile_trees, key=lambda x: x.display_order)
+        for assoc in trees_assoc:
+            tree_dict = assoc.tree.to_dict()
+            tree_dict['colorCode'] = assoc.colorCode
+            tree_dict['display_order'] = assoc.display_order
+            profile_dict['trees'].append(tree_dict)
+        profiles_data.append(profile_dict)
+    
+    return jsonify({
+        'profiles': profiles_data
+    })
+
+@bp.route('/profile/save', methods=['POST'])
+@login_required
+def save_profile():
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
+
+    profile_name = data.get('name')
+    remote_avatar_url = data.get('remote_avatar_url')
+    trees_data = data.get('trees', [])
+
+    if not profile_name:
+        return jsonify({'status': 'error', 'message': _('Missing profile name')}), 400
+
+    profile = Profile.query.filter_by(user_id=current_user.id, name=profile_name).first()
+
+    if profile:
+        # Update existing
+        profile.remote_avatar_url = remote_avatar_url
+        ProfileTree.query.filter_by(profile_id=profile.id).delete()
+        message = _('Profile updated successfully')
+    else:
+        # Create new
+        profile = Profile(user_id=current_user.id, name=profile_name, remote_avatar_url=remote_avatar_url)
+        db.session.add(profile)
+        db.session.flush() # To get the profile.id
+        message = _('Profile saved successfully')
+
+    tree_ids = [t.get('treeId') for t in trees_data if t.get('treeId')]
+    valid_trees = {t.id for t in Tree.query.filter(Tree.id.in_(tree_ids), Tree.user_id == current_user.id).all()} if tree_ids else set()
+
+    for index, t_data in enumerate(trees_data):
+        tid = t_data.get('treeId')
+        if tid in valid_trees:
+            tree_assoc = ProfileTree(
+                profile_id=profile.id,
+                tree_id=tid,
+                user_id=current_user.id,
+                display_order=index + 1,
+                colorCode=t_data.get('colorCode', '#000000')
+            )
+            db.session.add(tree_assoc)
+
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': message,
+        'profile_id': profile.id
+    })
+
+@bp.route('/profile/<int:profile_id>', methods=['DELETE'])
+@login_required
+def delete_profile(profile_id):
+    profile = db.session.get(Profile, profile_id)
+    if profile is None:
+        return jsonify({'status': 'error', 'message': _('Profile not found')}), 404
+    if profile.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    db.session.delete(profile)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': _('Profile deleted successfully')})
 
 def delete_folder_recursive(folder):
     # The path from DB is relative. Combine it with the base path for physical operations.

@@ -244,19 +244,16 @@ class TreeBuilder {
             saveBtn.addEventListener('click', () => this.saveTree());
         }
 
-        const importBtn = document.getElementById('import-json-btn');
-        if (importBtn) {
-            importBtn.addEventListener('click', () => this.importTreeFromJSON());
-        }
 
-        const exportBtn = document.getElementById('export-json-btn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportTreeToJSON());
-        }
 
         const loadBtn = document.getElementById('load-tree-btn');
         if (loadBtn) {
             loadBtn.addEventListener('click', () => this.loadTree());
+        }
+
+        const deleteTreeBtn = document.getElementById('delete-tree-btn');
+        if (deleteTreeBtn) {
+            deleteTreeBtn.addEventListener('click', () => this.deleteTree());
         }
 
         if (this.imageSearch) {
@@ -338,6 +335,9 @@ class TreeBuilder {
                 console.error("Could not parse tree_data_from_post", e);
             }
         }
+
+        this.initProfileBuilder();
+        this.initProfileEvents();
 
         // Use event delegation for the export button, as it's in a modal
         $(document).on('click', '#export-pdf-vectoriel', async function () {
@@ -455,19 +455,7 @@ class TreeBuilder {
             return treantNode;
         };
 
-        const nodeStructure = {
-            children: this.rootNode.children.map(buildTreantNode)
-        };
-
-        // If there is more than one root branch, create an invisible pseudo-node to be the common parent.
-        if (nodeStructure.children.length > 1) {
-            return {
-                pseudo: true,
-                children: nodeStructure.children
-            };
-        }
-
-        return nodeStructure.children[0];
+        return buildTreantNode(this.rootNode);
     }
 
     reloadBuilderWithCurrentTree(event) {
@@ -653,7 +641,13 @@ class TreeBuilder {
                 oldParent.children = oldParent.children.filter(child => child !== draggedNode);
             }
 
-            if (zone === 'before' || zone === 'after') {
+            if (targetNode.image.id === 'root' && zone === 'replace') {
+                this.updateRootImage(draggedNode.image);
+                // Reparent all children of the dragged node to the root node
+                draggedNode.children.forEach(child => {
+                    this.rootNode.addChild(child);
+                });
+            } else if (zone === 'before' || zone === 'after') {
                 const parent = targetNode.parent;
                 const index = parent.children.indexOf(targetNode);
                 if (index > -1) {
@@ -888,7 +882,7 @@ class TreeBuilder {
             return;
         }
 
-        const isPublic = document.getElementById('tree-is-public').checked;
+        const isPublic = false;
         const jsonData = this.getTreeAsJSON();
 
         if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
@@ -908,8 +902,8 @@ class TreeBuilder {
             }
         }
 
-        // Check if a tree with the same name exists for the current user among both private and public lists
-        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        // Check if a tree with the same name exists for the current user
+        const allTrees = this.userTrees || [];
         const existingTree = allTrees.find(tree => tree.name === treeName && tree.user_id === this.currentUserId);
         
         let proceed = true;
@@ -975,21 +969,6 @@ class TreeBuilder {
     }
 
     filterTrees() {
-        const searchTerm = this.treeSearch.value.toLowerCase();
-        const treeLists = document.querySelectorAll('.tree-select-list');
-
-        treeLists.forEach(select => {
-            const options = select.options;
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                const optionText = option.textContent.toLowerCase();
-                if (optionText.includes(searchTerm)) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
-                }
-            }
-        });
     }
 
     async loadSavedTrees() {
@@ -1000,16 +979,363 @@ class TreeBuilder {
                 return;
             }
             const data = await response.json();
-            this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
             this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
             this.currentUserId = data.current_user_id;
         } catch (e) {
             console.error('Impossible de charger les arbres:', e);
             alert('Impossible de charger les arbres sauvegardés.');
-            this.publicTrees = [];
             this.userTrees = [];
         }
         this.renderTreeList();
+        this.renderProfileBuilderTreeList();
+        this.loadSavedProfiles();
+    }
+
+    initProfileEvents() {
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        if (saveProfileBtn) {
+            saveProfileBtn.addEventListener('click', () => this.saveProfile());
+        }
+
+        const loadProfileBtn = document.getElementById('load-profile-btn');
+        if (loadProfileBtn) {
+            loadProfileBtn.addEventListener('click', () => this.loadSelectedProfile());
+        }
+
+        const deleteProfileBtn = document.getElementById('delete-profile-btn');
+        if (deleteProfileBtn) {
+            deleteProfileBtn.addEventListener('click', () => this.deleteSelectedProfile());
+        }
+
+        const profileSearch = document.getElementById('profile-search');
+        if (profileSearch) {
+            profileSearch.addEventListener('input', () => this.filterProfiles());
+        }
+
+        const newProfileBtn = document.getElementById('new-profile-btn');
+        if (newProfileBtn) {
+            newProfileBtn.addEventListener('click', () => this.createNewProfile());
+        }
+
+        const avatarContainer = document.getElementById('profile-avatar-container');
+        if (avatarContainer) {
+            avatarContainer.addEventListener('click', () => this.openAvatarModal());
+        }
+    }
+
+    openAvatarModal() {
+        const modalEl = document.getElementById('avatar-modal');
+        if (!modalEl) return;
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        
+        if (!this.modalImageTree) {
+            this.modalImageTree = new ImageTree('modal-image-sidebar-tree');
+            this.modalImageTree.onImageClick = (data) => {
+                this.setProfileAvatar(`/pictogramsmin/${data.path}`);
+                modal.hide();
+            };
+            
+            this.modalArasaacSearch = new ArasaacSearch('modal-arasaac-search-container', null, (imgUrl) => {
+                this.setProfileAvatar(imgUrl);
+                modal.hide();
+            });
+        }
+        
+        modal.show();
+    }
+    
+    setProfileAvatar(url) {
+        const urlInput = document.getElementById('profile-image-url');
+        const previewImg = document.getElementById('profile-image-preview');
+        if (urlInput) urlInput.value = url;
+        if (previewImg) previewImg.src = url;
+    }
+
+    initProfileBuilder() {
+        const profileArea = document.getElementById('profile-builder-area');
+        const profileTreesList = document.getElementById('profile-trees-list');
+        const emptyMsg = document.getElementById('profile-builder-empty-msg');
+        
+        if (!profileArea || !profileTreesList) return;
+
+        // Drag events for dropping items into the profile area
+        profileArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            // Allow dropping from right sidebar OR reordering
+            e.dataTransfer.dropEffect = 'copy';
+            profileArea.classList.add('border-primary'); // Highlight dropzone
+            
+            // Visual feedback for reordering
+            const y = e.clientY;
+            const target = e.target.closest('.profile-dropped-tree-item');
+            if (target && !target.classList.contains('dragging')) {
+                const box = target.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                // Clear previous indicators
+                profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
+                    el.classList.remove('drop-above', 'drop-below');
+                });
+                
+                if (offset < 0) {
+                    target.classList.add('drop-above');
+                } else {
+                    target.classList.add('drop-below');
+                }
+            }
+        });
+
+        profileArea.addEventListener('dragleave', (e) => {
+            profileArea.classList.remove('border-primary');
+            // We shouldn't remove drop-above/below here unconditionally because dragleave fires when entering child elements
+        });
+
+        profileArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            profileArea.classList.remove('border-primary');
+            profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
+                el.classList.remove('drop-above', 'drop-below');
+            });
+            
+            let dragData = null;
+            try {
+                const dataString = e.dataTransfer.getData('application/json');
+                if (dataString) {
+                    dragData = JSON.parse(dataString);
+                }
+            } catch (err) {
+                console.error('Failed to parse drag data', err);
+            }
+
+            if (dragData && dragData.type === 'profile-tree-item') {
+                // Determine insertion point if reordering
+                const y = e.clientY;
+                const afterElement = this.getDragAfterElement(profileTreesList, y);
+                
+                // Need to find full tree data to pass to addTreeToProfile
+                const treeData = this.userTrees.find(t => t.id === dragData.treeId);
+                
+                if (treeData) {
+                    // Check if tree is already in the list
+                    const existingNode = profileTreesList.querySelector(`[data-tree-id="${treeData.id}"]`);
+                    if (existingNode && dragData.isReorder) {
+                        // We are just reordering an existing element
+                        if (afterElement == null) {
+                            profileTreesList.appendChild(existingNode);
+                        } else {
+                            profileTreesList.insertBefore(existingNode, afterElement);
+                        }
+                    } else if (!existingNode) {
+                        // Adding a new tree
+                        const newElement = this.createProfileTreeElement(treeData);
+                        if (afterElement == null) {
+                            profileTreesList.appendChild(newElement);
+                        } else {
+                            profileTreesList.insertBefore(newElement, afterElement);
+                        }
+                        if (emptyMsg) emptyMsg.style.display = 'none';
+                    } else {
+                        // Already in list, do not add duplicates
+                    }
+                    this.updateProfileTreeNumbers();
+                }
+            }
+        });
+    }
+
+    updateProfileTreeNumbers() {
+        const profileTreesList = document.getElementById('profile-trees-list');
+        if (!profileTreesList) return;
+        const items = profileTreesList.querySelectorAll('.profile-dropped-tree-item');
+        items.forEach((item, index) => {
+            const numberSpan = item.querySelector('.tree-number');
+            if (numberSpan) {
+                numberSpan.textContent = `${index + 1}.`;
+            }
+        });
+    }
+
+    getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.profile-dropped-tree-item:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    createProfileTreeElement(treeData) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center profile-dropped-tree-item mb-2 shadow-sm rounded';
+        li.setAttribute('draggable', 'true');
+        li.dataset.treeId = treeData.id;
+
+        // Drag events for reordering
+        li.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('application/json', JSON.stringify({
+                type: 'profile-tree-item',
+                treeId: treeData.id,
+                isReorder: true
+            }));
+            li.classList.add('dragging');
+            li.style.opacity = '0.5';
+        });
+
+        li.addEventListener('dragend', () => {
+            li.classList.remove('dragging');
+            li.style.opacity = '1';
+            const profileTreesList = document.getElementById('profile-trees-list');
+            if (profileTreesList) {
+                profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
+                    el.classList.remove('drop-above', 'drop-below');
+                });
+            }
+        });
+
+        // Left section: Handle, Number, Image, Name
+        const leftSection = document.createElement('div');
+        leftSection.className = 'd-flex align-items-center flex-grow-1';
+
+        const dragHandle = document.createElement('span');
+        dragHandle.innerHTML = '&#8942;&#8942;';
+        dragHandle.style.cursor = 'grab';
+        dragHandle.className = 'text-muted me-2 fs-5';
+        leftSection.appendChild(dragHandle);
+
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'tree-number fw-bold text-muted me-3 fs-5';
+        numberSpan.textContent = '1.';
+        leftSection.appendChild(numberSpan);
+
+        const imgContainer = document.createElement('div');
+        imgContainer.style.width = '40px';
+        imgContainer.style.height = '40px';
+        imgContainer.className = 'me-3';
+        const img = document.createElement('img');
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        let thumbUrl = '/static/images/folder-bold.png';
+        if (treeData.root_url) {
+            if (treeData.root_url.startsWith('http')) {
+                thumbUrl = treeData.root_url.replace(/_500\.png$/, '_300.png');
+            } else if (treeData.root_url.startsWith('/pictograms/')) {
+                thumbUrl = treeData.root_url.replace('/pictograms/', '/pictogramsmin/');
+            } else if (treeData.root_url.startsWith('/')) {
+                thumbUrl = treeData.root_url;
+            } else {
+                thumbUrl = `/pictogramsmin/${treeData.root_url}`;
+            }
+        }
+        img.src = thumbUrl;
+        img.onerror = function() { this.src = '/static/images/folder-bold.png'; };
+        imgContainer.appendChild(img);
+        leftSection.appendChild(imgContainer);
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'fw-bold';
+        nameSpan.textContent = treeData.name;
+        leftSection.appendChild(nameSpan);
+
+        li.appendChild(leftSection);
+
+        // Right section: Colors and Delete
+        const rightSection = document.createElement('div');
+        rightSection.className = 'd-flex align-items-center';
+
+        // Color options Dropdown - Unified with Mobile (Hex codes)
+        const colors = [
+            { hex: '#000000', label: 'Black' },
+            { hex: '#FFEB3B', label: 'Yellow' },
+            { hex: '#4CAF50', label: 'Green' },
+            { hex: '#FF9800', label: 'Orange' },
+            { hex: '#2196F3', label: 'Blue' },
+            { hex: '#E91E63', label: 'Pink' }
+        ];
+
+        const dropdownDiv = document.createElement('div');
+        dropdownDiv.className = 'dropdown me-3 profile-tree-color-dropdown';
+        
+        const dropdownBtn = document.createElement('button');
+        dropdownBtn.className = 'btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center';
+        dropdownBtn.type = 'button';
+        dropdownBtn.dataset.bsToggle = 'dropdown';
+        
+        const selectedColorSpan = document.createElement('span');
+        selectedColorSpan.className = 'rounded-circle me-2 color-indicator border';
+        selectedColorSpan.style.width = '14px';
+        selectedColorSpan.style.height = '14px';
+        
+        const selectedText = document.createElement('span');
+        
+        dropdownBtn.appendChild(selectedColorSpan);
+        dropdownBtn.appendChild(selectedText);
+        dropdownDiv.appendChild(dropdownBtn);
+        
+        const dropdownMenu = document.createElement('ul');
+        dropdownMenu.className = 'dropdown-menu';
+        dropdownMenu.style.minWidth = 'unset';
+
+        // Set initial color state
+        let currentColor = treeData.colorCode || '#000000';
+        dropdownDiv.dataset.selectedColor = currentColor;
+
+        const updateBtnVisuals = (colorHex) => {
+            const cInfo = colors.find(c => c.hex === colorHex) || colors[0];
+            selectedColorSpan.style.backgroundColor = cInfo.hex;
+            selectedText.textContent = cInfo.label;
+            dropdownDiv.dataset.selectedColor = cInfo.hex;
+        };
+        updateBtnVisuals(currentColor);
+
+        colors.forEach(color => {
+            const optionLi = document.createElement('li');
+            const a = document.createElement('a');
+            a.className = 'dropdown-item d-flex align-items-center';
+            a.href = '#';
+            
+            const swatch = document.createElement('span');
+            swatch.className = 'rounded-circle me-2 border';
+            swatch.style.width = '14px';
+            swatch.style.height = '14px';
+            swatch.style.backgroundColor = color.hex;
+            
+            a.appendChild(swatch);
+            a.appendChild(document.createTextNode(color.label));
+            
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                updateBtnVisuals(color.hex);
+            });
+            
+            optionLi.appendChild(a);
+            dropdownMenu.appendChild(optionLi);
+        });
+
+        dropdownDiv.appendChild(dropdownMenu);
+        rightSection.appendChild(dropdownDiv);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-outline-danger border-0';
+        deleteBtn.innerHTML = '&#10005;'; // X mark
+        deleteBtn.addEventListener('click', () => {
+            li.remove();
+            this.updateProfileTreeNumbers();
+            const profileTreesList = document.getElementById('profile-trees-list');
+            const emptyMsg = document.getElementById('profile-builder-empty-msg');
+            if (profileTreesList && profileTreesList.children.length === 0 && emptyMsg) {
+                emptyMsg.style.display = 'block';
+            }
+        });
+
+        rightSection.appendChild(deleteBtn);
+        li.appendChild(rightSection);
+
+        return li;
     }
 
     renderTreeList() {
@@ -1048,14 +1374,121 @@ class TreeBuilder {
             }
         };
 
-        createSelectList(this.userTrees, 'My Private Trees', 'user-tree-select');
-        createSelectList(this.publicTrees, 'Public Trees', 'public-tree-select');
+        createSelectList(this.userTrees, 'My Trees', 'user-tree-select');
 
         // Set the default active list if it exists
         if (this.userTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
-        } else if (this.publicTrees.length > 0) {
-            this.activeTreeSelect = document.getElementById('public-tree-select');
+        }
+    }
+
+    renderProfileBuilderTreeList() {
+        const profileTreeList = document.getElementById('profile-builder-tree-list');
+        if (!profileTreeList) return;
+        
+        profileTreeList.innerHTML = '';
+        
+        if (!this.userTrees || this.userTrees.length === 0) {
+            const emptyMsg = document.createElement('li');
+            emptyMsg.className = 'list-group-item text-muted text-center';
+            emptyMsg.textContent = 'No trees available.';
+            profileTreeList.appendChild(emptyMsg);
+            return;
+        }
+
+        this.userTrees.forEach(tree => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action d-flex align-items-center profile-tree-item';
+            li.setAttribute('draggable', 'true');
+            li.dataset.treeId = tree.id;
+            li.dataset.treeName = tree.name;
+            
+            // Icon to indicate draggability
+            const dragHandle = document.createElement('span');
+            dragHandle.innerHTML = '&#8942;&#8942;'; // vertical ellipsis (drag handle)
+            dragHandle.style.cursor = 'grab';
+            dragHandle.className = 'text-muted me-2 flex-shrink-0';
+
+            // Thumbnail Image
+            const imgContainer = document.createElement('div');
+            imgContainer.style.width = '40px';
+            imgContainer.style.height = '40px';
+            imgContainer.style.flexShrink = '0';
+            imgContainer.style.display = 'flex';
+            imgContainer.style.justifyContent = 'center';
+            imgContainer.style.alignItems = 'center';
+            imgContainer.className = 'me-2';
+
+            const img = document.createElement('img');
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            
+            let thumbUrl = '/static/images/folder-bold.png'; // default fallback
+            if (tree.root_url) {
+                if (tree.root_url.startsWith('http')) {
+                    // Arasaac: replace _500 with _300 if applicable
+                    thumbUrl = tree.root_url.replace(/_500\.png$/, '_300.png');
+                } else if (tree.root_url.startsWith('/pictograms/')) {
+                    thumbUrl = tree.root_url.replace('/pictograms/', '/pictogramsmin/');
+                } else if (tree.root_url.startsWith('/')) {
+                    thumbUrl = tree.root_url;
+                } else {
+                    thumbUrl = `/pictogramsmin/${tree.root_url}`;
+                }
+            }
+            img.src = thumbUrl;
+            img.alt = tree.name;
+            img.onerror = function() {
+                this.src = '/static/images/folder-bold.png';
+            };
+            
+            imgContainer.appendChild(img);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'flex-grow-1 tree-name text-truncate';
+            nameSpan.textContent = tree.name;
+
+            li.appendChild(dragHandle);
+            li.appendChild(imgContainer);
+            li.appendChild(nameSpan);
+
+            // Drag event listeners for future profile builder UI
+            li.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('application/json', JSON.stringify({
+                    type: 'profile-tree-item',
+                    treeId: tree.id,
+                    treeName: tree.name
+                }));
+                li.style.opacity = '0.5';
+            });
+            
+            li.addEventListener('dragend', () => {
+                li.style.opacity = '1';
+            });
+
+            profileTreeList.appendChild(li);
+        });
+
+        // Setup search functionality for profile trees
+        const searchInput = document.getElementById('profile-builder-tree-search');
+        if (searchInput) {
+            // Remove old listener to avoid duplicates
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            
+            newSearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const items = profileTreeList.querySelectorAll('.profile-tree-item');
+                
+                items.forEach(item => {
+                    const treeName = item.dataset.treeName.toLowerCase();
+                    if (treeName.includes(searchTerm)) {
+                        item.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        item.style.setProperty('display', 'none', 'important');
+                    }
+                });
+            });
         }
     }
 
@@ -1066,7 +1499,7 @@ class TreeBuilder {
         }
 
         const treeId = parseInt(this.activeTreeSelect.value, 10);
-        const allTrees = (this.userTrees || []).concat(this.publicTrees || []);
+        const allTrees = this.userTrees || [];
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {
@@ -1076,16 +1509,17 @@ class TreeBuilder {
             if (importMode === 'replace') {
                 this.rebuildTreeFromJSON(importedData, true);
             } else { // 'add'
-                // For 'add', we want to keep the current root, and add the *children* of the imported roots
+                // For 'add', we want to keep the current root, and add the imported roots as children
                 if (importedData.roots && importedData.roots.length > 0) {
                     importedData.roots.forEach(importedRoot => {
-                        if (importedRoot.children) {
-                            importedRoot.children.forEach(childData => {
-                                const childNode = this.buildNodeFromJsonData(childData);
-                                if (childNode) {
-                                    this.rootNode.addChild(childNode);
-                                }
-                            });
+                        // If the imported root still has the 'root' identifier, remove it so it acts like a normal node
+                        if (importedRoot.id === 'root') {
+                            importedRoot.id = -1;
+                        }
+                        // The imported root itself becomes a child of our current root
+                        const childNode = this.buildNodeFromJsonData(importedRoot);
+                        if (childNode) {
+                            this.rootNode.addChild(childNode);
                         }
                     });
                     this.renderTree();
@@ -1093,6 +1527,61 @@ class TreeBuilder {
             }
         } else {
             alert('Could not find the selected tree.');
+        }
+    }
+
+    async deleteTree() {
+        if (!this.activeTreeSelect || !this.activeTreeSelect.value) {
+            alert('Please select a tree to delete.');
+            return;
+        }
+
+        const treeId = parseInt(this.activeTreeSelect.value, 10);
+        const allTrees = this.userTrees || [];
+        const treeToDelete = allTrees.find(tree => tree.id === treeId);
+
+        if (!treeToDelete) {
+            alert('Could not find the selected tree.');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to delete the tree "${treeToDelete.name}"?`)) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        if (!csrfToken) {
+            alert('Security error: missing CSRF token. Please reload the page.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/tree/${treeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({}));
+                throw new Error(result.message || `Server error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert('Tree deleted successfully.');
+                await this.loadSavedTrees();
+                
+                // Clear the builder workspace just in case they deleted the active tree
+                this.rootNode.children = [];
+                this.renderTree();
+            } else {
+                alert(`Error deleting tree: ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Delete error:', e);
+            alert('Failed to delete the tree. Please try again.');
         }
     }
 
@@ -1185,90 +1674,256 @@ class TreeBuilder {
         this.renderTree();
     }
 
+    // Profile Management Methods
+    async loadSavedProfiles() {
+        try {
+            const response = await fetch('/api/profiles/load');
+            const data = await response.json();
+            this.savedProfiles = data.profiles || [];
+            this.renderProfileList();
+        } catch (error) {
+            console.error('Error loading profiles:', error);
+            alert('Failed to load profiles');
+        }
+    }
 
-
-    exportTreeToJSON() {
-        const jsonData = this.getTreeAsJSON();
-        if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
-            alert('The tree is empty.');
+    renderProfileList() {
+        const profileList = document.getElementById('profile-list');
+        if (!profileList) return;
+        profileList.innerHTML = '';
+        
+        if (!this.savedProfiles || this.savedProfiles.length === 0) {
+            profileList.innerHTML = '<div class="text-muted small">No profiles saved yet.</div>';
             return;
         }
 
-        let filename = prompt("Enter a filename for your JSON export:", "tree.json");
-        if (!filename) {
-            return; // User cancelled
-        }
-        if (!filename.endsWith('.json')) {
-            filename += '.json';
-        }
+        const select = document.createElement('select');
+        select.id = 'profile-select';
+        select.className = 'form-select form-select-sm mb-2 profile-select-list';
+        
+        this.savedProfiles.forEach(profile => {
+            const option = document.createElement('option');
+            option.value = profile.id;
+            option.textContent = profile.name;
+            select.appendChild(option);
+        });
 
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonData, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", filename);
-        document.body.appendChild(downloadAnchorNode); // required for firefox
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+        profileList.appendChild(select);
     }
 
-    importTreeFromJSON() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
+    filterProfiles() {
+        const profileSearch = document.getElementById('profile-search');
+        if (!profileSearch) return;
+        const query = profileSearch.value.toLowerCase();
+        
+        const select = document.getElementById('profile-select');
+        if (!select) return;
 
-                const validateNodeData = (node, depth = 0) => {
-                    if (depth > 50) return false;
-                    if (typeof node !== 'object' || node === null) return false;
-                    // Allow external https, absolute /pictograms/ or /static/, and relative public/ or users/
-                    if (node.url && !/^(https?:\/\/|\/pictograms\/|\/static\/|public\/|users\/)/.test(node.url)) {
-                        node.url = '';
-                    }
-                    if (Array.isArray(node.children)) {
-                        node.children = node.children.filter(child => validateNodeData(child, depth + 1));
-                    }
-                    return true;
-                };
-
-                reader.onload = (event) => {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        if (!importedData?.roots || !Array.isArray(importedData.roots)) {
-                            alert('Format de fichier invalide.');
-                            return;
-                        }
-                        importedData.roots.forEach(root => validateNodeData(root));
-
-                        const importMode = document.querySelector('input[name="import_mode"]:checked').value;
-
-                        if (importMode === 'replace') {
-                            this.rebuildTreeFromJSON(importedData, true);
-                        } else { // 'add'
-                            if (importedData.roots && importedData.roots.length > 0) {
-                                importedData.roots.forEach(importedRoot => {
-                                    if (importedRoot.children) {
-                                        importedRoot.children.forEach(childData => {
-                                            const childNode = this.buildNodeFromJsonData(childData);
-                                            if (childNode) {
-                                                this.rootNode.addChild(childNode);
-                                            }
-                                        });
-                                    }
-                                });
-                                this.renderTree();
-                            }
-                        }
-                    } catch {
-                        alert('Error parsing JSON file.');
-                    }
-                };
-                reader.readAsText(file);
+        Array.from(select.options).forEach(option => {
+            const name = option.textContent.toLowerCase();
+            option.style.display = name.includes(query) ? '' : 'none';
+        });
+        
+        // Reset selection to the first visible option if the current one is hidden
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption && selectedOption.style.display === 'none') {
+            const firstVisible = Array.from(select.options).find(opt => opt.style.display !== 'none');
+            if (firstVisible) {
+                select.value = firstVisible.value;
             }
+        }
+    }
+
+    async saveProfile() {
+        const profileNameInput = document.getElementById('profile-name');
+        if (!profileNameInput) return;
+        
+        const profileName = profileNameInput.value.trim();
+        if (!profileName) {
+            alert('Please enter a profile name.');
+            return;
+        }
+
+        const profileTreesList = document.getElementById('profile-trees-list');
+        const items = profileTreesList.querySelectorAll('.profile-dropped-tree-item');
+        if (items.length === 0) {
+            alert('Please add at least one tree to the profile.');
+            return;
+        }
+
+        const trees = [];
+        items.forEach((item, index) => {
+            const dropdown = item.querySelector('.profile-tree-color-dropdown');
+            const colorCode = dropdown ? dropdown.dataset.selectedColor : '#000000';
+            trees.push({
+                treeId: parseInt(item.dataset.treeId, 10),
+                colorCode: colorCode,
+                display_order: index + 1
+            });
+        });
+
+        const payload = {
+            name: profileName,
+            remote_avatar_url: document.getElementById('profile-image-url')?.value || '',
+            trees: trees
         };
-        input.click();
+
+        const saveBtn = document.getElementById('save-profile-btn');
+        const originalText = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+
+        try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+            
+            const response = await fetch('/api/profile/save', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert(data.message);
+                this.loadSavedProfiles(); // Refresh the list
+            } else {
+                alert(data.message || 'Error saving profile');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to save profile');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+    }
+
+    loadSelectedProfile() {
+        const select = document.getElementById('profile-select');
+        if (!select || !select.value) {
+            alert('Please select a profile to load.');
+            return;
+        }
+
+        const profileId = parseInt(select.value, 10);
+        const profile = this.savedProfiles.find(p => p.id === profileId);
+        
+        if (profile) {
+            this.loadProfileIntoBuilder(profile);
+        }
+    }
+
+    loadProfileIntoBuilder(profile) {
+        const profileNameInput = document.getElementById('profile-name');
+        if (profileNameInput) profileNameInput.value = profile.name;
+
+        if (profile.remote_avatar_url) {
+            this.setProfileAvatar(profile.remote_avatar_url);
+        } else {
+            // Placeholder SVG
+            this.setProfileAvatar("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>");
+            document.getElementById('profile-image-url').value = '';
+        }
+
+        const profileTreesList = document.getElementById('profile-trees-list');
+        const emptyMsg = document.getElementById('profile-builder-empty-msg');
+        
+        if (profileTreesList) profileTreesList.innerHTML = '';
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        if (profile.trees && profile.trees.length > 0) {
+            profile.trees.forEach(treeData => {
+                const element = this.createProfileTreeElement(treeData);
+                profileTreesList.appendChild(element);
+            });
+            this.updateProfileTreeNumbers();
+        } else {
+            if (emptyMsg) emptyMsg.style.display = 'block';
+        }
+    }
+
+    async deleteSelectedProfile() {
+        const select = document.getElementById('profile-select');
+        if (!select || !select.value) {
+            alert('Please select a profile to delete.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this profile?')) {
+            return;
+        }
+
+        const profileId = select.value;
+        const deleteBtn = document.getElementById('delete-profile-btn');
+        const originalText = deleteBtn.textContent;
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Deleting...';
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+
+        try {
+            const headers = {};
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+            const response = await fetch(`/api/profile/${profileId}`, { 
+                method: 'DELETE',
+                headers: headers
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message);
+                this.loadSavedProfiles();
+            } else {
+                alert(data.message || 'Error deleting profile');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to delete profile');
+        } finally {
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = originalText;
+        }
+    }
+
+    createNewProfile() {
+        if (!confirm('Are you sure you want to start a new profile? This will clear the current list.')) {
+            return;
+        }
+
+        // Clear the profile name input
+        const profileNameInput = document.getElementById('profile-name');
+        if (profileNameInput) {
+            profileNameInput.value = '';
+        }
+
+        // Clear the avatar
+        this.setProfileAvatar("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>");
+        document.getElementById('profile-image-url').value = '';
+
+        // Clear the list
+        const profileTreesList = document.getElementById('profile-trees-list');
+        if (profileTreesList) {
+            profileTreesList.innerHTML = '';
+        }
+
+        // Show empty message
+        const emptyMsg = document.getElementById('profile-builder-empty-msg');
+        if (emptyMsg) {
+            emptyMsg.style.display = 'block';
+        }
+
+        // Deselect any selected profile in the list
+        const profileSelect = document.getElementById('profile-select');
+        if (profileSelect) {
+            profileSelect.value = '';
+        }
     }
 }
 
@@ -1377,4 +2032,55 @@ document.addEventListener('DOMContentLoaded', () => {
         new bootstrap.Dropdown(dropdownEl);
     }
     new TreeBuilder();
+
+    // Synchronization logic between Accordions and Tabs
+    let isSyncing = false;
+
+    const collapseManageTrees = document.getElementById('collapseManageTrees');
+    const collapseManageProfiles = document.getElementById('collapseManageProfiles');
+    const treeBuilderTabEl = document.getElementById('tree-builder-tab');
+    const profileBuilderTabEl = document.getElementById('profile-builder-tab');
+
+    if (collapseManageTrees && collapseManageProfiles && treeBuilderTabEl && profileBuilderTabEl) {
+        
+        // When 'Manage Trees' accordion opens, switch to 'Tree Builder' tab
+        collapseManageTrees.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const tab = new bootstrap.Tab(treeBuilderTabEl);
+            tab.show();
+            isSyncing = false;
+        });
+
+        // When 'Manage Profiles' accordion opens, switch to 'Profile Builder' tab
+        collapseManageProfiles.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const tab = new bootstrap.Tab(profileBuilderTabEl);
+            tab.show();
+            isSyncing = false;
+        });
+
+        // When 'Tree Builder' tab is shown, open 'Manage Trees' accordion
+        treeBuilderTabEl.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
+            const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
+            bsCollapseProfiles.hide();
+            bsCollapseTrees.show();
+            isSyncing = false;
+        });
+
+        // When 'Profile Builder' tab is shown, open 'Manage Profiles' accordion
+        profileBuilderTabEl.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
+            const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
+            bsCollapseTrees.hide();
+            bsCollapseProfiles.show();
+            isSyncing = false;
+        });
+    }
 });

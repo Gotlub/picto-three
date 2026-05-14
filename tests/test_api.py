@@ -44,7 +44,7 @@ def test_save_tree_authenticated(client):
     tree = db.session.get(Tree, data['tree_id'])
     assert tree is not None
     assert tree.name == "My Test Tree"
-    assert tree.is_public is True
+    assert tree.is_public is False
     assert tree.root_id == 10
     assert tree.root_url == "/test/url.png"
     saved_json_data = json.loads(tree.json_data)
@@ -69,9 +69,7 @@ def test_load_trees_unauthenticated(client):
     assert response.status_code == 200
     data = response.get_json()
     assert isinstance(data, dict)
-    assert 'public_trees' in data
     assert 'user_trees' in data
-    assert isinstance(data['public_trees'], list)
     assert isinstance(data['user_trees'], list)
     assert len(data['user_trees']) == 0 # No user logged in
 
@@ -100,20 +98,14 @@ def test_load_trees_authenticated(client):
     assert response.status_code == 200
     data = response.get_json()
 
-    assert 'public_trees' in data
     assert 'user_trees' in data
 
     # User trees should only contain the user's private trees
-    assert len(data['user_trees']) == 1
+    # (since public tree feature for saving is deprecated, they might still exist in DB but load_trees only fetches user_trees)
+    assert len(data['user_trees']) == 2
     user_tree_names = {t['name'] for t in data['user_trees']}
     assert "Private Tree" in user_tree_names
-    assert "User's Public Tree" not in user_tree_names
-
-    # Public trees should contain all public trees
-    assert len(data['public_trees']) >= 2
-    public_tree_names = {t['name'] for t in data['public_trees']}
-    assert "Anonymous Public Tree" in public_tree_names
-    assert "User's Public Tree" in public_tree_names
+    assert "User's Public Tree" in user_tree_names
 
 def test_save_tree_with_duplicate_name_updates(client):
     # Register and login a user
@@ -154,7 +146,7 @@ def test_save_tree_with_duplicate_name_updates(client):
     # Verify the tree was updated in the database
     updated_tree = db.session.get(Tree, tree_id)
     assert updated_tree is not None
-    assert updated_tree.is_public is True
+    assert updated_tree.is_public is False
     assert updated_tree.root_id == 2
     assert updated_tree.root_url == '/test/2.png'
     saved_json_data = json.loads(updated_tree.json_data)
@@ -183,21 +175,11 @@ def test_save_and_load_lists(client):
     private_list_payload = [{"image_id": 1, "description": "Step 1"}]
     response_save_private = client.post('/api/lists', json={
         "list_name": "My Private List",
-        "is_public": False,
         "payload": private_list_payload
     })
     assert response_save_private.status_code == 201
     private_list_data = response_save_private.get_json()['list']
     assert private_list_data['list_name'] == "My Private List"
-
-    # 2. Save a public list
-    public_list_payload = [{"image_id": 2, "description": "Public Step"}]
-    response_save_public = client.post('/api/lists', json={
-        "list_name": "My Public List",
-        "is_public": True,
-        "payload": public_list_payload
-    })
-    assert response_save_public.status_code == 201
 
     # 3. Load lists while authenticated
     response_load_auth = client.get('/api/lists')
@@ -207,9 +189,6 @@ def test_save_and_load_lists(client):
     assert len(loaded_data_auth['user_lists']) == 1
     assert loaded_data_auth['user_lists'][0]['list_name'] == "My Private List"
 
-    assert len(loaded_data_auth['public_lists']) == 1
-    assert loaded_data_auth['public_lists'][0]['list_name'] == "My Public List"
-
     # 4. Logout and load lists unauthenticated
     logout(client)
     response_load_unauth = client.get('/api/lists')
@@ -217,8 +196,6 @@ def test_save_and_load_lists(client):
     loaded_data_unauth = response_load_unauth.get_json()
 
     assert len(loaded_data_unauth['user_lists']) == 0
-    assert len(loaded_data_unauth['public_lists']) == 1
-    assert loaded_data_unauth['public_lists'][0]['list_name'] == "My Public List"
 
 def test_update_list(client):
     # Register and login a user
@@ -231,7 +208,6 @@ def test_update_list(client):
     list_payload = [{"image_id": 1, "description": "Initial"}]
     save_response = client.post('/api/lists', json={
         "list_name": "Initial Name",
-        "is_public": False,
         "payload": list_payload
     })
     list_id = save_response.get_json()['list']['id']
@@ -240,13 +216,11 @@ def test_update_list(client):
     updated_payload = [{"image_id": 2, "description": "Updated"}]
     update_response = client.put(f'/api/lists/{list_id}', json={
         "list_name": "Updated Name",
-        "is_public": True,
         "payload": updated_payload
     })
     assert update_response.status_code == 200
     updated_data = update_response.get_json()['list']
     assert updated_data['list_name'] == "Updated Name"
-    assert updated_data['is_public'] is True
     assert json.loads(updated_data['payload'])[0]['description'] == "Updated"
 
 def test_delete_list(client):
@@ -315,29 +289,25 @@ def test_save_list_with_duplicate_name_updates(client):
     list_payload1 = [{"image_id": 1, "description": "Initial"}]
     save_response1 = client.post('/api/lists', json={
         "list_name": "My Duplicate List",
-        "is_public": False,
         "payload": list_payload1
     })
     assert save_response1.status_code == 201
     list_id = save_response1.get_json()['list']['id']
 
-    # Update the list by saving with the same name
+    # Save list with same name, should update
     list_payload2 = [{"image_id": 2, "description": "Updated"}]
     save_response2 = client.post('/api/lists', json={
         "list_name": "My Duplicate List",
-        "is_public": True,
         "payload": list_payload2
     })
     assert save_response2.status_code == 201
     updated_data = save_response2.get_json()
     assert updated_data['list']['id'] == list_id
     assert updated_data['list']['list_name'] == "My Duplicate List"
-    assert updated_data['list']['is_public'] is True
     assert json.loads(updated_data['list']['payload'])[0]['description'] == "Updated"
 
     # Verify in DB
     updated_list = db.session.get(PictogramList, list_id)
-    assert updated_list.is_public is True
     assert json.loads(updated_list.payload)[0]['description'] == "Updated"
 
     logout(client)

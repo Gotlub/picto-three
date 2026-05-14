@@ -148,8 +148,6 @@ class ListBuilder {
     constructor() {
         // General
         // Left Panel - List Section
-        this.importBtn = document.getElementById('import-list-json-btn');
-        this.exportBtn = document.getElementById('export-list-json-btn');
         this.saveBtn = document.getElementById('save-list-btn');
         this.listNameInput = document.getElementById('list-name');
         this.isPublicCheckbox = document.getElementById('list-is-public');
@@ -158,7 +156,6 @@ class ListBuilder {
         this.loadListBtn = document.getElementById('load-list-btn');
 
         // Left Panel - Tree Section
-        this.importTreeBtn = document.getElementById('import-tree-json-btn');
         this.treeContainer = document.getElementById('tree-container');
         this.loadTreeBtn = document.getElementById('load-tree-btn');
         this.treeSearchInput = document.getElementById('tree-search');
@@ -206,7 +203,7 @@ class ListBuilder {
         this.exportPdfBtn = document.getElementById('export-pdf-btn');
         this.pdfImageSizeSlider = document.getElementById('pdf-image-size');
         this.pdfImageSizeValue = document.getElementById('pdf-image-size-value');
-        
+
         // Quick Themes
         this.themePecsBtn = document.getElementById('theme-pecs');
         this.themeStripBtn = document.getElementById('theme-strip');
@@ -232,8 +229,50 @@ class ListBuilder {
         return indicator;
     }
 
+    initTabAccordionSync() {
+        const constructAccordion = document.getElementById('collapseConstruct');
+        const exportAccordion = document.getElementById('collapseExportPdf');
+        const importTabBtn = document.getElementById('import-describe-tab');
+        const printTabBtn = document.getElementById('print-tab');
+
+        if (!constructAccordion || !exportAccordion || !importTabBtn || !printTabBtn) return;
+
+        let isSyncing = false;
+
+        // Accordion -> Tabs
+        constructAccordion.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Tab.getOrCreateInstance(importTabBtn).show();
+            isSyncing = false;
+        });
+
+        exportAccordion.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Tab.getOrCreateInstance(printTabBtn).show();
+            isSyncing = false;
+        });
+
+        // Tabs -> Accordion
+        importTabBtn.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Collapse.getOrCreateInstance(constructAccordion).show();
+            isSyncing = false;
+        });
+
+        printTabBtn.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Collapse.getOrCreateInstance(exportAccordion).show();
+            isSyncing = false;
+        });
+    }
+
     initEventListeners() {
         this.initSelectionModeListener();
+        this.initTabAccordionSync();
 
         // PDF Export
         this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
@@ -251,11 +290,8 @@ class ListBuilder {
         // Left Panel - List
         this.saveBtn?.addEventListener('click', () => this.saveList());
         this.loadListBtn?.addEventListener('click', () => this.loadSelectedList());
-        this.importBtn?.addEventListener('click', () => this.importListFromJSON());
-        this.exportBtn?.addEventListener('click', () => this.exportListToJSON());
 
         // Left Panel - Tree
-        this.importTreeBtn?.addEventListener('click', () => this.importTreeFromJSON());
         this.loadTreeBtn?.addEventListener('click', () => this.loadSelectedTree());
         this.treeSearchInput?.addEventListener('input', () => this.filterTrees());
 
@@ -806,72 +842,6 @@ class ListBuilder {
         this.renderChainedList();
     }
 
-    exportListToJSON() {
-        if (this.chainedListItems.length === 0) {
-            alert('The list is empty.');
-            return;
-        }
-
-        let filename = prompt("Enter a filename for your JSON export:", "list.json");
-        if (!filename) {
-            return; // User cancelled
-        }
-        if (!filename.endsWith('.json')) {
-            filename += '.json';
-        }
-
-        const payload = this.chainedListItems.map(item => {
-            let imageId = item.data.image_id;
-            let imageUrl = item.data.path;
-            let imageName = item.data.name;
-
-            if (imageUrl && imageUrl.startsWith('http')) {
-                imageId = -1;
-            }
-
-            return {
-                image_id: imageId,
-                url: imageUrl,
-                name: imageName,
-                description: item.data.description
-            };
-        });
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", filename);
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
-
-    importListFromJSON() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const payload = JSON.parse(event.target.result);
-                        if (!Array.isArray(payload)) {
-                            alert('Format de fichier invalide (doit être un tableau).');
-                            return;
-                        }
-                        this.rebuildListFromData({ payload: JSON.stringify(payload) });
-                    } catch {
-                        alert('Error parsing JSON file.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        };
-        input.click();
-    }
-
-
     // --- Tree Viewer Loading (Center Panel) ---
     async loadSavedTrees() {
         try {
@@ -972,28 +942,6 @@ class ListBuilder {
         }
     }
 
-    importTreeFromJSON() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const treeData = JSON.parse(event.target.result);
-                        this.rebuildTreeViewer(treeData);
-                    } catch {
-                        alert('Error parsing JSON file.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        };
-        input.click();
-    }
-
     rebuildTreeViewer(treeData) {
         // Find the root if it exists in the new array structure
         const buildNode = (nodeData) => {
@@ -1011,7 +959,7 @@ class ListBuilder {
             } else {
                 image = null;
             }
-            
+
             if (!image) {
                 console.warn(`Image with ID ${nodeData.id} is not accessible. Using a placeholder.`);
                 image = {
@@ -1133,14 +1081,14 @@ class ListBuilder {
 
         try {
             const { jsPDF } = window.jspdf;
-            
+
             // Extract options
             const layoutMode = document.getElementById('pdf-layout-mode').value;
             const orientation = document.querySelector('input[name="pdf-orientation"]:checked').value;
             const imageSize = parseInt(document.getElementById('pdf-image-size').value, 10);
             const paddingX = parseInt(document.getElementById('pdf-padding-x').value, 10);
             const paddingY = parseInt(document.getElementById('pdf-padding-y').value, 10);
-            
+
             const borderColor = document.getElementById('pdf-border-color').value;
             const borderWidth = parseInt(document.getElementById('pdf-border-width').value, 10);
             const borderRadius = parseInt(document.getElementById('pdf-border-radius').value, 10);
@@ -1179,7 +1127,7 @@ class ListBuilder {
                     img.crossOrigin = 'Anonymous';
                     img.onload = () => resolve(img);
                     img.onerror = () => resolve(null);
-                    
+
                     let fullSrc = src;
                     if (!src.startsWith('http') && !src.startsWith('/')) {
                         fullSrc = '/pictograms/' + src;
@@ -1205,7 +1153,7 @@ class ListBuilder {
                         doc.addPage();
                         cursorX = margin;
                     }
-                } else { 
+                } else {
                     if (cursorX + boxWidth > pageWidth - margin) {
                         cursorX = margin;
                         cursorY += boxHeight + itemSpacing;
@@ -1236,20 +1184,20 @@ class ListBuilder {
                 // 3. Draw Image
                 const imgAreaWidth = boxWidth - (paddingX * 2);
                 const imgAreaHeight = boxHeight - (paddingY * 2) - textAllowance;
-                
+
                 if (imgAreaWidth > 0 && imgAreaHeight > 0) {
                     const iw = imgElement.naturalWidth || imgElement.width || 1;
                     const ih = imgElement.naturalHeight || imgElement.height || 1;
                     const scale = Math.min(imgAreaWidth / iw, imgAreaHeight / ih);
                     const w = iw * scale;
                     const h = ih * scale;
-                    
+
                     const ix = cursorX + paddingX + (imgAreaWidth - w) / 2;
                     let iy = cursorY + paddingY;
                     if (showText && textPosition === 'top') {
-                        iy += textAllowance; 
+                        iy += textAllowance;
                     }
-                    
+
                     // Always try 'PNG' or 'JPEG' fallback is done by jsPDF
                     doc.addImage(imgElement, 'PNG', ix, iy, w, h);
                 }
@@ -1259,13 +1207,13 @@ class ListBuilder {
                     doc.setFont(fontFamily);
                     doc.setFontSize(fontSize);
                     doc.setTextColor(textColor);
-                    
+
                     const tx = cursorX + boxWidth / 2;
-                    let ty = cursorY + paddingY; 
+                    let ty = cursorY + paddingY;
                     if (textPosition === 'top') {
                         ty += fontSize;
                     } else {
-                        ty = cursorY + boxHeight - paddingY - 2; 
+                        ty = cursorY + boxHeight - paddingY - 2;
                     }
                     doc.text(item.data.description, tx, ty, { align: 'center' });
                 }
@@ -1291,30 +1239,6 @@ class ListBuilder {
     }
 }
 
-function updateContainerHeight() {
-    const header = document.querySelector('nav.navbar');
-    const footer = document.querySelector('footer.footer');
-    const mainContent = document.querySelector('main.content');
-    const listPageContainer = document.getElementById('list-page-container');
-
-    if (!header || !footer || !mainContent || !listPageContainer) {
-        return;
-    }
-
-    const mainContentStyles = window.getComputedStyle(mainContent);
-    const mainMarginTop = parseInt(mainContentStyles.marginTop, 10) || 0;
-    const mainMarginBottom = parseInt(mainContentStyles.marginBottom, 10) || 0;
-
-    const headerHeight = header.offsetHeight;
-    const footerHeight = footer.offsetHeight;
-
-    const availableHeight = Math.max(0, window.innerHeight - headerHeight - footerHeight - mainMarginTop - mainMarginBottom);
-
-    listPageContainer.style.height = `${availableHeight}px`;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     new ListBuilder();
-    updateContainerHeight();
-    window.addEventListener('resize', updateContainerHeight);
 });

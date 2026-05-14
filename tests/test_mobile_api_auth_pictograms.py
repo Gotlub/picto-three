@@ -47,7 +47,7 @@ def test_mobile_pictograms_auth(client, app):
     # TEST: Try to access someone else's image (Forbidden bounds)
     r3 = client.get('/api/v1/mobile/pictograms/other_user/secret.png', headers=headers)
     assert r3.status_code == 403
-    assert r3.data == b"prohibit image"
+    assert r3.get_json() == {"error": "Forbidden"}
     
     # TEST: Path traversal attack (Secured via posix normalization on send_from_directory usually, but explicitly verified)
     r4 = client.get('/api/v1/mobile/pictograms/../config.py', headers=headers)

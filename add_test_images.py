@@ -7,7 +7,7 @@ from app import create_app, db
 from app.models import Image, Folder
 
 # --- Configuration des miniatures ---
-THUMB_SIZE = (48, 48) # Taille maximale pour les miniatures
+THUMB_SIZE = (300, 300) # Taille maximale pour les miniatures
 
 def create_thumbnail(filepath_relative, source_folder, thumbs_folder):
     """

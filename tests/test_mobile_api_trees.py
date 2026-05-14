@@ -59,9 +59,8 @@ def test_mobile_trees_api(client, app):
     # Find our tree
     our_tree = next(t for t in trees_data if t['id'] == tree_id)
     assert our_tree['name'] == 'Arbre Test'
-    assert our_tree['owner'] == 'android_tester'
     assert 'http' in our_tree['root_image_url']  # Host url should be appended
-    assert our_tree['root_image_url'].endswith('/images/want.png')
+    assert our_tree['root_image_url'].endswith('/api/v1/mobile/pictograms/want.png')
 
     # 4. Test GET /api/v1/mobile/trees/<id>
     tree_resp = client.get(f'/api/v1/mobile/trees/{tree_id}', headers=headers)
