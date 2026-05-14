@@ -2,8 +2,16 @@
 
 {% block content %}
 <!-- Intro / Hero Section with Background Image -->
-<div class="intro-header p-5 mb-5 rounded-3 shadow-sm position-relative overflow-hidden text-white">
-    <div class="background-overlay"></div>
+<div class="intro-header p-5 mb-5 rounded-3 shadow-sm position-relative overflow-hidden text-white" style="background-image: url('{{ url_for('static', filename='images/Eucalyptus_deglupta-base.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="background-overlay" style="background-color: rgba(0, 0, 0, 0.6); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;"></div>
+    
+    <!-- Discret source citation (Option A) -->
+    <div class="position-absolute bottom-0 end-0 p-2" style="z-index: 3; font-size: 0.75rem; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">
+        <a href="https://commons.wikimedia.org/wiki/File:Eucalyptus_deglupta-base.jpg" target="_blank" class="text-light text-decoration-none" title="Source: Wikimedia Commons">
+            <i class="fas fa-camera me-1"></i>Wikimedia Commons
+        </a>
+    </div>
+
     <div class="container-fluid py-2 position-relative" style="z-index: 2;">
         <h1 class="display-5 fw-bold">{{ _('PictoTree: A free, digital pictogram binder.') }}</h1>
         <h2 class="h5 text-warning mb-4">{{ _('(Currently under development)') }}</h2>

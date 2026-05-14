@@ -229,8 +229,50 @@ class ListBuilder {
         return indicator;
     }
 
+    initTabAccordionSync() {
+        const constructAccordion = document.getElementById('collapseConstruct');
+        const exportAccordion = document.getElementById('collapseExportPdf');
+        const importTabBtn = document.getElementById('import-describe-tab');
+        const printTabBtn = document.getElementById('print-tab');
+
+        if (!constructAccordion || !exportAccordion || !importTabBtn || !printTabBtn) return;
+
+        let isSyncing = false;
+
+        // Accordion -> Tabs
+        constructAccordion.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Tab.getOrCreateInstance(importTabBtn).show();
+            isSyncing = false;
+        });
+
+        exportAccordion.addEventListener('show.bs.collapse', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Tab.getOrCreateInstance(printTabBtn).show();
+            isSyncing = false;
+        });
+
+        // Tabs -> Accordion
+        importTabBtn.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Collapse.getOrCreateInstance(constructAccordion).show();
+            isSyncing = false;
+        });
+
+        printTabBtn.addEventListener('show.bs.tab', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            bootstrap.Collapse.getOrCreateInstance(exportAccordion).show();
+            isSyncing = false;
+        });
+    }
+
     initEventListeners() {
         this.initSelectionModeListener();
+        this.initTabAccordionSync();
 
         // PDF Export
         this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
