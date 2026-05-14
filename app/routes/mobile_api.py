@@ -175,7 +175,7 @@ def serve_mobile_pictogram(filepath):
         if not current_user_id:
             return jsonify({'error': 'Auth required'}), 401
         current_user = db.session.get(User, int(current_user_id))
-        if filepath.startswith(f"{current_user.username}/"):
+        if current_user and filepath.startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_path, filepath)
         return jsonify({"error": "Forbidden"}), 403
 
@@ -198,7 +198,7 @@ def serve_mobile_pictogram_min(filepath):
         if not current_user_id:
             return jsonify({'error': 'Auth required'}), 401
         current_user = db.session.get(User, int(current_user_id))
-        if filepath.startswith(f"{current_user.username}/"):
+        if current_user and filepath.startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_min_path, thumb_path_relative)
         return jsonify({"error": "Forbidden"}), 403
 
