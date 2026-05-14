@@ -1028,6 +1028,39 @@ class TreeBuilder {
         if (newProfileBtn) {
             newProfileBtn.addEventListener('click', () => this.createNewProfile());
         }
+
+        const avatarContainer = document.getElementById('profile-avatar-container');
+        if (avatarContainer) {
+            avatarContainer.addEventListener('click', () => this.openAvatarModal());
+        }
+    }
+
+    openAvatarModal() {
+        const modalEl = document.getElementById('avatar-modal');
+        if (!modalEl) return;
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        
+        if (!this.modalImageTree) {
+            this.modalImageTree = new ImageTree('modal-image-sidebar-tree');
+            this.modalImageTree.onImageClick = (data) => {
+                this.setProfileAvatar(`/pictogramsmin/${data.path}`);
+                modal.hide();
+            };
+            
+            this.modalArasaacSearch = new ArasaacSearch('modal-arasaac-search-container', null, (imgUrl) => {
+                this.setProfileAvatar(imgUrl);
+                modal.hide();
+            });
+        }
+        
+        modal.show();
+    }
+    
+    setProfileAvatar(url) {
+        const urlInput = document.getElementById('profile-image-url');
+        const previewImg = document.getElementById('profile-image-preview');
+        if (urlInput) urlInput.value = url;
+        if (previewImg) previewImg.src = url;
     }
 
     initProfileBuilder() {
@@ -1743,6 +1776,7 @@ class TreeBuilder {
 
         const payload = {
             name: profileName,
+            remote_avatar_url: document.getElementById('profile-image-url')?.value || '',
             trees: trees
         };
 
@@ -1799,6 +1833,14 @@ class TreeBuilder {
     loadProfileIntoBuilder(profile) {
         const profileNameInput = document.getElementById('profile-name');
         if (profileNameInput) profileNameInput.value = profile.name;
+
+        if (profile.remote_avatar_url) {
+            this.setProfileAvatar(profile.remote_avatar_url);
+        } else {
+            // Placeholder SVG
+            this.setProfileAvatar("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>");
+            document.getElementById('profile-image-url').value = '';
+        }
 
         const profileTreesList = document.getElementById('profile-trees-list');
         const emptyMsg = document.getElementById('profile-builder-empty-msg');
@@ -1872,6 +1914,10 @@ class TreeBuilder {
         if (profileNameInput) {
             profileNameInput.value = '';
         }
+
+        // Clear the avatar
+        this.setProfileAvatar("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>");
+        document.getElementById('profile-image-url').value = '';
 
         // Clear the list
         const profileTreesList = document.getElementById('profile-trees-list');

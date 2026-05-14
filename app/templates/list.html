@@ -15,9 +15,6 @@
 
             <!-- Tree Source Section -->
             <h5>{{ _('Tree Source') }}</h5>
-            <div class="d-grid gap-2 mb-3">
-                <button id="import-tree-json-btn" class="btn btn-sm btn-info">{{ _('Import Tree from JSON') }}</button>
-            </div>
             <div class="accordion" id="treeAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingLoadTree">
@@ -45,12 +42,6 @@
 
             <!-- List Operations Section -->
             <h5>{{ _('List Operations') }}</h5>
-            <div class="d-grid gap-2 mb-3">
-                <button id="import-list-json-btn" class="btn btn-sm btn-secondary">{{ _('Import List from JSON')
-                    }}</button>
-                <button id="export-list-json-btn" class="btn btn-sm btn-secondary">{{ _('Export List to JSON')
-                    }}</button>
-            </div>
 
             <div class="accordion" id="listAccordion">
                 {% if current_user.is_authenticated %}
@@ -119,11 +110,17 @@
 
                             <!-- Quick Themes -->
                             <div class="mb-3">
-                                <label class="form-label form-label-sm fw-bold w-100 text-center">{{ _('Quick Themes') }}</label>
+                                <label class="form-label form-label-sm fw-bold w-100 text-center">{{ _('Quick Themes')
+                                    }}</label>
                                 <div class="d-flex flex-column gap-2">
-                                    <button class="btn btn-sm btn-outline-primary" id="theme-pecs" title="{{ _('Grid without margins, with border') }}">✂️ {{ _('Planche à découper (PECS)') }}</button>
-                                    <button class="btn btn-sm btn-outline-success" id="theme-strip" title="{{ _('Single horizontal line') }}">📏 {{ _('Bandelette de Routine') }}</button>
-                                    <button class="btn btn-sm btn-outline-warning" id="theme-flashcard" title="{{ _('Large images') }}">🖼️ {{ _('Flashcards (A4)') }}</button>
+                                    <button class="btn btn-sm btn-outline-primary" id="theme-pecs"
+                                        title="{{ _('Grid without margins, with border') }}">✂️ {{ _('Planche à découper
+                                        (PECS)') }}</button>
+                                    <button class="btn btn-sm btn-outline-success" id="theme-strip"
+                                        title="{{ _('Single horizontal line') }}">📏 {{ _('Bandelette de Routine')
+                                        }}</button>
+                                    <button class="btn btn-sm btn-outline-warning" id="theme-flashcard"
+                                        title="{{ _('Large images') }}">🖼️ {{ _('Flashcards (A4)') }}</button>
                                 </div>
                             </div>
                             <hr class="my-2">

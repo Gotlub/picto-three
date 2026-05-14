@@ -201,7 +201,14 @@
             <!-- Main Content (Profile Builder Area) -->
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="mb-0">{{ _('Profile Builder') }}</h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <h2 class="mb-0">{{ _('Profile Builder') }}</h2>
+                        <div class="position-relative" style="cursor: pointer;" id="profile-avatar-container" title="{{ _('Change Avatar') }}">
+                            <img id="profile-image-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>" alt="Profile Avatar" class="rounded-circle border bg-light" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="position-absolute bottom-0 end-0 bg-white border rounded-circle d-flex justify-content-center align-items-center shadow-sm" style="width: 20px; height: 20px; font-size: 10px;">✏️</div>
+                            <input type="hidden" id="profile-image-url" value="">
+                        </div>
+                    </div>
                     <button id="new-profile-btn" class="btn btn-secondary">{{ _('New profile') }}</button>
                 </div>
                 <div class="profile-builder-area border p-3 rounded bg-light d-flex flex-column" id="profile-builder-area" style="min-height: 80vh; overflow-y: auto;">
@@ -232,6 +239,39 @@
 </div> <!-- End of col-md-10 -->
 </div> <!-- End of main row -->
 </div> <!-- End of container-fluid -->
+
+<!-- Avatar Selection Modal -->
+<div class="modal fade" id="avatar-modal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="avatarModalLabel">{{ _('Choose Profile Avatar') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="height: 60vh;">
+                <ul class="nav nav-tabs mb-2" id="modalImageTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active py-1 px-2" id="modal-local-tab" data-bs-toggle="tab" data-bs-target="#modal-local-images" type="button" role="tab" aria-controls="modal-local-images" aria-selected="true">{{ _('Local') }}</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link py-1 px-2" id="modal-arasaac-tab" data-bs-toggle="tab" data-bs-target="#modal-arasaac-images" type="button" role="tab" aria-controls="modal-arasaac-images" aria-selected="false">Arasaac</button>
+                    </li>
+                </ul>
+                <div class="tab-content h-100" id="modalImageTabsContent">
+                    <div class="tab-pane fade show active h-100" id="modal-local-images" role="tabpanel" aria-labelledby="modal-local-tab">
+                        <div class="d-flex flex-column h-100">
+                            <input type="text" id="modal-image-search" class="form-control mb-2 flex-shrink-0" placeholder="{{ _('Search local images...') }}">
+                            <div class="image-sidebar border p-3 flex-grow-1" id="modal-image-sidebar-tree" style="overflow: auto;"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade h-100" id="modal-arasaac-images" role="tabpanel" aria-labelledby="modal-arasaac-tab">
+                        <div id="modal-arasaac-search-container" class="h-100 d-flex flex-column"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script id="initial-tree-data" type="application/json">
     {{ initial_tree_data_json | safe }}

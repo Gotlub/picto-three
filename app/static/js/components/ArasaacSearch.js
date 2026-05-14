@@ -1,7 +1,8 @@
 export default class ArasaacSearch {
-    constructor(containerId, dragStartCallback) {
+    constructor(containerId, dragStartCallback, onClickCallback = null) {
         this.container = document.getElementById(containerId);
         this.dragStartCallback = dragStartCallback; // Callback to handle drag start in parent
+        this.onClickCallback = onClickCallback; // Optional callback for click selection
         this.timeout = null;
         this.render();
     }
@@ -146,6 +147,13 @@ export default class ArasaacSearch {
                 itemDiv.addEventListener('mouseleave', () => dlBtn.style.display = 'none');
 
                 itemDiv.appendChild(dlBtn);
+
+                if (this.onClickCallback) {
+                    itemDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.onClickCallback(imgUrl);
+                    });
+                }
 
                 // Setup Drag
                 itemDiv.addEventListener('dragstart', (e) => {

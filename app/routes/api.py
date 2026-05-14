@@ -26,9 +26,6 @@ def load_trees():
 
 @bp.route('/lists', methods=['GET'])
 def load_lists():
-    # Public lists are all lists with is_public = True, ordered by name
-    public_lists = PictogramList.query.filter_by(is_public=True).order_by(PictogramList.list_name).all()
-
     user_lists = []
     if current_user.is_authenticated:
         # Private lists are user-owned lists with is_public = False, ordered by name
@@ -37,7 +34,6 @@ def load_lists():
     # In to_dict(), the payload is already a string, but if it were an object, we'd need to handle it.
     # The current to_dict returns the payload as is, which is what we want.
     return jsonify({
-        'public_lists': [lst.to_dict() for lst in public_lists],
         'user_lists': [lst.to_dict() for lst in user_lists]
     })
 
@@ -49,36 +45,16 @@ def save_list():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     list_name = data.get('list_name')
-    is_public = data.get('is_public', False)
+    is_public = False
     payload = data.get('payload')
 
     if not list_name or payload is None:
         return jsonify({'status': 'error', 'message': _('Missing required fields: list_name and payload are required.')}), 400
 
-    # Validate images if saving a public list
-    if is_public:
-        image_ids = set()
-        if isinstance(payload, list):
-            for item in payload:
-                if isinstance(item, dict) and 'image_id' in item:
-                    # Filter out Arasaac images (id = -1)
-                    # Filter out Arasaac images (id = -1)
-                    if item['image_id'] != -1:
-                        image_ids.add(item['image_id'])
-
-        if image_ids:
-            # Public lists cannot contain any user-owned images (user_id is not NULL)
-            user_owned_images = Image.query.filter(Image.id.in_(image_ids), Image.user_id.isnot(None)).all()
-            if user_owned_images:
-                return jsonify({
-                    'status': 'error',
-                    'message': _('Public lists can only contain global public images. Please remove any user-owned images before saving publicly.')
-                }), 400
-
-    payload_str = json.dumps(payload)
-
     # Check if a list with the same name already exists for this user
     existing_list = PictogramList.query.filter_by(user_id=current_user.id, list_name=list_name).first()
+
+    payload_str = json.dumps(payload) if isinstance(payload, (dict, list)) else payload
 
     if existing_list:
         # If it exists, update it
@@ -121,7 +97,7 @@ def update_list(list_id):
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     plist.list_name = data.get('list_name', plist.list_name)
-    plist.is_public = data.get('is_public', plist.is_public)
+    plist.is_public = False
     payload = data.get('payload')
     if payload is not None:
         plist.payload = json.dumps(payload)
@@ -540,6 +516,7 @@ def save_profile():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     profile_name = data.get('name')
+    remote_avatar_url = data.get('remote_avatar_url')
     trees_data = data.get('trees', [])
 
     if not profile_name:
@@ -549,11 +526,12 @@ def save_profile():
 
     if profile:
         # Update existing
+        profile.remote_avatar_url = remote_avatar_url
         ProfileTree.query.filter_by(profile_id=profile.id).delete()
         message = _('Profile updated successfully')
     else:
         # Create new
-        profile = Profile(user_id=current_user.id, name=profile_name)
+        profile = Profile(user_id=current_user.id, name=profile_name, remote_avatar_url=remote_avatar_url)
         db.session.add(profile)
         db.session.flush() # To get the profile.id
         message = _('Profile saved successfully')

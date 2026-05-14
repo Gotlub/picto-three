@@ -43,42 +43,6 @@ def seeded_db(client):
 
 
 
-def test_save_public_list_with_user_image_fails(seeded_db):
-    """A public list cannot contain images owned by a user."""
-    client = seeded_db
-    login(client, 'user1', 'password')
-
-    # List payload contains a user-owned image (ID 101)
-    list_payload = [{"image_id": 101, "description": "Invalid"}]
-
-    response = client.post('/api/lists', json={
-        "list_name": "Invalid Public List",
-        "is_public": True,
-        "payload": list_payload
-    })
-
-    assert response.status_code == 400
-    data = response.get_json()
-    assert data['status'] == 'error'
-    assert "Public lists can only contain global public images" in data['message']
-
-def test_save_public_list_with_global_image_succeeds(seeded_db):
-    """A public list can contain global (non-user-owned) images."""
-    client = seeded_db
-    login(client, 'user1', 'password')
-
-    # List payload contains a global public image (ID 100)
-    list_payload = [{"image_id": 100, "description": "Valid"}]
-
-    response = client.post('/api/lists', json={
-        "list_name": "Valid Public List",
-        "is_public": True,
-        "payload": list_payload
-    })
-
-    assert response.status_code == 201 # 201 Created
-    assert response.get_json()['status'] == 'success'
-
 def test_search_local_images_unauthenticated(seeded_db):
     """Unauthenticated users should only find global and user-public images via search."""
     client = seeded_db
