@@ -337,6 +337,7 @@ class TreeBuilder {
         }
 
         this.initProfileBuilder();
+        this.initProfileEvents();
 
         // Use event delegation for the export button, as it's in a modal
         $(document).on('click', '#export-pdf-vectoriel', async function () {
@@ -1000,7 +1001,6 @@ class TreeBuilder {
         this.renderTreeList();
         this.renderProfileBuilderTreeList();
         this.loadSavedProfiles();
-        this.initProfileEvents();
     }
 
     initProfileEvents() {
