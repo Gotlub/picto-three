@@ -455,19 +455,7 @@ class TreeBuilder {
             return treantNode;
         };
 
-        const nodeStructure = {
-            children: this.rootNode.children.map(buildTreantNode)
-        };
-
-        // If there is more than one root branch, create an invisible pseudo-node to be the common parent.
-        if (nodeStructure.children.length > 1) {
-            return {
-                pseudo: true,
-                children: nodeStructure.children
-            };
-        }
-
-        return nodeStructure.children[0];
+        return buildTreantNode(this.rootNode);
     }
 
     reloadBuilderWithCurrentTree(event) {
