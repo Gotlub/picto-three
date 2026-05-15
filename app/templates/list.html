@@ -89,168 +89,123 @@
                     <div id="collapseExportPdf" class="accordion-collapse collapse" aria-labelledby="headingExportPdf"
                         data-bs-parent="#mainSidebarAccordion">
                         <div class="accordion-body p-2">
-
-                            <!-- Quick Themes -->
+                            <!-- Orientation -->
                             <div class="mb-3">
-                                <label class="form-label form-label-sm fw-bold w-100 text-center">{{ _('Quick Themes') }}</label>
-                                <div class="d-flex flex-column gap-2">
-                                    <button class="btn btn-sm btn-outline-primary" id="theme-pecs" title="{{ _('Grid without margins, with border') }}">🧱 {{ _('Planche à découper (PECS)') }}</button>
-                                    <button class="btn btn-sm btn-outline-success" id="theme-strip" title="{{ _('Single horizontal line') }}">📏 {{ _('Bandelette de Routine') }}</button>
-                                    <button class="btn btn-sm btn-outline-warning" id="theme-flashcard" title="{{ _('Large images') }}">📇 {{ _('Flashcards (A4)') }}</button>
+                                <label class="form-label form-label-sm fw-bold">{{ _('Orientation') }}</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="print-orientation" id="print-orient-portrait" value="portrait" checked>
+                                    <label class="btn btn-outline-secondary btn-sm" for="print-orient-portrait">{{ _('Portrait') }}</label>
+                                    <input type="radio" class="btn-check" name="print-orientation" id="print-orient-landscape" value="landscape">
+                                    <label class="btn btn-outline-secondary btn-sm" for="print-orient-landscape">{{ _('Landscape') }}</label>
                                 </div>
                             </div>
-                            <hr class="my-2">
+                            
+                            <!-- Image Size -->
+                            <div class="mb-3">
+                                <label for="print-image-size" class="form-label form-label-sm fw-bold">
+                                    {{ _('Image Size') }}: <span id="print-size-px">100</span>px (<span id="print-size-cm">2.6</span>cm)
+                                </label>
+                                <input type="range" class="form-range" min="50" max="400" value="100" id="print-image-size">
+                            </div>
 
-                            <!-- Tabs for Export Options -->
-                            <ul class="nav nav-tabs mb-3" id="exportTabs" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active py-1 px-2" id="layout-tab" data-bs-toggle="tab"
-                                        data-bs-target="#layout" type="button" role="tab" aria-controls="layout"
-                                        aria-selected="true" style="font-size: 0.8rem;">{{ _('Layout') }}</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link py-1 px-2" id="style-tab" data-bs-toggle="tab"
-                                        data-bs-target="#style" type="button" role="tab" aria-controls="style"
-                                        aria-selected="false" style="font-size: 0.8rem;">{{ _('Style') }}</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link py-1 px-2" id="text-tab" data-bs-toggle="tab"
-                                        data-bs-target="#text" type="button" role="tab" aria-controls="text"
-                                        aria-selected="false" style="font-size: 0.8rem;">{{ _('Text') }}</button>
-                                </li>
-                            </ul>
+                            <!-- Borders -->
+                            <div class="mb-3">
+                                <label class="form-label form-label-sm fw-bold">{{ _('Borders') }}</label>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">{{ _('Thickness') }}</span>
+                                    <input type="range" class="form-range form-control" id="print-border-width" value="1" min="0" max="10" style="padding: 0.5rem;">
+                                    <span class="input-group-text" id="print-border-width-val">1px</span>
+                                </div>
+                                <div class="color-palette d-flex justify-content-between mt-2">
+                                    <!-- Radio buttons mapped to circles via CSS -->
+                                    <input type="radio" name="print-border-color" id="color-black" value="#000000" checked hidden>
+                                    <label for="color-black" class="color-circle" style="background-color: #000000;"></label>
+                                    
+                                    <input type="radio" name="print-border-color" id="color-yellow" value="#FFEB3B" hidden>
+                                    <label for="color-yellow" class="color-circle" style="background-color: #FFEB3B;"></label>
+                                    
+                                    <input type="radio" name="print-border-color" id="color-green" value="#4CAF50" hidden>
+                                    <label for="color-green" class="color-circle" style="background-color: #4CAF50;"></label>
+                                    
+                                    <input type="radio" name="print-border-color" id="color-orange" value="#FF9800" hidden>
+                                    <label for="color-orange" class="color-circle" style="background-color: #FF9800;"></label>
+                                    
+                                    <input type="radio" name="print-border-color" id="color-blue" value="#2196F3" hidden>
+                                    <label for="color-blue" class="color-circle" style="background-color: #2196F3;"></label>
+                                    
+                                    <input type="radio" name="print-border-color" id="color-pink" value="#E91E63" hidden>
+                                    <label for="color-pink" class="color-circle" style="background-color: #E91E63;"></label>
+                                </div>
+                            </div>
 
-                            <div class="tab-content" id="exportTabsContent">
+                            <!-- Text -->
+                            <div class="mb-3">
+                                <label class="form-label form-label-sm fw-bold">{{ _('Text') }}</label>
+                                <div class="form-check form-switch mb-1">
+                                    <input class="form-check-input" type="checkbox" id="print-show-text" checked>
+                                    <label class="form-check-label form-label-sm" for="print-show-text">{{ _('Show description') }}</label>
+                                </div>
+                                <div class="input-group input-group-sm mb-1">
+                                    <span class="input-group-text">{{ _('Position') }}</span>
+                                    <select class="form-select form-select-sm" id="print-text-position">
+                                        <option value="bottom" selected>{{ _('Bottom') }}</option>
+                                        <option value="top">{{ _('Top') }}</option>
+                                    </select>
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">{{ _('Placement') }}</span>
+                                    <select class="form-select form-select-sm" id="print-text-placement">
+                                        <option value="outside" selected>{{ _('Outside border') }}</option>
+                                        <option value="inside">{{ _('Inside border') }}</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                                <!-- Layout Tab -->
-                                <div class="tab-pane fade show active" id="layout" role="tabpanel"
-                                    aria-labelledby="layout-tab">
-                                    <div class="mb-2">
-                                        <label class="form-label form-label-sm fw-bold">{{ _('Layout Mode') }}</label>
-                                        <select class="form-select form-select-sm" id="pdf-layout-mode">
-                                            <option value="chain">{{ _('Vertical Chain') }}</option>
-                                            <option value="strip">{{ _('Horizontal Strip') }}</option>
-                                            <option value="grid">{{ _('Grid') }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label form-label-sm fw-bold">{{ _('Page Orientation')
-                                            }}</label>
-                                        <div class="btn-group w-100" role="group">
-                                            <input type="radio" class="btn-check" name="pdf-orientation"
-                                                id="orient-portrait" value="portrait" checked>
-                                            <label class="btn btn-outline-secondary btn-sm" for="orient-portrait">{{
-                                                _('Portrait') }}</label>
-                                            <input type="radio" class="btn-check" name="pdf-orientation"
-                                                id="orient-landscape" value="landscape">
-                                            <label class="btn btn-outline-secondary btn-sm" for="orient-landscape">{{
-                                                _('Landscape') }}</label>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="pdf-image-size" class="form-label form-label-sm fw-bold">{{ _('Image
-                                            Size') }}: <span id="pdf-image-size-value">100</span>px</label>
-                                        <input type="range" class="form-range" min="50" max="300" value="100"
-                                            id="pdf-image-size">
-                                    </div>
-                                    <div class="row g-2 mb-2">
-                                        <div class="col-6">
-                                            <label for="pdf-padding-x" class="form-label form-label-sm fw-bold">{{
-                                                _('Lateral Padding') }}</label>
-                                            <div class="input-group input-group-sm">
-                                                <input type="number" class="form-control" id="pdf-padding-x" value="10"
-                                                    min="0" max="50">
-                                                <span class="input-group-text">px</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label for="pdf-padding-y" class="form-label form-label-sm fw-bold">{{
-                                                _('Vertical Padding') }}</label>
-                                            <div class="input-group input-group-sm">
-                                                <input type="number" class="form-control" id="pdf-padding-y" value="10"
-                                                    min="0" max="50">
-                                                <span class="input-group-text">px</span>
-                                            </div>
+                            <!-- Display Modes (Accordions) -->
+                            <div class="accordion accordion-flush mb-3" id="printModesAccordion">
+                                <!-- Grid Mode -->
+                                <div class="accordion-item border">
+                                    <h2 class="accordion-header" id="headingGridMode">
+                                        <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGridMode" aria-expanded="false" aria-controls="collapseGridMode">
+                                            <input type="radio" name="print-mode" id="mode-grid" value="grid" class="me-2" checked>
+                                            <label for="mode-grid" class="mb-0 fw-bold" style="font-size: 0.9em;">{{ _('Grid Fill Mode') }}</label>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseGridMode" class="accordion-collapse collapse show" aria-labelledby="headingGridMode" data-bs-parent="#printModesAccordion">
+                                        <div class="accordion-body p-2">
+                                            <label for="print-grid-multiplier" class="form-label form-label-sm">{{ _('Multiplier (Repeats per image)') }}</label>
+                                            <input type="number" class="form-control form-control-sm" id="print-grid-multiplier" value="1" min="1" max="50">
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Style Tab -->
-                                <div class="tab-pane fade" id="style" role="tabpanel" aria-labelledby="style-tab">
-                                    <div class="mb-2">
-                                        <label class="form-label form-label-sm fw-bold">{{ _('Border') }}</label>
-                                        <div class="input-group input-group-sm mb-1">
-                                            <span class="input-group-text">{{ _('Color') }}</span>
-                                            <input type="color" class="form-control form-control-color"
-                                                id="pdf-border-color" value="#000000" title="Choose border color">
-                                        </div>
-                                        <div class="input-group input-group-sm mb-1">
-                                            <span class="input-group-text">{{ _('Width') }}</span>
-                                            <input type="number" class="form-control" id="pdf-border-width" value="1"
-                                                min="0" max="10">
-                                            <span class="input-group-text">px</span>
-                                        </div>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">{{ _('Radius') }}</span>
-                                            <input type="number" class="form-control" id="pdf-border-radius" value="0"
-                                                min="0" max="50">
-                                            <span class="input-group-text">px</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label form-label-sm fw-bold">{{ _('Background') }}</label>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">{{ _('Color') }}</span>
-                                            <input type="color" class="form-control form-control-color"
-                                                id="pdf-bg-color" value="#ffffff" title="Choose background color">
-                                        </div>
-                                    </div>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="pdf-show-shadow">
-                                        <label class="form-check-label form-label-sm" for="pdf-show-shadow">{{ _('Show
-                                            Shadow') }}</label>
-                                    </div>
-                                </div>
-
-                                <!-- Text Tab -->
-                                <div class="tab-pane fade" id="text" role="tabpanel" aria-labelledby="text-tab">
-                                    <div class="form-check form-switch mb-2">
-                                        <input class="form-check-input" type="checkbox" id="pdf-show-text" checked>
-                                        <label class="form-check-label form-label-sm fw-bold" for="pdf-show-text">{{
-                                            _('Show Text') }}</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label form-label-sm">{{ _('Position') }}</label>
-                                        <select class="form-select form-select-sm" id="pdf-text-position">
-                                            <option value="bottom" selected>{{ _('Bottom') }}</option>
-                                            <option value="top">{{ _('Top') }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label form-label-sm">{{ _('Font') }}</label>
-                                        <select class="form-select form-select-sm mb-1" id="pdf-font-family">
-                                            <option value="Helvetica" selected>Helvetica</option>
-                                            <option value="Times-Roman">Times New Roman</option>
-                                            <option value="Courier">Courier</option>
-                                        </select>
-                                        <div class="input-group input-group-sm mb-1">
-                                            <span class="input-group-text">{{ _('Size') }}</span>
-                                            <input type="number" class="form-control" id="pdf-font-size" value="12"
-                                                min="6" max="36">
-                                            <span class="input-group-text">pt</span>
-                                        </div>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">{{ _('Color') }}</span>
-                                            <input type="color" class="form-control form-control-color"
-                                                id="pdf-text-color" value="#000000">
+                                <!-- Chained List Mode -->
+                                <div class="accordion-item border mt-1">
+                                    <h2 class="accordion-header" id="headingChainMode">
+                                        <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChainMode" aria-expanded="false" aria-controls="collapseChainMode">
+                                            <input type="radio" name="print-mode" id="mode-chain" value="chain" class="me-2">
+                                            <label for="mode-chain" class="mb-0 fw-bold" style="font-size: 0.9em;">{{ _('Chained List Mode') }}</label>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseChainMode" class="accordion-collapse collapse" aria-labelledby="headingChainMode" data-bs-parent="#printModesAccordion">
+                                        <div class="accordion-body p-2">
+                                            <div class="input-group input-group-sm mb-1">
+                                                <span class="input-group-text">{{ _('Horiz. Margin') }}</span>
+                                                <input type="number" class="form-control" id="print-margin-x" value="10" min="0" max="100">
+                                                <span class="input-group-text">px</span>
+                                            </div>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">{{ _('Vert. Margin') }}</span>
+                                                <input type="number" class="form-control" id="print-margin-y" value="10" min="0" max="100">
+                                                <span class="input-group-text">px</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <hr class="my-2">
-                            <button id="export-pdf-btn" class="btn btn-sm btn-primary w-100 fw-bold">
-                                <i class="bi bi-file-earmark-pdf"></i> {{ _('Generate PDF') }}
+                            <button id="btn-render-preview" class="btn btn-sm btn-info w-100 fw-bold text-white mb-2">
+                                <i class="bi bi-eye"></i> {{ _('Show / Update Preview') }}
                             </button>
                         </div>
                     </div>
@@ -351,7 +306,26 @@
 
                 <!-- Tab 2: Print -->
                 <div class="tab-pane fade h-100" id="print" role="tabpanel" aria-labelledby="print-tab">
-                    <!-- Empty for now -->
+                    <div class="d-flex flex-column h-100 bg-secondary" style="border-radius: 4px; overflow: hidden;">
+                        <!-- Print Toolbar -->
+                        <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center shadow-sm z-1">
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary" id="btn-zoom-out"><i class="fas fa-minus"></i></button>
+                                <span class="mx-2 fw-bold" id="zoom-level-text" style="display: inline-block; width: 50px; text-align: center;">100%</span>
+                                <button class="btn btn-sm btn-outline-secondary" id="btn-zoom-in"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <button id="export-pdf-btn" class="btn btn-sm btn-danger fw-bold">
+                                <i class="bi bi-file-earmark-pdf"></i> {{ _('Generate PDF') }}
+                            </button>
+                        </div>
+                        
+                        <!-- Print Workspace -->
+                        <div class="flex-grow-1" style="overflow: auto; background-color: #5a5a5a; padding: 20px 0;">
+                            <div id="print-pages-wrapper" style="transform-origin: top center; transition: transform 0.2s ease;">
+                                <!-- A4 Pages will be generated here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -363,10 +337,15 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>{{ _('Chained List Builder') }}</h4>
                 <div>
+                    <button id="import-local-pic-btn" class="btn btn-info text-white me-1">
+                        <i class="bi bi-upload"></i> {{ _('Import Picture') }}
+                    </button>
                     <button id="delete-link-btn" class="btn btn-danger">{{ _('Delete Selected Link') }}</button>
                     <button id="new-chain-btn" class="btn btn-secondary">{{ _('New Chain') }}</button>
                 </div>
             </div>
+            <!-- Hidden file input for importing local pictures -->
+            <input type="file" id="local-pic-input" accept="image/png, image/jpeg, image/gif, image/webp" style="display: none;">
             <div class="position-relative flex-grow-1" style="min-height: 0;">
                 <button id="scroll-list-left"
                     class="btn btn-sm btn-light position-absolute start-0 top-50 translate-middle-y z-1 shadow-sm d-none"

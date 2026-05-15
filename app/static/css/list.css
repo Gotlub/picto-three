@@ -60,3 +60,53 @@ body.is-dragging-list-item #scroll-list-left,
 body.is-dragging-list-item #scroll-list-right {
     pointer-events: none !important;
 }
+
+/* Print WYSIWYG Styles */
+.a4-page {
+    background-color: white;
+    margin: 20px auto;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
+    position: relative;
+    overflow: hidden;
+    /* A4 dimensions at 96 DPI: 794px x 1123px */
+    width: 794px;
+    height: 1123px;
+    /* Will be overridden dynamically by JS based on orientation */
+}
+
+.a4-page.landscape {
+    width: 1123px;
+    height: 794px;
+}
+
+/* Page content wrapper to handle global page margins */
+.a4-page .page-content {
+    width: 100%;
+    height: 100%;
+    /* Margin will be handled via JS padding */
+}
+
+/* Color Palette Circles */
+.color-palette {
+    gap: 5px;
+}
+
+.color-palette input[type="radio"] {
+    display: none;
+}
+
+.color-palette .color-circle {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.1s, border-color 0.1s;
+}
+
+.color-palette input[type="radio"]:checked + .color-circle {
+    border-color: #333;
+    transform: scale(1.15);
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}

@@ -109,7 +109,7 @@ class ChainedListItem {
         const img = document.createElement('img');
         // The path from the backend is now relative, so we build the URL for the new endpoint.
         // Unless it is an external URL (Arasaac)
-        if (this.data.path.startsWith('http')) {
+        if (this.data.path.startsWith('http') || this.data.path.startsWith('data:')) {
             img.src = this.data.path;
         } else {
             // Backward compatibility or local relative paths
@@ -191,6 +191,8 @@ class ListBuilder {
         this.scrollListRightBtn = document.getElementById('scroll-list-right');
         this.deleteLinkBtn = document.getElementById('delete-link-btn');
         this.newChainBtn = document.getElementById('new-chain-btn');
+        this.importLocalPicBtn = document.getElementById('import-local-pic-btn');
+        this.localPicInput = document.getElementById('local-pic-input');
         this.chainedListItems = [];
         this.selectedChainedItem = null;
 
@@ -199,15 +201,21 @@ class ListBuilder {
         this.draggedListItem = null; // What is being dragged within the list
         this.dropIndicator = this.createDropIndicator();
 
-        // PDF Export elements
+        // Print UI & State
+        this.currentZoom = 1.0;
+        this.btnZoomOut = document.getElementById('btn-zoom-out');
+        this.btnZoomIn = document.getElementById('btn-zoom-in');
+        this.zoomLevelText = document.getElementById('zoom-level-text');
+        this.btnRenderPreview = document.getElementById('btn-render-preview');
+        this.printPagesWrapper = document.getElementById('print-pages-wrapper');
         this.exportPdfBtn = document.getElementById('export-pdf-btn');
-        this.pdfImageSizeSlider = document.getElementById('pdf-image-size');
-        this.pdfImageSizeValue = document.getElementById('pdf-image-size-value');
 
-        // Quick Themes
-        this.themePecsBtn = document.getElementById('theme-pecs');
-        this.themeStripBtn = document.getElementById('theme-strip');
-        this.themeFlashcardBtn = document.getElementById('theme-flashcard');
+        // Print Settings
+        this.printImageSize = document.getElementById('print-image-size');
+        this.printSizePx = document.getElementById('print-size-px');
+        this.printSizeCm = document.getElementById('print-size-cm');
+        this.printBorderWidth = document.getElementById('print-border-width');
+        this.printBorderWidthVal = document.getElementById('print-border-width-val');
 
         this.initEventListeners();
         this.loadSavedLists();
@@ -276,16 +284,87 @@ class ListBuilder {
 
         // PDF Export
         this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
-        this.pdfImageSizeSlider?.addEventListener('input', () => {
-            if (this.pdfImageSizeValue) {
-                this.pdfImageSizeValue.textContent = this.pdfImageSizeSlider.value;
-            }
+        
+        // Print Tab specific logic
+        const printTabBtn = document.getElementById('print-tab');
+        const importTabBtn = document.getElementById('import-describe-tab');
+        
+        if (printTabBtn && importTabBtn) {
+            printTabBtn.addEventListener('show.bs.tab', () => {
+                if (this.deleteLinkBtn) this.deleteLinkBtn.style.display = 'none';
+                if (this.newChainBtn) this.newChainBtn.style.display = 'none';
+                if (this.importLocalPicBtn) this.importLocalPicBtn.style.display = 'none';
+                this.renderPreview(); // Auto render when switching
+            });
+            importTabBtn.addEventListener('show.bs.tab', () => {
+                if (this.deleteLinkBtn) this.deleteLinkBtn.style.display = 'inline-block';
+                if (this.newChainBtn) this.newChainBtn.style.display = 'inline-block';
+                if (this.importLocalPicBtn) this.importLocalPicBtn.style.display = 'inline-block';
+            });
+        }
+
+        // Import Local Picture Events
+        this.importLocalPicBtn?.addEventListener('click', () => {
+            this.localPicInput?.click();
         });
 
-        // Quick Themes
-        this.themePecsBtn?.addEventListener('click', () => this.applyPdfTheme('pecs'));
-        this.themeStripBtn?.addEventListener('click', () => this.applyPdfTheme('strip'));
-        this.themeFlashcardBtn?.addEventListener('click', () => this.applyPdfTheme('flashcard'));
+        this.localPicInput?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner une image valide.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+                
+                const sourceItem = {
+                    data: {
+                        id: 'local_' + Date.now(),
+                        path: dataUrl,
+                        name: fileName,
+                        description: fileName
+                    }
+                };
+                
+                this.addToList(sourceItem);
+            };
+            reader.readAsDataURL(file);
+            
+            // Reset input so the same file can be selected again
+            this.localPicInput.value = '';
+        });
+
+        // Print Accordion <-> Radio Button sync
+        const printModesAccordion = document.getElementById('printModesAccordion');
+        if (printModesAccordion) {
+            printModesAccordion.addEventListener('show.bs.collapse', (e) => {
+                if (e.target.id === 'collapseGridMode') {
+                    document.getElementById('mode-grid').checked = true;
+                } else if (e.target.id === 'collapseChainMode') {
+                    document.getElementById('mode-chain').checked = true;
+                }
+            });
+        }
+
+        // Print UI Events
+        this.btnZoomOut?.addEventListener('click', () => this.changeZoom(-0.1));
+        this.btnZoomIn?.addEventListener('click', () => this.changeZoom(0.1));
+        
+        this.printImageSize?.addEventListener('input', () => {
+            if (this.printSizePx) this.printSizePx.textContent = this.printImageSize.value;
+            if (this.printSizeCm) this.printSizeCm.textContent = (this.printImageSize.value / 37.8).toFixed(1);
+        });
+        
+        this.printBorderWidth?.addEventListener('input', () => {
+            if (this.printBorderWidthVal) this.printBorderWidthVal.textContent = this.printBorderWidth.value + 'px';
+        });
+
+        this.btnRenderPreview?.addEventListener('click', () => this.renderPreview());
 
         // Left Panel - List
         this.saveBtn?.addEventListener('click', () => this.saveList());
@@ -1072,6 +1151,205 @@ class ListBuilder {
             setLayout('grid', 'portrait', 400, 20, 20);
             setStyle('#000000', 1, 15, '#f8f9fa', true);
             setText(true, 'bottom', 'center', 'Helvetica', 24, '#000000');
+        }
+    }
+
+    changeZoom(delta) {
+        this.currentZoom += delta;
+        if (this.currentZoom < 0.3) this.currentZoom = 0.3;
+        if (this.currentZoom > 2.0) this.currentZoom = 2.0;
+        
+        if (this.zoomLevelText) {
+            this.zoomLevelText.textContent = Math.round(this.currentZoom * 100) + '%';
+        }
+        
+        if (this.printPagesWrapper) {
+            this.printPagesWrapper.style.transform = `scale(${this.currentZoom})`;
+        }
+    }
+
+    renderPreview() {
+        if (!this.printPagesWrapper) return;
+        this.printPagesWrapper.innerHTML = '';
+        
+        if (!this.chainedListItems || this.chainedListItems.length === 0) {
+            this.printPagesWrapper.innerHTML = '<div class="text-center p-5 text-white">No images to print.</div>';
+            return;
+        }
+
+        // 1. Read settings
+        const orientRadios = document.querySelector('input[name="print-orientation"]:checked');
+        const orientation = orientRadios ? orientRadios.value : 'portrait';
+        const imageSize = parseInt(this.printImageSize?.value || 100);
+        const borderWidth = parseInt(this.printBorderWidth?.value || 1);
+        const colorRadios = document.querySelector('input[name="print-border-color"]:checked');
+        const borderColor = colorRadios ? colorRadios.value : '#000000';
+        const showText = document.getElementById('print-show-text')?.checked ?? true;
+        const textPosition = document.getElementById('print-text-position')?.value || 'bottom';
+        const textPlacement = document.getElementById('print-text-placement')?.value || 'outside';
+        
+        const modeRadios = document.querySelector('input[name="print-mode"]:checked');
+        const mode = modeRadios ? modeRadios.value : 'grid';
+        
+        const gridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value) || 1;
+        
+        const rawMarginX = parseInt(document.getElementById('print-margin-x')?.value, 10);
+        const marginX = isNaN(rawMarginX) ? 10 : rawMarginX;
+        
+        const rawMarginY = parseInt(document.getElementById('print-margin-y')?.value, 10);
+        const marginY = isNaN(rawMarginY) ? 10 : rawMarginY;
+
+        // 2. Prepare items
+        let itemsToRender = [];
+        if (mode === 'grid') {
+            for (const item of this.chainedListItems) {
+                for (let i = 0; i < gridMultiplier; i++) {
+                    itemsToRender.push(item);
+                }
+            }
+        } else {
+            itemsToRender = [...this.chainedListItems];
+        }
+
+        // 3. Mathematical Pagination
+        // A4 pixels at 96 DPI
+        const A4_PORTRAIT_W = 794;
+        const A4_PORTRAIT_H = 1123;
+        const pageWidth = orientation === 'portrait' ? A4_PORTRAIT_W : A4_PORTRAIT_H;
+        const pageHeight = orientation === 'portrait' ? A4_PORTRAIT_H : A4_PORTRAIT_W;
+        
+        const pagePadding = 40; // ~10mm global margin
+        const availWidth = pageWidth - 2 * pagePadding;
+        const availHeight = pageHeight - 2 * pagePadding;
+
+        // Estimate item dimensions
+        const textHeight = showText ? 24 : 0; // ~24px for text block
+        let itemTotalW = imageSize + 2 * borderWidth;
+        let itemTotalH = imageSize + 2 * borderWidth;
+        
+        if (textPlacement === 'outside') {
+            itemTotalH += textHeight;
+        }
+        
+        if (mode === 'grid') {
+            // Little default gap for grid breathing room
+            const gap = 5;
+            itemTotalW += gap;
+            itemTotalH += gap;
+        } else {
+            // Chained list uses explicit margins
+            itemTotalW += marginX;
+            itemTotalH += marginY;
+        }
+
+        // Calculate columns and rows
+        let cols, rows;
+        if (mode === 'chain' && orientation === 'portrait') {
+            // Fill vertically first
+            rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+            cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+        } else {
+            // Fill horizontally first
+            cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+            rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+        }
+        const itemsPerPage = Math.max(1, cols * rows); // at least 1 item per page
+
+        // 4. Generate DOM
+        for (let i = 0; i < itemsToRender.length; i += itemsPerPage) {
+            const chunk = itemsToRender.slice(i, i + itemsPerPage);
+            
+            const pageDiv = document.createElement('div');
+            pageDiv.className = `a4-page ${orientation}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'page-content';
+            contentDiv.style.padding = `${pagePadding}px`;
+            contentDiv.style.display = 'flex';
+            contentDiv.style.flexWrap = 'wrap';
+            contentDiv.style.alignContent = 'flex-start';
+            
+            if (mode === 'grid') {
+                contentDiv.style.gap = '5px';
+            } else {
+                contentDiv.style.columnGap = `${marginX}px`;
+                contentDiv.style.rowGap = `${marginY}px`;
+                if (orientation === 'portrait') {
+                    contentDiv.style.flexDirection = 'column';
+                }
+            }
+
+            chunk.forEach(item => {
+                const itemContainer = document.createElement('div');
+                itemContainer.style.display = 'flex';
+                itemContainer.style.flexDirection = 'column';
+                itemContainer.style.alignItems = 'center';
+                itemContainer.style.width = `${imageSize + 2*borderWidth}px`;
+                
+                const imgContainer = document.createElement('div');
+                imgContainer.style.border = `${borderWidth}px solid ${borderColor}`;
+                imgContainer.style.width = `${imageSize + 2*borderWidth}px`;
+                imgContainer.style.height = `${imageSize + 2*borderWidth}px`;
+                imgContainer.style.display = 'flex';
+                imgContainer.style.justifyContent = 'center';
+                imgContainer.style.alignItems = 'center';
+                imgContainer.style.backgroundColor = 'white';
+                imgContainer.style.overflow = 'hidden';
+                imgContainer.style.position = 'relative';
+
+                const img = document.createElement('img');
+                img.src = item.data.path.startsWith('http') || item.data.path.startsWith('/') || item.data.path.startsWith('data:')
+                            ? item.data.path 
+                            : `/pictograms/${item.data.path}`;
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '100%';
+                img.style.objectFit = 'contain';
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = item.data.description || item.data.name || '';
+                textSpan.style.fontSize = '14px';
+                textSpan.style.fontFamily = 'sans-serif';
+                textSpan.style.textAlign = 'center';
+                textSpan.style.width = '100%';
+                textSpan.style.wordWrap = 'break-word';
+                textSpan.style.padding = '2px';
+
+                if (textPlacement === 'inside') {
+                    // Place text inside the image container, over the image
+                    textSpan.style.position = 'absolute';
+                    textSpan.style.left = '0';
+                    textSpan.style.right = '0';
+                    textSpan.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                    
+                    if (textPosition === 'top') {
+                        textSpan.style.top = '0';
+                    } else {
+                        textSpan.style.bottom = '0';
+                    }
+                    
+                    imgContainer.appendChild(img);
+                    if (showText) imgContainer.appendChild(textSpan);
+                    itemContainer.appendChild(imgContainer);
+                } else {
+                    // Place text outside
+                    imgContainer.appendChild(img);
+                    
+                    if (showText && textPosition === 'top') {
+                        itemContainer.appendChild(textSpan);
+                    }
+                    
+                    itemContainer.appendChild(imgContainer);
+                    
+                    if (showText && textPosition === 'bottom') {
+                        itemContainer.appendChild(textSpan);
+                    }
+                }
+
+                contentDiv.appendChild(itemContainer);
+            });
+            
+            pageDiv.appendChild(contentDiv);
+            this.printPagesWrapper.appendChild(pageDiv);
         }
     }
 
