@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
+from flask_babel import _
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from app.models import User, Tree, Profile, ProfileTree
 from app import db 
@@ -112,7 +113,7 @@ def get_profile_details(profile_id):
     profile = Profile.query.filter_by(id=profile_id, user_id=current_user_id).first()
     
     if not profile:
-        return jsonify({"error": "Profil introuvable"}), 404
+        return jsonify({"error": _("Profile not found")}), 404
         
     tree_refs = ProfileTree.query.filter_by(profile_id=profile_id).order_by(ProfileTree.display_order).all()
     
@@ -139,7 +140,7 @@ def get_tree(tree_id):
     tree = db.session.get(Tree, tree_id)
     
     if not tree or tree.user_id != current_user_id:
-        return jsonify({'error': 'Accès refusé ou introuvable'}), 403
+        return jsonify({'error': _("Access denied or not found")}), 403
         
     try:
         raw_json_data = json.loads(tree.json_data)

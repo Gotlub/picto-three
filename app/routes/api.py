@@ -14,27 +14,42 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 @bp.route('/trees/load', methods=['GET'])
 def load_trees():
     user_trees = []
+    current_user_id = None
     if current_user.is_authenticated:
         # Fetch all user-owned trees, ignoring the deprecated is_public flag
         user_trees = Tree.query.filter_by(user_id=current_user.id).order_by(Tree.name).all()
+        current_user_id = current_user.id
+    else:
+        from app.models import User
+        demo_user = User.query.filter_by(username='demo').first()
+        if demo_user:
+            user_trees = Tree.query.filter_by(user_id=demo_user.id).order_by(Tree.name).all()
 
     return jsonify({
         'user_trees': [tree.to_dict() for tree in user_trees],
-        'current_user_id': current_user.id if current_user.is_authenticated else None
+        'current_user_id': current_user_id
     })
 
 
 @bp.route('/lists', methods=['GET'])
 def load_lists():
     user_lists = []
+    current_user_id = None
     if current_user.is_authenticated:
         # Private lists are user-owned lists with is_public = False, ordered by name
         user_lists = PictogramList.query.filter_by(user_id=current_user.id, is_public=False).order_by(PictogramList.list_name).all()
+        current_user_id = current_user.id
+    else:
+        from app.models import User
+        demo_user = User.query.filter_by(username='demo').first()
+        if demo_user:
+            user_lists = PictogramList.query.filter_by(user_id=demo_user.id, is_public=False).order_by(PictogramList.list_name).all()
 
     # In to_dict(), the payload is already a string, but if it were an object, we'd need to handle it.
     # The current to_dict returns the payload as is, which is what we want.
     return jsonify({
-        'user_lists': [lst.to_dict() for lst in user_lists]
+        'user_lists': [lst.to_dict() for lst in user_lists],
+        'current_user_id': current_user_id
     })
 
 @bp.route('/lists', methods=['POST'])
@@ -484,9 +499,16 @@ def delete_tree(tree_id):
     return jsonify({'status': 'success', 'message': _('Tree deleted successfully')})
 
 @bp.route('/profiles/load', methods=['GET'])
-@login_required
 def load_profiles():
-    profiles = Profile.query.filter_by(user_id=current_user.id).order_by(Profile.name).all()
+    profiles = []
+    if current_user.is_authenticated:
+        profiles = Profile.query.filter_by(user_id=current_user.id).order_by(Profile.name).all()
+    else:
+        from app.models import User
+        demo_user = User.query.filter_by(username='demo').first()
+        if demo_user:
+            profiles = Profile.query.filter_by(user_id=demo_user.id).order_by(Profile.name).all()
+
     profiles_data = []
     for profile in profiles:
         profile_dict = {

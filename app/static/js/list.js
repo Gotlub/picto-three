@@ -657,6 +657,11 @@ class ListBuilder {
 
     // --- API Calls ---
     async saveList() {
+        if (!this.currentUserId) {
+            alert("You must create an account to use this feature.");
+            return;
+        }
+
         const listName = this.listNameInput.value;
         if (!listName) {
             alert('Please enter a name for the list.');
@@ -740,6 +745,7 @@ class ListBuilder {
             const response = await fetch('/api/lists');
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
+            this.currentUserId = data.current_user_id;
             this.publicLists = Array.isArray(data.public_lists) ? data.public_lists : [];
             this.userLists = Array.isArray(data.user_lists) ? data.user_lists : [];
         } catch (e) {

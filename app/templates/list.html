@@ -46,7 +46,6 @@
 
                             <!-- List Operations -->
                             <h6 class="fw-bold">{{ _('List Operations') }}</h6>
-                            {% if current_user.is_authenticated %}
                             <div class="mb-3">
                                 <button class="btn btn-sm btn-outline-secondary w-100 mb-2 collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapseSaveList" aria-expanded="false" aria-controls="collapseSaveList">
@@ -61,7 +60,6 @@
                                     <button id="save-list-btn" class="btn btn-sm btn-primary w-100">{{ _('Save List') }}</button>
                                 </div>
                             </div>
-                            {% endif %}
                             <div class="mb-3">
                                 <button class="btn btn-sm btn-outline-secondary w-100 mb-2 collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapseLoadList" aria-expanded="false" aria-controls="collapseLoadList">
