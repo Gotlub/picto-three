@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-18 17:04+0200\n"
+"POT-Creation-Date: 2026-05-18 17:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -396,6 +396,14 @@ msgstr ""
 
 #: app/routes/mobile_api.py:181
 msgid "Access denied or not found"
+msgstr ""
+
+#: app/routes/mobile_api.py:215 app/routes/mobile_api.py:240
+msgid "Auth required"
+msgstr ""
+
+#: app/routes/mobile_api.py:221 app/routes/mobile_api.py:246
+msgid "Forbidden"
 msgstr ""
 
 #: app/templates/about.html:36

@@ -737,7 +737,7 @@ class ListBuilder {
     // --- API Calls ---
     async saveList() {
         if (!this.currentUserId) {
-            alert("You must create an account to use this feature.");
+            alert(window.translations.accountRequired);
             return;
         }
 

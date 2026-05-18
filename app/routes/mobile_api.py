@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
-from flask_babel import _
+from flask_babel import _ as _tr
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from app.models import User, Tree, Image, Profile, ProfileTree
 from app import db 
@@ -151,7 +151,7 @@ def get_profile_details(profile_id):
     profile = Profile.query.filter_by(id=profile_id, user_id=current_user_id).first()
     
     if not profile:
-        return jsonify({"error": _("Profile not found")}), 404
+        return jsonify({"error":_tr("Profile not found")}), 404
         
     tree_refs = ProfileTree.query.filter_by(profile_id=profile_id).order_by(ProfileTree.display_order).all()
     
@@ -178,7 +178,7 @@ def get_tree(tree_id):
     tree = db.session.get(Tree, tree_id)
     
     if not tree or tree.user_id != current_user_id:
-        return jsonify({'error': _("Access denied or not found")}), 403
+        return jsonify({'error':_tr("Access denied or not found")}), 403
         
     try:
         raw_json_data = json.loads(tree.json_data)
@@ -212,13 +212,13 @@ def serve_mobile_pictogram(filepath):
     else:
         current_user_id = get_jwt_identity()
         if not current_user_id:
-            return jsonify({'error': 'Auth required'}), 401
+            return jsonify({'error':_tr('Auth required')}), 401
         
         current_user = db.session.get(User, int(current_user_id))
         if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_path, filepath)
             
-        return jsonify({"error": "Forbidden"}), 403
+        return jsonify({"error":_tr("Forbidden")}), 403
 
 
 @bp.route('/pictogramsmin/<path:filepath>', methods=['GET'])
@@ -227,7 +227,7 @@ def serve_mobile_pictogram_min(filepath):
     """Distribution des miniatures."""
     import os
     filepath = posixpath.normpath(filepath)
-    thumb_filename, _ = os.path.splitext(filepath)
+    thumb_filename,_= os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
     
     pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
@@ -237,13 +237,13 @@ def serve_mobile_pictogram_min(filepath):
     else:
         current_user_id = get_jwt_identity()
         if not current_user_id:
-            return jsonify({'error': 'Auth required'}), 401
+            return jsonify({'error':_tr('Auth required')}), 401
             
         current_user = db.session.get(User, int(current_user_id))
         if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_min_path, thumb_path_relative)
             
-        return jsonify({"error": "Forbidden"}), 403
+        return jsonify({"error":_tr("Forbidden")}), 403
 
 
 def _get_full_url(raw_path, host_url):

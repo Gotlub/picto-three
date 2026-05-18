@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-18 17:04+0200\n"
+"POT-Creation-Date: 2026-05-18 17:31+0200\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -421,6 +421,15 @@ msgstr "La langue a été mise à jour pour cette session."
 #, fuzzy
 msgid "Access denied or not found"
 msgstr "Dossier non trouvé"
+
+#: app/routes/mobile_api.py:215 app/routes/mobile_api.py:240
+#, fuzzy
+msgid "Auth required"
+msgstr "parent_id est requis"
+
+#: app/routes/mobile_api.py:221 app/routes/mobile_api.py:246
+msgid "Forbidden"
+msgstr ""
 
 #: app/templates/about.html:36
 msgid "Open Source"
