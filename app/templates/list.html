@@ -152,12 +152,17 @@
                                         <option value="top">{{ _('Top') }}</option>
                                     </select>
                                 </div>
-                                <div class="input-group input-group-sm">
+                                <div class="input-group input-group-sm mb-1">
                                     <span class="input-group-text">{{ _('Placement') }}</span>
                                     <select class="form-select form-select-sm" id="print-text-placement">
                                         <option value="outside" selected>{{ _('Outside border') }}</option>
                                         <option value="inside">{{ _('Inside border') }}</option>
                                     </select>
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">{{ _('Size') }}</span>
+                                    <input type="number" class="form-control" id="print-text-size" value="14" min="8" max="48">
+                                    <span class="input-group-text">px</span>
                                 </div>
                             </div>
 

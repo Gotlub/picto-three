@@ -1115,44 +1115,6 @@ class ListBuilder {
         });
     }
 
-    applyPdfTheme(themeName) {
-        const setLayout = (mode, orient, size, padX, padY) => {
-            document.getElementById('pdf-layout-mode').value = mode;
-            document.querySelector(`input[name="pdf-orientation"][value="${orient}"]`).checked = true;
-            document.getElementById('pdf-image-size').value = size;
-            document.getElementById('pdf-image-size-value').textContent = size;
-            document.getElementById('pdf-padding-x').value = padX;
-            document.getElementById('pdf-padding-y').value = padY;
-        };
-        const setStyle = (bColor, bWidth, bRadius, bg, shadow) => {
-            document.getElementById('pdf-border-color').value = bColor;
-            document.getElementById('pdf-border-width').value = bWidth;
-            document.getElementById('pdf-border-radius').value = bRadius;
-            document.getElementById('pdf-bg-color').value = bg;
-            document.getElementById('pdf-show-shadow').checked = shadow;
-        };
-        const setText = (show, pos, align, font, size, color) => {
-            document.getElementById('pdf-show-text').checked = show;
-            document.getElementById('pdf-text-position').value = pos;
-            document.getElementById('pdf-font-family').value = font;
-            document.getElementById('pdf-font-size').value = size;
-            document.getElementById('pdf-text-color').value = color;
-        };
-
-        if (themeName === 'pecs') {
-            setLayout('grid', 'portrait', 120, 2, 2);
-            setStyle('#cccccc', 1, 0, '#ffffff', false);
-            setText(true, 'bottom', 'center', 'Helvetica', 10, '#000000');
-        } else if (themeName === 'strip') {
-            setLayout('strip', 'landscape', 150, 15, 10);
-            setStyle('#000000', 2, 10, '#ffffff', false);
-            setText(true, 'bottom', 'center', 'Helvetica', 12, '#000000');
-        } else if (themeName === 'flashcard') {
-            setLayout('grid', 'portrait', 400, 20, 20);
-            setStyle('#000000', 1, 15, '#f8f9fa', true);
-            setText(true, 'bottom', 'center', 'Helvetica', 24, '#000000');
-        }
-    }
 
     changeZoom(delta) {
         this.currentZoom += delta;
@@ -1187,6 +1149,8 @@ class ListBuilder {
         const showText = document.getElementById('print-show-text')?.checked ?? true;
         const textPosition = document.getElementById('print-text-position')?.value || 'bottom';
         const textPlacement = document.getElementById('print-text-placement')?.value || 'outside';
+        const textSizeInput = parseInt(document.getElementById('print-text-size')?.value, 10);
+        const textSize = isNaN(textSizeInput) ? 14 : textSizeInput;
         
         const modeRadios = document.querySelector('input[name="print-mode"]:checked');
         const mode = modeRadios ? modeRadios.value : 'grid';
@@ -1223,7 +1187,7 @@ class ListBuilder {
         const availHeight = pageHeight - 2 * pagePadding;
 
         // Estimate item dimensions
-        const textHeight = showText ? 24 : 0; // ~24px for text block
+        const textHeight = showText ? (textSize + 10) : 0; // ~textSize+10px for text block
         let itemTotalW = imageSize + 2 * borderWidth;
         let itemTotalH = imageSize + 2 * borderWidth;
         
@@ -1307,11 +1271,16 @@ class ListBuilder {
                 
                 const textSpan = document.createElement('span');
                 textSpan.textContent = item.data.description || item.data.name || '';
-                textSpan.style.fontSize = '14px';
+                textSpan.style.fontSize = `${textSize}px`;
                 textSpan.style.fontFamily = 'sans-serif';
                 textSpan.style.textAlign = 'center';
                 textSpan.style.width = '100%';
-                textSpan.style.wordWrap = 'break-word';
+                textSpan.style.whiteSpace = 'nowrap';
+                textSpan.style.overflow = 'hidden';
+                textSpan.style.textOverflow = 'ellipsis';
+                textSpan.style.display = 'block';
+                textSpan.style.height = `${textSize + 10}px`;
+                textSpan.style.lineHeight = `${textSize + 6}px`;
                 textSpan.style.padding = '2px';
 
                 if (textPlacement === 'inside') {
@@ -1366,45 +1335,84 @@ class ListBuilder {
         try {
             const { jsPDF } = window.jspdf;
 
-            // Extract options
-            const layoutMode = document.getElementById('pdf-layout-mode').value;
-            const orientation = document.querySelector('input[name="pdf-orientation"]:checked').value;
-            const imageSize = parseInt(document.getElementById('pdf-image-size').value, 10);
-            const paddingX = parseInt(document.getElementById('pdf-padding-x').value, 10);
-            const paddingY = parseInt(document.getElementById('pdf-padding-y').value, 10);
+            // 1. Read settings exactly as in renderPreview
+            const orientRadios = document.querySelector('input[name="print-orientation"]:checked');
+            const orientation = orientRadios ? orientRadios.value : 'portrait';
+            const imageSize = parseInt(this.printImageSize?.value || 100);
+            const borderWidth = parseInt(this.printBorderWidth?.value || 1);
+            const colorRadios = document.querySelector('input[name="print-border-color"]:checked');
+            const borderColor = colorRadios ? colorRadios.value : '#000000';
+            const showText = document.getElementById('print-show-text')?.checked ?? true;
+            const textPosition = document.getElementById('print-text-position')?.value || 'bottom';
+            const textPlacement = document.getElementById('print-text-placement')?.value || 'outside';
+            const textSizeInput = parseInt(document.getElementById('print-text-size')?.value, 10);
+            const textSize = isNaN(textSizeInput) ? 14 : textSizeInput;
+            
+            const modeRadios = document.querySelector('input[name="print-mode"]:checked');
+            const mode = modeRadios ? modeRadios.value : 'grid';
+            
+            const gridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value) || 1;
+            const rawMarginX = parseInt(document.getElementById('print-margin-x')?.value, 10);
+            const marginX = isNaN(rawMarginX) ? 10 : rawMarginX;
+            const rawMarginY = parseInt(document.getElementById('print-margin-y')?.value, 10);
+            const marginY = isNaN(rawMarginY) ? 10 : rawMarginY;
 
-            const borderColor = document.getElementById('pdf-border-color').value;
-            const borderWidth = parseInt(document.getElementById('pdf-border-width').value, 10);
-            const borderRadius = parseInt(document.getElementById('pdf-border-radius').value, 10);
-            const bgColor = document.getElementById('pdf-bg-color').value;
-            const showShadow = document.getElementById('pdf-show-shadow').checked;
-
-            const showText = document.getElementById('pdf-show-text').checked;
-            const textPosition = document.getElementById('pdf-text-position').value;
-            const fontFamily = document.getElementById('pdf-font-family').value;
-            const fontSize = parseInt(document.getElementById('pdf-font-size').value, 10);
-            const textColor = document.getElementById('pdf-text-color').value;
-
-            // Initialize document
+            // 2. Initialize document matching A4 px exactly (96 DPI equivalent layout)
             const doc = new jsPDF({
                 orientation: orientation,
-                unit: 'pt',
-                format: 'a4'
+                unit: 'px',
+                format: [794, 1123]
             });
 
-            const margin = 50;
-            const itemSpacing = 10;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
+            // 3. Prepare items
+            let itemsToRender = [];
+            if (mode === 'grid') {
+                for (const item of this.chainedListItems) {
+                    for (let i = 0; i < gridMultiplier; i++) {
+                        itemsToRender.push(item);
+                    }
+                }
+            } else {
+                itemsToRender = [...this.chainedListItems];
+            }
 
-            const textAllowance = showText ? (fontSize + 5) : 0;
-            const boxWidth = imageSize + (paddingX * 2);
-            const boxHeight = imageSize + (paddingY * 2) + textAllowance;
+            // 4. Mathematical Pagination
+            const A4_PORTRAIT_W = 794;
+            const A4_PORTRAIT_H = 1123;
+            const pageWidth = orientation === 'portrait' ? A4_PORTRAIT_W : A4_PORTRAIT_H;
+            const pageHeight = orientation === 'portrait' ? A4_PORTRAIT_H : A4_PORTRAIT_W;
+            
+            const pagePadding = 40;
+            const availWidth = pageWidth - 2 * pagePadding;
+            const availHeight = pageHeight - 2 * pagePadding;
 
-            let cursorX = margin;
-            let cursorY = margin; // Note: jsPDF runs top-down unlike reportlab
+            const textHeight = showText ? (textSize + 10) : 0;
+            let itemTotalW = imageSize + 2 * borderWidth;
+            let itemTotalH = imageSize + 2 * borderWidth;
+            
+            if (textPlacement === 'outside') {
+                itemTotalH += textHeight;
+            }
+            
+            if (mode === 'grid') {
+                const gap = 5;
+                itemTotalW += gap;
+                itemTotalH += gap;
+            } else {
+                itemTotalW += marginX;
+                itemTotalH += marginY;
+            }
 
-            // Helper to elegantly load images respecting CORS and relative path resolution
+            let cols, rows;
+            if (mode === 'chain' && orientation === 'portrait') {
+                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+            } else {
+                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+            }
+            const itemsPerPage = Math.max(1, cols * rows);
+
             const loadImage = (src) => {
                 return new Promise((resolve) => {
                     const img = new Image();
@@ -1413,114 +1421,112 @@ class ListBuilder {
                     img.onerror = () => resolve(null);
 
                     let fullSrc = src;
-                    if (!src.startsWith('http') && !src.startsWith('/')) {
+                    if (src.startsWith('data:')) {
+                        // Keep data URI
+                    } else if (!src.startsWith('http') && !src.startsWith('/')) {
                         fullSrc = '/pictograms/' + src;
                     }
                     img.src = fullSrc;
                 });
             };
 
-            for (const item of this.chainedListItems) {
-                const imgElement = await loadImage(item.data.path);
-                if (!imgElement) continue;
+            let currentPage = 1;
+            for (let i = 0; i < itemsToRender.length; i++) {
+                const pageIndex = Math.floor(i / itemsPerPage);
+                if (pageIndex + 1 > currentPage) {
+                    doc.addPage();
+                    currentPage++;
+                }
 
-                // Pagination & Row wrapping
-                if (layoutMode === 'chain') {
-                    if (cursorY + boxHeight > pageHeight - margin) {
-                        doc.addPage();
-                        cursorY = margin;
-                    }
-                    cursorX = (pageWidth - boxWidth) / 2; // Fixed centering
-                } else if (layoutMode === 'strip') {
-                    if (item === this.chainedListItems[0]) cursorY = (pageHeight - boxHeight) / 2;
-                    if (cursorX + boxWidth > pageWidth - margin) {
-                        doc.addPage();
-                        cursorX = margin;
-                    }
+                const indexOnPage = i % itemsPerPage;
+                let col, row;
+                if (mode === 'chain' && orientation === 'portrait') {
+                    col = Math.floor(indexOnPage / rows);
+                    row = indexOnPage % rows;
                 } else {
-                    if (cursorX + boxWidth > pageWidth - margin) {
-                        cursorX = margin;
-                        cursorY += boxHeight + itemSpacing;
-                    }
-                    if (cursorY + boxHeight > pageHeight - margin) {
-                        doc.addPage();
-                        cursorX = margin;
-                        cursorY = margin;
-                    }
+                    row = Math.floor(indexOnPage / cols);
+                    col = indexOnPage % cols;
                 }
 
-                // 1. Draw Shadow
-                if (showShadow) {
-                    doc.setFillColor('#cccccc');
-                    doc.roundedRect(cursorX + 3, cursorY + 3, boxWidth, boxHeight, borderRadius, borderRadius, 'F');
-                }
+                const x = pagePadding + col * itemTotalW;
+                const y = pagePadding + row * itemTotalH;
 
-                // 2. Draw Background and Border
-                doc.setFillColor(bgColor);
-                let rectStyle = 'F';
+                const item = itemsToRender[i];
+                const imgElement = await loadImage(item.data.path);
+
+                let imgBoxX = x;
+                let imgBoxY = y;
+                if (showText && textPlacement === 'outside' && textPosition === 'top') {
+                    imgBoxY += textHeight;
+                }
+                
+                // Draw Border / Background
                 if (borderWidth > 0) {
                     doc.setDrawColor(borderColor);
                     doc.setLineWidth(borderWidth);
-                    rectStyle = 'FD'; // Fill and stroke
+                    doc.setFillColor('#ffffff');
+                    doc.rect(imgBoxX, imgBoxY, imageSize + 2 * borderWidth, imageSize + 2 * borderWidth, 'FD');
+                } else {
+                    doc.setFillColor('#ffffff');
+                    doc.rect(imgBoxX, imgBoxY, imageSize, imageSize, 'F');
                 }
-                doc.roundedRect(cursorX, cursorY, boxWidth, boxHeight, borderRadius, borderRadius, rectStyle);
 
-                // 3. Draw Image
-                const imgAreaWidth = boxWidth - (paddingX * 2);
-                const imgAreaHeight = boxHeight - (paddingY * 2) - textAllowance;
-
-                if (imgAreaWidth > 0 && imgAreaHeight > 0) {
+                // Draw Image
+                if (imgElement) {
+                    const innerSize = imageSize;
                     const iw = imgElement.naturalWidth || imgElement.width || 1;
                     const ih = imgElement.naturalHeight || imgElement.height || 1;
-                    const scale = Math.min(imgAreaWidth / iw, imgAreaHeight / ih);
+                    const scale = Math.min(innerSize / iw, innerSize / ih);
                     const w = iw * scale;
                     const h = ih * scale;
-
-                    const ix = cursorX + paddingX + (imgAreaWidth - w) / 2;
-                    let iy = cursorY + paddingY;
-                    if (showText && textPosition === 'top') {
-                        iy += textAllowance;
-                    }
-
-                    // Always try 'PNG' or 'JPEG' fallback is done by jsPDF
+                    
+                    const ix = imgBoxX + borderWidth + (innerSize - w) / 2;
+                    const iy = imgBoxY + borderWidth + (innerSize - h) / 2;
+                    
                     doc.addImage(imgElement, 'PNG', ix, iy, w, h);
                 }
 
-                // 4. Draw Text
-                if (showText && item.data.description) {
-                    doc.setFont(fontFamily);
-                    doc.setFontSize(fontSize);
-                    doc.setTextColor(textColor);
-
-                    const tx = cursorX + boxWidth / 2;
-                    let ty = cursorY + paddingY;
-                    if (textPosition === 'top') {
-                        ty += fontSize;
+                // Draw Text
+                if (showText) {
+                    const textStr = item.data.description || item.data.name || '';
+                    doc.setFontSize(textSize);
+                    doc.setTextColor('#000000');
+                    
+                    if (textPlacement === 'inside') {
+                        doc.setFillColor('#ffffff'); // Solid white background for text readability
+                        const rectHeight = textSize + 6;
+                        const rectY = textPosition === 'top' ? imgBoxY : imgBoxY + imageSize + 2 * borderWidth - rectHeight;
+                        doc.rect(imgBoxX + borderWidth, rectY + borderWidth, imageSize, rectHeight, 'F');
+                        
+                        const textX = imgBoxX + borderWidth + imageSize / 2;
+                        const textY = textPosition === 'top' ? imgBoxY + borderWidth + textSize : imgBoxY + imageSize + 2 * borderWidth - 4;
+                        const splitTextInside = doc.splitTextToSize(textStr, imageSize);
+                        doc.text(splitTextInside[0], textX, textY, { align: 'center' });
                     } else {
-                        ty = cursorY + boxHeight - paddingY - 2;
+                        const textX = imgBoxX + (imageSize + 2 * borderWidth) / 2;
+                        let textY;
+                        if (textPosition === 'top') {
+                            textY = y + textSize + 4;
+                        } else {
+                            textY = imgBoxY + imageSize + 2 * borderWidth + textSize + 4;
+                        }
+                        const splitTextOutside = doc.splitTextToSize(textStr, imageSize + 2 * borderWidth);
+                        doc.text(splitTextOutside[0], textX, textY, { align: 'center' });
                     }
-                    doc.text(item.data.description, tx, ty, { align: 'center' });
-                }
-
-                // Advance cursor for next item
-                if (layoutMode === 'chain') {
-                    cursorY += boxHeight + itemSpacing;
-                } else {
-                    cursorX += boxWidth + itemSpacing;
                 }
             }
 
-            // Save straight to browser avoiding the backend
-            doc.save('pictogram_list.pdf');
+            doc.save('pictograms-list.pdf');
 
         } catch (error) {
-            console.error('Error exporting to PDF:', error);
-            alert(`An error occurred: ${error.message}`);
+            console.error(error);
+            alert('An error occurred during PDF generation.');
         } finally {
             this.exportPdfBtn.innerHTML = originalBtnText;
             this.exportPdfBtn.disabled = false;
         }
     }
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {

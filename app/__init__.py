@@ -60,7 +60,6 @@ def create_app(config_override=None):
     sitemap.init_app(app)
 
     # JWT Configuration for mobile API
-    app.config['JWT_SECRET_KEY'] = 'a-changer-pour-la-production-avec-githubSecretKey'
     jwt.init_app(app)
 
     def public_page_generator():

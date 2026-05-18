@@ -47,6 +47,6 @@ class Config:
 
     # JWT Configuration
     from datetime import timedelta
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or TOKEN_SECRET_KEY
+    JWT_SECRET_KEY = TOKEN_SECRET_KEY
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
