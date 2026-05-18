@@ -877,7 +877,7 @@ class TreeBuilder {
 
     async saveTree() {
         if (!this.currentUserId) {
-            alert("You must create an account to use this feature.");
+            alert(window.translations.accountRequired);
             return;
         }
 
@@ -1537,7 +1537,7 @@ class TreeBuilder {
 
     async deleteTree() {
         if (!this.currentUserId) {
-            alert("You must create an account to use this feature.");
+            alert(window.translations.accountRequired);
             return;
         }
 
@@ -1746,7 +1746,7 @@ class TreeBuilder {
 
     async saveProfile() {
         if (!this.currentUserId) {
-            alert("You must create an account to use this feature.");
+            alert(window.translations.accountRequired);
             return;
         }
 
@@ -1864,7 +1864,7 @@ class TreeBuilder {
 
     async deleteProfile() {
         if (!this.currentUserId) {
-            alert("You must create an account to use this feature.");
+            alert(window.translations.accountRequired);
             return;
         }
 
@@ -1915,7 +1915,7 @@ class TreeBuilder {
 
     createNewProfile() {
         if (!this.currentUserId) {
-            alert("You must create an account to use this feature.");
+            alert(window.translations.accountRequired);
             return;
         }
 

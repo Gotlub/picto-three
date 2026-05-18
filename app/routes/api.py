@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from flask_babel import _
 from werkzeug.utils import secure_filename
 from app import db
-from app.models import Tree, PictogramList, Folder, Image, Profile, ProfileTree
+from app.models import Tree, PictogramList, Folder, Image, Profile, ProfileTree, User
 from pathlib import Path
 import shutil
 from PIL import Image as PILImage
@@ -20,8 +20,7 @@ def load_trees():
         user_trees = Tree.query.filter_by(user_id=current_user.id).order_by(Tree.name).all()
         current_user_id = current_user.id
     else:
-        from app.models import User
-        demo_user = User.query.filter_by(username='demo').first()
+        demo_user = User.query.filter_by(username=current_app.config.get('DEMO_USERNAME', 'demo')).first()
         if demo_user:
             user_trees = Tree.query.filter_by(user_id=demo_user.id).order_by(Tree.name).all()
 
@@ -40,8 +39,7 @@ def load_lists():
         user_lists = PictogramList.query.filter_by(user_id=current_user.id, is_public=False).order_by(PictogramList.list_name).all()
         current_user_id = current_user.id
     else:
-        from app.models import User
-        demo_user = User.query.filter_by(username='demo').first()
+        demo_user = User.query.filter_by(username=current_app.config.get('DEMO_USERNAME', 'demo')).first()
         if demo_user:
             user_lists = PictogramList.query.filter_by(user_id=demo_user.id, is_public=False).order_by(PictogramList.list_name).all()
 
@@ -504,8 +502,7 @@ def load_profiles():
     if current_user.is_authenticated:
         profiles = Profile.query.filter_by(user_id=current_user.id).order_by(Profile.name).all()
     else:
-        from app.models import User
-        demo_user = User.query.filter_by(username='demo').first()
+        demo_user = User.query.filter_by(username=current_app.config.get('DEMO_USERNAME', 'demo')).first()
         if demo_user:
             profiles = Profile.query.filter_by(user_id=demo_user.id).order_by(Profile.name).all()
 

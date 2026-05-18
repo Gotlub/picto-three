@@ -313,7 +313,7 @@ class ListBuilder {
             if (!file) return;
             
             if (!file.type.startsWith('image/')) {
-                alert('Veuillez sélectionner une image valide.');
+                alert(window.translations.invalidImage);
                 return;
             }
             
