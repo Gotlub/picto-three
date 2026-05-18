@@ -876,6 +876,11 @@ class TreeBuilder {
     }
 
     async saveTree() {
+        if (!this.currentUserId) {
+            alert(window.translations.accountRequired);
+            return;
+        }
+
         const treeName = document.getElementById('tree-name').value;
         if (!treeName) {
             alert('Please enter a name for the tree.');
@@ -1004,7 +1009,7 @@ class TreeBuilder {
 
         const deleteProfileBtn = document.getElementById('delete-profile-btn');
         if (deleteProfileBtn) {
-            deleteProfileBtn.addEventListener('click', () => this.deleteSelectedProfile());
+            deleteProfileBtn.addEventListener('click', () => this.deleteProfile());
         }
 
         const profileSearch = document.getElementById('profile-search');
@@ -1531,6 +1536,11 @@ class TreeBuilder {
     }
 
     async deleteTree() {
+        if (!this.currentUserId) {
+            alert(window.translations.accountRequired);
+            return;
+        }
+
         if (!this.activeTreeSelect || !this.activeTreeSelect.value) {
             alert('Please select a tree to delete.');
             return;
@@ -1735,6 +1745,11 @@ class TreeBuilder {
     }
 
     async saveProfile() {
+        if (!this.currentUserId) {
+            alert(window.translations.accountRequired);
+            return;
+        }
+
         const profileNameInput = document.getElementById('profile-name');
         if (!profileNameInput) return;
         
@@ -1847,9 +1862,16 @@ class TreeBuilder {
         }
     }
 
-    async deleteSelectedProfile() {
-        const select = document.getElementById('profile-select');
-        if (!select || !select.value) {
+    async deleteProfile() {
+        if (!this.currentUserId) {
+            alert(window.translations.accountRequired);
+            return;
+        }
+
+        const profileSelect = document.getElementById('profile-select');
+        const profileId = profileSelect ? profileSelect.value : null;
+
+        if (!profileId) {
             alert('Please select a profile to delete.');
             return;
         }
@@ -1858,7 +1880,6 @@ class TreeBuilder {
             return;
         }
 
-        const profileId = select.value;
         const deleteBtn = document.getElementById('delete-profile-btn');
         const originalText = deleteBtn.textContent;
         deleteBtn.disabled = true;
@@ -1893,6 +1914,11 @@ class TreeBuilder {
     }
 
     createNewProfile() {
+        if (!this.currentUserId) {
+            alert(window.translations.accountRequired);
+            return;
+        }
+
         if (!confirm('Are you sure you want to start a new profile? This will clear the current list.')) {
             return;
         }

@@ -109,7 +109,7 @@ class ChainedListItem {
         const img = document.createElement('img');
         // The path from the backend is now relative, so we build the URL for the new endpoint.
         // Unless it is an external URL (Arasaac)
-        if (this.data.path.startsWith('http')) {
+        if (this.data.path.startsWith('http') || this.data.path.startsWith('data:')) {
             img.src = this.data.path;
         } else {
             // Backward compatibility or local relative paths
@@ -191,6 +191,8 @@ class ListBuilder {
         this.scrollListRightBtn = document.getElementById('scroll-list-right');
         this.deleteLinkBtn = document.getElementById('delete-link-btn');
         this.newChainBtn = document.getElementById('new-chain-btn');
+        this.importLocalPicBtn = document.getElementById('import-local-pic-btn');
+        this.localPicInput = document.getElementById('local-pic-input');
         this.chainedListItems = [];
         this.selectedChainedItem = null;
 
@@ -199,15 +201,21 @@ class ListBuilder {
         this.draggedListItem = null; // What is being dragged within the list
         this.dropIndicator = this.createDropIndicator();
 
-        // PDF Export elements
+        // Print UI & State
+        this.currentZoom = 1.0;
+        this.btnZoomOut = document.getElementById('btn-zoom-out');
+        this.btnZoomIn = document.getElementById('btn-zoom-in');
+        this.zoomLevelText = document.getElementById('zoom-level-text');
+        this.btnRenderPreview = document.getElementById('btn-render-preview');
+        this.printPagesWrapper = document.getElementById('print-pages-wrapper');
         this.exportPdfBtn = document.getElementById('export-pdf-btn');
-        this.pdfImageSizeSlider = document.getElementById('pdf-image-size');
-        this.pdfImageSizeValue = document.getElementById('pdf-image-size-value');
 
-        // Quick Themes
-        this.themePecsBtn = document.getElementById('theme-pecs');
-        this.themeStripBtn = document.getElementById('theme-strip');
-        this.themeFlashcardBtn = document.getElementById('theme-flashcard');
+        // Print Settings
+        this.printImageSize = document.getElementById('print-image-size');
+        this.printSizePx = document.getElementById('print-size-px');
+        this.printSizeCm = document.getElementById('print-size-cm');
+        this.printBorderWidth = document.getElementById('print-border-width');
+        this.printBorderWidthVal = document.getElementById('print-border-width-val');
 
         this.initEventListeners();
         this.loadSavedLists();
@@ -276,16 +284,87 @@ class ListBuilder {
 
         // PDF Export
         this.exportPdfBtn?.addEventListener('click', () => this.exportToPdf());
-        this.pdfImageSizeSlider?.addEventListener('input', () => {
-            if (this.pdfImageSizeValue) {
-                this.pdfImageSizeValue.textContent = this.pdfImageSizeSlider.value;
-            }
+        
+        // Print Tab specific logic
+        const printTabBtn = document.getElementById('print-tab');
+        const importTabBtn = document.getElementById('import-describe-tab');
+        
+        if (printTabBtn && importTabBtn) {
+            printTabBtn.addEventListener('show.bs.tab', () => {
+                if (this.deleteLinkBtn) this.deleteLinkBtn.style.display = 'none';
+                if (this.newChainBtn) this.newChainBtn.style.display = 'none';
+                if (this.importLocalPicBtn) this.importLocalPicBtn.style.display = 'none';
+                this.renderPreview(); // Auto render when switching
+            });
+            importTabBtn.addEventListener('show.bs.tab', () => {
+                if (this.deleteLinkBtn) this.deleteLinkBtn.style.display = 'inline-block';
+                if (this.newChainBtn) this.newChainBtn.style.display = 'inline-block';
+                if (this.importLocalPicBtn) this.importLocalPicBtn.style.display = 'inline-block';
+            });
+        }
+
+        // Import Local Picture Events
+        this.importLocalPicBtn?.addEventListener('click', () => {
+            this.localPicInput?.click();
         });
 
-        // Quick Themes
-        this.themePecsBtn?.addEventListener('click', () => this.applyPdfTheme('pecs'));
-        this.themeStripBtn?.addEventListener('click', () => this.applyPdfTheme('strip'));
-        this.themeFlashcardBtn?.addEventListener('click', () => this.applyPdfTheme('flashcard'));
+        this.localPicInput?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                alert(window.translations.invalidImage);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+                
+                const sourceItem = {
+                    data: {
+                        id: 'local_' + Date.now(),
+                        path: dataUrl,
+                        name: fileName,
+                        description: fileName
+                    }
+                };
+                
+                this.addToList(sourceItem);
+            };
+            reader.readAsDataURL(file);
+            
+            // Reset input so the same file can be selected again
+            this.localPicInput.value = '';
+        });
+
+        // Print Accordion <-> Radio Button sync
+        const printModesAccordion = document.getElementById('printModesAccordion');
+        if (printModesAccordion) {
+            printModesAccordion.addEventListener('show.bs.collapse', (e) => {
+                if (e.target.id === 'collapseGridMode') {
+                    document.getElementById('mode-grid').checked = true;
+                } else if (e.target.id === 'collapseChainMode') {
+                    document.getElementById('mode-chain').checked = true;
+                }
+            });
+        }
+
+        // Print UI Events
+        this.btnZoomOut?.addEventListener('click', () => this.changeZoom(-0.1));
+        this.btnZoomIn?.addEventListener('click', () => this.changeZoom(0.1));
+        
+        this.printImageSize?.addEventListener('input', () => {
+            if (this.printSizePx) this.printSizePx.textContent = this.printImageSize.value;
+            if (this.printSizeCm) this.printSizeCm.textContent = (this.printImageSize.value / 37.8).toFixed(1);
+        });
+        
+        this.printBorderWidth?.addEventListener('input', () => {
+            if (this.printBorderWidthVal) this.printBorderWidthVal.textContent = this.printBorderWidth.value + 'px';
+        });
+
+        this.btnRenderPreview?.addEventListener('click', () => this.renderPreview());
 
         // Left Panel - List
         this.saveBtn?.addEventListener('click', () => this.saveList());
@@ -657,6 +736,11 @@ class ListBuilder {
 
     // --- API Calls ---
     async saveList() {
+        if (!this.currentUserId) {
+            alert(window.translations.accountRequired);
+            return;
+        }
+
         const listName = this.listNameInput.value;
         if (!listName) {
             alert('Please enter a name for the list.');
@@ -740,6 +824,7 @@ class ListBuilder {
             const response = await fetch('/api/lists');
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
+            this.currentUserId = data.current_user_id;
             this.publicLists = Array.isArray(data.public_lists) ? data.public_lists : [];
             this.userLists = Array.isArray(data.user_lists) ? data.user_lists : [];
         } catch (e) {
@@ -1030,42 +1115,210 @@ class ListBuilder {
         });
     }
 
-    applyPdfTheme(themeName) {
-        const setLayout = (mode, orient, size, padX, padY) => {
-            document.getElementById('pdf-layout-mode').value = mode;
-            document.querySelector(`input[name="pdf-orientation"][value="${orient}"]`).checked = true;
-            document.getElementById('pdf-image-size').value = size;
-            document.getElementById('pdf-image-size-value').textContent = size;
-            document.getElementById('pdf-padding-x').value = padX;
-            document.getElementById('pdf-padding-y').value = padY;
-        };
-        const setStyle = (bColor, bWidth, bRadius, bg, shadow) => {
-            document.getElementById('pdf-border-color').value = bColor;
-            document.getElementById('pdf-border-width').value = bWidth;
-            document.getElementById('pdf-border-radius').value = bRadius;
-            document.getElementById('pdf-bg-color').value = bg;
-            document.getElementById('pdf-show-shadow').checked = shadow;
-        };
-        const setText = (show, pos, align, font, size, color) => {
-            document.getElementById('pdf-show-text').checked = show;
-            document.getElementById('pdf-text-position').value = pos;
-            document.getElementById('pdf-font-family').value = font;
-            document.getElementById('pdf-font-size').value = size;
-            document.getElementById('pdf-text-color').value = color;
-        };
 
-        if (themeName === 'pecs') {
-            setLayout('grid', 'portrait', 120, 2, 2);
-            setStyle('#cccccc', 1, 0, '#ffffff', false);
-            setText(true, 'bottom', 'center', 'Helvetica', 10, '#000000');
-        } else if (themeName === 'strip') {
-            setLayout('strip', 'landscape', 150, 15, 10);
-            setStyle('#000000', 2, 10, '#ffffff', false);
-            setText(true, 'bottom', 'center', 'Helvetica', 12, '#000000');
-        } else if (themeName === 'flashcard') {
-            setLayout('grid', 'portrait', 400, 20, 20);
-            setStyle('#000000', 1, 15, '#f8f9fa', true);
-            setText(true, 'bottom', 'center', 'Helvetica', 24, '#000000');
+    changeZoom(delta) {
+        this.currentZoom += delta;
+        if (this.currentZoom < 0.3) this.currentZoom = 0.3;
+        if (this.currentZoom > 2.0) this.currentZoom = 2.0;
+        
+        if (this.zoomLevelText) {
+            this.zoomLevelText.textContent = Math.round(this.currentZoom * 100) + '%';
+        }
+        
+        if (this.printPagesWrapper) {
+            this.printPagesWrapper.style.transform = `scale(${this.currentZoom})`;
+        }
+    }
+
+    renderPreview() {
+        if (!this.printPagesWrapper) return;
+        this.printPagesWrapper.innerHTML = '';
+        
+        if (!this.chainedListItems || this.chainedListItems.length === 0) {
+            this.printPagesWrapper.innerHTML = '<div class="text-center p-5 text-white">No images to print.</div>';
+            return;
+        }
+
+        // 1. Read settings
+        const orientRadios = document.querySelector('input[name="print-orientation"]:checked');
+        const orientation = orientRadios ? orientRadios.value : 'portrait';
+        const imageSize = parseInt(this.printImageSize?.value || 100);
+        const borderWidth = parseInt(this.printBorderWidth?.value || 1);
+        const colorRadios = document.querySelector('input[name="print-border-color"]:checked');
+        const borderColor = colorRadios ? colorRadios.value : '#000000';
+        const showText = document.getElementById('print-show-text')?.checked ?? true;
+        const textPosition = document.getElementById('print-text-position')?.value || 'bottom';
+        const textPlacement = document.getElementById('print-text-placement')?.value || 'outside';
+        const textSizeInput = parseInt(document.getElementById('print-text-size')?.value, 10);
+        const textSize = isNaN(textSizeInput) ? 14 : textSizeInput;
+        
+        const modeRadios = document.querySelector('input[name="print-mode"]:checked');
+        const mode = modeRadios ? modeRadios.value : 'grid';
+        
+        const gridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value) || 1;
+        
+        const rawMarginX = parseInt(document.getElementById('print-margin-x')?.value, 10);
+        const marginX = isNaN(rawMarginX) ? 10 : rawMarginX;
+        
+        const rawMarginY = parseInt(document.getElementById('print-margin-y')?.value, 10);
+        const marginY = isNaN(rawMarginY) ? 10 : rawMarginY;
+
+        // 2. Prepare items
+        let itemsToRender = [];
+        if (mode === 'grid') {
+            for (const item of this.chainedListItems) {
+                for (let i = 0; i < gridMultiplier; i++) {
+                    itemsToRender.push(item);
+                }
+            }
+        } else {
+            itemsToRender = [...this.chainedListItems];
+        }
+
+        // 3. Mathematical Pagination
+        // A4 pixels at 96 DPI
+        const A4_PORTRAIT_W = 794;
+        const A4_PORTRAIT_H = 1123;
+        const pageWidth = orientation === 'portrait' ? A4_PORTRAIT_W : A4_PORTRAIT_H;
+        const pageHeight = orientation === 'portrait' ? A4_PORTRAIT_H : A4_PORTRAIT_W;
+        
+        const pagePadding = 40; // ~10mm global margin
+        const availWidth = pageWidth - 2 * pagePadding;
+        const availHeight = pageHeight - 2 * pagePadding;
+
+        // Estimate item dimensions
+        const textHeight = showText ? (textSize + 10) : 0; // ~textSize+10px for text block
+        let itemTotalW = imageSize + 2 * borderWidth;
+        let itemTotalH = imageSize + 2 * borderWidth;
+        
+        if (textPlacement === 'outside') {
+            itemTotalH += textHeight;
+        }
+        
+        if (mode === 'grid') {
+            // Little default gap for grid breathing room
+            const gap = 5;
+            itemTotalW += gap;
+            itemTotalH += gap;
+        } else {
+            // Chained list uses explicit margins
+            itemTotalW += marginX;
+            itemTotalH += marginY;
+        }
+
+        // Calculate columns and rows
+        let cols, rows;
+        if (mode === 'chain' && orientation === 'portrait') {
+            // Fill vertically first
+            rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+            cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+        } else {
+            // Fill horizontally first
+            cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+            rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+        }
+        const itemsPerPage = Math.max(1, cols * rows); // at least 1 item per page
+
+        // 4. Generate DOM
+        for (let i = 0; i < itemsToRender.length; i += itemsPerPage) {
+            const chunk = itemsToRender.slice(i, i + itemsPerPage);
+            
+            const pageDiv = document.createElement('div');
+            pageDiv.className = `a4-page ${orientation}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'page-content';
+            contentDiv.style.padding = `${pagePadding}px`;
+            contentDiv.style.display = 'flex';
+            contentDiv.style.flexWrap = 'wrap';
+            contentDiv.style.alignContent = 'flex-start';
+            
+            if (mode === 'grid') {
+                contentDiv.style.gap = '5px';
+            } else {
+                contentDiv.style.columnGap = `${marginX}px`;
+                contentDiv.style.rowGap = `${marginY}px`;
+                if (orientation === 'portrait') {
+                    contentDiv.style.flexDirection = 'column';
+                }
+            }
+
+            chunk.forEach(item => {
+                const itemContainer = document.createElement('div');
+                itemContainer.style.display = 'flex';
+                itemContainer.style.flexDirection = 'column';
+                itemContainer.style.alignItems = 'center';
+                itemContainer.style.width = `${imageSize + 2*borderWidth}px`;
+                
+                const imgContainer = document.createElement('div');
+                imgContainer.style.border = `${borderWidth}px solid ${borderColor}`;
+                imgContainer.style.width = `${imageSize + 2*borderWidth}px`;
+                imgContainer.style.height = `${imageSize + 2*borderWidth}px`;
+                imgContainer.style.display = 'flex';
+                imgContainer.style.justifyContent = 'center';
+                imgContainer.style.alignItems = 'center';
+                imgContainer.style.backgroundColor = 'white';
+                imgContainer.style.overflow = 'hidden';
+                imgContainer.style.position = 'relative';
+
+                const img = document.createElement('img');
+                img.src = item.data.path.startsWith('http') || item.data.path.startsWith('/') || item.data.path.startsWith('data:')
+                            ? item.data.path 
+                            : `/pictograms/${item.data.path}`;
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '100%';
+                img.style.objectFit = 'contain';
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = item.data.description || item.data.name || '';
+                textSpan.style.fontSize = `${textSize}px`;
+                textSpan.style.fontFamily = 'sans-serif';
+                textSpan.style.textAlign = 'center';
+                textSpan.style.width = '100%';
+                textSpan.style.whiteSpace = 'nowrap';
+                textSpan.style.overflow = 'hidden';
+                textSpan.style.textOverflow = 'ellipsis';
+                textSpan.style.display = 'block';
+                textSpan.style.height = `${textSize + 10}px`;
+                textSpan.style.lineHeight = `${textSize + 6}px`;
+                textSpan.style.padding = '2px';
+
+                if (textPlacement === 'inside') {
+                    // Place text inside the image container, over the image
+                    textSpan.style.position = 'absolute';
+                    textSpan.style.left = '0';
+                    textSpan.style.right = '0';
+                    textSpan.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                    
+                    if (textPosition === 'top') {
+                        textSpan.style.top = '0';
+                    } else {
+                        textSpan.style.bottom = '0';
+                    }
+                    
+                    imgContainer.appendChild(img);
+                    if (showText) imgContainer.appendChild(textSpan);
+                    itemContainer.appendChild(imgContainer);
+                } else {
+                    // Place text outside
+                    imgContainer.appendChild(img);
+                    
+                    if (showText && textPosition === 'top') {
+                        itemContainer.appendChild(textSpan);
+                    }
+                    
+                    itemContainer.appendChild(imgContainer);
+                    
+                    if (showText && textPosition === 'bottom') {
+                        itemContainer.appendChild(textSpan);
+                    }
+                }
+
+                contentDiv.appendChild(itemContainer);
+            });
+            
+            pageDiv.appendChild(contentDiv);
+            this.printPagesWrapper.appendChild(pageDiv);
         }
     }
 
@@ -1082,45 +1335,84 @@ class ListBuilder {
         try {
             const { jsPDF } = window.jspdf;
 
-            // Extract options
-            const layoutMode = document.getElementById('pdf-layout-mode').value;
-            const orientation = document.querySelector('input[name="pdf-orientation"]:checked').value;
-            const imageSize = parseInt(document.getElementById('pdf-image-size').value, 10);
-            const paddingX = parseInt(document.getElementById('pdf-padding-x').value, 10);
-            const paddingY = parseInt(document.getElementById('pdf-padding-y').value, 10);
+            // 1. Read settings exactly as in renderPreview
+            const orientRadios = document.querySelector('input[name="print-orientation"]:checked');
+            const orientation = orientRadios ? orientRadios.value : 'portrait';
+            const imageSize = parseInt(this.printImageSize?.value || 100);
+            const borderWidth = parseInt(this.printBorderWidth?.value || 1);
+            const colorRadios = document.querySelector('input[name="print-border-color"]:checked');
+            const borderColor = colorRadios ? colorRadios.value : '#000000';
+            const showText = document.getElementById('print-show-text')?.checked ?? true;
+            const textPosition = document.getElementById('print-text-position')?.value || 'bottom';
+            const textPlacement = document.getElementById('print-text-placement')?.value || 'outside';
+            const textSizeInput = parseInt(document.getElementById('print-text-size')?.value, 10);
+            const textSize = isNaN(textSizeInput) ? 14 : textSizeInput;
+            
+            const modeRadios = document.querySelector('input[name="print-mode"]:checked');
+            const mode = modeRadios ? modeRadios.value : 'grid';
+            
+            const gridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value) || 1;
+            const rawMarginX = parseInt(document.getElementById('print-margin-x')?.value, 10);
+            const marginX = isNaN(rawMarginX) ? 10 : rawMarginX;
+            const rawMarginY = parseInt(document.getElementById('print-margin-y')?.value, 10);
+            const marginY = isNaN(rawMarginY) ? 10 : rawMarginY;
 
-            const borderColor = document.getElementById('pdf-border-color').value;
-            const borderWidth = parseInt(document.getElementById('pdf-border-width').value, 10);
-            const borderRadius = parseInt(document.getElementById('pdf-border-radius').value, 10);
-            const bgColor = document.getElementById('pdf-bg-color').value;
-            const showShadow = document.getElementById('pdf-show-shadow').checked;
-
-            const showText = document.getElementById('pdf-show-text').checked;
-            const textPosition = document.getElementById('pdf-text-position').value;
-            const fontFamily = document.getElementById('pdf-font-family').value;
-            const fontSize = parseInt(document.getElementById('pdf-font-size').value, 10);
-            const textColor = document.getElementById('pdf-text-color').value;
-
-            // Initialize document
+            // 2. Initialize document matching A4 px exactly (96 DPI equivalent layout)
             const doc = new jsPDF({
                 orientation: orientation,
-                unit: 'pt',
-                format: 'a4'
+                unit: 'px',
+                format: [794, 1123]
             });
 
-            const margin = 50;
-            const itemSpacing = 10;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
+            // 3. Prepare items
+            let itemsToRender = [];
+            if (mode === 'grid') {
+                for (const item of this.chainedListItems) {
+                    for (let i = 0; i < gridMultiplier; i++) {
+                        itemsToRender.push(item);
+                    }
+                }
+            } else {
+                itemsToRender = [...this.chainedListItems];
+            }
 
-            const textAllowance = showText ? (fontSize + 5) : 0;
-            const boxWidth = imageSize + (paddingX * 2);
-            const boxHeight = imageSize + (paddingY * 2) + textAllowance;
+            // 4. Mathematical Pagination
+            const A4_PORTRAIT_W = 794;
+            const A4_PORTRAIT_H = 1123;
+            const pageWidth = orientation === 'portrait' ? A4_PORTRAIT_W : A4_PORTRAIT_H;
+            const pageHeight = orientation === 'portrait' ? A4_PORTRAIT_H : A4_PORTRAIT_W;
+            
+            const pagePadding = 40;
+            const availWidth = pageWidth - 2 * pagePadding;
+            const availHeight = pageHeight - 2 * pagePadding;
 
-            let cursorX = margin;
-            let cursorY = margin; // Note: jsPDF runs top-down unlike reportlab
+            const textHeight = showText ? (textSize + 10) : 0;
+            let itemTotalW = imageSize + 2 * borderWidth;
+            let itemTotalH = imageSize + 2 * borderWidth;
+            
+            if (textPlacement === 'outside') {
+                itemTotalH += textHeight;
+            }
+            
+            if (mode === 'grid') {
+                const gap = 5;
+                itemTotalW += gap;
+                itemTotalH += gap;
+            } else {
+                itemTotalW += marginX;
+                itemTotalH += marginY;
+            }
 
-            // Helper to elegantly load images respecting CORS and relative path resolution
+            let cols, rows;
+            if (mode === 'chain' && orientation === 'portrait') {
+                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+            } else {
+                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+            }
+            const itemsPerPage = Math.max(1, cols * rows);
+
             const loadImage = (src) => {
                 return new Promise((resolve) => {
                     const img = new Image();
@@ -1129,114 +1421,112 @@ class ListBuilder {
                     img.onerror = () => resolve(null);
 
                     let fullSrc = src;
-                    if (!src.startsWith('http') && !src.startsWith('/')) {
+                    if (src.startsWith('data:')) {
+                        // Keep data URI
+                    } else if (!src.startsWith('http') && !src.startsWith('/')) {
                         fullSrc = '/pictograms/' + src;
                     }
                     img.src = fullSrc;
                 });
             };
 
-            for (const item of this.chainedListItems) {
-                const imgElement = await loadImage(item.data.path);
-                if (!imgElement) continue;
+            let currentPage = 1;
+            for (let i = 0; i < itemsToRender.length; i++) {
+                const pageIndex = Math.floor(i / itemsPerPage);
+                if (pageIndex + 1 > currentPage) {
+                    doc.addPage();
+                    currentPage++;
+                }
 
-                // Pagination & Row wrapping
-                if (layoutMode === 'chain') {
-                    if (cursorY + boxHeight > pageHeight - margin) {
-                        doc.addPage();
-                        cursorY = margin;
-                    }
-                    cursorX = (pageWidth - boxWidth) / 2; // Fixed centering
-                } else if (layoutMode === 'strip') {
-                    if (item === this.chainedListItems[0]) cursorY = (pageHeight - boxHeight) / 2;
-                    if (cursorX + boxWidth > pageWidth - margin) {
-                        doc.addPage();
-                        cursorX = margin;
-                    }
+                const indexOnPage = i % itemsPerPage;
+                let col, row;
+                if (mode === 'chain' && orientation === 'portrait') {
+                    col = Math.floor(indexOnPage / rows);
+                    row = indexOnPage % rows;
                 } else {
-                    if (cursorX + boxWidth > pageWidth - margin) {
-                        cursorX = margin;
-                        cursorY += boxHeight + itemSpacing;
-                    }
-                    if (cursorY + boxHeight > pageHeight - margin) {
-                        doc.addPage();
-                        cursorX = margin;
-                        cursorY = margin;
-                    }
+                    row = Math.floor(indexOnPage / cols);
+                    col = indexOnPage % cols;
                 }
 
-                // 1. Draw Shadow
-                if (showShadow) {
-                    doc.setFillColor('#cccccc');
-                    doc.roundedRect(cursorX + 3, cursorY + 3, boxWidth, boxHeight, borderRadius, borderRadius, 'F');
-                }
+                const x = pagePadding + col * itemTotalW;
+                const y = pagePadding + row * itemTotalH;
 
-                // 2. Draw Background and Border
-                doc.setFillColor(bgColor);
-                let rectStyle = 'F';
+                const item = itemsToRender[i];
+                const imgElement = await loadImage(item.data.path);
+
+                let imgBoxX = x;
+                let imgBoxY = y;
+                if (showText && textPlacement === 'outside' && textPosition === 'top') {
+                    imgBoxY += textHeight;
+                }
+                
+                // Draw Border / Background
                 if (borderWidth > 0) {
                     doc.setDrawColor(borderColor);
                     doc.setLineWidth(borderWidth);
-                    rectStyle = 'FD'; // Fill and stroke
+                    doc.setFillColor('#ffffff');
+                    doc.rect(imgBoxX, imgBoxY, imageSize + 2 * borderWidth, imageSize + 2 * borderWidth, 'FD');
+                } else {
+                    doc.setFillColor('#ffffff');
+                    doc.rect(imgBoxX, imgBoxY, imageSize, imageSize, 'F');
                 }
-                doc.roundedRect(cursorX, cursorY, boxWidth, boxHeight, borderRadius, borderRadius, rectStyle);
 
-                // 3. Draw Image
-                const imgAreaWidth = boxWidth - (paddingX * 2);
-                const imgAreaHeight = boxHeight - (paddingY * 2) - textAllowance;
-
-                if (imgAreaWidth > 0 && imgAreaHeight > 0) {
+                // Draw Image
+                if (imgElement) {
+                    const innerSize = imageSize;
                     const iw = imgElement.naturalWidth || imgElement.width || 1;
                     const ih = imgElement.naturalHeight || imgElement.height || 1;
-                    const scale = Math.min(imgAreaWidth / iw, imgAreaHeight / ih);
+                    const scale = Math.min(innerSize / iw, innerSize / ih);
                     const w = iw * scale;
                     const h = ih * scale;
-
-                    const ix = cursorX + paddingX + (imgAreaWidth - w) / 2;
-                    let iy = cursorY + paddingY;
-                    if (showText && textPosition === 'top') {
-                        iy += textAllowance;
-                    }
-
-                    // Always try 'PNG' or 'JPEG' fallback is done by jsPDF
+                    
+                    const ix = imgBoxX + borderWidth + (innerSize - w) / 2;
+                    const iy = imgBoxY + borderWidth + (innerSize - h) / 2;
+                    
                     doc.addImage(imgElement, 'PNG', ix, iy, w, h);
                 }
 
-                // 4. Draw Text
-                if (showText && item.data.description) {
-                    doc.setFont(fontFamily);
-                    doc.setFontSize(fontSize);
-                    doc.setTextColor(textColor);
-
-                    const tx = cursorX + boxWidth / 2;
-                    let ty = cursorY + paddingY;
-                    if (textPosition === 'top') {
-                        ty += fontSize;
+                // Draw Text
+                if (showText) {
+                    const textStr = item.data.description || item.data.name || '';
+                    doc.setFontSize(textSize);
+                    doc.setTextColor('#000000');
+                    
+                    if (textPlacement === 'inside') {
+                        doc.setFillColor('#ffffff'); // Solid white background for text readability
+                        const rectHeight = textSize + 6;
+                        const rectY = textPosition === 'top' ? imgBoxY : imgBoxY + imageSize + 2 * borderWidth - rectHeight;
+                        doc.rect(imgBoxX + borderWidth, rectY + borderWidth, imageSize, rectHeight, 'F');
+                        
+                        const textX = imgBoxX + borderWidth + imageSize / 2;
+                        const textY = textPosition === 'top' ? imgBoxY + borderWidth + textSize : imgBoxY + imageSize + 2 * borderWidth - 4;
+                        const splitTextInside = doc.splitTextToSize(textStr, imageSize);
+                        doc.text(splitTextInside[0], textX, textY, { align: 'center' });
                     } else {
-                        ty = cursorY + boxHeight - paddingY - 2;
+                        const textX = imgBoxX + (imageSize + 2 * borderWidth) / 2;
+                        let textY;
+                        if (textPosition === 'top') {
+                            textY = y + textSize + 4;
+                        } else {
+                            textY = imgBoxY + imageSize + 2 * borderWidth + textSize + 4;
+                        }
+                        const splitTextOutside = doc.splitTextToSize(textStr, imageSize + 2 * borderWidth);
+                        doc.text(splitTextOutside[0], textX, textY, { align: 'center' });
                     }
-                    doc.text(item.data.description, tx, ty, { align: 'center' });
-                }
-
-                // Advance cursor for next item
-                if (layoutMode === 'chain') {
-                    cursorY += boxHeight + itemSpacing;
-                } else {
-                    cursorX += boxWidth + itemSpacing;
                 }
             }
 
-            // Save straight to browser avoiding the backend
-            doc.save('pictogram_list.pdf');
+            doc.save('pictograms-list.pdf');
 
         } catch (error) {
-            console.error('Error exporting to PDF:', error);
-            alert(`An error occurred: ${error.message}`);
+            console.error(error);
+            alert('An error occurred during PDF generation.');
         } finally {
             this.exportPdfBtn.innerHTML = originalBtnText;
             this.exportPdfBtn.disabled = false;
         }
     }
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
+from flask_babel import _ as _tr
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from app.models import User, Tree, Profile, ProfileTree
+from app.models import User, Tree, Image, Profile, ProfileTree
 from app import db 
+from sqlalchemy import or_
 import json
 from pathlib import Path
 import posixpath
@@ -86,6 +88,44 @@ def list_trees():
     return jsonify(result), 200
 
 
+@bp.route('/pictosearch', methods=['GET'])
+@jwt_required()
+def search_pictograms():
+    """Recherche de pictogrammes (images) sur le nom ET la description.
+    Route renommée de /pictograms/search vers /pictosearch pour éviter le conflit de routage (403)."""
+    current_user_id = int(get_jwt_identity())
+    q = request.args.get('q', '').strip()
+    
+    if not q:
+        return jsonify([]), 200
+        
+    search_pattern = f"%{q}%"
+    
+    conditions = or_(
+        Image.is_public,
+        Image.user_id == current_user_id
+    )
+    
+    images = Image.query.filter(conditions).filter(
+        or_(
+            Image.name.ilike(search_pattern),
+            Image.description.ilike(search_pattern)
+        )
+    ).limit(50).all()
+    
+    host_url = request.host_url
+    results = []
+    for img in images:
+        results.append({
+            'id': img.id,
+            'name': img.name,
+            'image_url': _get_full_url(img.path, host_url),
+            'thumbnail_url': _get_thumb_url(img.path, host_url)
+        })
+        
+    return jsonify(results), 200
+
+
 @bp.route('/profiles', methods=['GET'])
 @jwt_required()
 def list_profiles():
@@ -97,7 +137,6 @@ def list_profiles():
     host_url = request.host_url
     for p in profiles:
         p_dict = p.to_dict()
-        # Normalisation intelligente de l'avatar
         p_dict['remote_avatar_url'] = _get_full_url(p.remote_avatar_url, host_url)
         result.append(p_dict)
         
@@ -112,7 +151,7 @@ def get_profile_details(profile_id):
     profile = Profile.query.filter_by(id=profile_id, user_id=current_user_id).first()
     
     if not profile:
-        return jsonify({"error": "Profil introuvable"}), 404
+        return jsonify({"error":_tr("Profile not found")}), 404
         
     tree_refs = ProfileTree.query.filter_by(profile_id=profile_id).order_by(ProfileTree.display_order).all()
     
@@ -139,7 +178,7 @@ def get_tree(tree_id):
     tree = db.session.get(Tree, tree_id)
     
     if not tree or tree.user_id != current_user_id:
-        return jsonify({'error': 'Accès refusé ou introuvable'}), 403
+        return jsonify({'error':_tr("Access denied or not found")}), 403
         
     try:
         raw_json_data = json.loads(tree.json_data)
@@ -173,11 +212,13 @@ def serve_mobile_pictogram(filepath):
     else:
         current_user_id = get_jwt_identity()
         if not current_user_id:
-            return jsonify({'error': 'Auth required'}), 401
+            return jsonify({'error':_tr('Auth required')}), 401
+        
         current_user = db.session.get(User, int(current_user_id))
-        if current_user and filepath.startswith(f"{current_user.username}/"):
+        if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_path, filepath)
-        return jsonify({"error": "Forbidden"}), 403
+            
+        return jsonify({"error":_tr("Forbidden")}), 403
 
 
 @bp.route('/pictogramsmin/<path:filepath>', methods=['GET'])
@@ -186,7 +227,7 @@ def serve_mobile_pictogram_min(filepath):
     """Distribution des miniatures."""
     import os
     filepath = posixpath.normpath(filepath)
-    thumb_filename, _ = os.path.splitext(filepath)
+    thumb_filename,_= os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
     
     pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
@@ -196,33 +237,28 @@ def serve_mobile_pictogram_min(filepath):
     else:
         current_user_id = get_jwt_identity()
         if not current_user_id:
-            return jsonify({'error': 'Auth required'}), 401
+            return jsonify({'error':_tr('Auth required')}), 401
+            
         current_user = db.session.get(User, int(current_user_id))
-        if current_user and filepath.startswith(f"{current_user.username}/"):
+        if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_min_path, thumb_path_relative)
-        return jsonify({"error": "Forbidden"}), 403
+            
+        return jsonify({"error":_tr("Forbidden")}), 403
 
 
 def _get_full_url(raw_path, host_url):
-    """Normalisateur AGILE : Détecte le bon endpoint (min ou full) et nettoie les doublons."""
     if not raw_path:
         return ""
     if raw_path.startswith(('http://', 'https://')):
         return raw_path
-    
-    # Détection : Est-ce une miniature ?
     is_min = "pictogramsmin" in raw_path
-    
-    # Nettoyage des préfixes existants pour éviter pictograms/pictogramsmin/...
     norm_path = re.sub(r'^/+', '', raw_path)
     norm_path = re.sub(r'^(pictograms/|images/|pictogramsmin/)', '', norm_path)
-    
     endpoint = "pictogramsmin" if is_min else "pictograms"
     return f"{host_url.rstrip('/')}/api/v1/mobile/{endpoint}/{norm_path}"
 
 
 def _get_thumb_url(raw_path, host_url):
-    """Alias pour forcer le format miniature."""
     if not raw_path:
         return ""
     if raw_path.startswith(('http://', 'https://')):
@@ -234,8 +270,7 @@ def _get_thumb_url(raw_path, host_url):
 
 def _map_node_to_android_structure(web_node, host_url, current_username):
     image_url = web_node.get('image') or web_node.get('url') or ''
-    web_label = web_node.get('text') or web_node.get('name') or ''
-    description = web_node.get('description') or web_label
+    description = web_node.get('description') or web_node.get('text') or web_node.get('name') or ''
     
     full_url = _get_full_url(image_url, host_url)
     
