@@ -2064,8 +2064,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const collapseManageTrees = document.getElementById('collapseManageTrees');
     const collapseManageProfiles = document.getElementById('collapseManageProfiles');
+    const collapseManageResources = document.getElementById('collapseManageResources');
     const treeBuilderTabEl = document.getElementById('tree-builder-tab');
     const profileBuilderTabEl = document.getElementById('profile-builder-tab');
+    const myResourcesTabEl = document.getElementById('my-resources-tab');
 
     if (collapseManageTrees && collapseManageProfiles && treeBuilderTabEl && profileBuilderTabEl) {
         
@@ -2087,6 +2089,17 @@ document.addEventListener('DOMContentLoaded', () => {
             isSyncing = false;
         });
 
+        // When 'Manage Resources' accordion opens, switch to 'My Resources' tab
+        if (collapseManageResources && myResourcesTabEl) {
+            collapseManageResources.addEventListener('show.bs.collapse', () => {
+                if (isSyncing) return;
+                isSyncing = true;
+                const tab = new bootstrap.Tab(myResourcesTabEl);
+                tab.show();
+                isSyncing = false;
+            });
+        }
+
         // When 'Tree Builder' tab is shown, open 'Manage Trees' accordion
         treeBuilderTabEl.addEventListener('show.bs.tab', () => {
             if (isSyncing) return;
@@ -2094,6 +2107,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
             const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
             bsCollapseProfiles.hide();
+            if (collapseManageResources) {
+                const bsCollapseResources = new bootstrap.Collapse(collapseManageResources, { toggle: false });
+                bsCollapseResources.hide();
+            }
             bsCollapseTrees.show();
             isSyncing = false;
         });
@@ -2105,8 +2122,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
             const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
             bsCollapseTrees.hide();
+            if (collapseManageResources) {
+                const bsCollapseResources = new bootstrap.Collapse(collapseManageResources, { toggle: false });
+                bsCollapseResources.hide();
+            }
             bsCollapseProfiles.show();
             isSyncing = false;
         });
+
+        // When 'My Resources' tab is shown, open 'Manage Resources' accordion
+        if (myResourcesTabEl && collapseManageResources) {
+            myResourcesTabEl.addEventListener('show.bs.tab', () => {
+                if (isSyncing) return;
+                isSyncing = true;
+                const bsCollapseTrees = new bootstrap.Collapse(collapseManageTrees, { toggle: false });
+                const bsCollapseProfiles = new bootstrap.Collapse(collapseManageProfiles, { toggle: false });
+                const bsCollapseResources = new bootstrap.Collapse(collapseManageResources, { toggle: false });
+                bsCollapseTrees.hide();
+                bsCollapseProfiles.hide();
+                bsCollapseResources.show();
+                isSyncing = false;
+            });
+        }
     }
 });

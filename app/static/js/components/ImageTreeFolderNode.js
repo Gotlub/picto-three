@@ -27,6 +27,16 @@ export default class ImageTreeFolderNode extends ImageTreeNode {
         nameElement.textContent = this.data.name;
         contentElement.appendChild(nameElement);
 
+        // Add refresh button next to folder name
+        const refreshBtn = document.createElement('i');
+        refreshBtn.classList.add('bi', 'bi-arrow-clockwise', 'refresh-btn', 'ms-2');
+        refreshBtn.setAttribute('title', 'Refresh folder');
+        refreshBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            await this.refresh();
+        });
+        contentElement.appendChild(refreshBtn);
+
         nodeElement.appendChild(contentElement);
 
         this.childrenContainer = document.createElement('div');
@@ -44,59 +54,125 @@ export default class ImageTreeFolderNode extends ImageTreeNode {
         return nodeElement;
     }
 
+    async expand() {
+        this.expanded = true;
+        this.icon.src = '/static/images/folder-open-bold.png';
+        this.childrenContainer.style.display = '';
+    }
 
     async toggle() {
-        this.expanded = !this.expanded;
         if (this.expanded) {
-            this.icon.src = '/static/images/folder-open-bold.png';
-            this.childrenContainer.style.display = '';
+            this.expanded = false;
+            this.icon.src = '/static/images/folder-bold.png';
+            this.childrenContainer.style.display = 'none';
+        } else {
+            await this.expand();
 
             // Lazy load images on first expand
             if (!this.imagesLoaded) {
-                const loadingInfo = document.createElement('div');
-                loadingInfo.classList.add('image-tree-node', 'info');
-                loadingInfo.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-                this.childrenContainer.appendChild(loadingInfo);
-
-                this.imagesLoaded = true;
-                try {
-                    const response = await fetch('/api/folder_images/' + this.data.id);
-                    if (response.ok) {
-                        const imagesData = await response.json();
-                        loadingInfo.remove();
-
-                        imagesData.forEach(childData => {
-                            if (childData.type === 'image') {
-                                const childNode = new this.nodeTypes.IMAGE(childData.data, this.imageTree);
-                                childNode.parent = this;
-                                this.children.push(childNode);
-                                this.childrenContainer.appendChild(childNode.element);
-                            }
-                        });
-
-                        if (this.children.length === 0) {
-                            const noItems = document.createElement('div');
-                            noItems.classList.add('image-tree-node', 'info');
-                            noItems.textContent = 'Empty folder';
-                            this.childrenContainer.appendChild(noItems);
-                        }
+                await this.refresh();
+            } else {
+                // Load images that are visible
+                this.children.forEach(child => {
+                    if (child instanceof this.nodeTypes.IMAGE) {
+                        child.load();
                     }
-                } catch (e) {
-                    console.error("Failed to lazy load images:", e);
-                    loadingInfo.remove();
-                    this.imagesLoaded = false; // allow retry
+                });
+            }
+        }
+    }
+
+    async refresh() {
+        if (this.refreshing) return;
+        this.refreshing = true;
+
+        const refreshBtn = this.element.querySelector('.refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.classList.add('spin');
+        }
+
+        let loadingInfo = null;
+        if (this.children.length === 0) {
+            loadingInfo = document.createElement('div');
+            loadingInfo.classList.add('image-tree-node', 'info');
+            loadingInfo.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            this.childrenContainer.appendChild(loadingInfo);
+        }
+
+        try {
+            // Keep track of which subfolders were expanded so we can recursively restore and refresh them
+            const expandedFolderIds = new Set(
+                this.children
+                    .filter(child => child instanceof this.nodeTypes.FOLDER && child.expanded)
+                    .map(child => child.data.id)
+            );
+
+            const response = await fetch(`/api/folder/contents?parent_id=${this.data.id}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch contents for folder ${this.data.id}`);
+            }
+
+            const items = await response.json();
+
+            if (loadingInfo) {
+                loadingInfo.remove();
+                loadingInfo = null;
+            }
+
+            this.childrenContainer.replaceChildren();
+            this.children = [];
+
+            for (const item of items) {
+                let childNode;
+                if (item.type === 'folder') {
+                    childNode = new this.nodeTypes.FOLDER(item, this.imageTree, [], this.nodeTypes);
+                } else if (item.type === 'image') {
+                    childNode = new this.nodeTypes.IMAGE(item, this.imageTree);
+                }
+
+                if (childNode) {
+                    childNode.parent = this;
+                    this.children.push(childNode);
+                    this.childrenContainer.appendChild(childNode.element);
                 }
             }
 
-            // Lazy load images
-            this.children.forEach(child => {
-                if (child instanceof this.nodeTypes.IMAGE) {
-                    child.load();
+            this.imagesLoaded = true;
+
+            if (this.children.length === 0) {
+                const noItems = document.createElement('div');
+                noItems.classList.add('image-tree-node', 'info');
+                noItems.textContent = 'Empty folder';
+                this.childrenContainer.appendChild(noItems);
+            } else {
+                this.children.forEach(child => {
+                    if (child instanceof this.nodeTypes.IMAGE) {
+                        child.load();
+                    }
+                });
+            }
+
+            // Recursively refresh child folders that were expanded
+            for (const childNode of this.children) {
+                if (childNode instanceof this.nodeTypes.FOLDER && expandedFolderIds.has(childNode.data.id)) {
+                    await childNode.expand();
+                    await childNode.refresh();
                 }
-            });
-        } else {
-            this.icon.src = '/static/images/folder-bold.png';
-            this.childrenContainer.style.display = 'none';
+            }
+
+        } catch (e) {
+            console.error("Failed to refresh folder:", e);
+            if (loadingInfo) {
+                loadingInfo.remove();
+            }
+            if (this.children.length === 0) {
+                this.imagesLoaded = false; // allow retry
+            }
+        } finally {
+            this.refreshing = false;
+            if (refreshBtn) {
+                refreshBtn.classList.remove('spin');
+            }
         }
     }
 

@@ -368,12 +368,18 @@ def upload_image():
 
         file.save(physical_path)
 
+        # Get description from form, fall back to name without extension
+        description = request.form.get('description', '').strip()
+        if not description:
+            description = Path(filename).stem
+
         new_image = Image(
             name=filename,
             path=str(relative_path).replace('\\', '/'),
             user_id=current_user.id,
             folder_id=folder.id,
-            description="" # Or get from form
+            description=description,
+            is_public=False
         )
         db.session.add(new_image)
         db.session.commit()
@@ -412,8 +418,8 @@ def update_image_details(image_id):
     if 'description' in data:
         image.description = data['description']
 
-    if 'is_public' in data:
-        image.is_public = bool(data['is_public'])
+    # is_public is forced to False for security - no public user images
+    image.is_public = False
 
     db.session.commit()
 
