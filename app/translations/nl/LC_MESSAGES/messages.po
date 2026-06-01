@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-18 17:31+0200\n"
+"POT-Creation-Date: 2026-05-30 02:18+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: nl\n"
@@ -18,124 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/forms.py:16
-#, fuzzy
-msgid "be at least 9 characters long"
-msgstr ""
-
-#: app/forms.py:18
-msgid "contain at least one uppercase letter"
-msgstr ""
-
-#: app/forms.py:20
-msgid "contain at least one digit"
-msgstr ""
-
-#: app/forms.py:23
-msgid "Password must"
-msgstr ""
-
-#: app/forms.py:27 app/forms.py:33 app/forms.py:60
-#, fuzzy
-msgid "Username"
-msgstr "Uw gebruikersnaam"
-
-#: app/forms.py:28 app/forms.py:35 app/forms.py:68
-#, fuzzy
-msgid "Password"
-msgstr "Wachtwoord opnieuw instellen"
-
-#: app/forms.py:29
-msgid "Remember Me"
-msgstr ""
-
-#: app/forms.py:30 app/templates/login.html:32 app/templates/register.html:84
-msgid "Sign In"
-msgstr "Inloggen"
-
-#: app/forms.py:34 app/forms.py:64 app/forms.py:74 app/forms.py:79
-#, fuzzy
-msgid "Email"
-msgstr "Uw gebruikersnaam"
-
-#: app/forms.py:37 app/forms.py:70
-#, fuzzy
-msgid "Repeat Password"
-msgstr "Wachtwoord opnieuw instellen"
-
-#: app/forms.py:38
-#, fuzzy
-msgid "I accept the Terms & Privacy Policy"
-msgstr "Gebruiksvoorwaarden en het Privacybeleid"
-
-#: app/forms.py:38
-msgid "You must accept the terms and privacy policy to continue."
-msgstr ""
-
-#: app/forms.py:40 app/templates/register.html:33
-msgid "Register"
-msgstr "Registreren"
-
-#: app/forms.py:45
-msgid "Please use a different username."
-msgstr ""
-
-#: app/forms.py:50
-msgid "Please use a different email address."
-msgstr ""
-
-#: app/forms.py:53
-#, fuzzy
-msgid "Current Password"
-msgstr "Wachtwoord opnieuw instellen"
-
-#: app/forms.py:54
-#, fuzzy
-msgid "New Password"
-msgstr "Wachtwoord wijzigen"
-
-#: app/forms.py:56
-#, fuzzy
-msgid "Repeat New Password"
-msgstr "Wachtwoord opnieuw instellen"
-
-#: app/forms.py:57 app/templates/account.html:10
-msgid "Change Password"
-msgstr "Wachtwoord wijzigen"
-
-#: app/forms.py:61 app/templates/account.html:60
-msgid "Delete My Account"
-msgstr "Mijn account verwijderen"
-
-#: app/forms.py:65
-#, fuzzy
-msgid "Request Password Reset"
-msgstr "Wachtwoord opnieuw instellen"
-
-#: app/forms.py:71 app/templates/forgot_password.html:5
-msgid "Reset Password"
-msgstr "Wachtwoord opnieuw instellen"
-
-#: app/forms.py:75 app/templates/resend_confirmation_request.html:5
-msgid "Resend Confirmation Email"
-msgstr "Bevestigingsmail opnieuw verzenden"
-
-#: app/forms.py:78
-#, fuzzy
-msgid "Name"
-msgstr "Uw gebruikersnaam"
-
-#: app/forms.py:80
-#, fuzzy
-msgid "Message"
-msgstr "Afbeeldingen"
-
-#: app/forms.py:82
-msgid "Send"
-msgstr ""
-
 #: app/routes/api.py:58 app/routes/api.py:110 app/routes/api.py:268
-#: app/routes/api.py:442 app/routes/api.py:535 app/routes/api.py:639
+#: app/routes/api.py:448 app/routes/api.py:541 app/routes/api.py:645
 msgid "Invalid data"
 msgstr "Ongeldige gegevens"
 
@@ -156,7 +40,7 @@ msgid "List not found"
 msgstr "Lijst niet gevonden"
 
 #: app/routes/api.py:106 app/routes/api.py:133 app/routes/api.py:153
-#: app/routes/api.py:492 app/routes/api.py:588
+#: app/routes/api.py:498 app/routes/api.py:594
 msgid "Unauthorized"
 msgstr "Ongeautoriseerd"
 
@@ -201,7 +85,7 @@ msgstr "Geen bestand geselecteerd"
 msgid "No folder_id specified"
 msgstr "Geen folder_id opgegeven"
 
-#: app/routes/api.py:344 app/routes/api.py:647
+#: app/routes/api.py:344 app/routes/api.py:653
 msgid "Folder not found or not owned by user"
 msgstr "Map niet gevonden of geen eigendom van gebruiker"
 
@@ -213,94 +97,94 @@ msgstr ""
 msgid "Fichier image invalide ou potentiellement malveillant."
 msgstr ""
 
-#: app/routes/api.py:390
+#: app/routes/api.py:396
 msgid "File upload failed"
 msgstr "Bestandsupload mislukt"
 
-#: app/routes/api.py:401
+#: app/routes/api.py:407
 msgid "Image not found"
 msgstr "Afbeelding niet gevonden"
 
-#: app/routes/api.py:405
+#: app/routes/api.py:411
 msgid "Unauthorized to edit this image"
 msgstr "Ongeautoriseerd om deze afbeelding te bewerken"
 
-#: app/routes/api.py:409
+#: app/routes/api.py:415
 msgid "Invalid JSON data"
 msgstr "Ongeldige JSON-gegevens"
 
-#: app/routes/api.py:422
+#: app/routes/api.py:428
 msgid "Image updated successfully"
 msgstr "Afbeelding succesvol bijgewerkt"
 
-#: app/routes/api.py:451
+#: app/routes/api.py:457
 msgid "Missing required fields"
 msgstr "Ontbrekende verplichte velden"
 
-#: app/routes/api.py:462
+#: app/routes/api.py:468
 msgid "Tree updated successfully"
 msgstr "Boom succesvol bijgewerkt"
 
-#: app/routes/api.py:474
+#: app/routes/api.py:480
 msgid "Tree saved successfully"
 msgstr "Boom succesvol opgeslagen"
 
-#: app/routes/api.py:490
+#: app/routes/api.py:496
 #, fuzzy
 msgid "Tree not found"
 msgstr "Lijst niet gevonden"
 
-#: app/routes/api.py:497
+#: app/routes/api.py:503
 #, fuzzy
 msgid "Tree deleted successfully"
 msgstr "Boom succesvol bijgewerkt"
 
-#: app/routes/api.py:542
+#: app/routes/api.py:548
 msgid "Missing profile name"
 msgstr ""
 
-#: app/routes/api.py:550
+#: app/routes/api.py:556
 #, fuzzy
 msgid "Profile updated successfully"
 msgstr "Boom succesvol bijgewerkt"
 
-#: app/routes/api.py:556
+#: app/routes/api.py:562
 #, fuzzy
 msgid "Profile saved successfully"
 msgstr "Boom succesvol opgeslagen"
 
-#: app/routes/api.py:586 app/routes/mobile_api.py:154
+#: app/routes/api.py:592
 #, fuzzy
 msgid "Profile not found"
 msgstr "Hoofdmap niet gevonden"
 
-#: app/routes/api.py:593
+#: app/routes/api.py:599
 #, fuzzy
 msgid "Profile deleted successfully"
 msgstr "Lijst succesvol verwijderd"
 
-#: app/routes/api.py:650
+#: app/routes/api.py:656
 msgid "Cannot delete root folder"
 msgstr "Kan hoofdmap niet verwijderen"
 
-#: app/routes/api.py:654
+#: app/routes/api.py:660
 msgid "Folder and all its contents deleted"
 msgstr "Map en al zijn inhoud verwijderd"
 
-#: app/routes/api.py:659
+#: app/routes/api.py:665
 msgid "Image not found or not owned by user"
 msgstr "Afbeelding niet gevonden of geen eigendom van gebruiker"
 
-#: app/routes/api.py:670
+#: app/routes/api.py:676
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Kon bestand niet verwijderen: %(error)s"
 
-#: app/routes/api.py:674
+#: app/routes/api.py:680
 msgid "Image deleted"
 msgstr "Afbeelding verwijderd"
 
-#: app/routes/api.py:676
+#: app/routes/api.py:682
 msgid "Invalid item type"
 msgstr "Ongeldig itemtype"
 
@@ -407,7 +291,7 @@ msgid "Your message has been sent successfully!"
 msgstr "Uw bericht is succesvol verzonden!"
 
 #: app/routes/main.py:35 app/templates/about.html:32
-#: app/templates/base.html:146
+#: app/templates/base.html:201
 msgid "About & Contact"
 msgstr "Over & Contact"
 
@@ -418,20 +302,6 @@ msgstr "Uw taal is bijgewerkt."
 #: app/routes/main.py:57
 msgid "The language has been updated for this session."
 msgstr "De taal is bijgewerkt voor deze sessie."
-
-#: app/routes/mobile_api.py:181
-#, fuzzy
-msgid "Access denied or not found"
-msgstr "Map niet gevonden"
-
-#: app/routes/mobile_api.py:215 app/routes/mobile_api.py:240
-#, fuzzy
-msgid "Auth required"
-msgstr "parent_id is verplicht"
-
-#: app/routes/mobile_api.py:221 app/routes/mobile_api.py:246
-msgid "Forbidden"
-msgstr ""
 
 #: app/templates/about.html:36
 msgid "Open Source"
@@ -474,6 +344,10 @@ msgstr ""
 msgid "Account Management"
 msgstr "Accountbeheer"
 
+#: app/templates/account.html:10
+msgid "Change Password"
+msgstr "Wachtwoord wijzigen"
+
 #: app/templates/account.html:29 app/templates/account.html:32
 msgid "Delete Account"
 msgstr "Account verwijderen"
@@ -510,45 +384,39 @@ msgstr "Uw gebruikersnaam"
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: app/templates/base.html:7 app/templates/base.html:51
-#: app/templates/base.html:143
+#: app/templates/account.html:60
+msgid "Delete My Account"
+msgstr "Mijn account verwijderen"
+
+#: app/templates/base.html:7 app/templates/base.html:198
 msgid "PictoTree.eu"
 msgstr ""
 
-#: app/templates/base.html:54
+#: app/templates/base.html:117
 msgid "Toggle navigation"
 msgstr "Navigatie in-/uitschakelen"
 
-#: app/templates/base.html:60
-msgid "Home"
-msgstr "Home"
-
-#: app/templates/base.html:63
+#: app/templates/base.html:123
 msgid "Mobile Setup"
 msgstr ""
 
-#: app/templates/base.html:66
+#: app/templates/base.html:126
 msgid "Paper Tools"
 msgstr ""
 
-#: app/templates/base.html:70
-#, fuzzy
-msgid "My Resources"
-msgstr "Boombron"
-
-#: app/templates/base.html:99
+#: app/templates/base.html:154
 msgid "Login"
 msgstr "Inloggen"
 
-#: app/templates/base.html:103
+#: app/templates/base.html:158
 msgid "Account"
 msgstr "Account"
 
-#: app/templates/base.html:106
+#: app/templates/base.html:161
 msgid "Logout"
 msgstr "Uitloggen"
 
-#: app/templates/base.html:130
+#: app/templates/base.html:185
 #, fuzzy, python-format
 msgid ""
 "This site uses only connection\n"
@@ -563,25 +431,25 @@ msgstr ""
 "informatie verzameld via tracking- of advertentiecookies. Door verder te "
 "navigeren, accepteert u ons <a href=\"%(href)s\">privacybeleid</a>."
 
-#: app/templates/base.html:135
+#: app/templates/base.html:190
 msgid "I understand"
 msgstr "Ik begrijp het"
 
-#: app/templates/base.html:141
+#: app/templates/base.html:196
 #, python-format
 msgid "Logged in as: %(username)s"
 msgstr "Ingelogd als: %(username)s"
 
-#: app/templates/base.html:145
+#: app/templates/base.html:200
 msgid "Terms & Privacy"
 msgstr "Voorwaarden & Privacy"
 
-#: app/templates/base.html:167
+#: app/templates/base.html:222
 #, fuzzy
 msgid "Please select a valid image."
 msgstr "Geselecteerde afbeelding bewerken"
 
-#: app/templates/base.html:168
+#: app/templates/base.html:223
 msgid "You must create an account to use this feature."
 msgstr ""
 
@@ -612,7 +480,7 @@ msgstr "Boom opslaan"
 msgid "Load / Delete Tree"
 msgstr "Boom laden"
 
-#: app/templates/builder.html:32 app/templates/builder.html:226
+#: app/templates/builder.html:32 app/templates/builder.html:249
 #: app/templates/list.html:37
 msgid "Search trees..."
 msgstr "Bomen zoeken..."
@@ -639,127 +507,225 @@ msgid "Delete Selected Tree"
 msgstr "Geselecteerde tak verwijderen"
 
 #: app/templates/builder.html:59
-msgid "Manage Profiles"
-msgstr ""
+#, fuzzy
+msgid "Manage Binders"
+msgstr "Mappen beheren"
 
 #: app/templates/builder.html:66
-msgid "Save Current Profile"
-msgstr ""
+#, fuzzy
+msgid "Save Current Binder"
+msgstr "Map opslaan"
 
 #: app/templates/builder.html:68
 #, fuzzy
-msgid "Profile Name"
+msgid "Binder Name"
 msgstr "Mapnaam"
 
 #: app/templates/builder.html:69
 #, fuzzy
-msgid "Enter profile name"
-msgstr "Voer boomnaam in"
+msgid "Enter binder name"
+msgstr "Voer mapnaam in"
 
 #: app/templates/builder.html:71
 #, fuzzy
-msgid "Save Profile"
-msgstr "Boom opslaan"
+msgid "Save Binder"
+msgstr "Map opslaan"
 
 #: app/templates/builder.html:74
 #, fuzzy
-msgid "Load / Delete Profile"
-msgstr "Geen bestand geselecteerd"
+msgid "Load / Delete Binder"
+msgstr "Map laden / verwijderen"
 
 #: app/templates/builder.html:75
 #, fuzzy
-msgid "Search profiles..."
-msgstr "Bomen zoeken..."
+msgid "Search binders..."
+msgstr "Mappen zoeken..."
 
 #: app/templates/builder.html:77
 #, fuzzy
-msgid "Load Profile"
-msgstr "Boom laden"
+msgid "Load Binder"
+msgstr "Map laden"
 
 #: app/templates/builder.html:78
 #, fuzzy
-msgid "Delete Selected Profile"
-msgstr "Geselecteerde link verwijderen"
+msgid "Delete Selected Binder"
+msgstr "Geselecteerde map verwijderen"
 
-#: app/templates/builder.html:90 app/templates/builder.html:104
+#: app/templates/builder.html:89
+#, fuzzy
+msgid "Manage Resources"
+msgstr "Hulpmiddelen beheren"
+
+#: app/templates/builder.html:95
+msgid ""
+"Use the tab content to manage folders, upload pictures, and organize your"
+" resource library."
+msgstr ""
+"Gebruik de inhoud van het tabblad om mappen te beheren, afbeeldingen te "
+"uploaden en uw bibliotheek met hulpmiddelen te organiseren."
+
+#: app/templates/builder.html:108 app/templates/builder.html:127
 msgid "Tree Builder"
 msgstr "Boom-bouwer"
 
-#: app/templates/builder.html:93 app/templates/builder.html:203
+#: app/templates/builder.html:111 app/templates/builder.html:226
 #, fuzzy
-msgid "Profile Builder"
-msgstr "Boom-bouwer"
+msgid "Binder Builder"
+msgstr "Mappenbouwer"
 
-#: app/templates/builder.html:105
+#: app/templates/builder.html:115
+#, fuzzy
+msgid "My Resources"
+msgstr "Mijn Hulpmiddelen"
+
+#: app/templates/builder.html:128
 msgid "Visualize Tree"
 msgstr "Boom visualiseren"
 
-#: app/templates/builder.html:118
+#: app/templates/builder.html:141
 msgid "Interactive Tree Visualization"
 msgstr "Interactieve boomvisualisatie"
 
-#: app/templates/builder.html:128
+#: app/templates/builder.html:151
 msgid "Close"
 msgstr "Sluiten"
 
-#: app/templates/builder.html:129 app/templates/list.html:86
+#: app/templates/builder.html:152 app/templates/list.html:86
 msgid "Export to PDF"
 msgstr "Exporteren naar PDF"
 
-#: app/templates/builder.html:140
+#: app/templates/builder.html:163
 msgid "Node Description"
 msgstr "Knoopbeschrijving"
 
-#: app/templates/builder.html:143
+#: app/templates/builder.html:166
 msgid "Enter node description..."
 msgstr "Voer knoopbeschrijving in..."
 
-#: app/templates/builder.html:148
+#: app/templates/builder.html:171
 msgid "Images"
 msgstr "Afbeeldingen"
 
-#: app/templates/builder.html:153 app/templates/builder.html:252
+#: app/templates/builder.html:176 app/templates/builder.html:343
 #: app/templates/list.html:272
 msgid "Local"
 msgstr ""
 
-#: app/templates/builder.html:169 app/templates/builder.html:261
+#: app/templates/builder.html:192 app/templates/builder.html:352
 #: app/templates/list.html:288
 #, fuzzy
 msgid "Search local images..."
 msgstr "Afbeeldingen zoeken..."
 
-#: app/templates/builder.html:188
+#: app/templates/builder.html:211
 msgid "Delete selected branch"
 msgstr "Geselecteerde tak verwijderen"
 
-#: app/templates/builder.html:189
+#: app/templates/builder.html:212
 msgid "New tree"
 msgstr "Nieuwe boom"
 
-#: app/templates/builder.html:204
+#: app/templates/builder.html:227
 #, fuzzy
 msgid "Change Avatar"
 msgstr "Wachtwoord wijzigen"
 
-#: app/templates/builder.html:210
+#: app/templates/builder.html:233
 #, fuzzy
-msgid "New profile"
-msgstr "Nieuwe boom"
+msgid "New binder"
+msgstr "Nieuwe map"
 
-#: app/templates/builder.html:214
-msgid "Drag and drop trees here to build your profile."
-msgstr ""
+#: app/templates/builder.html:237
+msgid "Drag and drop trees here to build your binder."
+msgstr "Sleep hier bomen naartoe om uw map te bouwen."
 
-#: app/templates/builder.html:225
+#: app/templates/builder.html:248
 #, fuzzy
 msgid "Trees"
 msgstr "Boombron"
 
-#: app/templates/builder.html:246
+#: app/templates/builder.html:267 app/templates/pictogram_bank.html:9
+msgid "My Pictograms"
+msgstr "Mijn pictogrammen"
+
+#: app/templates/builder.html:268 app/templates/pictogram_bank.html:12
 #, fuzzy
-msgid "Choose Profile Avatar"
+msgid "Refresh"
+msgstr "Boombron"
+
+#: app/templates/builder.html:278 app/templates/pictogram_bank.html:23
+msgid "Create Folder"
+msgstr "Map maken"
+
+#: app/templates/builder.html:280 app/templates/pictogram_bank.html:25
+msgid "Folder name"
+msgstr "Mapnaam"
+
+#: app/templates/builder.html:281 app/templates/pictogram_bank.html:26
+msgid "Create"
+msgstr "Maken"
+
+#: app/templates/builder.html:286 app/templates/pictogram_bank.html:31
+msgid "Import Image"
+msgstr "Afbeelding importeren"
+
+#: app/templates/builder.html:288 app/templates/pictogram_bank.html:33
+msgid "Upload from disk"
+msgstr "Uploaden vanaf schijf"
+
+#: app/templates/builder.html:291 app/templates/pictogram_bank.html:36
+msgid "Choose File"
 msgstr "Kies bestand"
+
+#: app/templates/builder.html:292 app/templates/pictogram_bank.html:37
+msgid "No file chosen"
+msgstr "Geen bestand gekozen"
+
+#: app/templates/builder.html:296 app/templates/pictogram_bank.html:41
+msgid "Description (optional)"
+msgstr "Beschrijving (optioneel)"
+
+#: app/templates/builder.html:299 app/templates/pictogram_bank.html:44
+msgid "Upload"
+msgstr "Uploaden"
+
+#: app/templates/builder.html:305 app/templates/builder.html:307
+#: app/templates/pictogram_bank.html:50 app/templates/pictogram_bank.html:52
+msgid "Edit Selected Image"
+msgstr "Geselecteerde afbeelding bewerken"
+
+#: app/templates/builder.html:306 app/templates/pictogram_bank.html:51
+msgid "Edit Selected Folder"
+msgstr "Geselecteerde map bewerken"
+
+#: app/templates/builder.html:310 app/templates/pictogram_bank.html:55
+msgid "Description"
+msgstr "Beschrijving"
+
+#: app/templates/builder.html:314 app/templates/pictogram_bank.html:65
+msgid "Save Changes"
+msgstr "Wijzigingen opslaan"
+
+#: app/templates/builder.html:315 app/templates/pictogram_bank.html:66
+msgid "Delete"
+msgstr "Verwijderen"
+
+#: app/templates/builder.html:321 app/templates/pictogram_bank.html:72
+msgid "Export Image"
+msgstr "Afbeelding exporteren"
+
+#: app/templates/builder.html:322 app/templates/pictogram_bank.html:73
+msgid "Download Selected Image"
+msgstr "Geselecteerde afbeelding downloaden"
+
+#: app/templates/builder.html:337
+#, fuzzy
+msgid "Choose Binder Avatar"
+msgstr "Kies mapavatar"
+
+#: app/templates/forgot_password.html:5
+msgid "Reset Password"
+msgstr "Wachtwoord opnieuw instellen"
 
 #: app/templates/index.html:16
 msgid "PictoTree: A free, digital pictogram binder."
@@ -1441,6 +1407,10 @@ msgstr "Geselecteerde link verwijderen"
 msgid "New Chain"
 msgstr "Nieuwe keten"
 
+#: app/templates/login.html:32 app/templates/register.html:84
+msgid "Sign In"
+msgstr "Inloggen"
+
 #: app/templates/login.html:58
 msgid "New User?"
 msgstr "Nieuwe gebruiker?"
@@ -1453,77 +1423,17 @@ msgstr "Klik om te registreren!"
 msgid "Forgot Your Password?"
 msgstr "Wachtwoord vergeten?"
 
-#: app/templates/pictogram_bank.html:9
-msgid "My Pictograms"
-msgstr "Mijn pictogrammen"
-
-#: app/templates/pictogram_bank.html:10
+#: app/templates/pictogram_bank.html:11
 msgid "Root"
 msgstr "Hoofdmap"
 
-#: app/templates/pictogram_bank.html:11
-msgid "Delete"
-msgstr "Verwijderen"
-
-#: app/templates/pictogram_bank.html:21
-msgid "Create Folder"
-msgstr "Map maken"
-
-#: app/templates/pictogram_bank.html:23
-msgid "Folder name"
-msgstr "Mapnaam"
-
-#: app/templates/pictogram_bank.html:24
-msgid "Create"
-msgstr "Maken"
-
-#: app/templates/pictogram_bank.html:29
-msgid "Import Image"
-msgstr "Afbeelding importeren"
-
-#: app/templates/pictogram_bank.html:31
-msgid "Upload from disk"
-msgstr "Uploaden vanaf schijf"
-
-#: app/templates/pictogram_bank.html:34
-msgid "Choose File"
-msgstr "Kies bestand"
-
-#: app/templates/pictogram_bank.html:35
-msgid "No file chosen"
-msgstr "Geen bestand gekozen"
-
-#: app/templates/pictogram_bank.html:39
-msgid "Description (optional)"
-msgstr "Beschrijving (optioneel)"
-
-#: app/templates/pictogram_bank.html:42
-msgid "Upload"
-msgstr "Uploaden"
-
-#: app/templates/pictogram_bank.html:47
-msgid "Edit Selected Image"
-msgstr "Geselecteerde afbeelding bewerken"
-
-#: app/templates/pictogram_bank.html:49
-msgid "Description"
-msgstr "Beschrijving"
-
-#: app/templates/pictogram_bank.html:55
+#: app/templates/pictogram_bank.html:61
 msgid "Make image public"
 msgstr "Afbeelding openbaar maken"
 
-#: app/templates/pictogram_bank.html:58
-msgid "Save Changes"
-msgstr "Wijzigingen opslaan"
-
-#: app/templates/pictogram_bank.html:63
-msgid "Export Image"
-msgstr "Afbeelding exporteren"
-
-#: app/templates/pictogram_bank.html:64
-msgid "Download Selected Image"
-msgstr "Geselecteerde afbeelding downloaden"
+#: app/templates/register.html:33
+msgid "Register"
+msgstr "Registreren"
 
 #: app/templates/register.html:73
 msgid "I accept the"
@@ -1536,6 +1446,10 @@ msgstr "Gebruiksvoorwaarden en het Privacybeleid"
 #: app/templates/register.html:84
 msgid "Already have an account?"
 msgstr ""
+
+#: app/templates/resend_confirmation_request.html:5
+msgid "Resend Confirmation Email"
+msgstr "Bevestigingsmail opnieuw verzenden"
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""
@@ -1572,497 +1486,6 @@ msgstr ""
 #: app/templates/emails/reset_password.html:4
 msgid "If you did not make this request, please ignore this email."
 msgstr "Als u dit verzoek niet heeft gedaan, negeer deze e-mail dan."
-
-#: venv/Lib/site-packages/click/_termui_impl.py:613
-#, python-brace-format
-msgid "{editor}: Editing failed"
-msgstr ""
-
-#: venv/Lib/site-packages/click/_termui_impl.py:617
-#, python-brace-format
-msgid "{editor}: Editing failed: {e}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1114
-#: venv/Lib/site-packages/click/core.py:1151
-#, python-brace-format
-msgid "{text} {deprecated_message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1170
-#, fuzzy
-msgid "Options"
-msgstr "Beschrijving"
-
-#: venv/Lib/site-packages/click/core.py:1245
-#, python-brace-format
-msgid "Got unexpected extra argument ({args})"
-msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/core.py:1264
-#, python-brace-format
-msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1448
-msgid "Aborted!"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1822
-msgid "Commands"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1853
-msgid "Missing command."
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:1931
-#, python-brace-format
-msgid "No such command {name!r}."
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:2355
-msgid "Value must be an iterable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:2378
-#, python-brace-format
-msgid "Takes {nargs} values but 1 was given."
-msgid_plural "Takes {nargs} values but {len} were given."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/core.py:2567
-#, python-brace-format
-msgid ""
-"DeprecationWarning: The {param_type} {name!r} is "
-"deprecated.{extra_message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3015
-#, python-brace-format
-msgid "env var: {var}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3018
-#, python-brace-format
-msgid "default: {default}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3022
-msgid "required"
-msgstr ""
-
-#: venv/Lib/site-packages/click/core.py:3082
-msgid "(dynamic)"
-msgstr ""
-
-#: venv/Lib/site-packages/click/decorators.py:465
-#, python-format
-msgid "%(prog)s, version %(version)s"
-msgstr ""
-
-#: venv/Lib/site-packages/click/decorators.py:522
-msgid "Show the version and exit."
-msgstr ""
-
-#: venv/Lib/site-packages/click/decorators.py:548
-msgid "Show this message and exit."
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:50
-#: venv/Lib/site-packages/click/exceptions.py:89
-#, fuzzy, python-brace-format
-msgid "Error: {message}"
-msgstr "Afbeeldingen"
-
-#: venv/Lib/site-packages/click/exceptions.py:81
-#, python-brace-format
-msgid "Try '{command} {option}' for help."
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:130
-#, python-brace-format
-msgid "Invalid value: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:132
-#, python-brace-format
-msgid "Invalid value for {param_hint}: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:190
-msgid "Missing argument"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:192
-#, fuzzy
-msgid "Missing option"
-msgstr "Lijstbewerkingen"
-
-#: venv/Lib/site-packages/click/exceptions.py:194
-msgid "Missing parameter"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:196
-#, python-brace-format
-msgid "Missing {param_type}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:203
-#, python-brace-format
-msgid "Missing parameter: {param_name}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:223
-#, python-brace-format
-msgid "No such option: {name}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:235
-#, python-brace-format
-msgid "Did you mean {possibility}?"
-msgid_plural "(Possible options: {possibilities})"
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/exceptions.py:282
-msgid "unknown error"
-msgstr ""
-
-#: venv/Lib/site-packages/click/exceptions.py:289
-#, python-brace-format
-msgid "Could not open file {filename!r}: {message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/parser.py:199
-#, python-brace-format
-msgid "Argument {name!r} takes {nargs} values."
-msgstr ""
-
-#: venv/Lib/site-packages/click/parser.py:381
-#, python-brace-format
-msgid "Option {name!r} does not take a value."
-msgstr ""
-
-#: venv/Lib/site-packages/click/parser.py:444
-#, python-brace-format
-msgid "Option {name!r} requires an argument."
-msgid_plural "Option {name!r} requires {nargs} arguments."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/shell_completion.py:332
-msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr ""
-
-#: venv/Lib/site-packages/click/shell_completion.py:339
-msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:165
-#, fuzzy
-msgid "Repeat for confirmation"
-msgstr "Bevestigingsmail opnieuw verzenden"
-
-#: venv/Lib/site-packages/click/termui.py:181
-msgid "Error: The value you entered was invalid."
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:183
-#, python-brace-format
-msgid "Error: {e.message}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:194
-msgid "Error: The two entered values do not match."
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:253
-msgid "Error: invalid input"
-msgstr ""
-
-#: venv/Lib/site-packages/click/termui.py:872
-msgid "Press any key to continue..."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:332
-#, python-brace-format
-msgid ""
-"Choose from:\n"
-"\t{choices}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:369
-#, python-brace-format
-msgid "{value!r} is not {choice}."
-msgid_plural "{value!r} is not one of {choices}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/types.py:460
-#, python-brace-format
-msgid "{value!r} does not match the format {format}."
-msgid_plural "{value!r} does not match the formats {formats}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/click/types.py:482
-#, python-brace-format
-msgid "{value!r} is not a valid {number_type}."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:538
-#, python-brace-format
-msgid "{value} is not in the range {range}."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:719
-#, python-brace-format
-msgid "{value!r} is not a valid boolean. Recognized values: {states}"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:747
-#, python-brace-format
-msgid "{value!r} is not a valid UUID."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:937
-msgid "file"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:939
-msgid "directory"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:941
-msgid "path"
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:988
-#, python-brace-format
-msgid "{name} {filename!r} does not exist."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:997
-#, python-brace-format
-msgid "{name} {filename!r} is a file."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1005
-#, python-brace-format
-msgid "{name} {filename!r} is a directory."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1014
-#, python-brace-format
-msgid "{name} {filename!r} is not readable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1023
-#, python-brace-format
-msgid "{name} {filename!r} is not writable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1032
-#, python-brace-format
-msgid "{name} {filename!r} is not executable."
-msgstr ""
-
-#: venv/Lib/site-packages/click/types.py:1099
-#, python-brace-format
-msgid "{len_type} values are required, but {len_value} was given."
-msgid_plural "{len_type} values are required, but {len_value} were given."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/flask_wtf/file.py:55
-#: venv/Lib/site-packages/wtforms/validators.py:293
-#: venv/Lib/site-packages/wtforms/validators.py:323
-#, fuzzy
-msgid "This field is required."
-msgstr "parent_id is verplicht"
-
-#: venv/Lib/site-packages/flask_wtf/file.py:94
-#, python-brace-format
-msgid "File does not have an approved extension: {extensions}"
-msgstr ""
-
-#: venv/Lib/site-packages/flask_wtf/file.py:101
-msgid "File does not have an approved extension."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:86
-#, python-format
-msgid "Invalid field name '%s'."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:99
-#, python-format
-msgid "Field must be equal to %(other_name)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:146
-#, python-format
-msgid "Field must be at least %(min)d character long."
-msgid_plural "Field must be at least %(min)d characters long."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:152
-#, python-format
-msgid "Field cannot be longer than %(max)d character."
-msgid_plural "Field cannot be longer than %(max)d characters."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:158
-#, python-format
-msgid "Field must be exactly %(max)d character long."
-msgid_plural "Field must be exactly %(max)d characters long."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:164
-#, python-format
-msgid "Field must be between %(min)d and %(max)d characters long."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:216
-#, python-format
-msgid "Number must be at least %(min)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:219
-#, python-format
-msgid "Number must be at most %(max)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:222
-#, python-format
-msgid "Number must be between %(min)s and %(max)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:358
-#, fuzzy
-msgid "Invalid input."
-msgstr "Ongeldige gegevens"
-
-#: venv/Lib/site-packages/wtforms/validators.py:422
-#, fuzzy
-msgid "Invalid email address."
-msgstr "Ongeldig itemtype"
-
-#: venv/Lib/site-packages/wtforms/validators.py:460
-msgid "Invalid IP address."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:503
-#, fuzzy
-msgid "Invalid Mac address."
-msgstr "Ongeldig huidig wachtwoord."
-
-#: venv/Lib/site-packages/wtforms/validators.py:540
-#, fuzzy
-msgid "Invalid URL."
-msgstr "Ongeldige gegevens"
-
-#: venv/Lib/site-packages/wtforms/validators.py:561
-#, fuzzy
-msgid "Invalid UUID."
-msgstr "Ongeldige gegevens"
-
-#: venv/Lib/site-packages/wtforms/validators.py:595
-#, python-format
-msgid "Invalid value, must be one of: %(values)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:631
-#, python-format
-msgid "Invalid value, can't be any of: %(values)s."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:700
-msgid "This field cannot be edited."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/validators.py:716
-msgid "This field is disabled and cannot have a value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/csrf/core.py:96
-#, fuzzy
-msgid "Invalid CSRF Token."
-msgstr "Ongeldige JSON-gegevens"
-
-#: venv/Lib/site-packages/wtforms/csrf/session.py:64
-msgid "CSRF token missing."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/csrf/session.py:72
-#, fuzzy
-msgid "CSRF failed."
-msgstr "Kies bestand"
-
-#: venv/Lib/site-packages/wtforms/csrf/session.py:77
-msgid "CSRF token expired."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:142
-msgid "Invalid Choice: could not coerce."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:149
-#: venv/Lib/site-packages/wtforms/fields/choices.py:203
-msgid "Choices cannot be None."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:155
-msgid "Not a valid choice."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:194
-msgid "Invalid choice(s): one or more data inputs could not be coerced."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/choices.py:212
-#, python-format
-msgid "'%(value)s' is not a valid choice for this field."
-msgid_plural "'%(value)s' are not valid choices for this field."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:52
-msgid "Not a valid datetime value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:78
-#, fuzzy
-msgid "Not a valid date value."
-msgstr "Ongeldige gegevens"
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:104
-msgid "Not a valid time value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/datetime.py:149
-msgid "Not a valid week value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:82
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:92
-msgid "Not a valid integer value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:168
-msgid "Not a valid decimal value."
-msgstr ""
-
-#: venv/Lib/site-packages/wtforms/fields/numeric.py:197
-msgid "Not a valid float value."
-msgstr ""
 
 #~ msgid "privacy policy"
 #~ msgstr "privacy policy"
@@ -2187,7 +1610,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Email"
-#~ msgstr ""
+#~ msgstr "Uw gebruikersnaam"
 
 #~ msgid "Repeat Password"
 #~ msgstr "Wachtwoord opnieuw instellen"
@@ -2211,7 +1634,7 @@ msgstr ""
 #~ msgstr "Wachtwoord opnieuw instellen"
 
 #~ msgid "Name"
-#~ msgstr "Boomnaam"
+#~ msgstr "Uw gebruikersnaam"
 
 #~ msgid "Message"
 #~ msgstr "Afbeeldingen"
@@ -2258,7 +1681,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Options"
-#~ msgstr "Importopties"
+#~ msgstr "Beschrijving"
 
 #~ msgid "Got unexpected extra argument ({args})"
 #~ msgid_plural "Got unexpected extra arguments ({args})"
@@ -2315,7 +1738,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Error: {message}"
-#~ msgstr ""
+#~ msgstr "Afbeeldingen"
 
 #~ msgid "Try '{command} {option}' for help."
 #~ msgstr ""
@@ -2772,4 +2195,54 @@ msgstr ""
 
 #~ msgid "Font"
 #~ msgstr ""
+
+#~ msgid "Access denied or not found"
+#~ msgstr "Map niet gevonden"
+
+#~ msgid "Auth required"
+#~ msgstr "parent_id is verplicht"
+
+#~ msgid "Forbidden"
+#~ msgstr ""
+
+#~ msgid "Manage Profiles"
+#~ msgstr ""
+
+#~ msgid "Save Current Profile"
+#~ msgstr ""
+
+#~ msgid "Profile Name"
+#~ msgstr "Mapnaam"
+
+#~ msgid "Enter profile name"
+#~ msgstr "Voer boomnaam in"
+
+#~ msgid "Save Profile"
+#~ msgstr "Boom opslaan"
+
+#~ msgid "Load / Delete Profile"
+#~ msgstr "Geen bestand geselecteerd"
+
+#~ msgid "Search profiles..."
+#~ msgstr "Bomen zoeken..."
+
+#~ msgid "Load Profile"
+#~ msgstr "Boom laden"
+
+#~ msgid "Delete Selected Profile"
+#~ msgstr "Geselecteerde link verwijderen"
+
+#~ msgid "Profile Builder"
+#~ msgstr "Boom-bouwer"
+
+#~ msgid "New profile"
+#~ msgstr "Nieuwe boom"
+
+#~ msgid "Drag and drop trees here to build your profile."
+#~ msgstr ""
+
+#~ msgid "Field must be at least %(min)d character long."
+#~ msgid_plural "Field must be at least %(min)d characters long."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
 

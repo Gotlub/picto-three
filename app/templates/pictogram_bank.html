@@ -5,10 +5,12 @@
     <div class="row">
         <!-- Main Content -->
         <div class="col-md-9">
-            <div class="d-flex align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">{{ _('My Pictograms') }}</h2>
-                <button id="root-btn" class="btn btn-info ms-3">{{ _('Root') }}</button>
-                <button id="delete-btn" class="btn btn-danger ms-3">{{ _('Delete') }}</button>
+                <div>
+                    <button id="root-btn" class="btn btn-info me-3">{{ _('Root') }}</button>
+                    <i class="bi bi-arrow-clockwise refresh-btn fs-4" id="bank-refresh-btn" title="{{ _('Refresh') }}"></i>
+                </div>
             </div>
             <div class="tree-display border p-3 rounded" id="pictogram-display" style="min-height: 80vh;">
                 <!-- Pictogram tree will be built here -->
@@ -44,18 +46,25 @@
 
             <!-- Edit Image Section (hidden by default) -->
             <div id="edit-image-section" style="display: none;">
-                <h4>{{ _('Edit Selected Image') }}</h4>
-                <div class="mb-3">
+                <h4 id="edit-section-title"
+                    data-image-title="{{ _('Edit Selected Image') }}"
+                    data-folder-title="{{ _('Edit Selected Folder') }}">
+                    {{ _('Edit Selected Image') }}
+                </h4>
+                <div id="edit-description-container" class="mb-3">
                     <label for="edit-image-description" class="form-label">{{ _('Description') }}</label>
                     <input type="text" id="edit-image-description" class="form-control">
                 </div>
-                <div class="form-check mb-3">
+                <div class="form-check mb-3" id="edit-public-container">
                     <input class="form-check-input" type="checkbox" value="" id="edit-image-public">
                     <label class="form-check-label" for="edit-image-public">
                         {{ _('Make image public') }}
                     </label>
                 </div>
-                <button id="save-image-changes-btn" class="btn btn-success">{{ _('Save Changes') }}</button>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button id="save-image-changes-btn" class="btn btn-success">{{ _('Save Changes') }}</button>
+                    <button id="bank-delete-btn" class="btn btn-danger ms-auto">{{ _('Delete') }}</button>
+                </div>
             </div>
             <hr>
 

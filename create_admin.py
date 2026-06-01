@@ -42,10 +42,10 @@ def create_admin_user(username, email, password):
         # 2. Création de son dossier racine (Normalement géré à la confirmation)
         print(f"Création du dossier racine pour {username}...")
         root_folder = Folder(
-            name=f"root_{username}", 
+            name=f"{username}", 
             user_id=user.id, 
             parent_id=None, 
-            path=f"root_{username}"
+            path=f"{username}"
         )
         db.session.add(root_folder)
         db.session.commit()

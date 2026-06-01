@@ -26,16 +26,75 @@
         .nav-logo {
             height: 40px;
             width: auto;
-            margin-right: 10px;
-            /* Inversion pour avoir un fond noir, puis screen pour le rendre transparent */
-            filter: invert(1) sepia(1) hue-rotate(210deg) brightness(1.1);
-            mix-blend-mode: screen; 
-            transition: filter 0.3s ease;
+            margin-right: 12px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
         .navbar-brand:hover .nav-logo {
-            filter: invert(1) sepia(1) hue-rotate(220deg) brightness(1.4);
+            transform: scale(1.15) rotate(5deg);
         }
+
+        /* Brand text styling */
+        .brand-text {
+            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .brand-text span {
+            display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.25s ease;
+        }
+
+        /* Hover effect on brand text: alternating wave/bounce */
+        .navbar-brand:hover .brand-text span {
+            filter: brightness(1.2) contrast(1.1);
+        }
+
+
+        /* Pastel Palette matching the logo's icons */
+        .brand-text .letter-p { color: #ff9ebb; }      /* Pastel Pink (smile) */
+        .brand-text .letter-i { color: #ffb37c; }      /* Pastel Orange (fork/knife) */
+        .brand-text .letter-c { color: #fdf196; }      /* Pastel Yellow (glass/check) */
+        .brand-text .letter-t { color: #a5e1a9; }      /* Pastel Green (football) */
+        .brand-text .letter-o { color: #9adcfa; }      /* Pastel Blue (WC) */
+        .brand-text .letter-t-cap { color: #a0c4ff; }  /* Pastel Indigo (star) */
+        .brand-text .letter-r { color: #ff9e9e; }      /* Pastel Red (hand) */
+        .brand-text .letter-e1 { color: #ff9ebb; }     /* Pastel Pink (smile) */
+        .brand-text .letter-e2 { color: #ffb37c; }     /* Pastel Orange (fork/knife) */
+        .brand-text .brand-dot { color: #ffffff; }     /* White */
+        .brand-text .brand-e { color: #9adcfa; }       /* Pastel Blue (WC) */
+        .brand-text .brand-u { color: #a0c4ff; }       /* Pastel Indigo (star) */
+
+        /* Color sequencing on navbar and footer links */
+        .navbar-dark .navbar-nav .nav-link,
+        .footer a,
+        .footer span {
+            transition: color 0.25s ease;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover,
+        .footer a:hover {
+            filter: brightness(1.25);
+        }
+
+        /* Color sequence (Left Navbar) */
+        .navbar-nav.me-auto .nav-item:nth-child(1) .nav-link { color: #ffb37c !important; } /* Orange */
+        .navbar-nav.me-auto .nav-item:nth-child(2) .nav-link { color: #fdf196 !important; } /* Yellow */
+        .navbar-nav.me-auto .nav-item:nth-child(3) .nav-link { color: #a5e1a9 !important; } /* Green */
+
+        /* Color sequence (Right Navbar) */
+        .navbar-nav:not(.me-auto) .nav-item:nth-child(1) .nav-link { color: #9adcfa !important; } /* Blue */
+        .navbar-nav:not(.me-auto) .nav-item:nth-child(2) .nav-link { color: #a0c4ff !important; } /* Indigo */
+        .navbar-nav:not(.me-auto) .nav-item:nth-child(3) .nav-link { color: #ff9e9e !important; } /* Red */
+
+        /* Color sequence (Footer elements) */
+        .footer span { color: #ff9ebb !important; } /* Pink */
+        .footer a:nth-of-type(1) { color: #ffb37c !important; } /* Orange */
+        .footer a:nth-of-type(2) { color: #fdf196 !important; } /* Yellow */
     </style>
     <script>
         window.CURRENT_LOCALE = "{{ get_locale() }}";
@@ -47,8 +106,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='images/homepage_tree.jpeg') }}" class="nav-logo" alt="Logo">
-                {{ _('PictoTree.eu') }}
+                <img src="{{ url_for('static', filename='images/logo.png') }}" class="nav-logo" alt="Logo">
+                <span class="brand-text">
+                    <span class="letter-p">P</span><span class="letter-i">i</span><span class="letter-c">c</span><span class="letter-t">t</span><span class="letter-o">o</span><span class="letter-t-cap">T</span><span class="letter-r">r</span><span class="letter-e1">e</span><span class="letter-e2">e</span><span class="brand-dot">.</span><span class="brand-e">e</span><span class="brand-u">u</span>
+                </span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Toggle navigation') }}">
@@ -57,19 +118,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('builder.builder') }}">{{ _('Mobile Setup') }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('builder.list_page') }}">{{ _('Paper Tools') }}</a>
                     </li>
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('builder.pictogram_bank') }}">{{ _('My Resources') }}</a>
-                    </li>
-                    {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
@@ -142,8 +195,8 @@
             {% else %}
             <span>{{ _('PictoTree.eu') }}</span>
             {% endif %}
-            <a href="{{ url_for('main.legal_page') }}" class="ms-auto text-white">{{ _('Terms & Privacy') }}</a>
-            <a href="{{ url_for('main.about') }}" class="ms-3 text-white">{{ _('About & Contact') }}</a>
+            <a href="{{ url_for('main.legal_page') }}" class="ms-auto">{{ _('Terms & Privacy') }}</a>
+            <a href="{{ url_for('main.about') }}" class="ms-3">{{ _('About & Contact') }}</a>
         </div>
     </footer>
 

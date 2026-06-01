@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, request, flash, json
+from flask import render_template, Blueprint, request, flash, json, redirect, url_for
 from flask_babel import _
 from flask_login import current_user, login_required
 from app.models import Folder
@@ -33,23 +33,26 @@ def builder():
     # The initial data for the right sidebar tree
     initial_tree_data_json = json.dumps(initial_folders)
 
+    pictograms_json = None
+    if current_user.is_authenticated:
+        root_folder = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
+        if not root_folder:
+            pictograms_json = json.dumps({'id': 'root', 'type': 'folder', 'name': 'root', 'children': []})
+        else:
+            pictograms_json = json.dumps(root_folder.to_dict(include_children=True))
+
     return render_template(
         'builder.html',
         title='Mobile Setup',
         initial_tree_data_json=initial_tree_data_json,
-        tree_data_from_post=tree_data_from_post
+        tree_data_from_post=tree_data_from_post,
+        pictograms_json=pictograms_json
     )
 
 @bp.route('/pictogram-bank')
 @login_required
 def pictogram_bank():
-    root_folder = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
-    if not root_folder:
-        pictograms_json = json.dumps({'id': 'root', 'type': 'folder', 'name': 'root', 'children': []})
-    else:
-        pictograms_json = json.dumps(root_folder.to_dict(include_children=True))
-
-    return render_template('pictogram_bank.html', title='My Resources', pictograms_json=pictograms_json)
+    return redirect(url_for('builder.builder', tab='resources'))
 
 
 @bp.route('/list')

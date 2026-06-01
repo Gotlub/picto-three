@@ -51,34 +51,52 @@
                     </div>
                 </div>
 
-                <!-- Manage Profiles -->
+                <!-- Manage Binders -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingManageProfiles">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseManageProfiles" aria-expanded="false" aria-controls="collapseManageProfiles">
-                            {{ _('Manage Profiles') }}
+                            {{ _('Manage Binders') }}
                         </button>
                     </h2>
                     <div id="collapseManageProfiles" class="accordion-collapse collapse" aria-labelledby="headingManageProfiles"
                         data-bs-parent="#treeAccordion">
                         <div class="accordion-body p-2">
                             <!-- Save Section -->
-                            <h6 class="border-bottom pb-1 mb-2">{{ _('Save Current Profile') }}</h6>
+                            <h6 class="border-bottom pb-1 mb-2">{{ _('Save Current Binder') }}</h6>
                             <div class="form-group mb-2">
-                                <label for="profile-name" class="form-label-sm">{{ _('Profile Name') }}</label>
-                                <input type="text" id="profile-name" class="form-control form-control-sm" placeholder="{{ _('Enter profile name') }}">
+                                <label for="profile-name" class="form-label-sm">{{ _('Binder Name') }}</label>
+                                <input type="text" id="profile-name" class="form-control form-control-sm" placeholder="{{ _('Enter binder name') }}">
                             </div>
-                            <button id="save-profile-btn" class="btn btn-sm btn-primary w-100 mb-3">{{ _('Save Profile') }}</button>
+                            <button id="save-profile-btn" class="btn btn-sm btn-primary w-100 mb-3">{{ _('Save Binder') }}</button>
                             
                             <!-- Load/Delete Section -->
-                            <h6 class="border-bottom pb-1 mb-2">{{ _('Load / Delete Profile') }}</h6>
-                            <input type="text" id="profile-search" class="form-control form-control-sm mb-2" placeholder="{{ _('Search profiles...') }}">
+                            <h6 class="border-bottom pb-1 mb-2">{{ _('Load / Delete Binder') }}</h6>
+                            <input type="text" id="profile-search" class="form-control form-control-sm mb-2" placeholder="{{ _('Search binders...') }}">
                             <div id="profile-list" class="mb-2"></div>
-                            <button id="load-profile-btn" class="btn btn-sm btn-success w-100 mb-2">{{ _('Load Profile') }}</button>
-                            <button id="delete-profile-btn" class="btn btn-sm btn-danger w-100">{{ _('Delete Selected Profile') }}</button>
+                            <button id="load-profile-btn" class="btn btn-sm btn-success w-100 mb-2">{{ _('Load Binder') }}</button>
+                            <button id="delete-profile-btn" class="btn btn-sm btn-danger w-100">{{ _('Delete Selected Binder') }}</button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Manage Resources -->
+                {% if current_user.is_authenticated %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingManageResources">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseManageResources" aria-expanded="false" aria-controls="collapseManageResources">
+                            {{ _('Manage Resources') }}
+                        </button>
+                    </h2>
+                    <div id="collapseManageResources" class="accordion-collapse collapse" aria-labelledby="headingManageResources"
+                        data-bs-parent="#treeAccordion">
+                        <div class="accordion-body p-2 text-center text-muted">
+                            <p class="small mb-0">{{ _('Use the tab content to manage folders, upload pictures, and organize your resource library.') }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
             <hr>
         </div>
@@ -90,8 +108,13 @@
                     <button class="nav-link active" id="tree-builder-tab" data-bs-toggle="tab" data-bs-target="#tree-builder-pane" type="button" role="tab" aria-controls="tree-builder-pane" aria-selected="true">{{ _('Tree Builder') }}</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="profile-builder-tab" data-bs-toggle="tab" data-bs-target="#profile-builder-pane" type="button" role="tab" aria-controls="profile-builder-pane" aria-selected="false">{{ _('Profile Builder') }}</button>
+                    <button class="nav-link" id="profile-builder-tab" data-bs-toggle="tab" data-bs-target="#profile-builder-pane" type="button" role="tab" aria-controls="profile-builder-pane" aria-selected="false">{{ _('Binder Builder') }}</button>
                 </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="my-resources-tab" data-bs-toggle="tab" data-bs-target="#my-resources-pane" type="button" role="tab" aria-controls="my-resources-pane" aria-selected="false">{{ _('My Resources') }}</button>
+                </li>
+                {% endif %}
             </ul>
 
             <div class="tab-content" id="builderTabsContent">
@@ -200,18 +223,18 @@
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="d-flex align-items-center gap-3">
-                        <h2 class="mb-0">{{ _('Profile Builder') }}</h2>
+                        <h2 class="mb-0">{{ _('Binder Builder') }}</h2>
                         <div class="position-relative" style="cursor: pointer;" id="profile-avatar-container" title="{{ _('Change Avatar') }}">
                             <img id="profile-image-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>" alt="Profile Avatar" class="rounded-circle border bg-light" style="width: 50px; height: 50px; object-fit: cover;">
                             <div class="position-absolute bottom-0 end-0 bg-white border rounded-circle d-flex justify-content-center align-items-center shadow-sm" style="width: 20px; height: 20px; font-size: 10px;">✏️</div>
                             <input type="hidden" id="profile-image-url" value="">
                         </div>
                     </div>
-                    <button id="new-profile-btn" class="btn btn-secondary">{{ _('New profile') }}</button>
+                    <button id="new-profile-btn" class="btn btn-secondary">{{ _('New binder') }}</button>
                 </div>
                 <div class="profile-builder-area border p-3 rounded bg-light d-flex flex-column" id="profile-builder-area" style="min-height: 80vh; overflow-y: auto;">
                     <div id="profile-builder-empty-msg" class="text-muted text-center mt-5">
-                        <p>{{ _('Drag and drop trees here to build your profile.') }}</p>
+                        <p>{{ _('Drag and drop trees here to build your binder.') }}</p>
                     </div>
                     <ul id="profile-trees-list" class="list-group flex-grow-1" style="min-height: 100px;">
                         <!-- Dropped trees will be appended here -->
@@ -233,6 +256,74 @@
             </div>
         </div>
     </div> <!-- End of Profile Builder Tab -->
+
+    <!-- My Resources Tab -->
+    {% if current_user.is_authenticated %}
+    <div class="tab-pane fade" id="my-resources-pane" role="tabpanel" aria-labelledby="my-resources-tab">
+        <div class="row">
+            <!-- Main Content (Bank Display) -->
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">{{ _('My Pictograms') }}</h2>
+                    <i class="bi bi-arrow-clockwise refresh-btn fs-4" id="bank-refresh-btn" title="{{ _('Refresh') }}"></i>
+                </div>
+                <div class="tree-display border p-3 rounded" id="pictogram-display" style="min-height: 80vh;">
+                    <!-- Pictogram tree will be built here -->
+                </div>
+            </div>
+
+            <!-- Right Sidebar for Actions -->
+            <div class="col-md-4 sidebar">
+                <!-- Create Folder Section -->
+                <h4>{{ _('Create Folder') }}</h4>
+                <div class="input-group mb-3">
+                    <input type="text" id="new-folder-name" class="form-control" placeholder="{{ _('Folder name') }}">
+                    <button id="create-folder-btn" class="btn btn-primary">{{ _('Create') }}</button>
+                </div>
+                <hr>
+
+                <!-- Upload Image Section -->
+                <h4>{{ _('Import Image') }}</h4>
+                <div class="mb-3">
+                    <label for="image-upload-file" class="form-label">{{ _('Upload from disk') }}</label>
+                    <div class="input-group">
+                        <input type="file" id="image-upload-file" class="d-none" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp">
+                        <label for="image-upload-file" class="btn btn-outline-secondary">{{ _('Choose File') }}</label>
+                        <span class="form-control" id="file-chosen">{{ _('No file chosen') }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="image-description" class="form-label">{{ _('Description (optional)') }}</label>
+                    <input type="text" id="image-description" class="form-control">
+                </div>
+                <button id="upload-image-btn" class="btn btn-secondary mt-2">{{ _('Upload') }}</button>
+                <hr>
+
+                <!-- Edit Image Section (hidden by default) -->
+                <div id="edit-image-section" style="display: none;">
+                    <h4 id="edit-section-title"
+                        data-image-title="{{ _('Edit Selected Image') }}"
+                        data-folder-title="{{ _('Edit Selected Folder') }}">
+                        {{ _('Edit Selected Image') }}
+                    </h4>
+                    <div id="edit-description-container" class="mb-3">
+                        <label for="edit-image-description" class="form-label">{{ _('Description') }}</label>
+                        <input type="text" id="edit-image-description" class="form-control">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <button id="save-image-changes-btn" class="btn btn-success">{{ _('Save Changes') }}</button>
+                        <button id="bank-delete-btn" class="btn btn-danger ms-auto">{{ _('Delete') }}</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- Export Image Section -->
+                <h4>{{ _('Export Image') }}</h4>
+                <button id="export-image-btn" class="btn btn-success" disabled>{{ _('Download Selected Image') }}</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div> <!-- End of builderTabsContent -->
 </div> <!-- End of col-md-10 -->
 </div> <!-- End of main row -->
@@ -243,7 +334,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="avatarModalLabel">{{ _('Choose Profile Avatar') }}</h5>
+                <h5 class="modal-title" id="avatarModalLabel">{{ _('Choose Binder Avatar') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="height: 60vh;">
@@ -295,4 +386,49 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 
 <script type="module" src="{{ url_for('static', filename='js/builder.js') }}"></script>
+
+{% if current_user.is_authenticated %}
+<script id="pictogram-data" type="application/json">
+    {{ pictograms_json | safe }}
+</script>
+<script>
+    window.MAX_IMAGE_SIZE_KB = parseInt("{{ config.MAX_IMAGE_SIZE_KB }}", 10);
+    window.MAX_ITEMS_LIMIT = parseInt("{{ config.MAX_ITEMS_LIMIT }}", 10);
+</script>
+<script src="{{ url_for('static', filename='js/pictogram_bank.js') }}"></script>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab');
+        if (activeTab === 'resources') {
+            const tabEl = document.getElementById('my-resources-tab');
+            if (tabEl) {
+                const tab = new bootstrap.Tab(tabEl);
+                tab.show();
+            }
+        }
+    });
+</script>
+
+<style>
+    .refresh-btn {
+        opacity: 0.4;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .refresh-btn:hover {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+    .refresh-btn.spin {
+        animation: refresh-spin 1.5s linear infinite;
+    }
+    @keyframes refresh-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
 {% endblock %}

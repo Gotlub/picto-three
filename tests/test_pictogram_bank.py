@@ -19,8 +19,8 @@ def test_pictogram_bank_authenticated(client):
     confirm_user(client, user.email)
     login(client, 'testuser_pictogram', 'Password123')
     response = client.get('/pictogram-bank')
-    assert response.status_code == 200
-    assert b'My Pictograms' in response.data
+    assert response.status_code == 302
+    assert '/builder?tab=resources' in response.location
 
 # -----------------------------------------------------------------------------
 # Tests for API endpoints
@@ -248,12 +248,12 @@ def test_update_image_details_success(client):
     json_data = update_response.get_json()
     assert json_data['status'] == 'success'
     assert json_data['image']['description'] == 'A new description'
-    assert json_data['image']['is_public'] is True
+    assert json_data['image']['is_public'] is False  # Forced to False for security
 
     # Verify in the database
     updated_image = db.session.get(Image, image_id)
     assert updated_image.description == 'A new description'
-    assert updated_image.is_public is True
+    assert updated_image.is_public is False  # Forced to False for security
 
 def test_update_image_details_unauthorized(client):
     """Test that a user cannot update another user's image."""

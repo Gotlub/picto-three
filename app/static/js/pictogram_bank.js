@@ -115,18 +115,35 @@ class PictogramBank {
     initEventListeners() {
         document.getElementById('create-folder-btn').addEventListener('click', () => this.createFolder());
         document.getElementById('upload-image-btn').addEventListener('click', () => this.uploadImage());
-        document.getElementById('delete-btn').addEventListener('click', () => this.deleteSelected());
-        document.getElementById('root-btn').addEventListener('click', () => this.selectRoot());
+        document.getElementById('bank-delete-btn').addEventListener('click', () => this.deleteSelected());
         document.getElementById('export-image-btn').addEventListener('click', () => this.exportImage());
         document.getElementById('image-upload-file').addEventListener('change', (e) => {
             const fileChosen = document.getElementById('file-chosen');
             if (e.target.files.length > 0) {
-                fileChosen.textContent = e.target.files[0].name;
+                const filename = e.target.files[0].name;
+                fileChosen.textContent = filename;
+                
+                // Automatically suggest description (filename without extension)
+                const lastDotIndex = filename.lastIndexOf('.');
+                const nameWithoutExt = lastDotIndex !== -1 ? filename.substring(0, lastDotIndex) : filename;
+                const descInput = document.getElementById('image-description');
+                if (descInput) {
+                    descInput.value = nameWithoutExt;
+                }
             } else {
                 fileChosen.textContent = fileChosen.dataset.defaultText;
+                const descInput = document.getElementById('image-description');
+                if (descInput) {
+                    descInput.value = '';
+                }
             }
         });
         document.getElementById('save-image-changes-btn').addEventListener('click', () => this.saveImageChanges());
+
+        const refreshBtn = document.getElementById('bank-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.refresh());
+        }
 
         this.display.addEventListener('click', (e) => {
             if (e.target === this.display) {
@@ -142,19 +159,56 @@ class PictogramBank {
             this.selectedNode.element.querySelector('.node-content').classList.add('selected');
         }
 
-        document.getElementById('delete-btn').disabled = this.selectedNode.data.parent_id === null; // Cannot delete root
-
+        const deleteBtn = document.getElementById('bank-delete-btn');
         const exportBtn = document.getElementById('export-image-btn');
         const editSection = document.getElementById('edit-image-section');
+        
+        // Defensive selections for optional containers
+        const descContainer = document.getElementById('edit-description-container');
+        const publicContainer = document.getElementById('edit-public-container');
+        const saveChangesBtn = document.getElementById('save-image-changes-btn');
+        const sectionTitle = document.getElementById('edit-section-title');
 
-        if (this.selectedNode instanceof ImageNode) {
-            exportBtn.disabled = false;
-            editSection.style.display = 'block';
-            document.getElementById('edit-image-description').value = this.selectedNode.data.description || '';
-            document.getElementById('edit-image-public').checked = this.selectedNode.data.is_public;
+        if (this.selectedNode) {
+            const isRoot = this.selectedNode.data.parent_id === null;
+            if (isRoot) {
+                // Root is a folder but cannot be edited or deleted
+                if (editSection) editSection.style.display = 'none';
+                if (exportBtn) exportBtn.disabled = true;
+            } else if (this.selectedNode instanceof ImageNode) {
+                if (exportBtn) exportBtn.disabled = false;
+                if (editSection) editSection.style.display = 'block';
+                if (descContainer) descContainer.style.display = 'block';
+                if (publicContainer) publicContainer.style.display = 'block';
+                if (saveChangesBtn) saveChangesBtn.style.display = 'block';
+                if (sectionTitle) sectionTitle.textContent = sectionTitle.dataset.imageTitle;
+                
+                const descInput = document.getElementById('edit-image-description');
+                if (descInput) descInput.value = this.selectedNode.data.description || '';
+                
+                const publicCheckbox = document.getElementById('edit-image-public');
+                if (publicCheckbox) publicCheckbox.checked = !!this.selectedNode.data.is_public;
+                
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.style.display = 'block';
+                }
+            } else if (this.selectedNode instanceof FolderNode) {
+                if (exportBtn) exportBtn.disabled = true;
+                if (editSection) editSection.style.display = 'block';
+                if (descContainer) descContainer.style.display = 'none';
+                if (publicContainer) publicContainer.style.display = 'none';
+                if (saveChangesBtn) saveChangesBtn.style.display = 'none';
+                if (sectionTitle) sectionTitle.textContent = sectionTitle.dataset.folderTitle;
+                
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.style.display = 'block';
+                }
+            }
         } else {
-            exportBtn.disabled = true;
-            editSection.style.display = 'none';
+            if (editSection) editSection.style.display = 'none';
+            if (exportBtn) exportBtn.disabled = true;
         }
     }
 
@@ -164,7 +218,7 @@ class PictogramBank {
         }
         this.selectedNode = null;
         this.rootSelected = false;
-        document.getElementById('delete-btn').disabled = true;
+        document.getElementById('bank-delete-btn').disabled = true;
         document.getElementById('export-image-btn').disabled = true;
         document.getElementById('edit-image-section').style.display = 'none';
     }
@@ -332,7 +386,8 @@ class PictogramBank {
 
                 const result = await response.json();
                 if (result.status === 'success') {
-                    window.location.href = '/pictogram-bank';
+                    this.removeNodeFromTree(this.selectedNode);
+                    this.deselectAllNodes();
                 } else {
                     alert(`Error deleting item: ${result.message}`);
                 }
@@ -370,7 +425,6 @@ class PictogramBank {
 
         const imageId = this.selectedNode.data.id;
         const description = document.getElementById('edit-image-description').value;
-        const isPublic = document.getElementById('edit-image-public').checked;
 
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         try {
@@ -382,7 +436,6 @@ class PictogramBank {
                 },
                 body: JSON.stringify({
                     description: description,
-                    is_public: isPublic,
                 }),
             });
 
@@ -411,11 +464,24 @@ class PictogramBank {
     }
 
     removeNodeFromTree(nodeToRemove) {
-        const parentNode = this.findNodeById(this.rootNode, nodeToRemove.data.parent_id);
-        if (parentNode) {
-            parentNode.children = parentNode.children.filter(child => child.data.id !== nodeToRemove.data.id);
-            this.renderTree();
-        }
+        const removeChild = (parent) => {
+            const originalLength = parent.children.length;
+            parent.children = parent.children.filter(child => child.data.id !== nodeToRemove.data.id || child.data.type !== nodeToRemove.data.type);
+            if (parent.children.length < originalLength) {
+                return true;
+            }
+            for (const child of parent.children) {
+                if (child.children && child.children.length > 0) {
+                    if (removeChild(child)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        removeChild(this.rootNode);
+        this.renderTree();
     }
 
     findNodeById(node, id) {
@@ -438,21 +504,49 @@ class PictogramBank {
     }
 
     renderChildren(node) {
-        // Fix: Clean up old DOM element references before appending to avoid memory/DOM duplication
         const oldContainer = node.element.querySelector('.children');
         if (oldContainer) {
             oldContainer.remove();
+        }
+
+        if (node.children.length === 0) {
+            return;
         }
 
         const childrenContainer = document.createElement('div');
         childrenContainer.classList.add('children');
         node.children.forEach(child => {
             childrenContainer.appendChild(child.element);
-            if (child.children.length > 0) {
-                this.renderChildren(child);
-            }
+            this.renderChildren(child);
         });
         node.element.appendChild(childrenContainer);
+    }
+
+    async refresh() {
+        const refreshBtn = document.getElementById('bank-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.classList.add('spin');
+        }
+
+        try {
+            const response = await fetch('/api/pictograms');
+            if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+            
+            const newData = await response.json();
+            this.initialData = newData;
+            
+            this.deselectAllNodes();
+            
+            this.rootNode = new FolderNode(this.initialData, this);
+            this.renderTree();
+        } catch (e) {
+            console.error('Erreur lors du rafraîchissement de la banque:', e);
+            alert('Le rafraîchissement a échoué. Vérifiez votre connexion.');
+        } finally {
+            if (refreshBtn) {
+                refreshBtn.classList.remove('spin');
+            }
+        }
     }
 }
 
