@@ -60,6 +60,14 @@ def change_language(locale):
     from urllib.parse import urlparse, urljoin
 
     def is_safe_url(target):
+        if not target:
+            return False
+        target = target.strip()
+        # Convert backslashes to forward slashes to prevent browser-specific bypasses
+        target_normalized = target.replace('\\', '/')
+        # Prevent protocol-relative URLs (e.g., //evil.com or ///evil.com)
+        if target_normalized.startswith('//'):
+            return False
         ref_url = urlparse(request.host_url)
         test_url = urlparse(urljoin(request.host_url, target))
         return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
