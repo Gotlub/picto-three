@@ -201,6 +201,7 @@ def get_tree(tree_id):
 @jwt_required(optional=True)
 def serve_mobile_pictogram(filepath):
     """Distribution des images standards."""
+    filepath = filepath.replace('\\', '/')
     filepath = posixpath.normpath(filepath)
     if filepath.startswith('..') or posixpath.isabs(filepath):
         return jsonify({"error": "Invalid path"}), 400
@@ -215,7 +216,7 @@ def serve_mobile_pictogram(filepath):
             return jsonify({'error':_tr('Auth required')}), 401
         
         current_user = db.session.get(User, int(current_user_id))
-        if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
+        if current_user and filepath.startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_path, filepath)
             
         return jsonify({"error":_tr("Forbidden")}), 403
@@ -226,7 +227,11 @@ def serve_mobile_pictogram(filepath):
 def serve_mobile_pictogram_min(filepath):
     """Distribution des miniatures."""
     import os
+    filepath = filepath.replace('\\', '/')
     filepath = posixpath.normpath(filepath)
+    if filepath.startswith('..') or posixpath.isabs(filepath):
+        return jsonify({"error": "Invalid path"}), 400
+
     thumb_filename,_= os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
     
@@ -240,7 +245,7 @@ def serve_mobile_pictogram_min(filepath):
             return jsonify({'error':_tr('Auth required')}), 401
             
         current_user = db.session.get(User, int(current_user_id))
-        if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
+        if current_user and filepath.startswith(f"{current_user.username}/"):
             return send_from_directory(pictograms_min_path, thumb_path_relative)
             
         return jsonify({"error":_tr("Forbidden")}), 403

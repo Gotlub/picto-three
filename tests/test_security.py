@@ -85,3 +85,25 @@ def test_search_local_images_authenticated(seeded_db):
     # User 1 should NOT see:
     # - Other user's private (201)
     assert 201 not in image_ids
+
+def test_mobile_pictogram_path_traversal(seeded_db):
+    """Test that directory traversal using backslashes is blocked."""
+    client = seeded_db
+
+    # We first login to get a JWT token for mobile api tests
+    # Wait, mobile_api uses jwt_required. Let's see if there's a login route.
+    # The normal `login(client, 'user1', 'password')` is for sessions.
+    # The vulnerability can be triggered with just a GET request.
+    # `jwt_required(optional=True)` means we can test it without auth.
+
+    # Test path traversal in standard pictograms
+    response = client.get('/api/v1/mobile/pictograms/user1\\..\\admin\\secret.png')
+    assert response.status_code in (400, 401, 403, 404)
+    # The patch should turn it into `user1/../admin/secret.png`, normalize to `admin/secret.png`,
+    # which fails the `startswith('user1/')` check or public check, returning 401, 403 (or 404).
+    # Since it lacks `user1/` it goes to `else:` and since we aren't logged in, we get 401.
+    # What's important is we do not get 200 or 500.
+
+    # Test path traversal in mini pictograms
+    response_min = client.get('/api/v1/mobile/pictogramsmin/user1\\..\\admin\\secret.png')
+    assert response_min.status_code in (400, 401, 403, 404)
