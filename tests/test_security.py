@@ -90,20 +90,19 @@ def test_mobile_pictogram_path_traversal(seeded_db):
     """Test that directory traversal using backslashes is blocked."""
     client = seeded_db
 
-    # We first login to get a JWT token for mobile api tests
-    # Wait, mobile_api uses jwt_required. Let's see if there's a login route.
-    # The normal `login(client, 'user1', 'password')` is for sessions.
-    # The vulnerability can be triggered with just a GET request.
-    # `jwt_required(optional=True)` means we can test it without auth.
+    # Log in to get a JWT token for mobile API tests
+    login_response = client.post('/api/v1/mobile/login', json={
+        'username': 'user1',
+        'password': 'password'
+    })
+    assert login_response.status_code == 200
+    token = login_response.get_json()['access_token']
+    headers = {'Authorization': f'Bearer {token}'}
 
     # Test path traversal in standard pictograms
-    response = client.get('/api/v1/mobile/pictograms/user1\\..\\admin\\secret.png')
-    assert response.status_code in (400, 401, 403, 404)
-    # The patch should turn it into `user1/../admin/secret.png`, normalize to `admin/secret.png`,
-    # which fails the `startswith('user1/')` check or public check, returning 401, 403 (or 404).
-    # Since it lacks `user1/` it goes to `else:` and since we aren't logged in, we get 401.
-    # What's important is we do not get 200 or 500.
+    response = client.get('/api/v1/mobile/pictograms/user1\\..\\admin\\secret.png', headers=headers)
+    assert response.status_code == 403
 
     # Test path traversal in mini pictograms
-    response_min = client.get('/api/v1/mobile/pictogramsmin/user1\\..\\admin\\secret.png')
-    assert response_min.status_code in (400, 401, 403, 404)
+    response_min = client.get('/api/v1/mobile/pictogramsmin/user1\\..\\admin\\secret.png', headers=headers)
+    assert response_min.status_code == 403
