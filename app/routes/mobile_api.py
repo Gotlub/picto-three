@@ -233,6 +233,7 @@ def serve_mobile_pictogram(filepath):
         return response
 
     # Fallback to legacy path-based serving
+    filepath = filepath.replace('\\', '/')
     filepath = posixpath.normpath(filepath)
     if filepath.startswith('..') or posixpath.isabs(filepath):
         return jsonify({"error": "Invalid path"}), 400
@@ -247,7 +248,7 @@ def serve_mobile_pictogram(filepath):
             return jsonify({'error':_tr('Auth required')}), 401
         
         current_user = db.session.get(User, int(current_user_id))
-        if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
+        if current_user and filepath.startswith(f"{current_user.username}/"):
             response = send_from_directory(pictograms_path, filepath)
         else:
             return jsonify({"error":_tr("Forbidden")}), 403
@@ -301,6 +302,7 @@ def serve_mobile_pictogram_min(filepath):
         return response
 
     # Fallback to legacy path-based serving
+    filepath = filepath.replace('\\', '/')
     filepath = posixpath.normpath(filepath)
     if filepath.startswith('..') or posixpath.isabs(filepath):
         return jsonify({"error": "Invalid path"}), 400
@@ -318,7 +320,7 @@ def serve_mobile_pictogram_min(filepath):
             return jsonify({'error':_tr('Auth required')}), 401
             
         current_user = db.session.get(User, int(current_user_id))
-        if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
+        if current_user and filepath.startswith(f"{current_user.username}/"):
             response = send_from_directory(pictograms_min_path, thumb_path_relative)
         else:
             return jsonify({"error":_tr("Forbidden")}), 403
