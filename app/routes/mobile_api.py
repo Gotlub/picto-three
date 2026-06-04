@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 import posixpath
 import re
+import os
+from urllib.parse import quote
 
 # Création du Blueprint dédié au mobile
 bp = Blueprint('mobile_api', __name__, url_prefix='/api/v1/mobile')
@@ -81,8 +83,8 @@ def list_trees():
             'name': t.name,
             'owner': t.user.username if t.user else 'System',
             'is_public': t.is_public,
-            'root_image_url': _get_full_url(t.root_url, host_url),
-            'root_thumbnail_url': _get_thumb_url(t.root_url, host_url)
+            'root_image_url': _get_full_url(t.root_url, host_url, img_id=t.root_id),
+            'root_thumbnail_url': _get_thumb_url(t.root_url, host_url, img_id=t.root_id)
         })
         
     return jsonify(result), 200
@@ -119,8 +121,8 @@ def search_pictograms():
         results.append({
             'id': img.id,
             'name': img.name,
-            'image_url': _get_full_url(img.path, host_url),
-            'thumbnail_url': _get_thumb_url(img.path, host_url)
+            'image_url': _get_full_url(img.path, host_url, img_id=img.id),
+            'thumbnail_url': _get_thumb_url(img.path, host_url, img_id=img.id)
         })
         
     return jsonify(results), 200
@@ -200,7 +202,37 @@ def get_tree(tree_id):
 @bp.route('/pictograms/<path:filepath>', methods=['GET'])
 @jwt_required(optional=True)
 def serve_mobile_pictogram(filepath):
-    """Distribution des images standards."""
+    """Distribution des images standards par ID ou par chemin."""
+    try:
+        # Check if filepath is an ID
+        img_id = int(filepath)
+    except (ValueError, TypeError):
+        img_id = None
+
+    if img_id is not None:
+        try:
+            image = db.session.get(Image, img_id)
+        except Exception:
+            image = None
+            
+        if image is None:
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+            
+        if image.user_id is not None:
+            current_user_id = get_jwt_identity()
+            if not current_user_id or image.user_id != int(current_user_id):
+                return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+                
+        pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
+        response = send_from_directory(pictograms_path, image.path)
+        response.headers['X-Image-Description'] = quote(image.description or '')
+        response.headers['X-Image-Name'] = quote(image.name or '')
+        response.headers['X-Image-Hash'] = image.image_hash or ''
+        response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
+        response.headers['X-Image-Id'] = str(image.id)
+        return response
+
+    # Fallback to legacy path-based serving
     filepath = posixpath.normpath(filepath)
     if filepath.startswith('..') or posixpath.isabs(filepath):
         return jsonify({"error": "Invalid path"}), 400
@@ -208,7 +240,7 @@ def serve_mobile_pictogram(filepath):
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
     
     if filepath.startswith('public/'):
-        return send_from_directory(pictograms_path, filepath)
+        response = send_from_directory(pictograms_path, filepath)
     else:
         current_user_id = get_jwt_identity()
         if not current_user_id:
@@ -216,16 +248,59 @@ def serve_mobile_pictogram(filepath):
         
         current_user = db.session.get(User, int(current_user_id))
         if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
-            return send_from_directory(pictograms_path, filepath)
-            
-        return jsonify({"error":_tr("Forbidden")}), 403
+            response = send_from_directory(pictograms_path, filepath)
+        else:
+            return jsonify({"error":_tr("Forbidden")}), 403
+
+    try:
+        image = db.session.scalar(db.select(Image).filter_by(path=filepath))
+        if image:
+            response.headers['X-Image-Description'] = quote(image.description or '')
+            response.headers['X-Image-Name'] = quote(image.name or '')
+            response.headers['X-Image-Hash'] = image.image_hash or ''
+            response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
+            response.headers['X-Image-Id'] = str(image.id)
+    except Exception:
+        pass
+    return response
 
 
 @bp.route('/pictogramsmin/<path:filepath>', methods=['GET'])
 @jwt_required(optional=True)
 def serve_mobile_pictogram_min(filepath):
-    """Distribution des miniatures."""
-    import os
+    """Distribution des miniatures par ID ou par chemin."""
+    try:
+        # Check if filepath is an ID
+        img_id = int(filepath)
+    except (ValueError, TypeError):
+        img_id = None
+
+    if img_id is not None:
+        try:
+            image = db.session.get(Image, img_id)
+        except Exception:
+            image = None
+            
+        if image is None:
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+            
+        if image.user_id is not None:
+            current_user_id = get_jwt_identity()
+            if not current_user_id or image.user_id != int(current_user_id):
+                return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+                
+        filepath_min, _ = os.path.splitext(image.path)
+        filepath_min = filepath_min + ".png"
+        pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+        response = send_from_directory(pictograms_min_path, filepath_min)
+        response.headers['X-Image-Description'] = quote(image.description or '')
+        response.headers['X-Image-Name'] = quote(image.name or '')
+        response.headers['X-Image-Hash'] = image.image_hash or ''
+        response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
+        response.headers['X-Image-Id'] = str(image.id)
+        return response
+
+    # Fallback to legacy path-based serving
     filepath = posixpath.normpath(filepath)
     thumb_filename,_= os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
@@ -233,7 +308,7 @@ def serve_mobile_pictogram_min(filepath):
     pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
     
     if filepath.startswith('public/'):
-        return send_from_directory(pictograms_min_path, thumb_path_relative)
+        response = send_from_directory(pictograms_min_path, thumb_path_relative)
     else:
         current_user_id = get_jwt_identity()
         if not current_user_id:
@@ -241,16 +316,38 @@ def serve_mobile_pictogram_min(filepath):
             
         current_user = db.session.get(User, int(current_user_id))
         if current_user and filepath.replace('\\', '/').startswith(f"{current_user.username}/"):
-            return send_from_directory(pictograms_min_path, thumb_path_relative)
-            
-        return jsonify({"error":_tr("Forbidden")}), 403
+            response = send_from_directory(pictograms_min_path, thumb_path_relative)
+        else:
+            return jsonify({"error":_tr("Forbidden")}), 403
+
+    try:
+        image = db.session.scalar(db.select(Image).filter_by(path=filepath))
+        if image:
+            response.headers['X-Image-Description'] = quote(image.description or '')
+            response.headers['X-Image-Name'] = quote(image.name or '')
+            response.headers['X-Image-Hash'] = image.image_hash or ''
+            response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
+            response.headers['X-Image-Id'] = str(image.id)
+    except Exception:
+        pass
+    return response
 
 
-def _get_full_url(raw_path, host_url):
+def _get_full_url(raw_path, host_url, img_id=None):
+    if img_id is not None:
+        try:
+            val = int(img_id)
+            if val >= 0:
+                return f"{host_url.rstrip('/')}/api/v1/mobile/pictograms/{val}"
+        except (ValueError, TypeError):
+            pass
     if not raw_path:
         return ""
     if raw_path.startswith(('http://', 'https://')):
         return raw_path
+    if raw_path.startswith('/static/') or raw_path.startswith('static/'):
+        path_suffix = raw_path if raw_path.startswith('/') else f"/{raw_path}"
+        return f"{host_url.rstrip('/')}{path_suffix}"
     is_min = "pictogramsmin" in raw_path
     norm_path = re.sub(r'^/+', '', raw_path)
     norm_path = re.sub(r'^(pictograms/|images/|pictogramsmin/)', '', norm_path)
@@ -258,11 +355,21 @@ def _get_full_url(raw_path, host_url):
     return f"{host_url.rstrip('/')}/api/v1/mobile/{endpoint}/{norm_path}"
 
 
-def _get_thumb_url(raw_path, host_url):
+def _get_thumb_url(raw_path, host_url, img_id=None):
+    if img_id is not None:
+        try:
+            val = int(img_id)
+            if val >= 0:
+                return f"{host_url.rstrip('/')}/api/v1/mobile/pictogramsmin/{val}"
+        except (ValueError, TypeError):
+            pass
     if not raw_path:
         return ""
     if raw_path.startswith(('http://', 'https://')):
         return raw_path
+    if raw_path.startswith('/static/') or raw_path.startswith('static/'):
+        path_suffix = raw_path if raw_path.startswith('/') else f"/{raw_path}"
+        return f"{host_url.rstrip('/')}{path_suffix}"
     norm_path = re.sub(r'^/+', '', raw_path)
     norm_path = re.sub(r'^(pictograms/|images/|pictogramsmin/)', '', norm_path)
     return f"{host_url.rstrip('/')}/api/v1/mobile/pictogramsmin/{norm_path}"
@@ -270,15 +377,22 @@ def _get_thumb_url(raw_path, host_url):
 
 def _map_node_to_android_structure(web_node, host_url, current_username):
     image_url = web_node.get('image') or web_node.get('url') or ''
-    description = web_node.get('description') or web_node.get('text') or web_node.get('name') or ''
+    name = web_node.get('name') or web_node.get('text') or ''
+    description = web_node.get('description') or ''
     
-    full_url = _get_full_url(image_url, host_url)
+    node_id = web_node.get('id')
+    try:
+        img_id = int(node_id)
+    except (ValueError, TypeError):
+        img_id = web_node.get('real_id')
+
+    full_url = _get_full_url(image_url, host_url, img_id=img_id)
     
     children = web_node.get('children', [])
     mapped_children = [_map_node_to_android_structure(c, host_url, current_username) for c in children]
     return {
         'node_id': str(web_node.get('id', 'unsaved')),
-        'label': description,
+        'label': name,
         'description': description,
         'image_url': full_url,
         'children': mapped_children

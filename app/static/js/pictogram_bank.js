@@ -62,8 +62,15 @@ class ImageNode extends BaseNode {
         contentElement.classList.add('node-content');
 
         const imgElement = document.createElement('img');
-        // The path from the backend is now relative, so we build the URL for the new endpoint.
-        imgElement.src = `/pictograms/${this.data.path}`;
+        // Retrieve by ID if valid, else by path
+        const imageId = Number(this.data.id);
+        if (this.data.path && this.data.path.startsWith('http')) {
+            imgElement.src = this.data.path;
+        } else if (!isNaN(imageId) && imageId >= 0) {
+            imgElement.src = `/pictograms/${imageId}`;
+        } else {
+            imgElement.src = `/pictograms/${this.data.path}`;
+        }
         imgElement.alt = this.data.name;
 
         // Add tooltip events
@@ -405,7 +412,8 @@ class PictogramBank {
         }
 
         const relativePath = this.selectedNode.data.path;
-        const imageUrl = `/pictograms/${relativePath}`;
+        const imageId = Number(this.selectedNode.data.id);
+        const imageUrl = (relativePath && relativePath.startsWith('http')) ? relativePath : ((!isNaN(imageId) && imageId >= 0) ? `/pictograms/${imageId}` : `/pictograms/${relativePath}`);
         console.log(`Exporting image with URL: ${imageUrl}`);
 
         const link = document.createElement('a');

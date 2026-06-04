@@ -292,3 +292,92 @@ def test_update_image_details_unauthenticated(client):
     # No login
     update_response = client.put('/api/image/1', json={'description': 'test'})
     assert update_response.status_code == 401
+
+
+def test_upload_image_generates_hash_and_updated_at(client, app):
+    """Test that uploading an image calculates its SHA-256 hash and sets updated_at."""
+    user = create_user(client, 'testuser_pictogram_hash', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_pictogram_hash', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    data = {
+        'folder_id': root_folder.id,
+        'file': (create_test_image_io(), 'test_hash.jpg')
+    }
+    response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
+    assert response.status_code == 200
+    json_data = response.get_json()
+    assert json_data['status'] == 'success'
+    assert 'image_hash' in json_data['image']
+    assert json_data['image']['image_hash'] is not None
+    assert 'updated_at' in json_data['image']
+    assert json_data['image']['updated_at'] is not None
+
+    # Verify database
+    image = db.session.get(Image, json_data['image']['id'])
+    assert image.image_hash == json_data['image']['image_hash']
+    assert image.updated_at is not None
+
+
+def test_update_image_recalculates_hash_and_updated_at(client, app):
+    """Test that modifying an image's description recalculates the hash and updates the date."""
+    user = create_user(client, 'testuser_pictogram_rehash', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_pictogram_rehash', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    # Upload
+    data = {
+        'folder_id': root_folder.id,
+        'file': (create_test_image_io(), 'test_rehash.jpg')
+    }
+    response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
+    image_data = response.get_json()['image']
+    old_hash = image_data['image_hash']
+    old_updated_at = image_data['updated_at']
+
+    # Update description
+    update_response = client.put(f'/api/image/{image_data["id"]}', json={'description': 'Changed description'})
+    assert update_response.status_code == 200
+    updated_image_data = update_response.get_json()['image']
+
+    assert updated_image_data['image_hash'] != old_hash
+    assert updated_image_data['updated_at'] != old_updated_at
+
+
+def test_serve_pictogram_and_thumbnail_by_id(client, app):
+    """Test serving pictograms and thumbnails by database image ID."""
+    user = create_user(client, 'testuser_serve_id', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_serve_id', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    # Upload
+    data = {
+        'folder_id': root_folder.id,
+        'file': (create_test_image_io(), 'serve_id.jpg')
+    }
+    response = client.post('/api/image/upload', data=data, content_type='multipart/form-data')
+    image_id = response.get_json()['image']['id']
+
+    # Try serving by ID
+    serve_res = client.get(f'/pictograms/{image_id}')
+    assert serve_res.status_code == 200
+    assert serve_res.mimetype in ('image/jpeg', 'image/png')
+
+    # Try serving min by ID
+    serve_min_res = client.get(f'/pictogramsmin/{image_id}')
+    assert serve_min_res.status_code == 200
+    assert serve_min_res.mimetype == 'image/png'
+
+    # Test permissions: another user cannot access it
+    client.get('/logout', follow_redirects=True)
+    hacker = create_user(client, 'hacker_serve', 'Password123', 'hacker_serve@test.com')
+    confirm_user(client, hacker.email)
+    login(client, 'hacker_serve', 'Password123')
+
+    res_hacker = client.get(f'/pictograms/{image_id}')
+    # Should get prohibit-bold.png (served from static/images)
+    assert res_hacker.status_code == 200
+    assert res_hacker.mimetype == 'image/png'

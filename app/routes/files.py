@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 from app import db
 from app.models import Image
+from urllib.parse import quote
 
 bp = Blueprint('files', __name__)
 
@@ -17,34 +18,53 @@ def serve_js(filename):
     )
 
 
-@bp.route('/pictograms/<path:filepath>')
-def serve_pictogram(filepath):
-    """Serves a pictogram from the external data directory."""
+@bp.route('/pictograms/<img_id>')
+def serve_pictogram(img_id):
+    """Serves a pictogram from the external data directory by its database ID."""
+    try:
+        image = db.session.get(Image, int(img_id))
+    except (ValueError, TypeError):
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+        
+    if image is None:
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+        
+    if image.user_id is not None:
+        if not current_user.is_authenticated or image.user_id != current_user.id:
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+            
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
-    if filepath.startswith("public/"):
-    # send_from_directory is security-conscious and will prevent path traversal attacks.
-        return send_from_directory(pictograms_path, filepath)
-    image = db.session.scalar(db.select(Image).filter_by(path=filepath))
-    # 2. On vérifie si l'image existe ET qu'elle est public
-    if image is None or (((current_user.is_authenticated and image.user_id != current_user.id) or not current_user.is_authenticated) and not image.is_public):
-        # Si l'image n'existe pas ou n'appartient pas à l'utilisateur, on bloque.
+    response = send_from_directory(pictograms_path, image.path)
+    response.headers['X-Image-Description'] = quote(image.description or '')
+    response.headers['X-Image-Name'] = quote(image.name or '')
+    response.headers['X-Image-Hash'] = image.image_hash or ''
+    response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
+    response.headers['X-Image-Id'] = str(image.id)
+    return response
+
+
+@bp.route('/pictogramsmin/<img_id>')
+def serve_pictogram_min(img_id):
+    """Serves a pictogram thumbnail from the external data directory by its database ID."""
+    try:
+        image = db.session.get(Image, int(img_id))
+    except (ValueError, TypeError):
         return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
-    return send_from_directory(pictograms_path, filepath)
-
-
-@bp.route('/pictogramsmin/<path:filepath>')
-def serve_pictogram_min(filepath):
-    """Serves a pictogram from the external data directory."""
+        
+    if image is None:
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+        
+    if image.user_id is not None:
+        if not current_user.is_authenticated or image.user_id != current_user.id:
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+            
+    filepath_min, _ = os.path.splitext(image.path)
+    filepath_min = filepath_min + ".png"
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
-    pictograms_path_min, _ = os.path.splitext(filepath)
-    pictograms_path_min = pictograms_path_min + ".png"
-    if filepath.startswith("public/"):
-    # send_from_directory is security-conscious and will prevent path traversal attacks.
-        return send_from_directory(pictograms_path, pictograms_path_min)
-    image = db.session.scalar(db.select(Image).filter_by(path=filepath))
-    # 2. On vérifie si l'image existe ET qu'elle est public
-    if image is None or (((current_user.is_authenticated and image.user_id != current_user.id) or not current_user.is_authenticated) and not image.is_public):
-        # Si l'image n'existe pas ou n'appartient pas à l'utilisateur, on bloque.
-        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
-    
-    return send_from_directory(pictograms_path, pictograms_path_min)
+    response = send_from_directory(pictograms_path, filepath_min)
+    response.headers['X-Image-Description'] = quote(image.description or '')
+    response.headers['X-Image-Name'] = quote(image.name or '')
+    response.headers['X-Image-Hash'] = image.image_hash or ''
+    response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
+    response.headers['X-Image-Id'] = str(image.id)
+    return response

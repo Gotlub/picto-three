@@ -71,6 +71,8 @@ class Image(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     is_public = db.Column(db.Boolean, default=False, nullable=False, server_default='0')
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'))
+    image_hash = db.Column(db.String(64), nullable=True)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC), nullable=True)
 
     def to_dict(self):
         return {
@@ -82,6 +84,8 @@ class Image(db.Model):
             'user_id': self.user_id,
             'is_public': self.is_public,
             'folder_id': self.folder_id,
+            'image_hash': self.image_hash,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
 
     def __repr__(self):
