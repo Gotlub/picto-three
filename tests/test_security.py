@@ -85,3 +85,24 @@ def test_search_local_images_authenticated(seeded_db):
     # User 1 should NOT see:
     # - Other user's private (201)
     assert 201 not in image_ids
+
+def test_mobile_pictogram_path_traversal(seeded_db):
+    """Test that directory traversal using backslashes is blocked."""
+    client = seeded_db
+
+    # Log in to get a JWT token for mobile API tests
+    login_response = client.post('/api/v1/mobile/login', json={
+        'username': 'user1',
+        'password': 'password'
+    })
+    assert login_response.status_code == 200
+    token = login_response.get_json()['access_token']
+    headers = {'Authorization': f'Bearer {token}'}
+
+    # Test path traversal in standard pictograms
+    response = client.get('/api/v1/mobile/pictograms/user1\\..\\admin\\secret.png', headers=headers)
+    assert response.status_code == 403
+
+    # Test path traversal in mini pictograms
+    response_min = client.get('/api/v1/mobile/pictogramsmin/user1\\..\\admin\\secret.png', headers=headers)
+    assert response_min.status_code == 403

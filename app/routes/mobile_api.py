@@ -302,6 +302,9 @@ def serve_mobile_pictogram_min(filepath):
 
     # Fallback to legacy path-based serving
     filepath = posixpath.normpath(filepath)
+    if filepath.startswith('..') or posixpath.isabs(filepath):
+        return jsonify({"error": "Invalid path"}), 400
+
     thumb_filename,_= os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
     
