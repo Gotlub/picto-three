@@ -1276,10 +1276,12 @@ class ListBuilder {
                      img.src = item.data.path;
                  } else if (!isNaN(imageId) && imageId >= 0) {
                      img.src = `/pictograms/${imageId}`;
-                 } else {
+                 } else if (item.data.path) {
                      img.src = item.data.path.startsWith('/') || item.data.path.startsWith('data:')
                                  ? item.data.path 
-                                 : `/pictograms/${item.data.path}`;
+                                 : '/pictograms/' + item.data.path;
+                 } else {
+                     img.src = '/static/images/prohibit-bold.png';
                  }
                 img.style.maxWidth = '100%';
                 img.style.maxHeight = '100%';
