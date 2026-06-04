@@ -332,7 +332,8 @@ def calculate_image_hash(filepath_full, description):
                 hasher.update(chunk)
     except FileNotFoundError:
         pass
-    hasher.update(description.encode('utf-8'))
+    desc_str = description or ""
+    hasher.update(desc_str.encode('utf-8'))
     return hasher.hexdigest()
 
 @bp.route('/image/upload', methods=['POST'])
