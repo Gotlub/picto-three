@@ -1442,10 +1442,12 @@ class ListBuilder {
                         // Keep HTTP URL
                     } else if (!isNaN(imageId) && imageId >= 0) {
                         fullSrc = `/pictograms/${imageId}`;
-                    } else if (src.startsWith('data:')) {
+                    } else if (src && src.startsWith('data:')) {
                         // Keep data URI
-                    } else if (!src.startsWith('/')) {
+                    } else if (src && !src.startsWith('/')) {
                         fullSrc = '/pictograms/' + src;
+                    } else if (!src) {
+                        fullSrc = '/static/images/prohibit-bold.png';
                     }
                     img.src = fullSrc;
                 });
