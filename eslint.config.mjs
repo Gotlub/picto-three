@@ -1,26 +1,30 @@
-import js from "@eslint/js";
 import globals from "globals";
+import pluginJs from "@eslint/js";
 
 export default [
-    {
-        ignores: ["**/lib/**", "app/static/js/lib/**/*.js"]
-    },
-    js.configs.recommended,
-    {
-        languageOptions: {
-            ecmaVersion: 2022,
-            sourceType: "module",
-            globals: {
-                ...globals.browser,
-                $: "readonly",
-                bootstrap: "readonly",
-                tooltip: "readonly",
-                Treant: "readonly"
-            }
-        },
-        rules: {
-            "no-unused-vars": ["warn"],
-            "no-undef": "error"
-        }
+  // 1. Les dossiers à ignorer globalement (doit être son propre objet)
+  {
+    ignores: [
+      "venv/",
+      "app/static/vendor/",
+      "app/static/js/lib/"
+    ]
+  },
+
+  // 2. Ton environnement (navigateur) et variables globales
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        tooltip: "readonly",
+        bootstrap: "readonly",
+        $: "readonly",
+        jQuery: "readonly",
+        Treant: "readonly"
+      }
     }
+  },
+
+  // 3. Les règles recommandées standards de JavaScript
+  pluginJs.configs.recommended
 ];

@@ -8,6 +8,8 @@ from pathlib import Path
 import shutil
 from PIL import Image as PILImage
 from sqlalchemy import or_
+import hashlib
+from datetime import datetime, UTC
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -322,6 +324,18 @@ def create_thumbnail_for_upload(filepath_relative):
     except Exception as e:
         current_app.logger.error(f"Erreur lors de la création de la miniature pour {filepath_relative}: {e}")
 
+def calculate_image_hash(filepath_full, description):
+    hasher = hashlib.sha256()
+    try:
+        with open(filepath_full, 'rb') as f:
+            while chunk := f.read(8192):
+                hasher.update(chunk)
+    except FileNotFoundError:
+        pass
+    desc_str = description or ""
+    hasher.update(desc_str.encode('utf-8'))
+    return hasher.hexdigest()
+
 @bp.route('/image/upload', methods=['POST'])
 @login_required
 def upload_image():
@@ -373,13 +387,22 @@ def upload_image():
         if not description:
             description = Path(filename).stem
 
+        # Calculate hash
+        try:
+            image_hash = calculate_image_hash(physical_path, description)
+        except Exception as e:
+            current_app.logger.error(f"Error hashing image: {e}")
+            image_hash = None
+
         new_image = Image(
             name=filename,
             path=str(relative_path).replace('\\', '/'),
             user_id=current_user.id,
             folder_id=folder.id,
             description=description,
-            is_public=False
+            is_public=False,
+            image_hash=image_hash,
+            updated_at=datetime.now(UTC)
         )
         db.session.add(new_image)
         db.session.commit()
@@ -420,6 +443,15 @@ def update_image_details(image_id):
 
     # is_public is forced to False for security - no public user images
     image.is_public = False
+
+    # Recalculate hash and update modification time
+    try:
+        base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+        physical_path = base_path / image.path
+        image.image_hash = calculate_image_hash(physical_path, image.description)
+    except Exception as e:
+        current_app.logger.error(f"Error rehashing image on update: {e}")
+    image.updated_at = datetime.now(UTC)
 
     db.session.commit()
 
@@ -497,6 +529,9 @@ def delete_tree(tree_id):
     if tree.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
 
+    # Delete references in ProfileTree association table
+    db.session.execute(db.delete(ProfileTree).filter_by(tree_id=tree_id))
+
     db.session.delete(tree)
     db.session.commit()
 
@@ -523,6 +558,8 @@ def load_profiles():
         # Order by display_order
         trees_assoc = sorted(profile.profile_trees, key=lambda x: x.display_order)
         for assoc in trees_assoc:
+            if assoc.tree is None:
+                continue
             tree_dict = assoc.tree.to_dict()
             tree_dict['colorCode'] = assoc.colorCode
             tree_dict['display_order'] = assoc.display_order

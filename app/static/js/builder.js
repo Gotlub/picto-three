@@ -3,15 +3,16 @@ import ArasaacSearch from './components/ArasaacSearch.js';
 
 
 class BuilderNode {
-    constructor(image, builder, nodeData = null) {
+    constructor(image, builder, nodeData = null, isRoot = false) {
         this.image = image;
         this.builder = builder;
         this.nodeData = nodeData;
         this.children = [];
         this.parent = null;
+        this.isRoot = isRoot;
         // Prioritize description from saved tree data, fallback to image data.
         this.description = (nodeData && nodeData.description !== undefined) ? nodeData.description : (image.description || '');
-        this.isDefaultRoot = (image.id === 'root' && (!nodeData || !nodeData.url));
+        this.isDefaultRoot = (this.isRoot && (image.id === 'root' || (!nodeData || !nodeData.url)));
         this.element = this.createElement(builder);
     }
 
@@ -23,7 +24,7 @@ class BuilderNode {
     createElement(builder) {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
-        nodeElement.setAttribute('draggable', this.image.id !== 'root');
+        nodeElement.setAttribute('draggable', !this.isRoot);
 
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
@@ -33,7 +34,12 @@ class BuilderNode {
             // Path can be a new relative path (e.g., 'public/foo.png')
             // or an absolute URL for the root node icon (e.g., '/pictograms/public/...')
             // or an external URL from Arasaac (e.g. 'https://static.arasaac.org/...')
-            if (this.image.path.startsWith('http') || this.image.path.startsWith('/')) {
+            const imageId = Number(this.image.id);
+            if (this.image.path.startsWith('http')) {
+                imgElement.src = this.image.path;
+            } else if (!isNaN(imageId) && imageId >= 0) {
+                imgElement.src = `/pictograms/${imageId}`;
+            } else if (this.image.path.startsWith('/')) {
                 imgElement.src = this.image.path; // It's already a full URL or absolute path
             } else {
                 imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
@@ -65,7 +71,7 @@ class BuilderNode {
         this.nameElement = nameElement;
         contentElement.appendChild(nameElement);
 
-        if (this.image.id === 'root') {
+        if (this.isRoot) {
             // For the root node, add a visual indicator that it can be changed
             const hintElement = document.createElement('div');
             hintElement.style.fontSize = '0.7em';
@@ -146,7 +152,7 @@ class TreeBuilder {
         this.closeVisualizeXBtn = document.getElementById('close-visualizer-x-btn');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.savedTrees = [];
-        this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
+        this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this, null, true);
         this.treeDisplay.appendChild(this.rootNode.element);
         this.selectedNode = null;
         this.draggedNode = null;
@@ -417,8 +423,11 @@ class TreeBuilder {
     getTreeForVisualization() {
         const buildTreantNode = (builderNode) => {
             let imageSrc;
+            const imageId = Number(builderNode.image.id);
             if (builderNode.image.path.startsWith('http')) {
                 imageSrc = builderNode.image.path;
+            } else if (!isNaN(imageId) && imageId >= 0) {
+                imageSrc = `/pictograms/${imageId}`;
             } else if (builderNode.image.path.startsWith('/')) {
                 imageSrc = builderNode.image.path;
             } else {
@@ -553,7 +562,7 @@ class TreeBuilder {
     }
 
     handleDragStart(e, theNode) {
-        if (theNode.image.id === 'root') {
+        if (theNode.isRoot) {
             e.preventDefault();
             return;
         }
@@ -578,7 +587,7 @@ class TreeBuilder {
                 const offsetY = e.clientY - rect.top;
                 const height = rect.height;
 
-                if (targetNode.image.id === 'root') {
+                if (targetNode.isRoot) {
                     if (offsetY < height / 2) {
                         targetContent.classList.add('drag-over-replace');
                     } else {
@@ -611,7 +620,7 @@ class TreeBuilder {
             const rect = targetContent.getBoundingClientRect();
             const offsetY = e.clientY - rect.top;
             const height = rect.height;
-            if (targetNode.image.id === 'root') {
+            if (targetNode.isRoot) {
                 zone = offsetY < height / 2 ? 'replace' : 'child';
             } else {
                 if (offsetY < height * 0.25) {
@@ -641,7 +650,7 @@ class TreeBuilder {
                 oldParent.children = oldParent.children.filter(child => child !== draggedNode);
             }
 
-            if (targetNode.image.id === 'root' && zone === 'replace') {
+            if (targetNode.isRoot && zone === 'replace') {
                 this.updateRootImage(draggedNode.image);
                 // Reparent all children of the dragged node to the root node
                 draggedNode.children.forEach(child => {
@@ -670,7 +679,7 @@ class TreeBuilder {
                 const dragData = JSON.parse(dragDataString);
                 if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
 
-                    if (targetNode.image.id === 'root' && zone === 'replace') {
+                    if (targetNode.isRoot && zone === 'replace') {
                         // If dropping on root top half, change the root's image
                         this.updateRootImage(dragData.data);
                         return;
@@ -702,15 +711,14 @@ class TreeBuilder {
         // Keep the children but recreate the root node with the new image
         const children = this.rootNode.children;
         const newRootData = {
-            id: 'root', // Keep it identified as root
-            real_id: imageData.id, // The actual image ID
+            id: imageData.id, // Now it uses the real database ID!
             name: imageData.name,
             path: imageData.path || imageData.url,
             description: imageData.description || imageData.name
         };
 
         // Custom node logic to handle our modified root
-        this.rootNode = new BuilderNode(newRootData, this, { url: newRootData.path });
+        this.rootNode = new BuilderNode(newRootData, this, { url: newRootData.path }, true);
         this.rootNode.children = children;
 
         // Re-assign parents
@@ -788,7 +796,7 @@ class TreeBuilder {
     }
 
     deleteSelectedNode() {
-        if (!this.selectedNode || this.selectedNode.image.id === 'root') {
+        if (!this.selectedNode || this.selectedNode.isRoot) {
             alert(this.selectedNode ? 'You cannot delete the root node.' : 'Please select a node to delete.');
             return;
         }
@@ -899,7 +907,8 @@ class TreeBuilder {
         let root_id = -1;
         let root_url = null;
         if (this.rootNode && !this.rootNode.isDefaultRoot) {
-            root_id = this.rootNode.image.real_id !== undefined ? this.rootNode.image.real_id : this.rootNode.image.id;
+            const rawId = this.rootNode.image.real_id !== undefined ? this.rootNode.image.real_id : this.rootNode.image.id;
+            root_id = isNaN(Number(rawId)) ? -1 : Number(rawId);
             root_url = this.rootNode.image.path;
 
             if (root_url && root_url.startsWith('http')) {
@@ -1036,7 +1045,9 @@ class TreeBuilder {
         if (!this.modalImageTree) {
             this.modalImageTree = new ImageTree('modal-image-sidebar-tree');
             this.modalImageTree.onImageClick = (data) => {
-                this.setProfileAvatar(`/pictogramsmin/${data.path}`);
+                const imageId = Number(data.id);
+                const avatarUrl = (data.path && data.path.startsWith('http')) ? data.path : ((!isNaN(imageId) && imageId >= 0) ? `/pictogramsmin/${imageId}` : `/pictogramsmin/${data.path}`);
+                this.setProfileAvatar(avatarUrl);
                 modal.hide();
             };
             
@@ -1090,7 +1101,7 @@ class TreeBuilder {
             }
         });
 
-        profileArea.addEventListener('dragleave', (e) => {
+        profileArea.addEventListener('dragleave', () => {
             profileArea.classList.remove('border-primary');
             // We shouldn't remove drop-above/below here unconditionally because dragleave fires when entering child elements
         });
@@ -1225,10 +1236,13 @@ class TreeBuilder {
         img.style.maxWidth = '100%';
         img.style.maxHeight = '100%';
         let thumbUrl = '/static/images/folder-bold.png';
-        if (treeData.root_url) {
-            if (treeData.root_url.startsWith('http')) {
-                thumbUrl = treeData.root_url.replace(/_500\.png$/, '_300.png');
-            } else if (treeData.root_url.startsWith('/pictograms/')) {
+        const rootId = Number(treeData.root_id);
+        if (treeData.root_url && treeData.root_url.startsWith('http')) {
+            thumbUrl = treeData.root_url.replace(/_500\.png$/, '_300.png');
+        } else if (!isNaN(rootId) && rootId > 0) {
+            thumbUrl = `/pictogramsmin/${rootId}`;
+        } else if (treeData.root_url) {
+            if (treeData.root_url.startsWith('/pictograms/')) {
                 thumbUrl = treeData.root_url.replace('/pictograms/', '/pictogramsmin/');
             } else if (treeData.root_url.startsWith('/')) {
                 thumbUrl = treeData.root_url;
@@ -1429,11 +1443,14 @@ class TreeBuilder {
             img.style.maxHeight = '100%';
             
             let thumbUrl = '/static/images/folder-bold.png'; // default fallback
-            if (tree.root_url) {
-                if (tree.root_url.startsWith('http')) {
-                    // Arasaac: replace _500 with _300 if applicable
-                    thumbUrl = tree.root_url.replace(/_500\.png$/, '_300.png');
-                } else if (tree.root_url.startsWith('/pictograms/')) {
+            const rootId = Number(tree.root_id);
+            if (tree.root_url && tree.root_url.startsWith('http')) {
+                // Arasaac: replace _500 with _300 if applicable
+                thumbUrl = tree.root_url.replace(/_500\.png$/, '_300.png');
+            } else if (!isNaN(rootId) && rootId > 0) {
+                thumbUrl = `/pictogramsmin/${rootId}`;
+            } else if (tree.root_url) {
+                if (tree.root_url.startsWith('/pictograms/')) {
                     thumbUrl = tree.root_url.replace('/pictograms/', '/pictogramsmin/');
                 } else if (tree.root_url.startsWith('/')) {
                     thumbUrl = tree.root_url;
@@ -1647,14 +1664,15 @@ class TreeBuilder {
             if (treeData.roots && treeData.roots.length === 1) {
                 const rootData = treeData.roots[0];
                 // Initialize root Node from the data
+                const rootImageId = rootData.id !== 'root' && rootData.id !== undefined ? rootData.id : rootData.real_id;
                 const rootImage = {
-                    id: 'root',
-                    real_id: rootData.id !== undefined ? rootData.id : rootData.real_id,
+                    id: rootImageId !== undefined ? rootImageId : 'root',
+                    real_id: rootData.real_id,
                     name: rootData.name || 'Root',
                     path: rootData.url || '/static/images/folder-open-bold.png',
                     description: rootData.description || rootData.name
                 };
-                this.rootNode = new BuilderNode(rootImage, this, rootData);
+                this.rootNode = new BuilderNode(rootImage, this, rootData, true);
 
                 // Process its children
                 if (rootData.children) {
@@ -1667,7 +1685,7 @@ class TreeBuilder {
                 }
             } else if (treeData.roots && treeData.roots.length > 1) {
                 // Fallback for older saves where multiple roots were allowed at top level
-                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
+                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this, null, true);
                 treeData.roots.forEach(rootData => {
                     const rootNode = this.buildNodeFromJsonData(rootData);
                     if (rootNode) {
@@ -1676,7 +1694,7 @@ class TreeBuilder {
                 });
             } else {
                 // Empty
-                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this);
+                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this, null, true);
             }
         }
 

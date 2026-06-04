@@ -32,7 +32,9 @@ export default class ImageTreeImageNode extends ImageTreeNode {
 
         // Add tooltip events targeting full resolution image
         imgElement.addEventListener('mouseover', (e) => {
-            tooltip.show(e, `/pictograms/${this.data.path}`, this.data.name, this.data.description);
+            const imageId = Number(this.data.id);
+            const fullUrl = (this.data.path && this.data.path.startsWith('http')) ? this.data.path : ((!isNaN(imageId) && imageId >= 0) ? `/pictograms/${imageId}` : `/pictograms/${this.data.path}`);
+            tooltip.show(e, fullUrl, this.data.name, this.data.description);
         });
         imgElement.addEventListener('mouseout', (e) => {
             tooltip.hide(e);
@@ -42,7 +44,8 @@ export default class ImageTreeImageNode extends ImageTreeNode {
 
         // Hover Download Button Overlay
         const dlBtn = document.createElement('a');
-        dlBtn.href = `/pictograms/${this.data.path}`;
+        const imageId = Number(this.data.id);
+        dlBtn.href = (this.data.path && this.data.path.startsWith('http')) ? this.data.path : ((!isNaN(imageId) && imageId >= 0) ? `/pictograms/${imageId}` : `/pictograms/${this.data.path}`);
         dlBtn.download = this.data.name || 'download.png';
         dlBtn.innerHTML = '&#128229;'; // Inbox tray emoji
         dlBtn.style.position = 'absolute';
@@ -92,8 +95,14 @@ export default class ImageTreeImageNode extends ImageTreeNode {
         const imgElement = this.element.querySelector('img');
 
         const thumbPath = this.data.path;
-
-        imgElement.src = `/pictogramsmin/${thumbPath}`;
+        const imageId = Number(this.data.id);
+        if (thumbPath && thumbPath.startsWith('http')) {
+            imgElement.src = thumbPath;
+        } else if (!isNaN(imageId) && imageId >= 0) {
+            imgElement.src = `/pictogramsmin/${imageId}`;
+        } else {
+            imgElement.src = `/pictogramsmin/${thumbPath}`;
+        }
         this.isLoaded = true;
     }
 

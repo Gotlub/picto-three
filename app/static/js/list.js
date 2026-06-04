@@ -3,12 +3,14 @@ import ArasaacSearch from './components/ArasaacSearch.js';
 
 // --- Start of Tree Viewer (Center Panel, adapted from builder.js) ---
 class ReadOnlyNode {
-    constructor(nodeData, image, listBuilder) {
+    constructor(nodeData, image, listBuilder, isRoot = false) {
         this.nodeData = nodeData;
         this.image = image;
         this.listBuilder = listBuilder;
         this.children = [];
         this.parent = null;
+        this.isRoot = isRoot;
+        this.isDefaultRoot = (this.isRoot && (image.id === 'root' || (!nodeData || !nodeData.url)));
         this.description = nodeData.description || image.description || '';
         this.element = this.createElement();
 
@@ -18,7 +20,7 @@ class ReadOnlyNode {
             e.stopPropagation();
             // 1. Fonction récursive pour collecter les données de la branche (inchangée)
             const collectBranchData = (node) => {
-                const nodeData = { ...node.image, description: node.description };
+                const nodeData = { ...node.image, description: node.description, isRoot: node.isRoot };
                 let branch = [nodeData];
                 if (node.children && node.children.length > 0) {
                     node.children.forEach(child => {
@@ -35,7 +37,7 @@ class ReadOnlyNode {
                 branchData = collectBranchData(this);
             } else {
                 // Nouveau comportement : copier uniquement le nœud sélectionné
-                const nodeData = { ...this.image, description: this.description };
+                const nodeData = { ...this.image, description: this.description, isRoot: this.isRoot };
                 branchData = [nodeData];
             }
 
@@ -64,8 +66,11 @@ class ReadOnlyNode {
         if (this.image.path) {
             // Path can be a new relative path or an old absolute one during transition
             // or an external URL from Arasaac
+            const imageId = Number(this.image.id);
             if (this.image.path.startsWith('http')) {
                 imgElement.src = this.image.path;
+            } else if (!isNaN(imageId) && imageId >= 0) {
+                imgElement.src = `/pictograms/${imageId}`;
             } else if (this.image.path.startsWith('/')) {
                 imgElement.src = this.image.path; // It's already a full URL
             } else {
@@ -109,8 +114,11 @@ class ChainedListItem {
         const img = document.createElement('img');
         // The path from the backend is now relative, so we build the URL for the new endpoint.
         // Unless it is an external URL (Arasaac)
-        if (this.data.path.startsWith('http') || this.data.path.startsWith('data:')) {
+        const imageId = Number(this.data.image_id);
+        if (this.data.path && (this.data.path.startsWith('http') || this.data.path.startsWith('data:'))) {
             img.src = this.data.path;
+        } else if (!isNaN(imageId) && imageId >= 0) {
+            img.src = `/pictograms/${imageId}`;
         } else {
             // Backward compatibility or local relative paths
             // Adjust if path already starts with / or not
@@ -173,7 +181,7 @@ class ListBuilder {
             name: 'Root',
             path: '/static/images/folder-open-bold.png',
         };
-        this.treeRoot = new ReadOnlyNode(rootData, rootData, this);
+        this.treeRoot = new ReadOnlyNode(rootData, rootData, this, true);
         this.selectedTreeNode = null;
 
         // Right Panel
@@ -670,7 +678,7 @@ class ListBuilder {
                             path: itemData.path,
                             description: itemData.description || ""
                         };
-                        if (newItemData.name !== "Root") {
+                        if (!itemData.isRoot && newItemData.name !== "Root") {
                             const newListItem = new ChainedListItem(newItemData, this);
                             // On insère l'item et on incrémente l'index pour le suivant
                             this.chainedListItems.splice(newIndex + 1, 0, newListItem);
@@ -1068,14 +1076,15 @@ class ListBuilder {
 
         if (treeData.roots && treeData.roots.length === 1) {
             const rootData = treeData.roots[0];
+            const rootImageId = rootData.id !== 'root' && rootData.id !== undefined ? rootData.id : rootData.real_id;
             const rootImage = {
-                id: 'root',
-                real_id: rootData.id !== undefined ? rootData.id : rootData.real_id,
+                id: rootImageId !== undefined ? rootImageId : 'root',
+                real_id: rootData.real_id,
                 name: rootData.name || 'Root',
                 path: rootData.url || '/static/images/folder-open-bold.png',
                 description: rootData.description || rootData.name
             };
-            this.treeRoot = new ReadOnlyNode(rootData, rootImage, this);
+            this.treeRoot = new ReadOnlyNode(rootData, rootImage, this, true);
 
             if (rootData.children) {
                 rootData.children.forEach(childData => {
@@ -1085,7 +1094,7 @@ class ListBuilder {
             }
         } else if (treeData.roots && treeData.roots.length > 1) {
             const rootDisplayData = { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png', description: 'Root' };
-            this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
+            this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this, true);
 
             treeData.roots.forEach(rootData => {
                 const rootNode = buildNode(rootData);
@@ -1093,7 +1102,7 @@ class ListBuilder {
             });
         } else {
             const rootDisplayData = { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png', description: 'Root' };
-            this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this);
+            this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this, true);
         }
 
         this.renderTreeViewer();
@@ -1261,10 +1270,19 @@ class ListBuilder {
                 imgContainer.style.overflow = 'hidden';
                 imgContainer.style.position = 'relative';
 
-                const img = document.createElement('img');
-                img.src = item.data.path.startsWith('http') || item.data.path.startsWith('/') || item.data.path.startsWith('data:')
-                            ? item.data.path 
-                            : `/pictograms/${item.data.path}`;
+                 const img = document.createElement('img');
+                 const imageId = Number(item.data.image_id);
+                 if (item.data.path && item.data.path.startsWith('http')) {
+                     img.src = item.data.path;
+                 } else if (!isNaN(imageId) && imageId >= 0) {
+                     img.src = `/pictograms/${imageId}`;
+                 } else if (item.data.path) {
+                     img.src = item.data.path.startsWith('/') || item.data.path.startsWith('data:')
+                                 ? item.data.path 
+                                 : '/pictograms/' + item.data.path;
+                 } else {
+                     img.src = '/static/images/prohibit-bold.png';
+                 }
                 img.style.maxWidth = '100%';
                 img.style.maxHeight = '100%';
                 img.style.objectFit = 'contain';
@@ -1413,7 +1431,7 @@ class ListBuilder {
             }
             const itemsPerPage = Math.max(1, cols * rows);
 
-            const loadImage = (src) => {
+            const loadImage = (src, imgId) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = 'Anonymous';
@@ -1421,10 +1439,17 @@ class ListBuilder {
                     img.onerror = () => resolve(null);
 
                     let fullSrc = src;
-                    if (src.startsWith('data:')) {
+                    const imageId = Number(imgId);
+                    if (src && src.startsWith('http')) {
+                        // Keep HTTP URL
+                    } else if (!isNaN(imageId) && imageId >= 0) {
+                        fullSrc = `/pictograms/${imageId}`;
+                    } else if (src && src.startsWith('data:')) {
                         // Keep data URI
-                    } else if (!src.startsWith('http') && !src.startsWith('/')) {
+                    } else if (src && !src.startsWith('/')) {
                         fullSrc = '/pictograms/' + src;
+                    } else if (!src) {
+                        fullSrc = '/static/images/prohibit-bold.png';
                     }
                     img.src = fullSrc;
                 });
@@ -1452,7 +1477,7 @@ class ListBuilder {
                 const y = pagePadding + row * itemTotalH;
 
                 const item = itemsToRender[i];
-                const imgElement = await loadImage(item.data.path);
+                const imgElement = await loadImage(item.data.path, item.data.image_id);
 
                 let imgBoxX = x;
                 let imgBoxY = y;
