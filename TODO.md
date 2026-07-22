@@ -100,4 +100,7 @@ Liste des jalons et tâches à réaliser par les agents IA.
 
 ## Maintenance
 - [x] Corriger la configuration SMTP pour Brevo (séparation user/sender).
+- [x] Créer le Makefile pour faciliter la gestion des conteneurs Docker (admin, images, bash, psql).
+- [x] Configurer la stack Docker de production (Dockerfile optimisé + docker-compose.yml unique + volumes nommés + limites BDD 512 Mo).
+- [x] Mettre à jour la documentation README.md avec la gestion Docker unique, le Makefile et le mode démonstration (DEMO_USERNAME).
 ```

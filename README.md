@@ -19,15 +19,76 @@ This project is currently in the **Alpha stage** and under active development. F
 ---
 
 ## 🛠 Technical Stack
-- **Backend:** Python 3.10+ / [Flask](https://flask.palletsprojects.com/)
-- **Database:** SQLite (SQLAlchemy) - Default path: `../data/app.db`
+- **Backend:** Python 3.11+ / [Flask](https://flask.palletsprojects.com/) / Gunicorn
+- **Database:** PostgreSQL 15 (Alpine)
 - **Frontend:** HTML5 / Bootstrap 5 / Treant.js / Vanilla JS
+- **Containerization:** Docker & Docker Compose
 - **Internationalization (i18n):** [Flask-Babel](https://python-babel.github.io/flask-babel/)
 - **Testing:** [Pytest](https://docs.pytest.org/)
 
 ---
 
-## 🚀 Installation & Setup
+## 🐳 Docker Deployment & Makefile Commands
+
+A single production-ready Docker setup is used across environments (`docker-compose.yml`), featuring an optimized `python:3.11-slim` image, Gunicorn server, PostgreSQL 15 (capped at 512MB RAM), and persistent named volumes.
+
+### Quick Start with Docker
+
+```bash
+# 1. Build and launch containers in background
+make up
+
+# 2. Apply database migrations
+make upgrade
+
+# 3. Create the demo account (for unauthenticated mode)
+make user U=DEMO_USERNAME E=demo@demo.demo P="yourpassword"
+
+# 4. (Optional) Create an admin account
+make user U=admin E=admin@pictotree.eu P="Password123!"
+
+# 5. Import initial public pictograms & thumbnails
+make add-img
+```
+
+*Direct Docker Compose command equivalent:*
+```bash
+docker compose up -d --build
+```
+
+### Summary of Makefile Commands
+
+| Command | Description |
+| :--- | :--- |
+| `make up` | Build and start Docker containers in background (`docker compose up -d --build`) |
+| `make build` | Rebuild Docker images without cache (`docker compose build --no-cache`) |
+| `make down` | Stop and remove Docker containers (`docker compose down`) |
+| `make restart` | Restart Docker containers |
+| `make logs` | View live container logs (`docker compose logs -f`) |
+| `make user [U=.. E=.. P=..]` | Manually create a user (bypassing SMTP email confirmation) |
+| `make add-img` | Scan and import public pictograms & generate thumbnails |
+| `make upgrade` | Apply Flask database migrations (`flask db upgrade`) |
+| `make migrate [M="..."]` | Generate a new Flask database migration (`flask db migrate`) |
+| `make bash` | Open a `bash` shell inside the `web` container |
+| `make db-bash` | Open a `psql` shell inside the `db` PostgreSQL container |
+| `make test` | Run the Pytest suite inside the `web` container |
+
+---
+
+## 👤 Unauthenticated / Demo Mode (`DEMO_USERNAME`)
+
+PictoTree supports an **Unauthenticated / Demo Mode** allowing offline users or visitors without an active login session to browse public profiles and pictogram trees.
+
+- When a user accesses the builder or profiles without logging in, the application automatically loads profiles and trees belonging to the user specified by `DEMO_USERNAME`.
+
+To set up the demo account:
+```bash
+make user U=DEMO_USERNAME E=demo@demo.demo P="DemoPassword123!"
+```
+
+---
+
+## 💻 Local Setup (Without Docker - Optional)
 
 ### 1. Create Virtual Environment
 ```bash
@@ -43,79 +104,46 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Database Setup
-The database is expected to be located at `../data/app.db`.
+### 3. Database Setup & Run
 ```bash
 flask db upgrade
-```
-
-### 4. Run the Application
-```bash
 flask run
-# or
-python -m flask run
 ```
 The dashboard will be available at `http://127.0.0.1:5000`.
 
 ---
 
-## 🔧 Developer Tools & Workarounds
+## 🛠 Development Workflow & Quality Control
 
-### Creating an Admin User
-Since the registration flow requires SMTP (Email) and Google reCAPTCHA secrets, you can use the following script to create a user manually:
+To maintain code quality, please run linting and tests before committing:
+
 ```bash
-python create_admin.py <username> <email> "<password>"
-# Example:
-python create_admin.py test teste@teste.com "Password123!"
-```
+# Run tests inside Docker
+make test
 
-### Importing Pictograms
-To scan and add images to the database, place your images in `../data/pictograms/public` and run:
-```bash
-python add_test_images.py
-```
+# Or run locally
+pytest -v
 
----
-
-## 🛠 Development Workflow
-
-To maintain code quality and avoid CI failures, please run the following commands before committing your changes:
-
-### 1. Quality Control (Linting)
-We use **Ruff** for Python and **ESLint** for JavaScript.
-```bash
 # Python linting
 ruff check .
 
 # JavaScript linting
-npm run lint
-# or
 npx eslint .
-```
-
-### 2. Running Tests
-Ensure all backend tests pass using **Pytest**:
-```bash
-pytest -v
 ```
 
 ---
 
-## 🌐 Internationalization & Testing
+## 🌐 Internationalization (i18n)
 
-### Running Tests
-We use Pytest for backend and API coverage:
-```bash
-pytest -v
-```
+The project supports multiple languages (`de`, `es`, `fr`, `it`, `nl`, `pl`). To update translations:
 
-### Managing Translations
-The project supports multiple languages (de, es, fr, it, nl, pl). To update translations after modifying templates:
 ```bash
 # Extract strings
 pybabel extract -F babel.cfg -k _l -o messages.pot .
+
 # Update existing catalogs
 pybabel update -i messages.pot -d app/translations
+
 # Compile binary catalogs
 pybabel compile -d app/translations
 ```

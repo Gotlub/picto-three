@@ -56,11 +56,11 @@ def create_admin_user(username, email, password):
         
         # On récupère le chemin de base défini dans ta config Flask
         base_path = current_app.config.get('PICTOGRAMS_PATH', 'app/static/pictograms')
-        user_folder_path = os.path.join(base_path, f"root_{username}")
+        user_folder_path = os.path.join(base_path, f"{username}")
         
         if not os.path.exists(user_folder_path):
             os.makedirs(user_folder_path)
-            print(f"📁 Dossier physique créé : {user_folder_path}")
+            print(f"📁 Dossier physique créé : {username}")
 
         print(f"✅ Dossier racine créé avec succès (ID: {root_folder.id}).")
         print("--------------------------------------------------")
