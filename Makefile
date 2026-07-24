@@ -69,4 +69,4 @@ reset:
 	@echo "🧨 Destruction de l'environnement et des volumes de données..."
 	docker compose down -v
 	@echo "🌱 Reconstruction d'un environnement tout neuf..."
-	make init
+	make up

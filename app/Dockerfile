@@ -30,7 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Création préalable des répertoires de stockage des pictogrammes et attribution des droits à appuser
-RUN mkdir -p /app/app/static/pictograms /app/app/static/pictogramsmin && \
+RUN mkdir -p /app/data/pictograms /app/data/pictogramsmin && \
     chown -R appuser:appgroup /app
 
 # Passage à l'utilisateur non-root

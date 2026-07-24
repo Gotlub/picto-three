@@ -43,6 +43,6 @@ jobs:
 
           
           # Le script à exécuter sur le serveur distant
-          script: sudo /home/deploy-github/deploy.sh "${{ secrets.DEPLOY_KEY }}"
+          script: /home/deploy-github/deploy.sh "${{ secrets.DEPLOY_KEY }}"
 
     

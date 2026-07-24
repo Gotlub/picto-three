@@ -7,16 +7,17 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      # Stockage persistant des images utilisateurs via le volume nommé pictograms_data
-      - pictograms_data:/app/app/static
+      # Stockage persistant des images utilisateurs isolé du code
+      - pictograms_data:/app/data
     env_file:
       - .env
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-pictotree}
-      - PICTOGRAMS_PATH=/app/app/static/pictograms
-      - PICTOGRAMS_PATH_MIN=/app/app/static/pictogramsmin
+      # Mise à jour des chemins pour pointer vers le volume sécurisé
+      - PICTOGRAMS_PATH=/app/data/pictograms
+      - PICTOGRAMS_PATH_MIN=/app/data/pictogramsmin
     depends_on:
       db:
         condition: service_healthy
