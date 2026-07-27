@@ -11,16 +11,16 @@ class Config:
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY') or 'your-recaptcha-private-key'
 
     # Determine base data directory:
-    # 1. Environment variable DATA_DIR if set
-    # 2. Local basedir / "data" if it exists (e.g. /app/data inside Docker container)
+    # 1. Environment variable DATA_DIR if set (sanitizing legacy /data to /app/data in containers)
+    # 2. Inside Docker container (/app), use /app/data
     # 3. Fallback to sibling basedir.parent / "data" (e.g. ../data in local dev)
     if os.environ.get('DATA_DIR'):
         raw_data_dir = Path(os.environ['DATA_DIR'])
-        if (str(raw_data_dir) == '/data' or str(raw_data_dir).startswith('/data/')) and not raw_data_dir.exists() and (basedir / "data").exists():
-            DATA_DIR = Path(str(raw_data_dir).replace('/data', str(basedir / "data"), 1))
+        if str(raw_data_dir) == '/data' or str(raw_data_dir).startswith('/data/'):
+            DATA_DIR = Path(str(raw_data_dir).replace('/data', '/app/data', 1))
         else:
             DATA_DIR = raw_data_dir
-    elif (basedir / "data").exists():
+    elif basedir.parent == Path('/') or str(basedir) == '/app':
         DATA_DIR = basedir / "data"
     else:
         DATA_DIR = basedir.parent / "data"
@@ -34,16 +34,16 @@ class Config:
     # Path for storing uploaded pictograms
     if os.environ.get('PICTOGRAMS_PATH'):
         p_path = Path(os.environ['PICTOGRAMS_PATH'])
-        if (str(p_path) == '/data/pictograms' or str(p_path).startswith('/data/')) and not p_path.parent.exists() and (basedir / "data").exists():
-            p_path = Path(str(p_path).replace('/data', str(basedir / "data"), 1))
+        if str(p_path) == '/data/pictograms' or str(p_path).startswith('/data/'):
+            p_path = Path(str(p_path).replace('/data', '/app/data', 1))
         PICTOGRAMS_PATH = p_path
     else:
         PICTOGRAMS_PATH = DATA_DIR / "pictograms"
 
     if os.environ.get('PICTOGRAMS_PATH_MIN'):
         p_path_min = Path(os.environ['PICTOGRAMS_PATH_MIN'])
-        if (str(p_path_min) == '/data/pictogramsmin' or str(p_path_min).startswith('/data/')) and not p_path_min.parent.exists() and (basedir / "data").exists():
-            p_path_min = Path(str(p_path_min).replace('/data', str(basedir / "data"), 1))
+        if str(p_path_min) == '/data/pictogramsmin' or str(p_path_min).startswith('/data/'):
+            p_path_min = Path(str(p_path_min).replace('/data', '/app/data', 1))
         PICTOGRAMS_PATH_MIN = p_path_min
     else:
         PICTOGRAMS_PATH_MIN = DATA_DIR / "pictogramsmin"
