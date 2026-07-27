@@ -36,18 +36,24 @@ def create_app(config_override=None):
 
     # Ensure the instance folder exists for sqlite
     if app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite'):
-        # In a Posix system, the path is absolute, so it starts with a '/'
-        # and the replace will result in a path like '/path/to/db'
-        # In Windows, the path is 'C:/path/to/db', so it does not start with '/'
-        # and the replace will result in a path like 'C:/path/to/db'
         db_uri = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+        if db_uri.startswith('/data'):
+            db_uri = db_uri.replace('/data', '/app/data', 1)
+            app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_uri}'
         db_path = Path(db_uri)
         db_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Ensure the pictograms folders exist
     pictograms_path = Path(app.config['PICTOGRAMS_PATH'])
+    if str(pictograms_path).startswith('/data'):
+        pictograms_path = Path(str(pictograms_path).replace('/data', '/app/data', 1))
+        app.config['PICTOGRAMS_PATH'] = pictograms_path
     pictograms_path.mkdir(parents=True, exist_ok=True)
+
     pictograms_path_min = Path(app.config['PICTOGRAMS_PATH_MIN'])
+    if str(pictograms_path_min).startswith('/data'):
+        pictograms_path_min = Path(str(pictograms_path_min).replace('/data', '/app/data', 1))
+        app.config['PICTOGRAMS_PATH_MIN'] = pictograms_path_min
     pictograms_path_min.mkdir(parents=True, exist_ok=True)
 
     csrf = CSRFProtect(app)
