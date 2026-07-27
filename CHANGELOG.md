@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Updated SMTP configuration to support Brevo by separating `MAIL_USERNAME` (auth) from `MAIL_DEFAULT_SENDER` (sender address).
+- Fixed `/data` permission error (`[Errno 13] Permission denied: '/data'`) in Docker deployments by introducing configurable `DATA_DIR` environment variable defaulting to `/app/data` in Docker container and `../data` in local environments.
 
 ### Changed
 - Externalized the database to a sibling `data/` directory (`../data/`) to fully separate data from application code, improving deployment and security.

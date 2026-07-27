@@ -10,17 +10,17 @@ class Config:
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY') or 'your-recaptcha-public-key'
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY') or 'your-recaptcha-private-key'
 
-    # The database is located in a 'basedir.parent/data' directory SIBLING to the app directory
-    # e.g. /var/www/data/app.db
-    data_dir = basedir.parent / "data"
-    db_path = data_dir / "app.db"
+    # Data directory (can be overridden via DATA_DIR env var, e.g. /app/data in Docker)
+    DATA_DIR = Path(os.environ.get('DATA_DIR')) if os.environ.get('DATA_DIR') else (basedir.parent / "data")
+    data_dir = DATA_DIR
+    db_path = DATA_DIR / "app.db"
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         f'sqlite:///{db_path}'
 
     # Path for storing uploaded pictograms
-    PICTOGRAMS_PATH = data_dir / "pictograms"
-    PICTOGRAMS_PATH_MIN = data_dir / "pictogramsmin"
+    PICTOGRAMS_PATH = Path(os.environ.get('PICTOGRAMS_PATH')) if os.environ.get('PICTOGRAMS_PATH') else (DATA_DIR / "pictograms")
+    PICTOGRAMS_PATH_MIN = Path(os.environ.get('PICTOGRAMS_PATH_MIN')) if os.environ.get('PICTOGRAMS_PATH_MIN') else (DATA_DIR / "pictogramsmin")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl']
 

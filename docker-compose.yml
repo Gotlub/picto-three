@@ -16,6 +16,7 @@ services:
       - FLASK_DEBUG=0
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-pictotree}
       # Mise à jour des chemins pour pointer vers le volume sécurisé
+      - DATA_DIR=/app/data
       - PICTOGRAMS_PATH=/app/data/pictograms
       - PICTOGRAMS_PATH_MIN=/app/data/pictogramsmin
     depends_on:

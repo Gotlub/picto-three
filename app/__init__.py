@@ -44,9 +44,11 @@ def create_app(config_override=None):
         db_path = Path(db_uri)
         db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Ensure the pictograms folder exists
+    # Ensure the pictograms folders exist
     pictograms_path = Path(app.config['PICTOGRAMS_PATH'])
     pictograms_path.mkdir(parents=True, exist_ok=True)
+    pictograms_path_min = Path(app.config['PICTOGRAMS_PATH_MIN'])
+    pictograms_path_min.mkdir(parents=True, exist_ok=True)
 
     csrf = CSRFProtect(app)
     from app.routes import api
