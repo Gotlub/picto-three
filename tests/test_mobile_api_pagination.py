@@ -1,6 +1,7 @@
 from app import db
 from app.models import Tree, User
-from tests.conftest import create_user, confirm_user
+from tests.conftest import confirm_user, create_user
+
 
 def test_mobile_trees_pagination_and_search(client, app):
     # Setup users

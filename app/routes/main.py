@@ -1,6 +1,16 @@
-from flask import render_template, flash, redirect, url_for, Blueprint, request, session, current_app
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import _
 from flask_login import current_user
+
 from app.forms import ContactForm
 from app.utils import send_email
 
@@ -57,7 +67,7 @@ def change_language(locale):
         flash(_('The language has been updated for this session.'))
 
     # Redirige l'utilisateur vers la page où il se trouvait précédemment
-    from urllib.parse import urlparse, urljoin
+    from urllib.parse import urljoin, urlparse
 
     def is_safe_url(target):
         if not target:

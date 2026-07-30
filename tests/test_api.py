@@ -1,9 +1,12 @@
 import json
 import os
+
 from PIL import Image as PILImage
-from app.models import User, Tree, PictogramList, Folder, Image
+
 from app import db
-from tests.conftest import login, confirm_user
+from app.models import Folder, Image, PictogramList, Tree, User
+from tests.conftest import confirm_user, login
+
 
 def logout(client):
     return client.get('/logout', follow_redirects=True)

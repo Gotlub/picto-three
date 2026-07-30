@@ -1,15 +1,17 @@
-from flask import Blueprint, jsonify, request, current_app, json, abort
-from flask_login import current_user, login_required
-from flask_babel import _
-from werkzeug.utils import secure_filename
-from app import db
-from app.models import Tree, PictogramList, Folder, Image, Profile, ProfileTree, User
-from pathlib import Path
+import hashlib
 import shutil
+from datetime import UTC, datetime
+from pathlib import Path
+
+from flask import Blueprint, abort, current_app, json, jsonify, request
+from flask_babel import _
+from flask_login import current_user, login_required
 from PIL import Image as PILImage
 from sqlalchemy import or_
-import hashlib
-from datetime import datetime, UTC
+from werkzeug.utils import secure_filename
+
+from app import db
+from app.models import Folder, Image, PictogramList, Profile, ProfileTree, Tree, User
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -150,9 +152,8 @@ def get_folder_contents():
         return jsonify({'status': 'error', 'message': _('Folder not found')}), 404
 
     # Security check: If the folder is not public, user must be logged in and own it
-    if parent_folder.user_id is not None:
-        if not current_user.is_authenticated or parent_folder.user_id != current_user.id:
-            return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+    if parent_folder.user_id is not None and (not current_user.is_authenticated or parent_folder.user_id != current_user.id):
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
 
     child_folders = [folder.to_dict() for folder in parent_folder.children.order_by(Folder.name).all()]
     child_images = [image.to_dict() for image in parent_folder.images.order_by(Image.name).all()]
@@ -220,9 +221,8 @@ def folder_images(folder_id):
     if folder is None:
         abort(404)
     # Vérification des droits : dossier public ou appartenant à l'utilisateur
-    if folder.user_id is not None:
-        if not current_user.is_authenticated or folder.user_id != current_user.id:
-            return jsonify({'error': 'Unauthorized'}), 403
+    if folder.user_id is not None and (not current_user.is_authenticated or folder.user_id != current_user.id):
+        return jsonify({'error': 'Unauthorized'}), 403
             
     images = folder.images.order_by(Image.name).all()
     results = [{'type': 'image', 'data': img.to_dict()} for img in images]
@@ -321,7 +321,7 @@ def create_thumbnail_for_upload(filepath_relative):
             img.thumbnail(THUMB_SIZE)
             img.save(thumb_path_full, 'PNG', quality=85, optimize=True)
 
-    except Exception as e:
+    except (OSError, ValueError) as e:
         current_app.logger.error(f"Erreur lors de la création de la miniature pour {filepath_relative}: {e}")
 
 def calculate_image_hash(filepath_full, description):
@@ -377,7 +377,7 @@ def upload_image():
             pil_img = PILImage.open(file)
             pil_img.verify()
             file.seek(0) # Reset stream after reading
-        except Exception:
+        except (OSError, SyntaxError, ValueError):
             return jsonify({'status': 'error', 'message': _('Fichier image invalide ou potentiellement malveillant.')}), 400
 
         file.save(physical_path)
@@ -390,7 +390,7 @@ def upload_image():
         # Calculate hash
         try:
             image_hash = calculate_image_hash(physical_path, description)
-        except Exception as e:
+        except (OSError, TypeError, ValueError) as e:
             current_app.logger.error(f"Error hashing image: {e}")
             image_hash = None
 
@@ -410,7 +410,7 @@ def upload_image():
         # --- AJOUTER L'APPEL POUR CRÉER LA MINIATURE ---
         try:
             create_thumbnail_for_upload(new_image.path)
-        except Exception as e:
+        except (OSError, ValueError) as e:
             current_app.logger.error(f"Échec de la création de miniature pour {new_image.path}: {e}")
         # --- FIN DE L'AJOUT ---
 
@@ -449,7 +449,7 @@ def update_image_details(image_id):
         base_path = Path(current_app.config['PICTOGRAMS_PATH'])
         physical_path = base_path / image.path
         image.image_hash = calculate_image_hash(physical_path, image.description)
-    except Exception as e:
+    except (OSError, TypeError, ValueError) as e:
         current_app.logger.error(f"Error rehashing image on update: {e}")
     image.updated_at = datetime.now(UTC)
 
@@ -468,7 +468,7 @@ def get_image_ids_from_tree(nodes):
         # The 'id' in the tree data corresponds to the image ID
         if 'id' in node and node['id'] != -1:
             image_ids.add(node['id'])
-        if 'children' in node and node['children']:
+        if node.get('children'):
             image_ids.update(get_image_ids_from_tree(node['children']))
     return image_ids
 

@@ -1,15 +1,18 @@
-from flask import Flask, request, current_app, session, jsonify, redirect, url_for
 from pathlib import Path
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from config import Config
-from flask_wtf.csrf import CSRFProtect
-from flask_login import LoginManager, current_user
+
+from flask import Flask, current_app, jsonify, redirect, request, session, url_for
 from flask_babel import Babel
-from flask_mail import Mail
 from flask_bootstrap import Bootstrap
-from .extensions import sitemap
 from flask_jwt_extended import JWTManager
+from flask_login import LoginManager, current_user
+from flask_mail import Mail
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
+
+from config import Config
+
+from .extensions import sitemap
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -79,7 +82,7 @@ def create_app(config_override=None):
     app.babel_localeselector = get_locale
 
     # Register Blueprints
-    from app.routes import auth, main, builder, files, mobile_api
+    from app.routes import auth, builder, files, main, mobile_api
     # api is already imported above
     app.register_blueprint(auth.bp)
     app.register_blueprint(main.bp)
@@ -101,7 +104,7 @@ def create_app(config_override=None):
             with open(sitemap_path, 'w', encoding='utf-8') as f:
                 f.write(xml_content)
             print(f"✅ Sitemap généré avec succès dans {sitemap_path}")
-        except Exception as e:
+        except (OSError, RuntimeError) as e:
             print(f"❌ Erreur lors de la génération du sitemap : {e}")
 
     # Expose get_locale to templates

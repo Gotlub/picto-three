@@ -1,5 +1,7 @@
 from pathlib import Path
-from tests.conftest import create_user, confirm_user
+
+from tests.conftest import confirm_user, create_user
+
 
 def test_mobile_pictograms_auth(client, app):
     # Setup user

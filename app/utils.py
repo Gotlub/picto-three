@@ -1,9 +1,11 @@
 import re
 from smtplib import SMTPException
+
+from flask import current_app, render_template
 from flask_mail import Message
-from flask import render_template, current_app
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+
 from app import mail
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 EMAIL_CONFIRMATION_SALT = 'email-confirmation-salt'
 PASSWORD_RESET_SALT = 'password-reset-salt'
@@ -25,7 +27,7 @@ def send_email(to, subject, template, **kwargs):
         if current_app.debug:
             current_app.logger.debug(f"Détail SMTP: {e}")
         return False
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         current_app.logger.error(f"Erreur inattendue lors de l'envoi d'e-mail : {type(e).__name__}")
         return False
 
@@ -51,7 +53,7 @@ def confirm_token(token, expiration=3600):
     except BadSignature:
         current_app.logger.warning("Token de confirmation avec signature invalide détecté.")
         return False
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         current_app.logger.error(f"Erreur inattendue lors de la validation du token : {type(e).__name__}")
         return False
 
@@ -71,7 +73,7 @@ def confirm_password_reset_token(token, expiration=3600):
     except BadSignature:
         current_app.logger.warning("Token de reset avec signature invalide détecté.")
         return False
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         current_app.logger.error(f"Erreur inattendue lors de la validation du token de reset : {type(e).__name__}")
         return False
 

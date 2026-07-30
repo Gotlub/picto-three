@@ -1,5 +1,5 @@
 from app import create_app, db
-from app.models import User, Image, Tree
+from app.models import Image, Tree, User
 
 app = create_app()
 

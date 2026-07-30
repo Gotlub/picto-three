@@ -23,7 +23,7 @@ def test_builder_page_authenticated(client):
     # Assuming 'logged_in_test_user' is not easily available without proper mock,
     # Let's just create an authenticated session if we have a fixture,
     # But since I don't see the fixtures, I will leave the test simpler or use the client proxy.
-    from tests.conftest import create_user, confirm_user, login
+    from tests.conftest import confirm_user, create_user, login
     create_user(client, 'builderuser', 'Password123', 'builder@test.com')
     confirm_user(client, 'builder@test.com')
     login(client, 'builderuser', 'Password123')

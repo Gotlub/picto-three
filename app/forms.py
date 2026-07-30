@@ -1,10 +1,13 @@
+import re
+
+from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+
 from app.models import User
-from flask_babel import lazy_gettext as _l
-import re
+
 
 def strip_filter(x):
     return x.strip() if x else None

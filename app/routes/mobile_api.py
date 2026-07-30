@@ -1,15 +1,22 @@
-from flask import Blueprint, request, jsonify, current_app, send_from_directory
-from flask_babel import _ as _tr
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from app.models import User, Tree, Image, Profile, ProfileTree
-from app import db 
-from sqlalchemy import or_
 import json
-from pathlib import Path
+import os
 import posixpath
 import re
-import os
+from pathlib import Path
 from urllib.parse import quote
+
+from flask import Blueprint, current_app, jsonify, request, send_from_directory
+from flask_babel import _ as _tr
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    get_jwt_identity,
+    jwt_required,
+)
+from sqlalchemy import or_
+
+from app import db
+from app.models import Image, Profile, ProfileTree, Tree, User
 
 # Création du Blueprint dédié au mobile
 bp = Blueprint('mobile_api', __name__, url_prefix='/api/v1/mobile')
@@ -194,7 +201,7 @@ def get_tree(tree_id):
             'name': tree.name,
             'root_node': root_node
         }), 200
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         current_app.logger.error(f"Erreur de formatage dans get_tree (ID: {tree_id}): {e}")
         return jsonify({'error': "Une erreur interne est survenue lors du formatage de l'arbre."}), 500
 
@@ -212,7 +219,7 @@ def serve_mobile_pictogram(filepath):
     if img_id is not None:
         try:
             image = db.session.get(Image, img_id)
-        except Exception:
+        except Exception:  # noqa: BLE001
             image = None
             
         if image is None:
@@ -261,8 +268,8 @@ def serve_mobile_pictogram(filepath):
             response.headers['X-Image-Hash'] = image.image_hash or ''
             response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
             response.headers['X-Image-Id'] = str(image.id)
-    except Exception:
-        pass
+    except Exception as e:  # noqa: BLE001
+        current_app.logger.debug(f"Header resolution skipped: {e}")
     return response
 
 
@@ -279,7 +286,7 @@ def serve_mobile_pictogram_min(filepath):
     if img_id is not None:
         try:
             image = db.session.get(Image, img_id)
-        except Exception:
+        except Exception:  # noqa: BLE001
             image = None
             
         if image is None:
@@ -333,8 +340,8 @@ def serve_mobile_pictogram_min(filepath):
             response.headers['X-Image-Hash'] = image.image_hash or ''
             response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
             response.headers['X-Image-Id'] = str(image.id)
-    except Exception:
-        pass
+    except Exception as e:  # noqa: BLE001
+        current_app.logger.debug(f"Header resolution skipped: {e}")
     return response
 
 
@@ -350,7 +357,7 @@ def _get_full_url(raw_path, host_url, img_id=None):
         return ""
     if raw_path.startswith(('http://', 'https://')):
         return raw_path
-    if raw_path.startswith('/static/') or raw_path.startswith('static/'):
+    if raw_path.startswith(('/static/', 'static/')):
         path_suffix = raw_path if raw_path.startswith('/') else f"/{raw_path}"
         return f"{host_url.rstrip('/')}{path_suffix}"
     is_min = "pictogramsmin" in raw_path
@@ -372,7 +379,7 @@ def _get_thumb_url(raw_path, host_url, img_id=None):
         return ""
     if raw_path.startswith(('http://', 'https://')):
         return raw_path
-    if raw_path.startswith('/static/') or raw_path.startswith('static/'):
+    if raw_path.startswith(('/static/', 'static/')):
         path_suffix = raw_path if raw_path.startswith('/') else f"/{raw_path}"
         return f"{host_url.rstrip('/')}{path_suffix}"
     norm_path = re.sub(r'^/+', '', raw_path)

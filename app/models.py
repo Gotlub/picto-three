@@ -1,7 +1,10 @@
-from app import db, login
-from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import UTC, datetime
+
 from flask_login import UserMixin
-from datetime import datetime, UTC
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from app import db, login
+
 
 @login.user_loader
 def load_user(id):
@@ -28,7 +31,7 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return f'<User {self.username}>'
 
 class Folder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,7 +92,7 @@ class Image(db.Model):
         }
 
     def __repr__(self):
-        return '<Image {}>'.format(self.name)
+        return f'<Image {self.name}>'
 
 class Tree(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -123,7 +126,7 @@ class Tree(db.Model):
         }
 
     def __repr__(self):
-        return '<Tree {}>'.format(self.name)
+        return f'<Tree {self.name}>'
 
 class PictogramList(db.Model):
     __tablename__ = 'pictogram_list'

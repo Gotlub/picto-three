@@ -1,7 +1,9 @@
 import pytest
+
 from app import db
-from app.models import User, Image
+from app.models import Image, User
 from tests.conftest import login
+
 
 @pytest.fixture
 def seeded_db(client):

@@ -48,7 +48,7 @@ class Config:
     else:
         PICTOGRAMS_PATH_MIN = DATA_DIR / "pictogramsmin"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    LANGUAGES = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl']
+    LANGUAGES = ('en', 'fr', 'es', 'de', 'it', 'nl', 'pl')
 
     # Email configuration
     MAIL_SERVER = 'smtp.gmail.com'

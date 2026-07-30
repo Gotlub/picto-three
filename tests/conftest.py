@@ -1,9 +1,12 @@
-import pytest
-from app import create_app, db
-from pathlib import Path
 import shutil
+from pathlib import Path
+
+import pytest
+
+from app import create_app, db
+from app.models import Image, User
 from app.utils import generate_confirmation_token
-from app.models import User, Image
+
 
 @pytest.fixture
 def app():
@@ -45,10 +48,10 @@ def runner(app):
 
 def login(client, username, password):
     client.get('/login')
-    return client.post('/login', data=dict(
-        username=username,
-        password=password
-    ), follow_redirects=True)
+    return client.post('/login', data={
+        'username': username,
+        'password': password
+    }, follow_redirects=True)
 
 def confirm_user(client, email):
     """Helper function to confirm a user's email."""
@@ -60,11 +63,11 @@ def create_user(client, username='testuser', password='Password123', email=None)
     if email is None:
         email = f'{username}@test.com'
     client.get('/register')
-    client.post('/register', data=dict(
-        username=username,
-        email=email,
-        password=password,
-        password2=password,
-        accept_terms='y'
-    ), follow_redirects=True)
+    client.post('/register', data={
+        'username': username,
+        'email': email,
+        'password': password,
+        'password2': password,
+        'accept_terms': 'y'
+    }, follow_redirects=True)
     return User.query.filter_by(username=username).first()

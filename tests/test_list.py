@@ -1,5 +1,6 @@
 import re
 
+
 def test_list_page_loads(client):
     """Tests that the /list page loads correctly."""
     response = client.get('/list')

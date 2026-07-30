@@ -1,10 +1,12 @@
-from flask import Blueprint, send_from_directory, current_app
-from flask_login import current_user
-from pathlib import Path
 import os
+from pathlib import Path
+from urllib.parse import quote
+
+from flask import Blueprint, current_app, send_from_directory
+from flask_login import current_user
+
 from app import db
 from app.models import Image
-from urllib.parse import quote
 
 bp = Blueprint('files', __name__)
 
@@ -29,9 +31,8 @@ def serve_pictogram(img_id):
     if image is None:
         return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
         
-    if image.user_id is not None:
-        if not current_user.is_authenticated or image.user_id != current_user.id:
-            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+    if image.user_id is not None and (not current_user.is_authenticated or image.user_id != current_user.id):
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
             
     pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
     response = send_from_directory(pictograms_path, image.path)
@@ -54,9 +55,8 @@ def serve_pictogram_min(img_id):
     if image is None:
         return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
         
-    if image.user_id is not None:
-        if not current_user.is_authenticated or image.user_id != current_user.id:
-            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+    if image.user_id is not None and (not current_user.is_authenticated or image.user_id != current_user.id):
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
             
     filepath_min, _ = os.path.splitext(image.path)
     filepath_min = filepath_min + ".png"

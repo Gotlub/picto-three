@@ -1,6 +1,7 @@
-from app.models import User
 from app import db
-from tests.conftest import login, confirm_user, create_user
+from app.models import User
+from tests.conftest import confirm_user, create_user, login
+
 
 def test_app_config(app):
     assert app.config["TESTING"] is True

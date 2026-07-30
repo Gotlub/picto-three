@@ -2,9 +2,13 @@
 
 import os
 from pathlib import Path
-from PIL import Image as PILImage # Renommer pour éviter le conflit avec notre modèle Image
+
+from PIL import (
+    Image as PILImage,  # Renommer pour éviter le conflit avec notre modèle Image
+)
+
 from app import create_app, db
-from app.models import Image, Folder
+from app.models import Folder, Image
 
 # --- Configuration des miniatures ---
 THUMB_SIZE = (300, 300) # Taille maximale pour les miniatures
@@ -30,7 +34,7 @@ def create_thumbnail(filepath_relative, source_folder, thumbs_folder):
             img.save(thumb_path_full, 'PNG', quality=85, optimize=True)
             # print(f"Miniature créée : {thumb_path_full}") # Décommenter pour le debug
 
-    except (IOError, FileNotFoundError) as e:
+    except (OSError, FileNotFoundError) as e:
         print(f"Erreur lors de la création de la miniature pour {filepath_relative} : {e}")
 
 def main():

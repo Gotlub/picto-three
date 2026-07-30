@@ -1,14 +1,30 @@
-from flask import render_template, flash, redirect, url_for, Blueprint, current_app
-from flask_login import current_user, login_user, logout_user, login_required
-from flask_babel import _
-from markupsafe import Markup
-from app import db
-from app.forms import LoginForm, RegistrationForm, ChangePasswordForm, DeleteAccountForm, ForgotPasswordForm, ResetPasswordForm, ResendConfirmationForm
-from app.models import User, Tree, PictogramList, Image, Folder
-from app.utils import send_email, generate_confirmation_token, confirm_token, generate_password_reset_token, confirm_password_reset_token
-from datetime import datetime, UTC
-from pathlib import Path
 import shutil
+from datetime import UTC, datetime
+from pathlib import Path
+
+from flask import Blueprint, current_app, flash, redirect, render_template, url_for
+from flask_babel import _
+from flask_login import current_user, login_required, login_user, logout_user
+from markupsafe import Markup
+
+from app import db
+from app.forms import (
+    ChangePasswordForm,
+    DeleteAccountForm,
+    ForgotPasswordForm,
+    LoginForm,
+    RegistrationForm,
+    ResendConfirmationForm,
+    ResetPasswordForm,
+)
+from app.models import Folder, Image, PictogramList, Tree, User
+from app.utils import (
+    confirm_password_reset_token,
+    confirm_token,
+    generate_confirmation_token,
+    generate_password_reset_token,
+    send_email,
+)
 
 bp = Blueprint('auth', __name__)
 

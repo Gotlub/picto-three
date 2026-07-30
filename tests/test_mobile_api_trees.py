@@ -1,7 +1,9 @@
 import json
+
 from app import db
 from app.models import Tree, User
-from tests.conftest import create_user, confirm_user
+from tests.conftest import confirm_user, create_user
+
 
 def test_mobile_trees_api(client, app):
     # 1. Setup User and Auth

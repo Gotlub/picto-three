@@ -1,9 +1,12 @@
 from io import BytesIO
-from PIL import Image as PILImage
 from pathlib import Path
-from app.models import Folder, Image
+
+from PIL import Image as PILImage
+
 from app import db
-from tests.conftest import create_user, login, confirm_user
+from app.models import Folder, Image
+from tests.conftest import confirm_user, create_user, login
+
 
 def create_test_image_io():
     """Helper to create a valid in-memory JPEG image for upload tests."""

@@ -1,6 +1,7 @@
-from flask import render_template, Blueprint, request, flash, json, redirect, url_for
+from flask import Blueprint, flash, json, redirect, render_template, request, url_for
 from flask_babel import _
 from flask_login import current_user, login_required
+
 from app.models import Folder
 
 bp = Blueprint('builder', __name__)

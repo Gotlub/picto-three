@@ -9,9 +9,10 @@ Utilisation :
 """
 
 import sys
+from datetime import UTC, datetime
+
 from app import create_app, db
-from app.models import User, Folder
-from datetime import datetime, UTC
+from app.models import Folder, User
 
 # Initialisation de l'application Flask pour avoir le contexte de la BDD
 app = create_app()
@@ -51,8 +52,9 @@ def create_admin_user(username, email, password):
         db.session.commit()
         
         # 3. Création du dossier physique sur le disque
-        from flask import current_app
         import os
+
+        from flask import current_app
         
         # On récupère le chemin de base défini dans ta config Flask
         base_path = current_app.config.get('PICTOGRAMS_PATH', 'app/static/pictograms')
