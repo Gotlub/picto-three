@@ -1,0 +1,19 @@
+# An allowlist also keeps .env, the local venv and Git out of the build context.
+**
+!requirements.txt
+!config.py
+!app/
+!app/**
+!migrations/
+!migrations/**
+!tests/
+!tests/e2e/
+!tests/e2e/**
+**/__pycache__/
+**/*.pyc
+**/node_modules/
+**/.env
+**/.env.*
+**/*.db
+**/*.sqlite*
+tests/e2e/artifacts/

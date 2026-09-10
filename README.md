@@ -124,12 +124,26 @@ make test
 # Or run locally
 pytest -v
 
+# E2E browser tests in an independent, disposable PostgreSQL 15 Docker stack
+npm run e2e
+# Without a local Node installation: bash tests/e2e/run.sh
+# Keep successful traces too for human review
+E2E_TRACE=1 npm run e2e
+
 # Python linting
 ruff check .
 
 # JavaScript linting
 npx eslint .
 ```
+
+The E2E command runs ten Chromium journeys, applies database migrations and
+cleans up its own containers and temporary data. It never uses the existing
+application stack or `.env`. Reports are retained in `tests/e2e/artifacts/`.
+The same suite runs on every push in `flask-review.yml`, alongside the existing
+SQLite-based Python tests in a separate job.
+See [the E2E guide](tests/e2e/README.md) for details, including the known List
+save blocker. Application refactoring must wait for human validation of the tests.
 
 ---
 

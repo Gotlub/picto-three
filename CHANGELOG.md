@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Extended E2E coverage to ten journeys (tree drag/drop and overwrite, binder persistence, image lifecycle and List/PDF), moved the disposable stack to migrated PostgreSQL 15, and added an independent E2E job with diagnostics to the push workflow. Application refactoring remains gated on human test validation.
+- Added an initial isolated Docker/Playwright smoke suite with five browser journeys, disposable SQLite/images, CSRF-enabled fake users, locked test dependencies and diagnostics. The List save defect is characterized without changing application code.
 - Add github workflows
 - Add Makefile for Docker container management commands (`user`, `add-img`, `bash`, `db-bash`, `up`, `build`, etc.)
 - Optimized production Dockerfile using Python 3.11-slim, Gunicorn, system dependencies (libmagic1, libpq-dev), non-root user, and sealed source code.

@@ -1,0 +1,81 @@
+# Standalone stack: never merge this with docker-compose.yml.
+services:
+  db-e2e:
+    image: postgres:15-alpine
+    user: postgres
+    environment:
+      POSTGRES_DB: pictotree_e2e
+      POSTGRES_USER: e2e
+      POSTGRES_PASSWORD: e2e-only-password
+    read_only: true
+    tmpfs:
+      - /var/lib/postgresql/data:uid=70,gid=70,mode=0700,size=512m
+      - /var/run/postgresql:uid=70,gid=70,mode=0775
+      - /tmp:mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      # The temporary initdb server has only a Unix socket, not TCP.
+      test: [CMD, pg_isready, -h, 127.0.0.1, -U, e2e, -d, pictotree_e2e]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    networks: [e2e]
+
+  app-e2e:
+    build:
+      context: .
+      dockerfile: tests/e2e/Dockerfile
+      target: app-e2e
+    environment:
+      PICTOTREE_E2E: "1"
+      FLASK_SKIP_DOTENV: "1"
+    depends_on:
+      db-e2e:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /e2e-data:uid=1000,gid=1000,mode=0700
+      - /tmp:mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, /app/tests/e2e/support/healthcheck.py]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    networks: [e2e]
+
+  playwright:
+    build:
+      context: .
+      dockerfile: tests/e2e/Dockerfile
+      target: playwright
+    environment:
+      PICTOTREE_E2E: "1"
+      CI: "1"
+      HOME: /tmp
+      E2E_TRACE: "${E2E_TRACE:-0}"
+    user: "${E2E_UID:?Use tests/e2e/run.sh}:${E2E_GID:?Use tests/e2e/run.sh}"
+    volumes:
+      - type: bind
+        source: "${E2E_ARTIFACTS:?Use tests/e2e/run.sh}"
+        target: /e2e-results
+        bind:
+          create_host_path: false
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+    shm_size: 1gb
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      app-e2e:
+        condition: service_healthy
+    networks: [e2e]
+
+networks:
+  e2e:
+    internal: true

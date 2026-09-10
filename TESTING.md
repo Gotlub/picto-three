@@ -1,6 +1,22 @@
       
 # Stratégie de Test
 
+## Tests E2E Playwright
+
+Les dix parcours navigateur utilisent un environnement Docker PostgreSQL 15
+independant et jetable, initialise par les migrations. Depuis la racine du depot dans WSL :
+
+```bash
+npm run e2e
+```
+
+Voir [tests/e2e/README.md](tests/e2e/README.md) pour l'isolation, les rapports et la
+caracterisation du blocage connu de sauvegarde List. Aucun serveur existant ne
+doit etre utilise par ces tests.
+
+Le workflow `flask-review.yml` execute aussi cette commande a chaque push, dans
+un job distinct des tests Python SQLite, et conserve les diagnostics en artifacts.
+
 Tous les nouveaux développements doivent être accompagnés de tests. La qualité de l'application dépend de la robustesse de sa suite de tests.
 
 ## Outils
@@ -23,5 +39,4 @@ La suite de tests complète doit être exécutée avant chaque commit.
 
 ```bash
 pytest -v
-
-    
+```

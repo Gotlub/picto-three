@@ -99,6 +99,10 @@ Liste des jalons et tâches à réaliser par les agents IA.
     - [x] Ajouter le lien "banque de pictogrammes" dans la barre de navigation.
 
 ## Maintenance
+- [x] Ajouter les etapes E2E 0/1 : stack Docker isolee, seed SQLite/images jetables et cinq parcours Playwright, sans modifier `app/`.
+- [x] Valider le socle E2E sur PostgreSQL 15 jetable et avec les migrations.
+- [x] Ajouter cinq parcours E2E de regression et un job dedie dans `flask-review.yml`.
+- [ ] Confirmer le premier passage GitHub Actions et obtenir la validation humaine des E2E avant toute refactorisation.
 - [x] Corriger la configuration SMTP pour Brevo (séparation user/sender).
 - [x] Créer le Makefile pour faciliter la gestion des conteneurs Docker (admin, images, bash, psql).
 - [x] Configurer la stack Docker de production (Dockerfile optimisé + docker-compose.yml unique + volumes nommés + limites BDD 512 Mo).

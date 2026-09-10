@@ -143,3 +143,6 @@ shelf/
 
 # Project-specific ignores
 /data/
+
+# Isolated Playwright reports, traces and downloads
+tests/e2e/artifacts/
