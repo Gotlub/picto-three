@@ -1,5 +1,7 @@
 import ImageTree from './components/ImageTree.js';
 import ArasaacSearch from './components/ArasaacSearch.js';
+import { ApiClient } from './services/ApiClient.js';
+import { NotificationService } from './services/NotificationService.js';
 
 
 class BuilderNode {
@@ -923,43 +925,25 @@ class TreeBuilder {
         let proceed = true;
 
         if (existingTree) {
-            proceed = confirm("A tree with this name already exists. Are you sure you want to overwrite it?");
+            proceed = NotificationService.confirm("A tree with this name already exists. Are you sure you want to overwrite it?");
         }
 
         if (!proceed) {
             return; // Stop if the user cancels
         }
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-        if (!csrfToken) {
-            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
-            return;
-        }
-
         try {
-            const response = await fetch('/api/tree/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    name: treeName,
-                    is_public: isPublic,
-                    root_id: root_id,
-                    root_url: root_url,
-                    json_data: jsonData,
-                }),
+            const result = await ApiClient.post('/api/tree/save', {
+                name: treeName,
+                is_public: isPublic,
+                root_id: root_id,
+                root_url: root_url,
+                json_data: jsonData,
             });
 
-            if (!response.ok) {
-                throw new Error(`Erreur serveur: ${response.status}`);
-            }
-
-            const result = await response.json();
             if (result.status === 'success') {
                 const message = existingTree ? 'Updated' : 'Created';
-                alert(message);
+                NotificationService.alert(message);
 
                 // Clear the existing tree before reloading from save
                 this.rootNode.children = [];
@@ -968,12 +952,11 @@ class TreeBuilder {
                 // Refresh the list of saved trees
                 this.loadSavedTrees();
             } else {
-                // Display specific error messages
-                alert(`Error saving tree: ${result.message}`);
+                NotificationService.alert(`Error saving tree: ${result.message}`);
             }
         } catch (e) {
             console.error('Erreur sauvegarde:', e);
-            alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
+            NotificationService.alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
         }
     }
 
@@ -983,21 +966,25 @@ class TreeBuilder {
     }
 
     filterTrees() {
+        if (!this.treeSearch) return;
+        const term = this.treeSearch.value.toLowerCase().trim();
+        const selects = this.treeList ? this.treeList.querySelectorAll('select.tree-select-list') : [];
+        selects.forEach(select => {
+            Array.from(select.options).forEach(opt => {
+                const matches = opt.textContent.toLowerCase().includes(term);
+                opt.style.display = matches ? '' : 'none';
+            });
+        });
     }
 
     async loadSavedTrees() {
         try {
-            const response = await fetch('/api/trees/load');
-            if (!response.ok) {
-                console.error(`Erreur HTTP: ${response.status}`);
-                return;
-            }
-            const data = await response.json();
+            const data = await ApiClient.get('/api/trees/load');
             this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
             this.currentUserId = data.current_user_id;
         } catch (e) {
             console.error('Impossible de charger les arbres:', e);
-            alert('Impossible de charger les arbres sauvegardés.');
+            NotificationService.alert('Impossible de charger les arbres sauvegardés.');
             this.userTrees = [];
         }
         this.renderTreeList();
@@ -1568,47 +1555,30 @@ class TreeBuilder {
         const treeToDelete = allTrees.find(tree => tree.id === treeId);
 
         if (!treeToDelete) {
-            alert('Could not find the selected tree.');
+            NotificationService.alert('Could not find the selected tree.');
             return;
         }
 
-        if (!confirm(`Are you sure you want to delete the tree "${treeToDelete.name}"?`)) {
-            return;
-        }
-
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-        if (!csrfToken) {
-            alert('Security error: missing CSRF token. Please reload the page.');
+        if (!NotificationService.confirm(`Are you sure you want to delete the tree "${treeToDelete.name}"?`)) {
             return;
         }
 
         try {
-            const response = await fetch(`/api/tree/${treeId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': csrfToken
-                }
-            });
+            const result = await ApiClient.delete(`/api/tree/${treeId}`);
 
-            if (!response.ok) {
-                const result = await response.json().catch(() => ({}));
-                throw new Error(result.message || `Server error: ${response.status}`);
-            }
-
-            const result = await response.json();
             if (result.status === 'success') {
-                alert('Tree deleted successfully.');
+                NotificationService.alert('Tree deleted successfully.');
                 await this.loadSavedTrees();
                 
                 // Clear the builder workspace just in case they deleted the active tree
                 this.rootNode.children = [];
                 this.renderTree();
             } else {
-                alert(`Error deleting tree: ${result.message}`);
+                NotificationService.alert(`Error deleting tree: ${result.message}`);
             }
         } catch (e) {
             console.error('Delete error:', e);
-            alert('Failed to delete the tree. Please try again.');
+            NotificationService.alert('Failed to delete the tree. Please try again.');
         }
     }
 
@@ -1705,13 +1675,12 @@ class TreeBuilder {
     // Profile Management Methods
     async loadSavedProfiles() {
         try {
-            const response = await fetch('/api/profiles/load');
-            const data = await response.json();
+            const data = await ApiClient.get('/api/profiles/load');
             this.savedProfiles = data.profiles || [];
             this.renderProfileList();
         } catch (error) {
             console.error('Error loading profiles:', error);
-            alert('Failed to load profiles');
+            NotificationService.alert('Failed to load profiles');
         }
     }
 
@@ -1806,30 +1775,13 @@ class TreeBuilder {
         saveBtn.disabled = true;
         saveBtn.textContent = 'Saving...';
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-
         try {
-            const headers = { 'Content-Type': 'application/json' };
-            if (csrfToken) {
-                headers['X-CSRFToken'] = csrfToken;
-            }
-            
-            const response = await fetch('/api/profile/save', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            
-            if (response.ok) {
-                alert(data.message);
-                this.loadSavedProfiles(); // Refresh the list
-            } else {
-                alert(data.message || 'Error saving profile');
-            }
+            const data = await ApiClient.post('/api/profile/save', payload);
+            NotificationService.alert(data.message);
+            this.loadSavedProfiles(); // Refresh the list
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to save profile');
+            NotificationService.alert(error.message || 'Failed to save profile');
         } finally {
             saveBtn.disabled = false;
             saveBtn.textContent = originalText;
@@ -1882,7 +1834,7 @@ class TreeBuilder {
 
     async deleteProfile() {
         if (!this.currentUserId) {
-            alert(window.translations.accountRequired);
+            NotificationService.alert(window.translations.accountRequired);
             return;
         }
 
@@ -1890,11 +1842,11 @@ class TreeBuilder {
         const profileId = profileSelect ? profileSelect.value : null;
 
         if (!profileId) {
-            alert('Please select a profile to delete.');
+            NotificationService.alert('Please select a profile to delete.');
             return;
         }
 
-        if (!confirm('Are you sure you want to delete this profile?')) {
+        if (!NotificationService.confirm('Are you sure you want to delete this profile?')) {
             return;
         }
 
@@ -1903,28 +1855,13 @@ class TreeBuilder {
         deleteBtn.disabled = true;
         deleteBtn.textContent = 'Deleting...';
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-
         try {
-            const headers = {};
-            if (csrfToken) {
-                headers['X-CSRFToken'] = csrfToken;
-            }
-            const response = await fetch(`/api/profile/${profileId}`, { 
-                method: 'DELETE',
-                headers: headers
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                alert(data.message);
-                this.loadSavedProfiles();
-            } else {
-                alert(data.message || 'Error deleting profile');
-            }
+            const data = await ApiClient.delete(`/api/profile/${profileId}`);
+            NotificationService.alert(data.message);
+            this.loadSavedProfiles();
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to delete profile');
+            NotificationService.alert(error.message || 'Failed to delete profile');
         } finally {
             deleteBtn.disabled = false;
             deleteBtn.textContent = originalText;

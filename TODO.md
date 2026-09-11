@@ -112,4 +112,28 @@ Liste des jalons et tâches à réaliser par les agents IA.
 - [x] Créer le Makefile pour faciliter la gestion des conteneurs Docker (admin, images, bash, psql).
 - [x] Configurer la stack Docker de production (Dockerfile optimisé + docker-compose.yml unique + volumes nommés + limites BDD 512 Mo).
 - [x] Mettre à jour la documentation README.md avec la gestion Docker unique, le Makefile et le mode démonstration (DEMO_USERNAME).
+
+## Phase 2 : Chasse au code mort & Déduplication transverse
+- [x] Renforcer les règles ESLint (`no-unused-vars` strict avec exclusion `^_`, `no-undef`, avertissement sur `console.log` de debug).
+- [x] Nettoyer le code mort et les logs de debug orphelins dans `builder.js`, `list.js`, `pictogram_bank.js`.
+- [x] Créer le service partagé `ApiClient.js` (centralisation des requêtes fetch, CSRF token automatique, sérialisation JSON, gestion unifiée des erreurs HTTP).
+- [x] Créer le service partagé `NotificationService.js` (interface unifiée pour alert/confirm/error/success tout en garantissant la compatibilité des dialogues natifs pour Playwright E2E).
+- [x] Créer le module utilitaire `DomUtils.js` (sécurisation XSS avec `escapeHtml`, `createElement`, sélecteurs DOM).
+- [x] Écrire la suite de tests unitaires pour `ApiClient`, `NotificationService`, `DomUtils` (26 tests unitaires JS au total).
+- [x] Intégrer `ApiClient` et `NotificationService` dans `builder.js` (sauvegarde/chargement d'arbres et profils, suppression) et `list.js` (sauvegarde/chargement listes et arbres).
+- [x] Valider l'absence de régression via l'exécution complète de `make test` (Ruff, ESLint, 26 tests JS, 56 tests Pytest, 11 tests E2E).
+
+## Idées d'améliorations futures (Backlog)
+- [ ] **Mode Administration** :
+  - Interface et droits dédiés pour les administrateurs.
+  - Possibilité pour les admins de créer et publier des images publiques directement dans la banque globale.
+  - Possibilité de créer et gérer des listes et des arbres publics modèles accessibles à tous.
+- [ ] **Banques d'images & Recherche avancée** :
+  - Intégration de banques d'images tierces supplémentaires (en complément d'ARASAAC).
+  - Optimisation des critères et algorithmes de recherche de pictogrammes (gestion des synonymes, lemmatisation, tolérance aux fautes/variantes).
+- [ ] **Gestion avancée du cycle de vie et intégrité référentielle** :
+  - Analyse d'impact avant suppression d'une ressource (détecter si une image est utilisée dans un arbre ou une liste, ou si une liste est utilisée dans un classeur).
+  - Mécanismes automatisés pour éviter les références orphelines (ex: classeurs avec listes supprimées, arbres avec images supprimées).
+  - Conception optimisée côté BDD / serveur pour préserver les performances sans surcharge de tables croisées.
 ```
+

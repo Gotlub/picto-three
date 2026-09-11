@@ -1,5 +1,7 @@
 import ImageTree from './components/ImageTree.js';
 import ArasaacSearch from './components/ArasaacSearch.js';
+import { ApiClient } from './services/ApiClient.js';
+import { NotificationService } from './services/NotificationService.js';
 
 // --- Start of Tree Viewer (Center Panel, adapted from builder.js) ---
 class ReadOnlyNode {
@@ -233,7 +235,6 @@ class ListBuilder {
         this.selectionModeRadios.forEach(radio => {
             radio.addEventListener('change', (event) => {
                 this.selectionMode = event.target.value;
-                console.log('Selection mode changed to:', this.selectionMode); // Pour le débogage
             });
         });
     }
@@ -762,7 +763,7 @@ class ListBuilder {
         let proceed = true;
 
         if (existingList) {
-            proceed = confirm("A list with this name already exists. Do you want to overwrite it?");
+            proceed = NotificationService.confirm("A list with this name already exists. Do you want to overwrite it?");
         }
 
         if (!proceed) {
@@ -786,55 +787,34 @@ class ListBuilder {
             };
         });
 
-        const csrfTokenNode = document.querySelector('input[name="csrf_token"]');
-        if (!csrfTokenNode) {
-            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
-            return;
-        }
-        const csrfToken = csrfTokenNode.value;
-
         try {
-            const response = await fetch('/api/lists', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    list_name: listName,
-                    payload: payload
-                })
+            const result = await ApiClient.post('/api/lists', {
+                list_name: listName,
+                payload: payload
             });
 
-            if (!response.ok) {
-                throw new Error(`Erreur serveur: ${response.status}`);
-            }
-
-            const result = await response.json();
             if (result.status === 'success') {
                 const message = existingList ? 'Updated' : 'Created';
-                alert(message);
+                NotificationService.alert(message);
                 this.loadSavedLists(); // Refresh the list
             } else {
-                alert(`Error: ${result.message}`);
+                NotificationService.alert(`Error: ${result.message}`);
             }
         } catch (e) {
             console.error('Erreur sauvegarde:', e);
-            alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
+            NotificationService.alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
         }
     }
 
     async loadSavedLists() {
         try {
-            const response = await fetch('/api/lists');
-            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-            const data = await response.json();
+            const data = await ApiClient.get('/api/lists');
             this.currentUserId = data.current_user_id;
             this.publicLists = Array.isArray(data.public_lists) ? data.public_lists : [];
             this.userLists = Array.isArray(data.user_lists) ? data.user_lists : [];
         } catch (e) {
             console.error('Impossible de charger les listes:', e);
-            alert('Impossible de charger les listes sauvegardées.');
+            NotificationService.alert('Impossible de charger les listes sauvegardées.');
             this.publicLists = [];
             this.userLists = [];
         }
@@ -935,14 +915,12 @@ class ListBuilder {
     // --- Tree Viewer Loading (Center Panel) ---
     async loadSavedTrees() {
         try {
-            const response = await fetch('/api/trees/load');
-            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-            const data = await response.json();
+            const data = await ApiClient.get('/api/trees/load');
             this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
             this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
         } catch (e) {
             console.error('Impossible de charger les arbres:', e);
-            alert('Impossible de charger les arbres sauvegardés.');
+            NotificationService.alert('Impossible de charger les arbres sauvegardés.');
             this.publicTrees = [];
             this.userTrees = [];
         }

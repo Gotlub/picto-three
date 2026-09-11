@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Phase 2 - Shared Transverse Modules**:
+  - `ApiClient.js` (`app/static/js/services/ApiClient.js`): Centralized HTTP `fetch` client with automatic CSRF token extraction (`input[name="csrf_token"]` or `<meta name="csrf-token">`), automatic JSON serialization for mutating methods (`POST`, `PUT`, `DELETE`), and unified `ApiClientError` handling.
+  - `NotificationService.js` (`app/static/js/services/NotificationService.js`): Unified notification and confirmation wrapper while preserving native browser dialog contracts (`alert`, `confirm`) required by Playwright E2E tests (`page.waitForEvent('dialog')`).
+  - `DomUtils.js` (`app/static/js/utils/DomUtils.js`): Utilities for XSS mitigation (`escapeHtml`), declarative DOM element creation (`createElement`), and query helpers (`qs`, `qsa`).
+  - Unit tests for `ApiClient`, `NotificationService`, and `DomUtils` (`tests/unit/api_client.test.js`, `tests/unit/notification_service.test.js`, `tests/unit/dom_utils.test.js`), bringing JS unit test count to 26 passing tests.
+- Strengthened ESLint configuration (`eslint.config.mjs`) with strict `no-unused-vars` (ignoring `^_`), `no-undef`, and debug `console.log` warnings.
+- Cleaned up dead code and orphaned debug logs in `builder.js`, `list.js`, and `pictogram_bank.js`.
+- Integrated `ApiClient` and `NotificationService` across `builder.js` and `list.js` for tree/list/profile persistence, tree loading, and deletion.
 - Added JavaScript unit test suite using Node.js native test runner (`node --test tests/unit/**/*.test.js`) testing pure tree composite logic (`TreeModel`, `TreeNode`, cycle prevention, move, remove) and list logic (`ListModel`, `ListItem`, pagination, reordering).
 - Integrated JavaScript unit tests into CI workflow (`.github/workflows/flask-review.yml`) and Makefile (`make test-js`, integrated into `make test`).
 - Updated `AGENTS.md` to require running and passing the full test suite (`make test`) before any commit.

@@ -247,7 +247,6 @@ class PictogramBank {
 
     async createFolder() {
         const totalItems = this.countItems(this.rootNode);
-        console.log(`Total items before creation: ${totalItems}`);
         const maxItems = window.MAX_ITEMS_LIMIT || 500;
         if (totalItems >= maxItems) {
             alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
@@ -301,7 +300,6 @@ class PictogramBank {
 
     async uploadImage() {
         const totalItems = this.countItems(this.rootNode);
-        console.log(`Total items before upload: ${totalItems}`);
         const maxItems = window.MAX_ITEMS_LIMIT || 500;
         if (totalItems >= maxItems) {
             alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
@@ -414,7 +412,6 @@ class PictogramBank {
         const relativePath = this.selectedNode.data.path;
         const imageId = Number(this.selectedNode.data.id);
         const imageUrl = (relativePath && relativePath.startsWith('http')) ? relativePath : ((!isNaN(imageId) && imageId >= 0) ? `/pictograms/${imageId}` : `/pictograms/${relativePath}`);
-        console.log(`Exporting image with URL: ${imageUrl}`);
 
         const link = document.createElement('a');
         link.href = imageUrl;

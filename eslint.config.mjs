@@ -2,7 +2,7 @@ import globals from "globals";
 import pluginJs from "@eslint/js";
 
 export default [
-  // 1. Les dossiers à ignorer globalement (doit être son propre objet)
+  // 1. Les dossiers à ignorer globalement
   {
     ignores: [
       "venv/",
@@ -12,20 +12,34 @@ export default [
     ]
   },
 
-  // 2. Ton environnement (navigateur) et variables globales
+  // 2. Environnement (navigateur, node pour tests) et variables globales
   {
     languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
       globals: {
         ...globals.browser,
+        ...globals.node,
         tooltip: "readonly",
         bootstrap: "readonly",
         $: "readonly",
         jQuery: "readonly",
-        Treant: "readonly"
+        Treant: "readonly",
+        DOMPurify: "readonly"
       }
+    },
+    rules: {
+      ...pluginJs.configs.recommended.rules,
+      "no-unused-vars": [
+        "error",
+        {
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
+      ],
+      "no-undef": "error",
+      "no-console": ["warn", { "allow": ["warn", "error"] }]
     }
-  },
-
-  // 3. Les règles recommandées standards de JavaScript
-  pluginJs.configs.recommended
+  }
 ];
