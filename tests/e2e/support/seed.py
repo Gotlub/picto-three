@@ -4,15 +4,15 @@ import hashlib
 import json
 from datetime import UTC, datetime
 
-from settings import CONFIG, DATA
-
-from app import create_app, db
-from app.models import Folder, Image, PictogramList, Tree, User
 from flask_migrate import upgrade
 from PIL import Image as PILImage
 from PIL import ImageDraw
+from settings import CONFIG, DATA
 from sqlalchemy import inspect
 from sqlalchemy.engine import make_url
+
+from app import create_app, db
+from app.models import Folder, Image, PictogramList, Tree, User
 
 if any(DATA.iterdir()):
     raise RuntimeError('E2E assets already exist; recreate the E2E stack')
