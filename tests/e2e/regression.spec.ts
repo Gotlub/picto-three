@@ -371,3 +371,76 @@ test('List reorders local images, deletes a link, cancels New Chain, and downloa
   await testInfo.attach('List PDF', { path: pdfPath, contentType: 'application/pdf' });
   await expect(page.locator('#export-pdf-btn')).toBeEnabled();
 });
+
+test('Tree Builder reorganizes branches by DnD, rejects cycle movement, deletes a branch, and persists the new tree', async ({ page }) => {
+  const newName = `E2E Reordered tree ${randomUUID()}`;
+  await login(page, 'e2e_tree_reorder');
+  await navigate(page, 'Mobile Setup');
+
+  const select = page.locator('#tree-list #user-tree-select');
+  const loadBtn = page.locator('#collapseManageTrees #load-tree-btn');
+  await select.selectOption({ label: 'Reorder tree' });
+  await loadBtn.click();
+
+  const root = page.locator('#tree-display > .node > .node-content');
+  const childOne = page.locator('#tree-display > .node > .children > .node').filter({ has: page.getByText('Child one') });
+  const childTwo = page.locator('#tree-display > .node > .children > .node').filter({ has: page.getByText('Child two') });
+  const grandchild = childOne.locator('> .children > .node');
+
+  // 1. Verify initial seeded structure: 4 nodes total
+  await expect(page.locator('#tree-display .node')).toHaveCount(4);
+  await expect(root.locator('.node-name')).toHaveText('Root pictogram');
+  await expect(childOne.locator('> .node-content .node-name')).toHaveText('Child one');
+  await expect(grandchild.locator('> .node-content .node-name')).toHaveText('Grandchild');
+  await expect(childTwo.locator('> .node-content .node-name')).toHaveText('Child two');
+
+  // 2. Cycle prevention: Attempt to drag Child one onto its own descendant Grandchild
+  const cycleAlert = expectDialog(page, 'alert', 'You cannot move a node into one of its own children.');
+  await childOne.locator('> .node-content').dragTo(grandchild.locator('> .node-content'));
+  await cycleAlert;
+  // Verify tree structure was NOT modified by the rejected cycle
+  await expect(page.locator('#tree-display .node')).toHaveCount(4);
+  await expect(childOne.locator('> .children > .node')).toHaveCount(1);
+
+  // 3. Valid reorganization: Drag Grandchild onto Child two
+  await grandchild.locator('> .node-content').dragTo(childTwo.locator('> .node-content'));
+  // Now Grandchild is under Child two, Child one has 0 children
+  await expect(childOne.locator('> .children > .node')).toHaveCount(0);
+  const movedGrandchild = childTwo.locator('> .children > .node');
+  await expect(movedGrandchild).toHaveCount(1);
+  await expect(movedGrandchild.locator('> .node-content .node-name')).toHaveText('Grandchild');
+
+  // 4. Branch deletion: Select Child one and delete its branch
+  await childOne.locator('> .node-content .node-name').click();
+  await expect(page.locator('#tree-builder-pane #node-description')).toHaveValue('Child one');
+  const deleteConfirm = expectDialog(page, 'confirm', 'Are you sure you want to delete the selected branch?', true);
+  await page.locator('#tree-builder-pane #delete-btn').click();
+  await deleteConfirm;
+
+  // Tree now has 3 nodes: Root, Child two, and Grandchild under Child two
+  await expect(page.locator('#tree-display .node')).toHaveCount(3);
+  await expect(page.locator('#tree-display .node-name').filter({ hasText: 'Child one' })).toHaveCount(0);
+
+  // 5. Persistence: Save as a new tree
+  await page.locator('#collapseManageTrees #tree-name').fill(newName);
+  const saved = page.waitForResponse(response =>
+    response.url() === `${baseURL}/api/tree/save` && response.request().method() === 'POST');
+  const created = expectDialog(page, 'alert', 'Created');
+  await page.locator('#collapseManageTrees #save-tree-btn').click();
+  await created;
+  const saveResponse = await saved;
+  expect(saveResponse.ok()).toBe(true);
+  expect(await saveResponse.json()).toMatchObject({ status: 'success' });
+
+  // 6. Reload through UI and verify the persisted structure
+  await page.reload();
+  await select.selectOption({ label: newName });
+  await loadBtn.click();
+  await expect(page.locator('#tree-display .node')).toHaveCount(3);
+  const reloadedRoot = page.locator('#tree-display > .node > .node-content');
+  const reloadedChildTwo = page.locator('#tree-display > .node > .children > .node').filter({ has: page.getByText('Child two') });
+  const reloadedGrandchild = reloadedChildTwo.locator('> .children > .node');
+  await expect(reloadedRoot.locator('.node-name')).toHaveText('Root pictogram');
+  await expect(reloadedChildTwo.locator('> .node-content .node-name')).toHaveText('Child two');
+  await expect(reloadedGrandchild.locator('> .node-content .node-name')).toHaveText('Grandchild');
+});

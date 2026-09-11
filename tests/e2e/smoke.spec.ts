@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import type { Request } from '@playwright/test';
 import { test, expect } from './support/browser';
 import { expectImage, login, navigate } from './support/actions';
 
@@ -121,11 +120,7 @@ test('builder saves an edited seeded child under a new name and reloads it throu
   await expect(page.locator('#tree-builder-pane #node-description')).toHaveValue(description);
 });
 
-test('List imports a local PNG, edits its description, previews landscape, and characterizes the save blocker', async ({ page, pageErrors }, testInfo) => {
-  testInfo.annotations.push({
-    type: 'known-issue',
-    description: 'List save reads checked from missing #list-is-public in ListBuilder.saveList before POST /api/lists.',
-  });
+test('List imports a local PNG, edits its description, previews landscape, saves the list, and reloads it', async ({ page }) => {
   await login(page, 'e2e_list_local');
   const listsLoaded = page.waitForResponse(response =>
     response.url() === `${baseURL}/api/lists` && response.request().method() === 'GET');
@@ -174,30 +169,28 @@ test('List imports a local PNG, edits its description, previews landscape, and c
   await expect(item.locator('p')).toHaveText(description);
   await expect(page.locator('#list-is-public')).toHaveCount(0);
   await expect(page.locator('#collapseSaveList #save-list-btn')).toBeEnabled();
-  expect(pageErrors).toEqual([]);
 
-  const posts: string[] = [];
-  const recordPost = (request: Request) => {
-    if (request.method() === 'POST') posts.push(request.url());
-  };
-  page.on('request', recordPost);
-  try {
-    const failure = page.waitForEvent('pageerror');
-    await page.locator('#collapseSaveList #save-list-btn').click();
-    const error = await failure;
-    expect(error.name).toBe('TypeError');
-    expect(error.message).toBe("Cannot read properties of null (reading 'checked')");
-    expect(error.stack).toMatch(/ListBuilder\.saveList/);
-    expect(error.stack).toMatch(/\/static\/js\/list\.js/);
-    expect(pageErrors).toHaveLength(1);
-    expect(pageErrors[0]).toBe(error);
-    // This rejection terminates saveList before fetch, so the pageerror is the
-    // synchronization boundary for absence of POST, not an arbitrary sleep.
-    expect(posts).toEqual([]);
-    pageErrors.shift();
-  } finally {
-    page.off('request', recordPost);
-  }
+  const saved = page.waitForResponse(response =>
+    response.url() === `${baseURL}/api/lists` && response.request().method() === 'POST');
+  const created = page.waitForEvent('dialog').then(async dialog => {
+    const result = { type: dialog.type(), message: dialog.message() };
+    await dialog.accept();
+    return result;
+  });
+  await page.locator('#collapseSaveList #save-list-btn').click();
+  expect(await created).toEqual({ type: 'alert', message: 'Created' });
+  const response = await saved;
+  expect(response.ok()).toBe(true);
+  expect(await response.json()).toMatchObject({ status: 'success' });
+
+  await page.reload();
+  await page.locator('#collapseConstruct button[data-bs-target="#collapseLoadList"]').click();
+  await page.locator('#list-container select').selectOption({ label: `e2e_list_local - ${name}` });
+  await page.locator('#collapseLoadList #load-list-btn').click();
+  const reloadedItem = page.locator('#chained-list-container .chained-list-item');
+  await expect(reloadedItem).toHaveCount(1);
+  await expect(reloadedItem.locator('p')).toHaveText(description);
+  await expectImage(page, reloadedItem.locator('img'), src);
 });
 
 test('List loads the seeded saved list in order and previews both pictograms', async ({ page }) => {

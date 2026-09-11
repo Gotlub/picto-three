@@ -158,7 +158,6 @@ class ListBuilder {
         // Left Panel - List Section
         this.saveBtn = document.getElementById('save-list-btn');
         this.listNameInput = document.getElementById('list-name');
-        this.isPublicCheckbox = document.getElementById('list-is-public');
         this.listSearchInput = document.getElementById('list-search');
         this.listContainer = document.getElementById('list-container');
         this.loadListBtn = document.getElementById('load-list-btn');
@@ -786,7 +785,6 @@ class ListBuilder {
                 description: item.data.description
             };
         });
-        const isPublic = this.isPublicCheckbox.checked;
 
         const csrfTokenNode = document.querySelector('input[name="csrf_token"]');
         if (!csrfTokenNode) {
@@ -804,7 +802,6 @@ class ListBuilder {
                 },
                 body: JSON.stringify({
                     list_name: listName,
-                    is_public: isPublic,
                     payload: payload
                 })
             });

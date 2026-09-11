@@ -102,6 +102,11 @@ Liste des jalons et tâches à réaliser par les agents IA.
 - [x] Ajouter les etapes E2E 0/1 : stack Docker isolee, seed SQLite/images jetables et cinq parcours Playwright, sans modifier `app/`.
 - [x] Valider le socle E2E sur PostgreSQL 15 jetable et avec les migrations.
 - [x] Ajouter cinq parcours E2E de regression et un job dedie dans `flask-review.yml`.
+- [x] Resoudre le blocage de sauvegarde List (suppression de la reference a l'element inexistant `#list-is-public`, assainissement API et validation nominale de sauvegarde/relecture dans les E2E).
+- [x] Integrer les linters (Ruff, ESLint), tests unitaires JS, pytest et les tests E2E Playwright dans le `Makefile` (`make test`, `make lint`, `make pytest`, `make test-js`, `make e2e`).
+- [x] Créer les modèles et tests unitaires JavaScript (`TreeModel`, `ListModel`) pour valider la logique d'arborescence (anti-cycle, déplacement, suppression) et listes avant refactorisation.
+- [x] Ajouter le 11ème parcours E2E Playwright pour la réorganisation d'arbres par Drag & Drop, le blocage des cycles et la suppression de branches persistée.
+- [x] Intégrer les tests unitaires JS dans GitHub Actions (`.github/workflows/flask-review.yml`) et documenter l'obligation de validation systématique `make test` dans `AGENTS.md`.
 - [ ] Confirmer le premier passage GitHub Actions et obtenir la validation humaine des E2E avant toute refactorisation.
 - [x] Corriger la configuration SMTP pour Brevo (séparation user/sender).
 - [x] Créer le Makefile pour faciliter la gestion des conteneurs Docker (admin, images, bash, psql).

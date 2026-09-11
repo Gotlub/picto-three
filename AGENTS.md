@@ -9,9 +9,12 @@ Environnement Windows : use Powershell.
 - **Backend Stack:** Python 3.10+, Flask, SQLAlchemy.
 
 ## Developer Commands
-- **Testing:** `pytest -v` (Must pass completely before committing)
-- **Python Linting:** `ruff check .`
-- **JavaScript Linting:** `npx eslint .` (Ignores `app/static/js/lib/**/*.js`)
+- **Full Test Suite:** `make test` (Executes Ruff, ESLint, JS unit tests, Pytest, and Playwright E2E - MUST pass completely before committing)
+- **Unit & Integration Tests (Python):** `pytest -v`
+- **Unit Tests (JavaScript):** `npm test` (or `make test-js`)
+- **Python Linting:** `ruff check .` (or `make lint-py`)
+- **JavaScript Linting:** `npx eslint .` (or `make lint-js`, ignores `app/static/js/lib/**/*.js`)
+- **E2E Tests:** `make e2e` (or `npm run e2e`)
 - **Run Dev Server:** `flask run`
 
 ## Database Migrations (Flask-Migrate)
@@ -29,4 +32,4 @@ The project uses Flask-Babel. If you add or modify translatable strings, update 
 - **Changelog:** Add an entry to `CHANGELOG.md` under `[Unreleased]` for every completed feature or fix.
 - **Commit Format:** Use Conventional Commits (e.g., `feat: add user registration`, `fix: correct image path`).
 - **Blockers:** If hopelessly blocked, document the issue in a `BLOCKER.md` file rather than guessing.
-- **Tests:** Never commit code that fails the test suite. Update tests in `tests/` to cover new code.
+- **Tests:** Chaque modification doit passer l'ensemble de la suite de validation (`make test`). Ne jamais commiter de code qui échoue aux tests. Mettre à jour les tests dans `tests/` pour couvrir tout nouveau code.

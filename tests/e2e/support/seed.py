@@ -49,6 +49,7 @@ with app.app_context():
     for scenario in (
         'demo', 'auth', 'builder', 'list_local', 'list_saved',
         'tree_dnd', 'tree_overwrite', 'binder', 'resources', 'list_edit',
+        'tree_reorder',
     ):
         user = User(
             username=f'e2e_{scenario}', email=f'{scenario}@example.test',
@@ -79,6 +80,30 @@ with app.app_context():
                 root_url=f'/pictograms/{root_image.id}', json_data=json.dumps({'roots': [root]}),
                 is_public=False,
             ))
+        if scenario == 'tree_reorder':
+            reorder_root = {
+                'id': images[0].id, 'url': f'/pictograms/{images[0].id}', 'name': images[0].name,
+                'description': 'Root pictogram', 'children': [
+                    {
+                        'id': images[1].id, 'url': f'/pictograms/{images[1].id}', 'name': images[1].name,
+                        'description': 'Child one', 'children': [
+                            {
+                                'id': images[2].id, 'url': f'/pictograms/{images[2].id}', 'name': images[2].name,
+                                'description': 'Grandchild', 'children': [],
+                            }
+                        ],
+                    },
+                    {
+                        'id': images[2].id, 'url': f'/pictograms/{images[2].id}', 'name': images[2].name,
+                        'description': 'Child two', 'children': [],
+                    },
+                ],
+            }
+            db.session.add(Tree(
+                name='Reorder tree', user_id=user.id, root_id=images[0].id,
+                root_url=f'/pictograms/{images[0].id}', json_data=json.dumps({'roots': [reorder_root]}),
+                is_public=False,
+            ))
         if scenario == 'list_saved':
             payload = [{
                 'image_id': image.id, 'url': f'/pictograms/{image.id}',
@@ -89,4 +114,4 @@ with app.app_context():
                 payload=json.dumps(payload),
             ))
     db.session.commit()
-    print('E2E seed ready: migrated PostgreSQL 15, 10 accounts, 3 images and thumbnails', flush=True)
+    print('E2E seed ready: migrated PostgreSQL 15, 11 accounts, 3 images and thumbnails', flush=True)

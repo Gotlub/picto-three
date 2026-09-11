@@ -62,7 +62,7 @@ def save_list():
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     list_name = data.get('list_name')
-    is_public = False
+    is_public = data.get('is_public', False)
     payload = data.get('payload')
 
     if not list_name or payload is None:
@@ -114,7 +114,8 @@ def update_list(list_id):
         return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
 
     plist.list_name = data.get('list_name', plist.list_name)
-    plist.is_public = False
+    if 'is_public' in data:
+        plist.is_public = bool(data['is_public'])
     payload = data.get('payload')
     if payload is not None:
         plist.payload = json.dumps(payload)

@@ -11,7 +11,7 @@ npm run e2e
 ```
 
 Voir [tests/e2e/README.md](tests/e2e/README.md) pour l'isolation, les rapports et la
-caracterisation du blocage connu de sauvegarde List. Aucun serveur existant ne
+description des parcours testés. Aucun serveur existant ne
 doit etre utilise par ces tests.
 
 Le workflow `flask-review.yml` execute aussi cette commande a chaque push, dans

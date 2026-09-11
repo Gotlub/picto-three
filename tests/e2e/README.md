@@ -70,23 +70,24 @@ compte demo E2E : un simple HTTP 200 sur l'accueil ne suffit pas.
 
 ## Donnees reproductibles
 
-Le seed cree dix utilisateurs confirmes, chacun avec son dossier personnel :
+Le seed cree onze utilisateurs confirmes, chacun avec son dossier personnel :
 `e2e_demo`, `e2e_auth`, `e2e_builder`, `e2e_list_local`, `e2e_list_saved`,
-`e2e_tree_dnd`, `e2e_tree_overwrite`, `e2e_binder`, `e2e_resources`, `e2e_list_edit`.
+`e2e_tree_dnd`, `e2e_tree_overwrite`, `e2e_binder`, `e2e_resources`, `e2e_list_edit`,
+`e2e_tree_reorder`.
 Le mot de passe commun, uniquement pour ce jeu jetable, est
 `E2eOnlyPassword123!`. Les adresses sont dans `example.test` et la langue est `en`.
 
 Trois PNG de 96 x 96 pixels sont generes par Pillow : carres rouge, bleu et vert.
 Chaque image publique a un vrai fichier, une miniature et un enregistrement DB.
-Des arbres racine/enfant sont prepares pour la demo, l'edition, l'ecrasement et
-la composition de classeur ; une liste de deux images appartient au compte de
-lecture List. Les scenarios de creation commencent avec leur espace prive vide.
+Des arbres racine/enfant sont prepares pour la demo, l'edition, l'ecrasement,
+la reorganisation et la composition de classeur ; une liste de deux images appartient
+au compte de lecture List. Les scenarios de creation commencent avec leur espace prive vide.
 
 Chaque test a un nouveau contexte navigateur. Les tests mutables ont des comptes
 distincts ; aucune donnee privee n'est preparee par un autre test. Les images
 publiques sont partagees en lecture seule. Un worker, aucun retry.
 
-## Les dix parcours
+## Les onze parcours
 
 1. Navigation anonyme : accueil, consentement, Builder, onglets arbre/classeur,
    miniature publique, puis List.
@@ -95,8 +96,9 @@ publiques sont partagees en lecture seule. Un worker, aucun retry.
 3. Persistance Builder : chargement d'un arbre, modification de la description
    d'un enfant, sauvegarde sous un nouveau nom, rechargement complet et relecture
    depuis l'interface. Les images et la structure sont verifiees.
-4. List local preview : selection d'un PNG via l'input fichier, modification de
-   description, preview paysage ; puis caracterisation du blocage Save actuel.
+4. List local save & reload : selection d'un PNG via l'input fichier, modification de
+   description, preview paysage, sauvegarde de la liste avec validation du dialogue,
+   persistance backend et rechargement complet depuis l'interface.
 5. List existante : chargement d'une liste seedee, ordre et descriptions des deux
    maillons, selection et preview portrait avec images decodees.
 6. Construction d'arbre : vrais gestes de glisser-deposer depuis la banque
@@ -109,31 +111,29 @@ publiques sont partagees en lecture seule. Un worker, aucun retry.
    original et miniature, annulation puis confirmation d'une suppression.
 10. List/PDF : reorganisation de trois maillons importes, suppression, annulation
     de New Chain, preview et telechargement d'un PDF avec les textes conserves.
+11. Reorganisation et integrite d'arbre : deplacement d'un noeud vers une autre
+    branche par glisser-deposer, detection et rejet d'un mouvement cyclique interdit
+    (parent dans enfant), suppression d'une branche avec confirmation, puis sauvegarde
+    et relecture persistante.
 
-Les cinq premiers sont dans `smoke.spec.ts`, les suivants dans
+Les cinq premiers sont dans `smoke.spec.ts`, les six suivants dans
 `regression.spec.ts`. L'ordre d'execution peut differer de cette presentation ;
 les scenarios ne dependent pas des donnees creees par un autre test. Le PDF est
 controle par sa signature, ses marqueurs page/image et ses textes : ce controle
 nominal ne remplace pas une comparaison visuelle de son rendu ni de sa pagination.
 
-### Blocage connu de sauvegarde List
+### Sauvegarde et relecture List
 
-Le quatrieme parcours de `smoke.spec.ts` porte une annotation `known-issue`. Apres avoir valide le
-preview, il tente de sauvegarder une liste non vide avec un compte connecte et
-un nom renseigne. Il attend exactement le `TypeError` lie a `.checked` sur le
-champ absent `#list-is-public`, avec une pile issue de `ListBuilder.saveList`,
-et verifie qu'aucun POST n'a ete emis.
+Le quatrieme parcours de `smoke.spec.ts` valide le cycle complet de sauvegarde
+et de relecture d'une liste locale :
+Apres avoir valide le preview, il sauvegarde une liste non vide avec un compte
+connecte et un nom renseigne. L'appel POST `/api/lists` est effectue, la
+confirmation d'alerte `Created` est validee, puis la page est rechargee pour
+recharger et verifier l'integrite de la liste persistee (nom, miniature et description).
 
-Le backend force deja `is_public=False`. Le blocage est cote navigateur, avant
-l'appel au backend : il ne constitue pas une validation de cette valeur par
-defaut, ni une fonctionnalite d'administration. Le futur parametrage admin reste
-hors perimetre de cette suite.
-
-**Un resultat vert ne signifie pas que la sauvegarde List fonctionne.** Ce test
-acte le defaut demande, sans case injectee, appel d'une methode interne, mock de
-l'API ou correction de `list.js`. Aucune autre erreur JS n'est toleree. Quand la
-correction sera autorisee, ce bloc devra devenir un vrai parcours sauvegarde et
-relecture ; si le defaut disparait entre-temps, le test echouera pour le signaler.
+L'ancien blocage cote navigateur (tentative de lecture de `.checked` sur un element
+absent `#list-is-public` dans `ListBuilder.saveList`) a ete resolu proprement,
+et le backend utilise la valeur par defaut du modele pour `is_public`.
 
 ## Reseau et dependances
 
@@ -225,7 +225,7 @@ pytest SQLite/PostgreSQL demandera d'abord de renforcer ses fixtures d'isolation
 ## Avant la refactorisation
 
 Attendre la validation humaine des parcours et un premier workflow CI reussi.
-Cette suite ne couvre pas tout : sauvegarde nominale List, droits entre deux
-utilisateurs, drag de branches et annulations complexes, ARASAAC, visualisation
+Cette suite ne couvre pas tout : droits entre deux utilisateurs,
+drag de branches et annulations complexes, ARASAAC, visualisation
 Treant et cas d'impression multipages restent a completer. Les defauts connus
 doivent etre distingues des comportements a preserver avant tout nettoyage du code.
