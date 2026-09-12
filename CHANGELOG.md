@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added full testing and linting chain in `Makefile` (`make test`) running `ruff check .`, `npx eslint .`, unit JS tests, unit/integration `pytest -v`, and Playwright E2E tests (`bash tests/e2e/run.sh`) sequentially, as well as modular targets (`make lint`, `make lint-py`, `make lint-js`, `make test-js`, `make pytest`, `make e2e`).
 
 ### Fixed
+- Fixed list saving edge cases and race conditions on `/list` (`app/static/js/list.js`, `app/templates/list.html`):
+  - Initialized `userLists`, `publicLists`, `userTrees`, `publicTrees`, and `currentUserId` in `ListBuilder` constructor, preventing `TypeError: Cannot read properties of undefined (reading 'find')` if saving before list fetch finishes.
+  - Added immediate user ID resolution via DOM metadata (`#current-user-meta[data-user-id]`) in `list.html` to eliminate race condition where `this.currentUserId` was unset.
+  - Guarded translation lookups with fallbacks (`window.translations?.accountRequired`) and unified modal/dialog calls with `NotificationService`.
+  - Rebuilt and restarted the development/production Docker container (`web`) ensuring changes are actively served.
 - Fixed List save blocker on client-side: removed dependency on missing `#list-is-public` element in `ListBuilder.saveList` (`list.js`) which caused a `TypeError: Cannot read properties of null (reading 'checked')`.
 - Cleaned up `is_public` handling in backend API (`app/routes/api.py`) to leverage model defaults properly.
 - Updated Playwright E2E smoke test 4 (`tests/e2e/smoke.spec.ts`) and documentation (`tests/e2e/README.md`) from expecting a save failure to verifying the full nominal save, confirmation alert, and UI reload/re-render flow.

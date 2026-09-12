@@ -226,6 +226,15 @@ class ListBuilder {
         this.printBorderWidth = document.getElementById('print-border-width');
         this.printBorderWidthVal = document.getElementById('print-border-width-val');
 
+        // User & collections state
+        const userMeta = typeof document !== 'undefined' ? document.getElementById('current-user-meta') : null;
+        const initialUserId = userMeta && userMeta.dataset.userId ? Number(userMeta.dataset.userId) : null;
+        this.currentUserId = initialUserId;
+        this.userLists = [];
+        this.publicLists = [];
+        this.userTrees = [];
+        this.publicTrees = [];
+
         this.initEventListeners();
         this.loadSavedLists();
         this.loadSavedTrees();
@@ -321,7 +330,10 @@ class ListBuilder {
             if (!file) return;
             
             if (!file.type.startsWith('image/')) {
-                alert(window.translations.invalidImage);
+                const msg = (typeof window !== 'undefined' && window.translations && window.translations.invalidImage)
+                    ? window.translations.invalidImage
+                    : 'Please select a valid image.';
+                NotificationService.alert(msg);
                 return;
             }
             
@@ -527,7 +539,7 @@ class ListBuilder {
 
     deleteSelectedLink() {
         if (!this.selectedChainedItem) {
-            alert('Please select a link to delete.');
+            NotificationService.alert('Please select a link to delete.');
             return;
         }
         this.chainedListItems = this.chainedListItems.filter(item => item !== this.selectedChainedItem);
@@ -538,7 +550,7 @@ class ListBuilder {
     }
 
     clearChain() {
-        if (confirm('Are you sure you want to clear the entire chain?')) {
+        if (NotificationService.confirm('Are you sure you want to clear the entire chain?')) {
             this.chainedListItems = [];
             this.selectedChainedItem = null;
             this.selectedLinkDescription.value = '';
@@ -744,22 +756,30 @@ class ListBuilder {
 
     // --- API Calls ---
     async saveList() {
-        if (!this.currentUserId) {
-            alert(window.translations.accountRequired);
+        const userMeta = typeof document !== 'undefined' ? document.getElementById('current-user-meta') : null;
+        const metaUserId = userMeta && userMeta.dataset.userId ? Number(userMeta.dataset.userId) : null;
+        const currentUserId = this.currentUserId || metaUserId;
+
+        if (!currentUserId) {
+            const msg = (typeof window !== 'undefined' && window.translations && window.translations.accountRequired)
+                ? window.translations.accountRequired
+                : 'You must create an account to use this feature.';
+            NotificationService.alert(msg);
             return;
         }
 
-        const listName = this.listNameInput.value;
+        const listName = (this.listNameInput ? this.listNameInput.value : '').trim();
         if (!listName) {
-            alert('Please enter a name for the list.');
+            NotificationService.alert('Please enter a name for the list.');
             return;
         }
-        if (this.chainedListItems.length === 0) {
-            alert('Cannot save an empty list.');
+        if (!this.chainedListItems || this.chainedListItems.length === 0) {
+            NotificationService.alert('Cannot save an empty list.');
             return;
         }
 
-        const existingList = this.userLists.find(list => list.list_name === listName);
+        const userLists = Array.isArray(this.userLists) ? this.userLists : [];
+        const existingList = userLists.find(list => list && list.list_name === listName);
         let proceed = true;
 
         if (existingList) {
@@ -771,9 +791,10 @@ class ListBuilder {
         }
 
         const payload = this.chainedListItems.map(item => {
-            let imageId = item.data.image_id;
-            let imageUrl = item.data.path;
-            let imageName = item.data.name;
+            const data = item.data || {};
+            let imageId = data.image_id;
+            const imageUrl = data.path || data.url || '';
+            const imageName = data.name || '';
 
             if (imageUrl && imageUrl.startsWith('http')) {
                 imageId = -1;
@@ -783,7 +804,7 @@ class ListBuilder {
                 image_id: imageId,
                 url: imageUrl,
                 name: imageName,
-                description: item.data.description
+                description: data.description || ''
             };
         });
 
@@ -793,25 +814,28 @@ class ListBuilder {
                 payload: payload
             });
 
-            if (result.status === 'success') {
+            if (result && result.status === 'success') {
                 const message = existingList ? 'Updated' : 'Created';
                 NotificationService.alert(message);
-                this.loadSavedLists(); // Refresh the list
+                await this.loadSavedLists(); // Refresh the list
             } else {
-                NotificationService.alert(`Error: ${result.message}`);
+                NotificationService.alert(`Error: ${result ? result.message : 'Unknown error'}`);
             }
         } catch (e) {
             console.error('Erreur sauvegarde:', e);
-            NotificationService.alert('La sauvegarde a échoué. Vérifiez votre connexion et réessayez.');
+            const errorMsg = e.message || 'La sauvegarde a échoué. Vérifiez votre connexion et réessayez.';
+            NotificationService.alert(errorMsg);
         }
     }
 
     async loadSavedLists() {
         try {
             const data = await ApiClient.get('/api/lists');
-            this.currentUserId = data.current_user_id;
-            this.publicLists = Array.isArray(data.public_lists) ? data.public_lists : [];
-            this.userLists = Array.isArray(data.user_lists) ? data.user_lists : [];
+            if (data && data.current_user_id) {
+                this.currentUserId = data.current_user_id;
+            }
+            this.publicLists = Array.isArray(data?.public_lists) ? data.public_lists : [];
+            this.userLists = Array.isArray(data?.user_lists) ? data.user_lists : [];
         } catch (e) {
             console.error('Impossible de charger les listes:', e);
             NotificationService.alert('Impossible de charger les listes sauvegardées.');
@@ -916,8 +940,11 @@ class ListBuilder {
     async loadSavedTrees() {
         try {
             const data = await ApiClient.get('/api/trees/load');
-            this.publicTrees = Array.isArray(data.public_trees) ? data.public_trees : [];
-            this.userTrees = Array.isArray(data.user_trees) ? data.user_trees : [];
+            if (data && data.current_user_id) {
+                this.currentUserId = data.current_user_id;
+            }
+            this.publicTrees = Array.isArray(data?.public_trees) ? data.public_trees : [];
+            this.userTrees = Array.isArray(data?.user_trees) ? data.user_trees : [];
         } catch (e) {
             console.error('Impossible de charger les arbres:', e);
             NotificationService.alert('Impossible de charger les arbres sauvegardés.');
