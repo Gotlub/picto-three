@@ -123,6 +123,21 @@ Liste des jalons et tâches à réaliser par les agents IA.
 - [x] Intégrer `ApiClient` et `NotificationService` dans `builder.js` (sauvegarde/chargement d'arbres et profils, suppression) et `list.js` (sauvegarde/chargement listes et arbres).
 - [x] Valider l'absence de régression via l'exécution complète de `make test` (Ruff, ESLint, 26 tests JS, 56 tests Pytest, 11 tests E2E).
 
+## Phase 3 : Découpage modulaire et Clean Code des monolithes JS
+- [x] **Étape 3.1 : Modularisation de `list.js`**
+  - [x] Extraire `app/static/js/services/ListPdfExporter.js` (gestion du zoom, synchronisation onglet-accordéon, calculs de mise en page grille/chaîne, rendu DOM preview et export jsPDF).
+  - [x] Extraire `app/static/js/components/ReadOnlyTreeViewer.js` (`ReadOnlyNode`, sélection de branche, reconstruction d'arbres et dragstart).
+  - [x] Extraire `app/static/js/components/ChainedListManager.js` (`ChainedListItem`, drag & drop reorder, édition de description en temps réel, scroll horizontal et boutons, import d'image locale).
+  - [x] Réduire `list.js` de ~1 562 lignes à 328 lignes en conservant le rôle d'orchestrateur principal.
+  - [x] Ajouter les tests unitaires JS pour `ListPdfExporter` et `ChainedListManager` (portant le total à 31 tests unitaires JS validés).
+  - [x] Valider l'absence de régression avec `make test` (100% de succès sur les 11 parcours E2E Playwright, 56 tests Pytest, ESLint et Ruff).
+- [ ] **Étape 3.2 : Modularisation de `builder.js`**
+  - [ ] Extraire `app/static/js/components/BinderManager.js` (composition et réorganisation de classeur).
+  - [ ] Extraire `app/static/js/services/TreePdfExporter.js` (export SVG / PDF de l'arbre Treant).
+  - [ ] Extraire `app/static/js/components/ProfileManager.js` (sauvegarde/chargement de profils et sélections).
+  - [ ] Réduire la complexité de `builder.js` autour de l'arbre Treant principal.
+  - [ ] Valider avec `make test`.
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

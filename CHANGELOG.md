@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Phase 3.1 - Modularization of `list.js`**:
+  - `ListPdfExporter.js` (`app/static/js/services/ListPdfExporter.js`): Service handling print settings, responsive zoom, tab-accordion synchronization, mathematical grid/chain pagination, DOM preview rendering, and jsPDF vector export.
+  - `ReadOnlyTreeViewer.js` (`app/static/js/components/ReadOnlyTreeViewer.js`): Visualizer component handling tree hierarchy rendering, branch and single-node selection, and drag-and-drop payload generation.
+  - `ChainedListManager.js` (`app/static/js/components/ChainedListManager.js`): Component handling sequential list items, smooth horizontal scrolling, DnD reordering with live drop indicator, real-time text description editing, and local image file imports.
+  - Refactored `list.js` from ~1 562 lines to 328 lines as a clean, focused orchestrator.
+  - Added unit test suites `tests/unit/list_pdf_exporter.test.js` and `tests/unit/chained_list_manager.test.js`, bringing JS unit test count to 31 passing tests.
 - **Phase 2 - Shared Transverse Modules**:
   - `ApiClient.js` (`app/static/js/services/ApiClient.js`): Centralized HTTP `fetch` client with automatic CSRF token extraction (`input[name="csrf_token"]` or `<meta name="csrf-token">`), automatic JSON serialization for mutating methods (`POST`, `PUT`, `DELETE`), and unified `ApiClientError` handling.
   - `NotificationService.js` (`app/static/js/services/NotificationService.js`): Unified notification and confirmation wrapper while preserving native browser dialog contracts (`alert`, `confirm`) required by Playwright E2E tests (`page.waitForEvent('dialog')`).
