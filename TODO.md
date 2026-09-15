@@ -131,12 +131,14 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Réduire `list.js` de ~1 562 lignes à 328 lignes en conservant le rôle d'orchestrateur principal.
   - [x] Ajouter les tests unitaires JS pour `ListPdfExporter` et `ChainedListManager` (portant le total à 31 tests unitaires JS validés).
   - [x] Valider l'absence de régression avec `make test` (100% de succès sur les 11 parcours E2E Playwright, 56 tests Pytest, ESLint et Ruff).
-- [ ] **Étape 3.2 : Modularisation de `builder.js`**
-  - [ ] Extraire `app/static/js/components/BinderManager.js` (composition et réorganisation de classeur).
-  - [ ] Extraire `app/static/js/services/TreePdfExporter.js` (export SVG / PDF de l'arbre Treant).
-  - [ ] Extraire `app/static/js/components/ProfileManager.js` (sauvegarde/chargement de profils et sélections).
-  - [ ] Réduire la complexité de `builder.js` autour de l'arbre Treant principal.
-  - [ ] Valider avec `make test`.
+- [x] **Étape 3.2 : Modularisation de `builder.js`**
+  - [x] Extraire `app/static/js/components/BuilderNode.js` (DOM, rendu visuel des nœuds, fallback et gestion des événements DnD).
+  - [x] Extraire `app/static/js/components/BinderManager.js` (composition et réorganisation de classeur, palette de couleurs, avatar et persistance profil).
+  - [x] Extraire `app/static/js/services/TreePdfExporter.js` (export SVG / PDF vectoriel de l'arbre Treant avec jsPDF).
+  - [x] Réduire la complexité de `builder.js` de 2 104 lignes à ~640 lignes comme orchestrateur principal.
+  - [x] Renforcer la sécurité en vue de l'audit Astra (éradication des XSS via innerHTML, sécurisation des URLs et caractères Unicode sécurisés).
+  - [x] Ajouter 3 suites de tests unitaires JS (`builder_node.test.js`, `binder_manager.test.js`, `tree_pdf_exporter.test.js` - total 39 tests unitaires JS).
+  - [x] Valider l'ensemble avec `make test` (100% de succès sur Linters Ruff & ESLint, 39 tests JS, 56 tests Pytest, 11 tests E2E Playwright).
 
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :

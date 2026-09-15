@@ -2,145 +2,12 @@ import ImageTree from './components/ImageTree.js';
 import ArasaacSearch from './components/ArasaacSearch.js';
 import { ApiClient } from './services/ApiClient.js';
 import { NotificationService } from './services/NotificationService.js';
+import { DomUtils } from './utils/DomUtils.js';
+import { BuilderNode, resolveBuilderImageUrl } from './components/BuilderNode.js';
+import { BinderManager } from './components/BinderManager.js';
+import { TreePdfExporter } from './services/TreePdfExporter.js';
 
-
-class BuilderNode {
-    constructor(image, builder, nodeData = null, isRoot = false) {
-        this.image = image;
-        this.builder = builder;
-        this.nodeData = nodeData;
-        this.children = [];
-        this.parent = null;
-        this.isRoot = isRoot;
-        // Prioritize description from saved tree data, fallback to image data.
-        this.description = (nodeData && nodeData.description !== undefined) ? nodeData.description : (image.description || '');
-        this.isDefaultRoot = (this.isRoot && (image.id === 'root' || (!nodeData || !nodeData.url)));
-        this.element = this.createElement(builder);
-    }
-
-    addChild(theNode) {
-        theNode.parent = this;
-        this.children.push(theNode);
-    }
-
-    createElement(builder) {
-        const nodeElement = document.createElement('div');
-        nodeElement.classList.add('node');
-        nodeElement.setAttribute('draggable', !this.isRoot);
-
-        const contentElement = document.createElement('div');
-        contentElement.classList.add('node-content');
-
-        const imgElement = document.createElement('img');
-        if (this.image.path) {
-            // Path can be a new relative path (e.g., 'public/foo.png')
-            // or an absolute URL for the root node icon (e.g., '/pictograms/public/...')
-            // or an external URL from Arasaac (e.g. 'https://static.arasaac.org/...')
-            const imageId = Number(this.image.id);
-            if (this.image.path.startsWith('http')) {
-                imgElement.src = this.image.path;
-            } else if (!isNaN(imageId) && imageId >= 0) {
-                imgElement.src = `/pictograms/${imageId}`;
-            } else if (this.image.path.startsWith('/')) {
-                imgElement.src = this.image.path; // It's already a full URL or absolute path
-            } else {
-                imgElement.src = `/pictograms/${this.image.path}`; // It's a relative path
-            }
-        }
-        imgElement.alt = this.image.name;
-
-        // Fallback for missing or broken images
-        imgElement.addEventListener('error', function() {
-            const fallbackSrc = '/static/images/folder-open-bold.png';
-            if (!this.src.endsWith(fallbackSrc)) {
-                this.src = fallbackSrc;
-            }
-        });
-
-        // Add tooltip events
-        imgElement.addEventListener('mouseover', (e) => {
-            tooltip.show(e, imgElement.src);
-        });
-        imgElement.addEventListener('mouseout', (e) => {
-            tooltip.hide(e);
-        });
-
-        contentElement.appendChild(imgElement);
-
-        const nameElement = document.createElement('span');
-        nameElement.classList.add('node-name');
-        nameElement.textContent = this.description || this.image.name;
-        this.nameElement = nameElement;
-        contentElement.appendChild(nameElement);
-
-        if (this.isRoot) {
-            // For the root node, add a visual indicator that it can be changed
-            const hintElement = document.createElement('div');
-            hintElement.style.fontSize = '0.7em';
-            hintElement.style.color = '#888';
-            hintElement.style.marginTop = '4px';
-
-            if (this.isDefaultRoot) {
-                hintElement.textContent = 'Drop an image here to set the root';
-                nameElement.textContent = 'Choose the root image';
-            } else {
-                hintElement.textContent = 'Drop here to change root';
-            }
-
-            contentElement.appendChild(hintElement);
-            // Ensure it's visually distinct before an image is set
-            if (this.isDefaultRoot) {
-                contentElement.style.border = '2px dashed #007bff';
-                contentElement.style.backgroundColor = '#f8f9fa';
-            }
-        }
-
-        nodeElement.appendChild(contentElement);
-
-        const childrenContainer = document.createElement('div');
-        childrenContainer.classList.add('children');
-        nodeElement.appendChild(childrenContainer);
-
-        nodeElement.addEventListener('click', (e) => {
-            e.stopPropagation();
-            builder.selectNode(this);
-        });
-
-        // Drag and Drop event listeners
-        nodeElement.addEventListener('dragstart', (e) => {
-            e.stopPropagation();
-            builder.handleDragStart(e, this);
-        });
-        nodeElement.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            builder.handleDragOver(e, this);
-        });
-        nodeElement.addEventListener('dragleave', (e) => {
-            e.stopPropagation();
-            builder.handleDragLeave(e, this);
-        });
-        nodeElement.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            builder.handleDrop(e, this);
-        });
-        nodeElement.addEventListener('dragend', (e) => {
-            e.stopPropagation();
-            builder.handleDragEnd(e, this);
-        });
-
-        return nodeElement;
-    }
-
-    updateDescription(newDescription) {
-        if (this.nameElement) {
-            this.nameElement.textContent = newDescription;
-        }
-    }
-}
-
-class TreeBuilder {
+export class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
         this.treeDisplay = document.getElementById('tree-display');
@@ -154,10 +21,12 @@ class TreeBuilder {
         this.closeVisualizeXBtn = document.getElementById('close-visualizer-x-btn');
         this.nodeDescriptionTextarea = document.getElementById('node-description');
         this.savedTrees = [];
-        this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this, null, true);
-        this.treeDisplay.appendChild(this.rootNode.element);
+        this.userTrees = [];
+        this.currentUserId = null;
+        this.activeTreeSelect = null;
         this.selectedNode = null;
         this.draggedNode = null;
+        this.treantChart = null;
 
         // Zoom & Pan state variables
         this.scale = 1;
@@ -166,48 +35,83 @@ class TreeBuilder {
         this.pointY = 0;
         this.start = { x: 0, y: 0 };
 
+        // Racine initiale par défaut
+        this.rootNode = new BuilderNode(
+            { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' },
+            this,
+            null,
+            true
+        );
+
+        if (this.treeDisplay) {
+            this.treeDisplay.appendChild(this.rootNode.element);
+        }
+
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.disabled = true;
             this.nodeDescriptionTextarea.addEventListener('input', () => {
                 if (this.selectedNode) {
                     const newDescription = this.nodeDescriptionTextarea.value;
                     this.selectedNode.description = newDescription;
-
-                    // As `this.selectedNode` is the BuilderNode instance (the "View"),
-                    // we can call its update method directly.
                     this.selectedNode.updateDescription(newDescription);
                 }
             });
         }
 
-        // New Image Tree initialization. The click callback is set to null to allow drag-and-drop to work without conflict.
+        // Arbre d'images de la banque locale
         this.imageTree = new ImageTree('image-sidebar-tree');
 
-        // Initialize Arasaac Search
+        // Recherche Arasaac
         this.arasaacSearch = new ArasaacSearch('arasaac-search-container', (e, payload) => {
             this.handleArasaacDragStart(e, payload);
         });
 
-        // --- Drag and Drop from Sidebar to Builder ---
-        this.treeDisplay.addEventListener('dragover', (e) => {
-            e.preventDefault(); // Necessary to allow drop
-            e.dataTransfer.dropEffect = 'copy';
-            this.treeDisplay.classList.add('drag-over'); // Add highlight class
+        // Gestionnaire de classeur multi-arbres (Profils)
+        this.binderManager = new BinderManager({
+            getUserTrees: () => this.userTrees,
+            getCurrentUserId: () => this.currentUserId
+        });
 
-            // Auto-scroll logic
+        this.initCanvasDragDrop();
+        this.initEventListeners();
+        this.initPanAndZoom();
+
+        this.loadSavedTrees();
+        this.updateVisualizeButtonState();
+
+        const treeDataFromPostElement = document.getElementById('tree-data-from-post');
+        if (treeDataFromPostElement && treeDataFromPostElement.textContent) {
+            try {
+                const treeData = JSON.parse(treeDataFromPostElement.textContent);
+                if (treeData) {
+                    this.rebuildTreeFromJSON(treeData);
+                }
+            } catch (e) {
+                console.error('Could not parse tree_data_from_post', e);
+            }
+        }
+    }
+
+    initCanvasDragDrop() {
+        if (!this.treeDisplay) return;
+
+        this.treeDisplay.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            this.treeDisplay.classList.add('drag-over');
+
+            // Défilement automatique lors du survol des bords
             const container = this.treeDisplay;
-            const threshold = 50; // pixels near the edge to trigger scrolling
+            const threshold = 50;
             const scrollSpeed = 10;
             const rect = container.getBoundingClientRect();
 
-            // Vertical scrolling
             if (e.clientY - rect.top < threshold) {
                 container.scrollTop -= scrollSpeed;
             } else if (rect.bottom - e.clientY < threshold) {
                 container.scrollTop += scrollSpeed;
             }
 
-            // Horizontal scrolling
             if (e.clientX - rect.left < threshold) {
                 container.scrollLeft -= scrollSpeed;
             } else if (rect.right - e.clientX < threshold) {
@@ -216,7 +120,7 @@ class TreeBuilder {
         });
 
         this.treeDisplay.addEventListener('dragleave', () => {
-            this.treeDisplay.classList.remove('drag-over'); // Remove highlight
+            this.treeDisplay.classList.remove('drag-over');
         });
 
         this.treeDisplay.addEventListener('drop', (e) => {
@@ -224,9 +128,13 @@ class TreeBuilder {
             this.treeDisplay.classList.remove('drag-over');
             const dragDataString = e.dataTransfer.getData('application/json');
             if (dragDataString) {
-                const dragData = JSON.parse(dragDataString);
-                if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
-                    this.addNewNodeFromDrop(dragData.data);
+                try {
+                    const dragData = JSON.parse(dragDataString);
+                    if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
+                        this.addNewNodeFromDrop(dragData.data);
+                    }
+                } catch (err) {
+                    console.error('Erreur parsing drop canvas:', err);
                 }
             }
         });
@@ -234,25 +142,23 @@ class TreeBuilder {
         document.addEventListener('click', (e) => {
             const deleteBtn = document.getElementById('delete-btn');
             const isClickOnDelete = deleteBtn ? deleteBtn.contains(e.target) : false;
-            const isClickInsideTree = this.treeDisplay.contains(e.target);
+            const isClickInsideTree = this.treeDisplay ? this.treeDisplay.contains(e.target) : false;
             const isClickInsideDescription = this.nodeDescriptionTextarea ? this.nodeDescriptionTextarea.contains(e.target) : false;
             const isClickInsideDropdown = e.target.closest('.dropdown');
 
-            // If the click is inside any of the builder's interactive areas or a dropdown menu, do nothing.
             if (isClickOnDelete || isClickInsideTree || isClickInsideDescription || isClickInsideDropdown) {
                 return;
             }
 
-            // Otherwise, deselect any selected node.
             this.deselectAllNodes();
         });
+    }
 
+    initEventListeners() {
         const saveBtn = document.getElementById('save-tree-btn');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => this.saveTree());
         }
-
-
 
         const loadBtn = document.getElementById('load-tree-btn');
         if (loadBtn) {
@@ -277,7 +183,7 @@ class TreeBuilder {
         if (newTreeBtn) {
             newTreeBtn.addEventListener('click', () => {
                 if (this.rootNode.children.length > 0) {
-                    if (confirm('You have an unsaved tree. Are you sure you want to leave?')) {
+                    if (NotificationService.confirm('You have an unsaved tree. Are you sure you want to leave?')) {
                         window.location.href = '/builder';
                     }
                 } else {
@@ -293,28 +199,29 @@ class TreeBuilder {
 
         if (this.visualizeTreeBtn) {
             this.visualizeTreeBtn.addEventListener('click', () => {
-                // The actual drawing is triggered by the modal's 'shown' event
-                const modal = new bootstrap.Modal(this.treeVisualizerModal);
-                modal.show();
+                if (typeof bootstrap !== 'undefined') {
+                    const modal = new bootstrap.Modal(this.treeVisualizerModal);
+                    modal.show();
+                }
             });
         }
 
         if (this.treeVisualizerModal) {
             this.treeVisualizerModal.addEventListener('shown.bs.modal', () => {
-                // --- DESTRUCTION ET NETTOYAGE ---
                 if (this.treantChart) {
                     this.treantChart.destroy();
                 }
-                document.getElementById('tree-visualizer-container').innerHTML = '';
+                const container = document.getElementById('tree-visualizer-container');
+                if (container) {
+                    container.innerHTML = '';
+                }
 
-                // Reset zoom and pan state each time the modal is opened
                 this.scale = 1;
                 this.panning = false;
                 this.pointX = 0;
                 this.pointY = 0;
                 this.start = { x: 0, y: 0 };
 
-                // Recréer l'arbre
                 this.drawTreeVisualization();
             });
         }
@@ -327,47 +234,28 @@ class TreeBuilder {
             this.closeVisualizeXBtn.addEventListener('click', this.reloadBuilderWithCurrentTree.bind(this));
         }
 
-        this.loadSavedTrees();
-        this.updateVisualizeButtonState();
+        // Export PDF vectoriel via délégation d'événement jQuery (modale)
+        if (typeof $ !== 'undefined') {
+            $(document).on('click', '#export-pdf-vectoriel', async function () {
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Exporting...');
 
-        this.initPanAndZoom();
-
-        const treeDataFromPostElement = document.getElementById('tree-data-from-post');
-        if (treeDataFromPostElement && treeDataFromPostElement.textContent) {
-            try {
-                const treeData = JSON.parse(treeDataFromPostElement.textContent);
-                if (treeData) {
-                    this.rebuildTreeFromJSON(treeData);
+                try {
+                    await TreePdfExporter.export();
+                } catch (error) {
+                    console.error("Erreur lors de l'export PDF:", error);
+                    NotificationService.alert("L'export PDF a échoué. Cause : " + error.message);
+                } finally {
+                    btn.prop('disabled', false).html('Export to PDF');
                 }
-            } catch (e) {
-                console.error("Could not parse tree_data_from_post", e);
-            }
+            });
         }
-
-        this.initProfileBuilder();
-        this.initProfileEvents();
-
-        // Use event delegation for the export button, as it's in a modal
-        $(document).on('click', '#export-pdf-vectoriel', async function () {
-            const btn = $(this);
-            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Exporting...');
-
-            try {
-                await exportToVectorPdf();
-            } catch (error) {
-                console.error("Erreur lors de l'export PDF:", error);
-                alert("L'export PDF a échoué. Cause : " + error.message);
-            } finally {
-                btn.prop('disabled', false).html('Export to PDF');
-            }
-        });
     }
 
     initPanAndZoom() {
         const treeContainer = document.getElementById('tree-visualizer-container');
         if (!treeContainer) return;
 
-        // The target for the transform is the inner div created by Treant, not the scroll container
         const setTransform = () => {
             const treantInnerContainer = treeContainer.querySelector('.Treant');
             if (treantInnerContainer) {
@@ -380,8 +268,7 @@ class TreeBuilder {
             if (e.ctrlKey) {
                 e.preventDefault();
                 const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                const newScale = Math.min(Math.max(0.5, this.scale + delta), 4);
-                this.scale = newScale;
+                this.scale = Math.min(Math.max(0.5, this.scale + delta), 4);
                 setTransform();
             }
         });
@@ -412,7 +299,6 @@ class TreeBuilder {
             treeContainer.addEventListener('mousemove', this._onMouseMove);
         }
 
-        // Set initial cursor
         treeContainer.style.cursor = 'grab';
     }
 
@@ -424,40 +310,28 @@ class TreeBuilder {
 
     getTreeForVisualization() {
         const buildTreantNode = (builderNode) => {
-            let imageSrc;
-            const imageId = Number(builderNode.image.id);
-            if (builderNode.image.path.startsWith('http')) {
-                imageSrc = builderNode.image.path;
-            } else if (!isNaN(imageId) && imageId >= 0) {
-                imageSrc = `/pictograms/${imageId}`;
-            } else if (builderNode.image.path.startsWith('/')) {
-                imageSrc = builderNode.image.path;
-            } else {
-                imageSrc = `/pictograms/${builderNode.image.path}`;
-            }
+            const imageSrc = resolveBuilderImageUrl(builderNode.image);
 
             const treantNode = {
-                text: { name: builderNode.image.name },
+                text: { name: builderNode.image.name || '' },
                 image: imageSrc,
                 children: []
             };
 
-            // To include the description in the node, we can use innerHTML
-            // The 'name' from the text property will be the title attribute of the container div
-            const description = builderNode.description || builderNode.image.name;
+            const rawDescription = builderNode.description || builderNode.image.name || '';
+            const safeDescription = DomUtils ? DomUtils.escapeHtml(rawDescription) : rawDescription;
             const rawHTML = `
                 <div class="node-content-wrapper">
                     <img src="${treantNode.image}" />
-                    <p class="node-name">${description}</p>
+                    <p class="node-name">${safeDescription}</p>
                 </div>
             `;
+
             if (window.DOMPurify) {
                 treantNode.innerHTML = window.DOMPurify.sanitize(rawHTML);
             } else {
-                console.error("DOMPurify not loaded, preventing potential XSS.");
                 treantNode.innerHTML = "<div style='color:red;'>Secure Rendering Failed</div>";
             }
-
 
             builderNode.children.forEach(child => {
                 treantNode.children.push(buildTreantNode(child));
@@ -470,13 +344,15 @@ class TreeBuilder {
     }
 
     reloadBuilderWithCurrentTree(event) {
-        event.preventDefault();
+        if (event && typeof event.preventDefault === 'function') {
+            event.preventDefault();
+        }
 
         const treeData = this.getTreeAsJSON();
         const treeDataString = JSON.stringify(treeData);
         const csrfTokenNode = document.querySelector('input[name="csrf_token"]');
         if (!csrfTokenNode) {
-            alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
+            NotificationService.alert('Erreur de sécurité : token CSRF manquant. Rechargez la page.');
             return;
         }
         const csrfToken = csrfTokenNode.value;
@@ -503,34 +379,33 @@ class TreeBuilder {
 
     drawTreeVisualization() {
         const treantTree = this.getTreeForVisualization();
-
         if (!treantTree) {
-            console.error("Cannot visualize an empty tree.");
+            console.error('Cannot visualize an empty tree.');
             return;
         }
 
-        const chart_config = {
+        const chartConfig = {
             chart: {
-                container: "#tree-visualizer-container",
+                container: '#tree-visualizer-container',
                 connectors: {
-                    type: "step"
+                    type: 'step'
                 },
                 node: {
                     collapsable: true,
-                    HTMLclass: 'treant-node' // Add a class for styling
+                    HTMLclass: 'treant-node'
                 },
-                scrollbar: "fancy" // Enable fancy scrollbar
+                scrollbar: 'fancy'
             },
             nodeStructure: treantTree
         };
 
-        // Destroy previous chart instance if it exists, to avoid errors on re-draw
         if (this.treantChart) {
             this.treantChart.destroy();
         }
-        this.treantChart = new Treant(chart_config, null, $);
+        if (typeof Treant !== 'undefined') {
+            this.treantChart = new Treant(chartConfig, null, $);
+        }
 
-        // Apply initial transform after the chart is drawn
         const treantInnerContainer = document.querySelector('#tree-visualizer-container .Treant');
         if (treantInnerContainer) {
             treantInnerContainer.style.transformOrigin = '0 0';
@@ -538,23 +413,11 @@ class TreeBuilder {
         }
     }
 
-    // handleImageClick(image) {
-    //     const newNode = new BuilderNode(image, this);
-    //     const parentNode = this.selectedNode || this.rootNode;
-    //     parentNode.addChild(newNode);
-    //     this.selectNode(newNode); // Select the new node
-    //     this.renderTree();
-    // }
-
     addNewNodeFromDrop(imageData) {
         const newNode = new BuilderNode(imageData, this);
-
-        // Always add to root instead of trying to be "smart" and finding closest element.
-        // This avoids confusion when dropping into the void.
         this.rootNode.addChild(newNode);
-
-        this.selectNode(newNode); // Select the newly added node.
-        this.renderTree(); // Update the tree display.
+        this.selectNode(newNode);
+        this.renderTree();
     }
 
     isDescendant(potentialDescendant, potentialAncestor) {
@@ -570,7 +433,7 @@ class TreeBuilder {
         }
         this.draggedNode = theNode;
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', theNode.image.id); // Required for Firefox
+        e.dataTransfer.setData('text/plain', String(theNode.image.id));
 
         setTimeout(() => {
             if (theNode.element) {
@@ -635,14 +498,14 @@ class TreeBuilder {
             }
         }
 
-        this.handleDragLeave(e, targetNode); // Clean up highlight
+        this.handleDragLeave(e, targetNode);
 
-        // Case 1: Reordering an existing node from within the builder
+        // Cas 1 : Réorganisation d'un nœud existant
         if (this.draggedNode) {
             const draggedNode = this.draggedNode;
             if (targetNode === draggedNode || this.isDescendant(targetNode, draggedNode)) {
                 if (this.isDescendant(targetNode, draggedNode)) {
-                    alert("You cannot move a node into one of its own children.");
+                    NotificationService.alert('You cannot move a node into one of its own children.');
                 }
                 return;
             }
@@ -654,35 +517,34 @@ class TreeBuilder {
 
             if (targetNode.isRoot && zone === 'replace') {
                 this.updateRootImage(draggedNode.image);
-                // Reparent all children of the dragged node to the root node
                 draggedNode.children.forEach(child => {
                     this.rootNode.addChild(child);
                 });
             } else if (zone === 'before' || zone === 'after') {
                 const parent = targetNode.parent;
-                const index = parent.children.indexOf(targetNode);
-                if (index > -1) {
-                    const insertIndex = zone === 'before' ? index : index + 1;
-                    parent.children.splice(insertIndex, 0, draggedNode);
-                    draggedNode.parent = parent;
+                if (parent) {
+                    const index = parent.children.indexOf(targetNode);
+                    if (index > -1) {
+                        const insertIndex = zone === 'before' ? index : index + 1;
+                        parent.children.splice(insertIndex, 0, draggedNode);
+                        draggedNode.parent = parent;
+                    }
                 }
             } else {
                 targetNode.addChild(draggedNode);
             }
 
             this.renderTree();
-            return; // End execution here for internal drops
+            return;
         }
 
-        // Case 2: Dropping a new node from the sidebar (Local or Arasaac)
+        // Cas 2 : Dépose d'un nouveau nœud depuis la barre latérale
         const dragDataString = e.dataTransfer.getData('application/json');
         if (dragDataString) {
             try {
                 const dragData = JSON.parse(dragDataString);
                 if (dragData.type === 'image-tree-node' || dragData.type === 'arasaac-image') {
-
                     if (targetNode.isRoot && zone === 'replace') {
-                        // If dropping on root top half, change the root's image
                         this.updateRootImage(dragData.data);
                         return;
                     }
@@ -690,11 +552,13 @@ class TreeBuilder {
                     const newNode = new BuilderNode(dragData.data, this);
                     if (zone === 'before' || zone === 'after') {
                         const parent = targetNode.parent;
-                        const index = parent.children.indexOf(targetNode);
-                        if (index > -1) {
-                            const insertIndex = zone === 'before' ? index : index + 1;
-                            parent.children.splice(insertIndex, 0, newNode);
-                            newNode.parent = parent;
+                        if (parent) {
+                            const index = parent.children.indexOf(targetNode);
+                            if (index > -1) {
+                                const insertIndex = zone === 'before' ? index : index + 1;
+                                parent.children.splice(insertIndex, 0, newNode);
+                                newNode.parent = parent;
+                            }
                         }
                     } else {
                         targetNode.addChild(newNode);
@@ -704,26 +568,23 @@ class TreeBuilder {
                     this.renderTree();
                 }
             } catch (err) {
-                console.error("Error parsing drop data", err);
+                console.error('Error parsing drop data', err);
             }
         }
     }
 
     updateRootImage(imageData) {
-        // Keep the children but recreate the root node with the new image
         const children = this.rootNode.children;
         const newRootData = {
-            id: imageData.id, // Now it uses the real database ID!
+            id: imageData.id,
             name: imageData.name,
             path: imageData.path || imageData.url,
             description: imageData.description || imageData.name
         };
 
-        // Custom node logic to handle our modified root
         this.rootNode = new BuilderNode(newRootData, this, { url: newRootData.path }, true);
         this.rootNode.children = children;
 
-        // Re-assign parents
         children.forEach(child => {
             child.parent = this.rootNode;
         });
@@ -733,10 +594,11 @@ class TreeBuilder {
     }
 
     handleArasaacDragStart(e, payload) {
-        // No notion of "draggedNode" internal state for external items, but we set dataTransfer
         e.dataTransfer.effectAllowed = 'copy';
         e.dataTransfer.setData('application/json', JSON.stringify(payload));
-        e.dataTransfer.setData('text/plain', payload.data.id.toString());
+        if (payload.data && payload.data.id !== undefined) {
+            e.dataTransfer.setData('text/plain', payload.data.id.toString());
+        }
     }
 
     handleDragEnd() {
@@ -782,14 +644,16 @@ class TreeBuilder {
     }
 
     deselectAllNodes() {
-        const selectedElements = this.treeDisplay.querySelectorAll('.node-content.selected');
-        selectedElements.forEach(el => {
-            el.classList.remove('selected');
-        });
-        const selectedNodes = this.treeDisplay.querySelectorAll('.node.is-selected');
-        selectedNodes.forEach(el => {
-            el.classList.remove('is-selected');
-        });
+        if (this.treeDisplay) {
+            const selectedElements = this.treeDisplay.querySelectorAll('.node-content.selected');
+            selectedElements.forEach(el => {
+                el.classList.remove('selected');
+            });
+            const selectedNodes = this.treeDisplay.querySelectorAll('.node.is-selected');
+            selectedNodes.forEach(el => {
+                el.classList.remove('is-selected');
+            });
+        }
         this.selectedNode = null;
         if (this.nodeDescriptionTextarea) {
             this.nodeDescriptionTextarea.value = '';
@@ -799,11 +663,11 @@ class TreeBuilder {
 
     deleteSelectedNode() {
         if (!this.selectedNode || this.selectedNode.isRoot) {
-            alert(this.selectedNode ? 'You cannot delete the root node.' : 'Please select a node to delete.');
+            NotificationService.alert(this.selectedNode ? 'You cannot delete the root node.' : 'Please select a node to delete.');
             return;
         }
 
-        if (confirm('Are you sure you want to delete the selected branch?')) {
+        if (NotificationService.confirm('Are you sure you want to delete the selected branch?')) {
             const parent = this.selectedNode.parent;
             if (parent) {
                 parent.children = parent.children.filter(child => child !== this.selectedNode);
@@ -814,6 +678,7 @@ class TreeBuilder {
     }
 
     renderTree() {
+        if (!this.treeDisplay) return;
         this.treeDisplay.innerHTML = '';
         if (this.rootNode && this.rootNode.element) {
             this.treeDisplay.appendChild(this.rootNode.element);
@@ -823,6 +688,7 @@ class TreeBuilder {
     }
 
     renderChildren(theNode) {
+        if (!theNode.element) return;
         const childrenContainer = theNode.element.querySelector('.children');
         if (!childrenContainer) return;
 
@@ -831,11 +697,6 @@ class TreeBuilder {
         theNode.children.forEach(child => {
             if (child.element) {
                 childrenContainer.appendChild(child.element);
-                // The children of the child are already rendered within its element,
-                // so no need to recurse here. The structure is built once.
-                // We just need to append the elements correctly.
-                // Wait, my understanding is wrong. The children elements need to be populated.
-                // The `renderChildren` needs to be recursive.
                 this.renderChildren(child);
             }
         });
@@ -843,17 +704,11 @@ class TreeBuilder {
 
     getTreeAsJSON() {
         const buildNode = (theNode) => {
-            // Unify data format: Always save descriptive data
-            // ID: Maintain ID for database matching (local) or -1 (external)
-            // URL/Path: Always save the path/url as 'url'
-            // Name: Always save the name
-
             let imageId = theNode.image.id;
-            let imageUrl = theNode.image.path;
-            let imageName = theNode.image.name;
+            const imageUrl = theNode.image.path;
+            const imageName = theNode.image.name;
 
-            // If it's an Arasaac image, ensure ID is -1 (though it likely is already)
-            if (imageUrl && imageUrl.startsWith('http')) {
+            if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
                 imageId = -1;
             }
 
@@ -872,10 +727,6 @@ class TreeBuilder {
         };
 
         const roots = [];
-
-        // Push the root node into the JSON hierarchy (as the single root array element)
-        // If it's a default root, we don't strictly need to export its placeholder image,
-        // but it keeps the structure consistent.
         if (this.rootNode) {
             roots.push(buildNode(this.rootNode));
         }
@@ -887,13 +738,14 @@ class TreeBuilder {
 
     async saveTree() {
         if (!this.currentUserId) {
-            alert(window.translations.accountRequired);
+            NotificationService.alert(window.translations?.accountRequired || 'Account required');
             return;
         }
 
-        const treeName = document.getElementById('tree-name').value;
+        const treeNameInput = document.getElementById('tree-name');
+        const treeName = treeNameInput ? treeNameInput.value.trim() : '';
         if (!treeName) {
-            alert('Please enter a name for the tree.');
+            NotificationService.alert('Please enter a name for the tree.');
             return;
         }
 
@@ -901,56 +753,50 @@ class TreeBuilder {
         const jsonData = this.getTreeAsJSON();
 
         if (!jsonData || !jsonData.roots || jsonData.roots.length === 0) {
-            alert('The tree is empty. Cannot save.');
+            NotificationService.alert('The tree is empty. Cannot save.');
             return;
         }
 
-        // Determine if there's a valid root image
-        let root_id = -1;
-        let root_url = null;
+        let rootId = -1;
+        let rootUrl = null;
         if (this.rootNode && !this.rootNode.isDefaultRoot) {
             const rawId = this.rootNode.image.real_id !== undefined ? this.rootNode.image.real_id : this.rootNode.image.id;
-            root_id = isNaN(Number(rawId)) ? -1 : Number(rawId);
-            root_url = this.rootNode.image.path;
+            rootId = isNaN(Number(rawId)) ? -1 : Number(rawId);
+            rootUrl = this.rootNode.image.path;
 
-            if (root_url && root_url.startsWith('http')) {
-                root_id = -1; // Arasaac or external
+            if (rootUrl && (rootUrl.startsWith('http://') || rootUrl.startsWith('https://'))) {
+                rootId = -1;
             }
         }
 
-        // Check if a tree with the same name exists for the current user
         const allTrees = this.userTrees || [];
         const existingTree = allTrees.find(tree => tree.name === treeName && tree.user_id === this.currentUserId);
-        
-        let proceed = true;
 
+        let proceed = true;
         if (existingTree) {
-            proceed = NotificationService.confirm("A tree with this name already exists. Are you sure you want to overwrite it?");
+            proceed = NotificationService.confirm('A tree with this name already exists. Are you sure you want to overwrite it?');
         }
 
         if (!proceed) {
-            return; // Stop if the user cancels
+            return;
         }
 
         try {
             const result = await ApiClient.post('/api/tree/save', {
                 name: treeName,
                 is_public: isPublic,
-                root_id: root_id,
-                root_url: root_url,
-                json_data: jsonData,
+                root_id: rootId,
+                root_url: rootUrl,
+                json_data: jsonData
             });
 
             if (result.status === 'success') {
                 const message = existingTree ? 'Updated' : 'Created';
                 NotificationService.alert(message);
 
-                // Clear the existing tree before reloading from save
                 this.rootNode.children = [];
-                // Reload the builder with the saved tree data
                 this.rebuildTreeFromJSON(result.tree_data);
-                // Refresh the list of saved trees
-                this.loadSavedTrees();
+                await this.loadSavedTrees();
             } else {
                 NotificationService.alert(`Error saving tree: ${result.message}`);
             }
@@ -961,6 +807,7 @@ class TreeBuilder {
     }
 
     filterImages() {
+        if (!this.imageSearch) return;
         const searchTerm = this.imageSearch.value;
         this.imageTree.filter(searchTerm);
     }
@@ -987,367 +834,16 @@ class TreeBuilder {
             NotificationService.alert('Impossible de charger les arbres sauvegardés.');
             this.userTrees = [];
         }
+
         this.renderTreeList();
-        this.renderProfileBuilderTreeList();
-        this.loadSavedProfiles();
-    }
-
-    initProfileEvents() {
-        const saveProfileBtn = document.getElementById('save-profile-btn');
-        if (saveProfileBtn) {
-            saveProfileBtn.addEventListener('click', () => this.saveProfile());
-        }
-
-        const loadProfileBtn = document.getElementById('load-profile-btn');
-        if (loadProfileBtn) {
-            loadProfileBtn.addEventListener('click', () => this.loadSelectedProfile());
-        }
-
-        const deleteProfileBtn = document.getElementById('delete-profile-btn');
-        if (deleteProfileBtn) {
-            deleteProfileBtn.addEventListener('click', () => this.deleteProfile());
-        }
-
-        const profileSearch = document.getElementById('profile-search');
-        if (profileSearch) {
-            profileSearch.addEventListener('input', () => this.filterProfiles());
-        }
-
-        const newProfileBtn = document.getElementById('new-profile-btn');
-        if (newProfileBtn) {
-            newProfileBtn.addEventListener('click', () => this.createNewProfile());
-        }
-
-        const avatarContainer = document.getElementById('profile-avatar-container');
-        if (avatarContainer) {
-            avatarContainer.addEventListener('click', () => this.openAvatarModal());
-        }
-    }
-
-    openAvatarModal() {
-        const modalEl = document.getElementById('avatar-modal');
-        if (!modalEl) return;
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        
-        if (!this.modalImageTree) {
-            this.modalImageTree = new ImageTree('modal-image-sidebar-tree');
-            this.modalImageTree.onImageClick = (data) => {
-                const imageId = Number(data.id);
-                const avatarUrl = (data.path && data.path.startsWith('http')) ? data.path : ((!isNaN(imageId) && imageId >= 0) ? `/pictogramsmin/${imageId}` : `/pictogramsmin/${data.path}`);
-                this.setProfileAvatar(avatarUrl);
-                modal.hide();
-            };
-            
-            this.modalArasaacSearch = new ArasaacSearch('modal-arasaac-search-container', null, (imgUrl) => {
-                this.setProfileAvatar(imgUrl);
-                modal.hide();
-            });
-        }
-        
-        modal.show();
-    }
-    
-    setProfileAvatar(url) {
-        const urlInput = document.getElementById('profile-image-url');
-        const previewImg = document.getElementById('profile-image-preview');
-        if (urlInput) urlInput.value = url;
-        if (previewImg) previewImg.src = url;
-    }
-
-    initProfileBuilder() {
-        const profileArea = document.getElementById('profile-builder-area');
-        const profileTreesList = document.getElementById('profile-trees-list');
-        const emptyMsg = document.getElementById('profile-builder-empty-msg');
-        
-        if (!profileArea || !profileTreesList) return;
-
-        // Drag events for dropping items into the profile area
-        profileArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            // Allow dropping from right sidebar OR reordering
-            e.dataTransfer.dropEffect = 'copy';
-            profileArea.classList.add('border-primary'); // Highlight dropzone
-            
-            // Visual feedback for reordering
-            const y = e.clientY;
-            const target = e.target.closest('.profile-dropped-tree-item');
-            if (target && !target.classList.contains('dragging')) {
-                const box = target.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                
-                // Clear previous indicators
-                profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
-                    el.classList.remove('drop-above', 'drop-below');
-                });
-                
-                if (offset < 0) {
-                    target.classList.add('drop-above');
-                } else {
-                    target.classList.add('drop-below');
-                }
-            }
-        });
-
-        profileArea.addEventListener('dragleave', () => {
-            profileArea.classList.remove('border-primary');
-            // We shouldn't remove drop-above/below here unconditionally because dragleave fires when entering child elements
-        });
-
-        profileArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            profileArea.classList.remove('border-primary');
-            profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
-                el.classList.remove('drop-above', 'drop-below');
-            });
-            
-            let dragData = null;
-            try {
-                const dataString = e.dataTransfer.getData('application/json');
-                if (dataString) {
-                    dragData = JSON.parse(dataString);
-                }
-            } catch (err) {
-                console.error('Failed to parse drag data', err);
-            }
-
-            if (dragData && dragData.type === 'profile-tree-item') {
-                // Determine insertion point if reordering
-                const y = e.clientY;
-                const afterElement = this.getDragAfterElement(profileTreesList, y);
-                
-                // Need to find full tree data to pass to addTreeToProfile
-                const treeData = this.userTrees.find(t => t.id === dragData.treeId);
-                
-                if (treeData) {
-                    // Check if tree is already in the list
-                    const existingNode = profileTreesList.querySelector(`[data-tree-id="${treeData.id}"]`);
-                    if (existingNode && dragData.isReorder) {
-                        // We are just reordering an existing element
-                        if (afterElement == null) {
-                            profileTreesList.appendChild(existingNode);
-                        } else {
-                            profileTreesList.insertBefore(existingNode, afterElement);
-                        }
-                    } else if (!existingNode) {
-                        // Adding a new tree
-                        const newElement = this.createProfileTreeElement(treeData);
-                        if (afterElement == null) {
-                            profileTreesList.appendChild(newElement);
-                        } else {
-                            profileTreesList.insertBefore(newElement, afterElement);
-                        }
-                        if (emptyMsg) emptyMsg.style.display = 'none';
-                    } else {
-                        // Already in list, do not add duplicates
-                    }
-                    this.updateProfileTreeNumbers();
-                }
-            }
-        });
-    }
-
-    updateProfileTreeNumbers() {
-        const profileTreesList = document.getElementById('profile-trees-list');
-        if (!profileTreesList) return;
-        const items = profileTreesList.querySelectorAll('.profile-dropped-tree-item');
-        items.forEach((item, index) => {
-            const numberSpan = item.querySelector('.tree-number');
-            if (numberSpan) {
-                numberSpan.textContent = `${index + 1}.`;
-            }
-        });
-    }
-
-    getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.profile-dropped-tree-item:not(.dragging)')];
-
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    createProfileTreeElement(treeData) {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center profile-dropped-tree-item mb-2 shadow-sm rounded';
-        li.setAttribute('draggable', 'true');
-        li.dataset.treeId = treeData.id;
-
-        // Drag events for reordering
-        li.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('application/json', JSON.stringify({
-                type: 'profile-tree-item',
-                treeId: treeData.id,
-                isReorder: true
-            }));
-            li.classList.add('dragging');
-            li.style.opacity = '0.5';
-        });
-
-        li.addEventListener('dragend', () => {
-            li.classList.remove('dragging');
-            li.style.opacity = '1';
-            const profileTreesList = document.getElementById('profile-trees-list');
-            if (profileTreesList) {
-                profileTreesList.querySelectorAll('.drop-above, .drop-below').forEach(el => {
-                    el.classList.remove('drop-above', 'drop-below');
-                });
-            }
-        });
-
-        // Left section: Handle, Number, Image, Name
-        const leftSection = document.createElement('div');
-        leftSection.className = 'd-flex align-items-center flex-grow-1';
-
-        const dragHandle = document.createElement('span');
-        dragHandle.innerHTML = '&#8942;&#8942;';
-        dragHandle.style.cursor = 'grab';
-        dragHandle.className = 'text-muted me-2 fs-5';
-        leftSection.appendChild(dragHandle);
-
-        const numberSpan = document.createElement('span');
-        numberSpan.className = 'tree-number fw-bold text-muted me-3 fs-5';
-        numberSpan.textContent = '1.';
-        leftSection.appendChild(numberSpan);
-
-        const imgContainer = document.createElement('div');
-        imgContainer.style.width = '40px';
-        imgContainer.style.height = '40px';
-        imgContainer.className = 'me-3';
-        const img = document.createElement('img');
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = '100%';
-        let thumbUrl = '/static/images/folder-bold.png';
-        const rootId = Number(treeData.root_id);
-        if (treeData.root_url && treeData.root_url.startsWith('http')) {
-            thumbUrl = treeData.root_url.replace(/_500\.png$/, '_300.png');
-        } else if (!isNaN(rootId) && rootId > 0) {
-            thumbUrl = `/pictogramsmin/${rootId}`;
-        } else if (treeData.root_url) {
-            if (treeData.root_url.startsWith('/pictograms/')) {
-                thumbUrl = treeData.root_url.replace('/pictograms/', '/pictogramsmin/');
-            } else if (treeData.root_url.startsWith('/')) {
-                thumbUrl = treeData.root_url;
-            } else {
-                thumbUrl = `/pictogramsmin/${treeData.root_url}`;
-            }
-        }
-        img.src = thumbUrl;
-        img.onerror = function() { this.src = '/static/images/folder-bold.png'; };
-        imgContainer.appendChild(img);
-        leftSection.appendChild(imgContainer);
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'fw-bold';
-        nameSpan.textContent = treeData.name;
-        leftSection.appendChild(nameSpan);
-
-        li.appendChild(leftSection);
-
-        // Right section: Colors and Delete
-        const rightSection = document.createElement('div');
-        rightSection.className = 'd-flex align-items-center';
-
-        // Color options Dropdown - Unified with Mobile (Hex codes)
-        const colors = [
-            { hex: '#000000', label: 'Black' },
-            { hex: '#FFEB3B', label: 'Yellow' },
-            { hex: '#4CAF50', label: 'Green' },
-            { hex: '#FF9800', label: 'Orange' },
-            { hex: '#2196F3', label: 'Blue' },
-            { hex: '#E91E63', label: 'Pink' }
-        ];
-
-        const dropdownDiv = document.createElement('div');
-        dropdownDiv.className = 'dropdown me-3 profile-tree-color-dropdown';
-        
-        const dropdownBtn = document.createElement('button');
-        dropdownBtn.className = 'btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center';
-        dropdownBtn.type = 'button';
-        dropdownBtn.dataset.bsToggle = 'dropdown';
-        
-        const selectedColorSpan = document.createElement('span');
-        selectedColorSpan.className = 'rounded-circle me-2 color-indicator border';
-        selectedColorSpan.style.width = '14px';
-        selectedColorSpan.style.height = '14px';
-        
-        const selectedText = document.createElement('span');
-        
-        dropdownBtn.appendChild(selectedColorSpan);
-        dropdownBtn.appendChild(selectedText);
-        dropdownDiv.appendChild(dropdownBtn);
-        
-        const dropdownMenu = document.createElement('ul');
-        dropdownMenu.className = 'dropdown-menu';
-        dropdownMenu.style.minWidth = 'unset';
-
-        // Set initial color state
-        let currentColor = treeData.colorCode || '#000000';
-        dropdownDiv.dataset.selectedColor = currentColor;
-
-        const updateBtnVisuals = (colorHex) => {
-            const cInfo = colors.find(c => c.hex === colorHex) || colors[0];
-            selectedColorSpan.style.backgroundColor = cInfo.hex;
-            selectedText.textContent = cInfo.label;
-            dropdownDiv.dataset.selectedColor = cInfo.hex;
-        };
-        updateBtnVisuals(currentColor);
-
-        colors.forEach(color => {
-            const optionLi = document.createElement('li');
-            const a = document.createElement('a');
-            a.className = 'dropdown-item d-flex align-items-center';
-            a.href = '#';
-            
-            const swatch = document.createElement('span');
-            swatch.className = 'rounded-circle me-2 border';
-            swatch.style.width = '14px';
-            swatch.style.height = '14px';
-            swatch.style.backgroundColor = color.hex;
-            
-            a.appendChild(swatch);
-            a.appendChild(document.createTextNode(color.label));
-            
-            a.addEventListener('click', (e) => {
-                e.preventDefault();
-                updateBtnVisuals(color.hex);
-            });
-            
-            optionLi.appendChild(a);
-            dropdownMenu.appendChild(optionLi);
-        });
-
-        dropdownDiv.appendChild(dropdownMenu);
-        rightSection.appendChild(dropdownDiv);
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-sm btn-outline-danger border-0';
-        deleteBtn.innerHTML = '&#10005;'; // X mark
-        deleteBtn.addEventListener('click', () => {
-            li.remove();
-            this.updateProfileTreeNumbers();
-            const profileTreesList = document.getElementById('profile-trees-list');
-            const emptyMsg = document.getElementById('profile-builder-empty-msg');
-            if (profileTreesList && profileTreesList.children.length === 0 && emptyMsg) {
-                emptyMsg.style.display = 'block';
-            }
-        });
-
-        rightSection.appendChild(deleteBtn);
-        li.appendChild(rightSection);
-
-        return li;
+        this.binderManager.setUserTrees(this.userTrees, this.currentUserId);
+        await this.binderManager.loadSavedProfiles();
     }
 
     renderTreeList() {
         if (!this.treeList) return;
         this.treeList.innerHTML = '';
-        this.activeTreeSelect = null; // To keep track of the currently active select element
+        this.activeTreeSelect = null;
 
         const createSelectList = (trees, title, id) => {
             if (trees.length > 0) {
@@ -1361,8 +857,6 @@ class TreeBuilder {
                 trees.forEach(tree => {
                     const option = document.createElement('option');
                     option.value = tree.id;
-
-                    // For private trees, just show the tree name. For public, show author.
                     if (id === 'user-tree-select') {
                         option.textContent = tree.name;
                     } else {
@@ -1371,7 +865,6 @@ class TreeBuilder {
                     select.appendChild(option);
                 });
 
-                // When a user clicks on a select list, it becomes the active one
                 select.addEventListener('focus', () => {
                     this.activeTreeSelect = select;
                 });
@@ -1382,128 +875,14 @@ class TreeBuilder {
 
         createSelectList(this.userTrees, 'My Trees', 'user-tree-select');
 
-        // Set the default active list if it exists
         if (this.userTrees.length > 0) {
             this.activeTreeSelect = document.getElementById('user-tree-select');
         }
     }
 
-    renderProfileBuilderTreeList() {
-        const profileTreeList = document.getElementById('profile-builder-tree-list');
-        if (!profileTreeList) return;
-        
-        profileTreeList.innerHTML = '';
-        
-        if (!this.userTrees || this.userTrees.length === 0) {
-            const emptyMsg = document.createElement('li');
-            emptyMsg.className = 'list-group-item text-muted text-center';
-            emptyMsg.textContent = 'No trees available.';
-            profileTreeList.appendChild(emptyMsg);
-            return;
-        }
-
-        this.userTrees.forEach(tree => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item list-group-item-action d-flex align-items-center profile-tree-item';
-            li.setAttribute('draggable', 'true');
-            li.dataset.treeId = tree.id;
-            li.dataset.treeName = tree.name;
-            
-            // Icon to indicate draggability
-            const dragHandle = document.createElement('span');
-            dragHandle.innerHTML = '&#8942;&#8942;'; // vertical ellipsis (drag handle)
-            dragHandle.style.cursor = 'grab';
-            dragHandle.className = 'text-muted me-2 flex-shrink-0';
-
-            // Thumbnail Image
-            const imgContainer = document.createElement('div');
-            imgContainer.style.width = '40px';
-            imgContainer.style.height = '40px';
-            imgContainer.style.flexShrink = '0';
-            imgContainer.style.display = 'flex';
-            imgContainer.style.justifyContent = 'center';
-            imgContainer.style.alignItems = 'center';
-            imgContainer.className = 'me-2';
-
-            const img = document.createElement('img');
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '100%';
-            
-            let thumbUrl = '/static/images/folder-bold.png'; // default fallback
-            const rootId = Number(tree.root_id);
-            if (tree.root_url && tree.root_url.startsWith('http')) {
-                // Arasaac: replace _500 with _300 if applicable
-                thumbUrl = tree.root_url.replace(/_500\.png$/, '_300.png');
-            } else if (!isNaN(rootId) && rootId > 0) {
-                thumbUrl = `/pictogramsmin/${rootId}`;
-            } else if (tree.root_url) {
-                if (tree.root_url.startsWith('/pictograms/')) {
-                    thumbUrl = tree.root_url.replace('/pictograms/', '/pictogramsmin/');
-                } else if (tree.root_url.startsWith('/')) {
-                    thumbUrl = tree.root_url;
-                } else {
-                    thumbUrl = `/pictogramsmin/${tree.root_url}`;
-                }
-            }
-            img.src = thumbUrl;
-            img.alt = tree.name;
-            img.onerror = function() {
-                this.src = '/static/images/folder-bold.png';
-            };
-            
-            imgContainer.appendChild(img);
-
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'flex-grow-1 tree-name text-truncate';
-            nameSpan.textContent = tree.name;
-
-            li.appendChild(dragHandle);
-            li.appendChild(imgContainer);
-            li.appendChild(nameSpan);
-
-            // Drag event listeners for future profile builder UI
-            li.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('application/json', JSON.stringify({
-                    type: 'profile-tree-item',
-                    treeId: tree.id,
-                    treeName: tree.name
-                }));
-                li.style.opacity = '0.5';
-            });
-            
-            li.addEventListener('dragend', () => {
-                li.style.opacity = '1';
-            });
-
-            profileTreeList.appendChild(li);
-        });
-
-        // Setup search functionality for profile trees
-        const searchInput = document.getElementById('profile-builder-tree-search');
-        if (searchInput) {
-            // Remove old listener to avoid duplicates
-            const newSearchInput = searchInput.cloneNode(true);
-            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-            
-            newSearchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const items = profileTreeList.querySelectorAll('.profile-tree-item');
-                
-                items.forEach(item => {
-                    const treeName = item.dataset.treeName.toLowerCase();
-                    if (treeName.includes(searchTerm)) {
-                        item.style.setProperty('display', 'flex', 'important');
-                    } else {
-                        item.style.setProperty('display', 'none', 'important');
-                    }
-                });
-            });
-        }
-    }
-
     loadTree() {
         if (!this.activeTreeSelect || !this.activeTreeSelect.value) {
-            alert('Please select a tree to load.');
+            NotificationService.alert('Please select a tree to load.');
             return;
         }
 
@@ -1512,20 +891,28 @@ class TreeBuilder {
         const treeToLoad = allTrees.find(tree => tree.id === treeId);
 
         if (treeToLoad) {
-            const importedData = JSON.parse(treeToLoad.json_data);
-            const importMode = document.querySelector('input[name="import_mode"]:checked').value;
+            let importedData;
+            try {
+                importedData = typeof treeToLoad.json_data === 'string'
+                    ? JSON.parse(treeToLoad.json_data)
+                    : treeToLoad.json_data;
+            } catch (err) {
+                console.error('Erreur parsing json_data:', err);
+                NotificationService.alert('Invalid tree data.');
+                return;
+            }
+
+            const importModeInput = document.querySelector('input[name="import_mode"]:checked');
+            const importMode = importModeInput ? importModeInput.value : 'replace';
 
             if (importMode === 'replace') {
                 this.rebuildTreeFromJSON(importedData, true);
-            } else { // 'add'
-                // For 'add', we want to keep the current root, and add the imported roots as children
+            } else {
                 if (importedData.roots && importedData.roots.length > 0) {
                     importedData.roots.forEach(importedRoot => {
-                        // If the imported root still has the 'root' identifier, remove it so it acts like a normal node
                         if (importedRoot.id === 'root') {
                             importedRoot.id = -1;
                         }
-                        // The imported root itself becomes a child of our current root
                         const childNode = this.buildNodeFromJsonData(importedRoot);
                         if (childNode) {
                             this.rootNode.addChild(childNode);
@@ -1535,18 +922,18 @@ class TreeBuilder {
                 }
             }
         } else {
-            alert('Could not find the selected tree.');
+            NotificationService.alert('Could not find the selected tree.');
         }
     }
 
     async deleteTree() {
         if (!this.currentUserId) {
-            alert(window.translations.accountRequired);
+            NotificationService.alert(window.translations?.accountRequired || 'Account required');
             return;
         }
 
         if (!this.activeTreeSelect || !this.activeTreeSelect.value) {
-            alert('Please select a tree to delete.');
+            NotificationService.alert('Please select a tree to delete.');
             return;
         }
 
@@ -1569,8 +956,7 @@ class TreeBuilder {
             if (result.status === 'success') {
                 NotificationService.alert('Tree deleted successfully.');
                 await this.loadSavedTrees();
-                
-                // Clear the builder workspace just in case they deleted the active tree
+
                 this.rootNode.children = [];
                 this.renderTree();
             } else {
@@ -1587,7 +973,7 @@ class TreeBuilder {
 
         if (nodeData.url) {
             image = {
-                id: nodeData.id !== undefined ? nodeData.id : nodeData.real_id, // fallback to old format
+                id: nodeData.id !== undefined ? nodeData.id : nodeData.real_id,
                 real_id: nodeData.real_id,
                 name: nodeData.name || 'Unknown',
                 path: nodeData.url,
@@ -1622,18 +1008,10 @@ class TreeBuilder {
 
     rebuildTreeFromJSON(treeData, isFullReplace = true) {
         if (isFullReplace) {
-            this.rootNode.children = []; // Clear existing tree before importing
+            this.rootNode.children = [];
 
-            // Check if the treeData has a root node properties attached directly
-            // (older versions or the new version might structure the DB representation differently)
-            // Based on our saveTree, the DB JSON data is just {"roots": [...]}
-            // The root properties (root_id, root_url) are passed via the backend endpoint optionally, 
-            // but treeData might just have `roots`.
-
-            // If treeData has exactly 1 root, let's make it the actual root of the builder
             if (treeData.roots && treeData.roots.length === 1) {
                 const rootData = treeData.roots[0];
-                // Initialize root Node from the data
                 const rootImageId = rootData.id !== 'root' && rootData.id !== undefined ? rootData.id : rootData.real_id;
                 const rootImage = {
                     id: rootImageId !== undefined ? rootImageId : 'root',
@@ -1644,7 +1022,6 @@ class TreeBuilder {
                 };
                 this.rootNode = new BuilderNode(rootImage, this, rootData, true);
 
-                // Process its children
                 if (rootData.children) {
                     rootData.children.forEach(childData => {
                         const childNode = this.buildNodeFromJsonData(childData);
@@ -1654,8 +1031,12 @@ class TreeBuilder {
                     });
                 }
             } else if (treeData.roots && treeData.roots.length > 1) {
-                // Fallback for older saves where multiple roots were allowed at top level
-                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this, null, true);
+                this.rootNode = new BuilderNode(
+                    { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' },
+                    this,
+                    null,
+                    true
+                );
                 treeData.roots.forEach(rootData => {
                     const rootNode = this.buildNodeFromJsonData(rootData);
                     if (rootNode) {
@@ -1663,358 +1044,28 @@ class TreeBuilder {
                     }
                 });
             } else {
-                // Empty
-                this.rootNode = new BuilderNode({ id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' }, this, null, true);
+                this.rootNode = new BuilderNode(
+                    { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png' },
+                    this,
+                    null,
+                    true
+                );
             }
         }
 
         this.selectedNode = this.rootNode;
         this.renderTree();
     }
-
-    // Profile Management Methods
-    async loadSavedProfiles() {
-        try {
-            const data = await ApiClient.get('/api/profiles/load');
-            this.savedProfiles = data.profiles || [];
-            this.renderProfileList();
-        } catch (error) {
-            console.error('Error loading profiles:', error);
-            NotificationService.alert('Failed to load profiles');
-        }
-    }
-
-    renderProfileList() {
-        const profileList = document.getElementById('profile-list');
-        if (!profileList) return;
-        profileList.innerHTML = '';
-        
-        if (!this.savedProfiles || this.savedProfiles.length === 0) {
-            profileList.innerHTML = '<div class="text-muted small">No profiles saved yet.</div>';
-            return;
-        }
-
-        const select = document.createElement('select');
-        select.id = 'profile-select';
-        select.className = 'form-select form-select-sm mb-2 profile-select-list';
-        
-        this.savedProfiles.forEach(profile => {
-            const option = document.createElement('option');
-            option.value = profile.id;
-            option.textContent = profile.name;
-            select.appendChild(option);
-        });
-
-        profileList.appendChild(select);
-    }
-
-    filterProfiles() {
-        const profileSearch = document.getElementById('profile-search');
-        if (!profileSearch) return;
-        const query = profileSearch.value.toLowerCase();
-        
-        const select = document.getElementById('profile-select');
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const name = option.textContent.toLowerCase();
-            option.style.display = name.includes(query) ? '' : 'none';
-        });
-        
-        // Reset selection to the first visible option if the current one is hidden
-        const selectedOption = select.options[select.selectedIndex];
-        if (selectedOption && selectedOption.style.display === 'none') {
-            const firstVisible = Array.from(select.options).find(opt => opt.style.display !== 'none');
-            if (firstVisible) {
-                select.value = firstVisible.value;
-            }
-        }
-    }
-
-    async saveProfile() {
-        if (!this.currentUserId) {
-            alert(window.translations.accountRequired);
-            return;
-        }
-
-        const profileNameInput = document.getElementById('profile-name');
-        if (!profileNameInput) return;
-        
-        const profileName = profileNameInput.value.trim();
-        if (!profileName) {
-            alert('Please enter a profile name.');
-            return;
-        }
-
-        const profileTreesList = document.getElementById('profile-trees-list');
-        const items = profileTreesList.querySelectorAll('.profile-dropped-tree-item');
-        if (items.length === 0) {
-            alert('Please add at least one tree to the profile.');
-            return;
-        }
-
-        const trees = [];
-        items.forEach((item, index) => {
-            const dropdown = item.querySelector('.profile-tree-color-dropdown');
-            const colorCode = dropdown ? dropdown.dataset.selectedColor : '#000000';
-            trees.push({
-                treeId: parseInt(item.dataset.treeId, 10),
-                colorCode: colorCode,
-                display_order: index + 1
-            });
-        });
-
-        const payload = {
-            name: profileName,
-            remote_avatar_url: document.getElementById('profile-image-url')?.value || '',
-            trees: trees
-        };
-
-        const saveBtn = document.getElementById('save-profile-btn');
-        const originalText = saveBtn.textContent;
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'Saving...';
-
-        try {
-            const data = await ApiClient.post('/api/profile/save', payload);
-            NotificationService.alert(data.message);
-            this.loadSavedProfiles(); // Refresh the list
-        } catch (error) {
-            console.error('Error:', error);
-            NotificationService.alert(error.message || 'Failed to save profile');
-        } finally {
-            saveBtn.disabled = false;
-            saveBtn.textContent = originalText;
-        }
-    }
-
-    loadSelectedProfile() {
-        const select = document.getElementById('profile-select');
-        if (!select || !select.value) {
-            alert('Please select a profile to load.');
-            return;
-        }
-
-        const profileId = parseInt(select.value, 10);
-        const profile = this.savedProfiles.find(p => p.id === profileId);
-        
-        if (profile) {
-            this.loadProfileIntoBuilder(profile);
-        }
-    }
-
-    loadProfileIntoBuilder(profile) {
-        const profileNameInput = document.getElementById('profile-name');
-        if (profileNameInput) profileNameInput.value = profile.name;
-
-        if (profile.remote_avatar_url) {
-            this.setProfileAvatar(profile.remote_avatar_url);
-        } else {
-            // Placeholder SVG
-            this.setProfileAvatar("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>");
-            document.getElementById('profile-image-url').value = '';
-        }
-
-        const profileTreesList = document.getElementById('profile-trees-list');
-        const emptyMsg = document.getElementById('profile-builder-empty-msg');
-        
-        if (profileTreesList) profileTreesList.innerHTML = '';
-        if (emptyMsg) emptyMsg.style.display = 'none';
-
-        if (profile.trees && profile.trees.length > 0) {
-            profile.trees.forEach(treeData => {
-                const element = this.createProfileTreeElement(treeData);
-                profileTreesList.appendChild(element);
-            });
-            this.updateProfileTreeNumbers();
-        } else {
-            if (emptyMsg) emptyMsg.style.display = 'block';
-        }
-    }
-
-    async deleteProfile() {
-        if (!this.currentUserId) {
-            NotificationService.alert(window.translations.accountRequired);
-            return;
-        }
-
-        const profileSelect = document.getElementById('profile-select');
-        const profileId = profileSelect ? profileSelect.value : null;
-
-        if (!profileId) {
-            NotificationService.alert('Please select a profile to delete.');
-            return;
-        }
-
-        if (!NotificationService.confirm('Are you sure you want to delete this profile?')) {
-            return;
-        }
-
-        const deleteBtn = document.getElementById('delete-profile-btn');
-        const originalText = deleteBtn.textContent;
-        deleteBtn.disabled = true;
-        deleteBtn.textContent = 'Deleting...';
-
-        try {
-            const data = await ApiClient.delete(`/api/profile/${profileId}`);
-            NotificationService.alert(data.message);
-            this.loadSavedProfiles();
-        } catch (error) {
-            console.error('Error:', error);
-            NotificationService.alert(error.message || 'Failed to delete profile');
-        } finally {
-            deleteBtn.disabled = false;
-            deleteBtn.textContent = originalText;
-        }
-    }
-
-    createNewProfile() {
-        if (!this.currentUserId) {
-            alert(window.translations.accountRequired);
-            return;
-        }
-
-        if (!confirm('Are you sure you want to start a new profile? This will clear the current list.')) {
-            return;
-        }
-
-        // Clear the profile name input
-        const profileNameInput = document.getElementById('profile-name');
-        if (profileNameInput) {
-            profileNameInput.value = '';
-        }
-
-        // Clear the avatar
-        this.setProfileAvatar("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>");
-        document.getElementById('profile-image-url').value = '';
-
-        // Clear the list
-        const profileTreesList = document.getElementById('profile-trees-list');
-        if (profileTreesList) {
-            profileTreesList.innerHTML = '';
-        }
-
-        // Show empty message
-        const emptyMsg = document.getElementById('profile-builder-empty-msg');
-        if (emptyMsg) {
-            emptyMsg.style.display = 'block';
-        }
-
-        // Deselect any selected profile in the list
-        const profileSelect = document.getElementById('profile-select');
-        if (profileSelect) {
-            profileSelect.value = '';
-        }
-    }
-}
-
-function imageToDataUrl(src) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/png'));
-        };
-        img.onerror = reject;
-        img.src = src;
-    });
-}
-
-async function exportToVectorPdf() {
-    // Leçon apprise n°2 : Utiliser le bon sélecteur
-    const treeContainer = document.querySelector("#tree-visualizer-container .Treant");
-    if (!treeContainer || treeContainer.children.length === 0) {
-        throw new Error("Le conteneur de l'arbre (#tree-container) est introuvable ou vide.");
-    }
-
-    const treantSvg = treeContainer.querySelector("svg");
-    const htmlNodes = treeContainer.querySelectorAll(".node");
-
-    const finalSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    const containerWidth = treeContainer.scrollWidth;
-    const containerHeight = treeContainer.scrollHeight;
-    finalSvg.setAttribute('width', containerWidth);
-    finalSvg.setAttribute('height', containerHeight);
-    finalSvg.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
-
-    const connectors = treantSvg.querySelectorAll('path');
-    connectors.forEach(connector => finalSvg.appendChild(connector.cloneNode(true)));
-
-    for (const node of htmlNodes) {
-        const x = parseInt(node.style.left, 10);
-        const y = parseInt(node.style.top, 10);
-        const width = node.offsetWidth;
-        const height = node.offsetHeight;
-
-        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        group.setAttribute('transform', `translate(${x}, ${y})`);
-
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('width', width);
-        rect.setAttribute('height', height);
-        rect.setAttribute('fill', '#fff');
-        rect.setAttribute('stroke', '#ccc');
-        group.appendChild(rect);
-
-        const imgElement = node.querySelector('img');
-        if (imgElement) {
-            const dataUrl = await imageToDataUrl(imgElement.src);
-            const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            image.setAttribute('href', dataUrl);
-            const imgWidth = 50;
-            const imgHeight = 50;
-            image.setAttribute('width', imgWidth);
-            image.setAttribute('height', imgHeight);
-            image.setAttribute('x', (width - imgWidth) / 2);
-            image.setAttribute('y', 10);
-            group.appendChild(image);
-        }
-
-        const textElement = node.querySelector('.node-name, .node-title');
-        if (textElement) {
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.textContent = textElement.textContent;
-            text.setAttribute('x', width / 2);
-            text.setAttribute('y', 80);
-            text.setAttribute('text-anchor', 'middle');
-            text.setAttribute('font-family', 'Arial, sans-serif');
-            text.setAttribute('font-size', '12');
-            text.setAttribute('fill', '#000');
-            group.appendChild(text);
-        }
-        finalSvg.appendChild(group);
-    }
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'pt',
-        format: [containerWidth, containerHeight]
-    });
-
-    await pdf.svg(finalSvg, {
-        x: 0,
-        y: 0,
-        width: containerWidth,
-        height: containerHeight
-    });
-
-    pdf.save('picto-tree-vectoriel.pdf');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const dropdownEl = document.getElementById('navbarDropdown');
-    if (dropdownEl) {
+    if (dropdownEl && typeof bootstrap !== 'undefined') {
         new bootstrap.Dropdown(dropdownEl);
     }
     new TreeBuilder();
 
-    // Synchronization logic between Accordions and Tabs
+    // Logique de synchronisation entre accordéons et onglets
     let isSyncing = false;
 
     const collapseManageTrees = document.getElementById('collapseManageTrees');
@@ -2024,9 +1075,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileBuilderTabEl = document.getElementById('profile-builder-tab');
     const myResourcesTabEl = document.getElementById('my-resources-tab');
 
-    if (collapseManageTrees && collapseManageProfiles && treeBuilderTabEl && profileBuilderTabEl) {
-        
-        // When 'Manage Trees' accordion opens, switch to 'Tree Builder' tab
+    if (collapseManageTrees && collapseManageProfiles && treeBuilderTabEl && profileBuilderTabEl && typeof bootstrap !== 'undefined') {
         collapseManageTrees.addEventListener('show.bs.collapse', () => {
             if (isSyncing) return;
             isSyncing = true;
@@ -2035,7 +1084,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isSyncing = false;
         });
 
-        // When 'Manage Profiles' accordion opens, switch to 'Profile Builder' tab
         collapseManageProfiles.addEventListener('show.bs.collapse', () => {
             if (isSyncing) return;
             isSyncing = true;
@@ -2044,7 +1092,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isSyncing = false;
         });
 
-        // When 'Manage Resources' accordion opens, switch to 'My Resources' tab
         if (collapseManageResources && myResourcesTabEl) {
             collapseManageResources.addEventListener('show.bs.collapse', () => {
                 if (isSyncing) return;
@@ -2055,7 +1102,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // When 'Tree Builder' tab is shown, open 'Manage Trees' accordion
         treeBuilderTabEl.addEventListener('show.bs.tab', () => {
             if (isSyncing) return;
             isSyncing = true;
@@ -2070,7 +1116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isSyncing = false;
         });
 
-        // When 'Profile Builder' tab is shown, open 'Manage Profiles' accordion
         profileBuilderTabEl.addEventListener('show.bs.tab', () => {
             if (isSyncing) return;
             isSyncing = true;
@@ -2085,7 +1130,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isSyncing = false;
         });
 
-        // When 'My Resources' tab is shown, open 'Manage Resources' accordion
         if (myResourcesTabEl && collapseManageResources) {
             myResourcesTabEl.addEventListener('show.bs.tab', () => {
                 if (isSyncing) return;

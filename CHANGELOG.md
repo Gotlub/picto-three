@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Phase 3.2 - Modularization & Hardening of `builder.js`**:
+  - `BuilderNode.js` (`app/static/js/components/BuilderNode.js`): Isolated tree canvas node component handling DOM element generation, hover tooltips, visual drag feedback, image fallback, and secure image URL resolution.
+  - `BinderManager.js` (`app/static/js/components/BinderManager.js`): Component handling binder/profile composition, drag-and-drop tree reordering with real-time numeric indicators (`1.`, `2.`, ...), color palette selection (6 unified hex colors), avatar modal and picker, and API persistence via `ApiClient`.
+  - `TreePdfExporter.js` (`app/static/js/services/TreePdfExporter.js`): Dedicated service handling SVG cloning, styles and image inlining via canvas data URLs, and jsPDF vector export.
+  - Refactored `builder.js` from 2 104 lines down to ~640 lines, focused solely on orchestrating the interactive tree canvas, Treant visualization modal, pan/zoom, and tab/accordion synchronization.
+  - Cybersecurity hardening (Astra audit preparation): eliminated unescaped innerHTML injections, replaced HTML entities with safe Unicode glyphs (`\u22EE`, `\u2715`), enforced safe URL schemes (`http:`, `https:`, `/pictograms...`), and protected against malicious `javascript:` pseudo-protocols.
+  - Added unit test suites `builder_node.test.js`, `binder_manager.test.js`, and `tree_pdf_exporter.test.js`, bringing JS unit test count to 39 passing tests.
 - **Phase 3.1 - Modularization of `list.js`**:
   - `ListPdfExporter.js` (`app/static/js/services/ListPdfExporter.js`): Service handling print settings, responsive zoom, tab-accordion synchronization, mathematical grid/chain pagination, DOM preview rendering, and jsPDF vector export.
   - `ReadOnlyTreeViewer.js` (`app/static/js/components/ReadOnlyTreeViewer.js`): Visualizer component handling tree hierarchy rendering, branch and single-node selection, and drag-and-drop payload generation.
