@@ -80,7 +80,19 @@ export async function exportToVectorPdf(containerSelector = '#tree-visualizer-co
 
     if (treantSvg) {
         const connectors = treantSvg.querySelectorAll('path');
-        connectors.forEach(connector => finalSvg.appendChild(connector.cloneNode(true)));
+        connectors.forEach(connector => {
+            const clone = connector.cloneNode(true);
+            if (!clone.getAttribute('stroke') || clone.getAttribute('stroke') === 'none') {
+                clone.setAttribute('stroke', '#b0b0b0');
+            }
+            if (!clone.getAttribute('stroke-width')) {
+                clone.setAttribute('stroke-width', '2');
+            }
+            if (!clone.getAttribute('fill')) {
+                clone.setAttribute('fill', 'none');
+            }
+            finalSvg.appendChild(clone);
+        });
     }
 
     for (const node of htmlNodes) {
@@ -96,7 +108,10 @@ export async function exportToVectorPdf(containerSelector = '#tree-visualizer-co
         rect.setAttribute('width', width.toString());
         rect.setAttribute('height', height.toString());
         rect.setAttribute('fill', '#fff');
-        rect.setAttribute('stroke', '#ccc');
+        rect.setAttribute('stroke', '#b0b0b0');
+        rect.setAttribute('stroke-width', '2');
+        rect.setAttribute('rx', '6');
+        rect.setAttribute('ry', '6');
         group.appendChild(rect);
 
         const imgElement = node.querySelector('img');

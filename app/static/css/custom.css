@@ -68,20 +68,15 @@ body {
     display: none !important;
 }
 
-/* Collapsable switch styling from the example */
-.treant-node .collapse-switch {
-    width: 100%;
-    height: 10px;
-    border: none;
-    border-bottom: 1px solid #b0b0b0;
-    cursor: pointer;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    background-color: #f7f7f7;
-    z-index: 1;
-}
-
-.treant-node.collapsed .collapse-switch {
-    background-color: #dcdcdc;
+/* Remove stray collapse switch marks completely from Treant nodes */
+.Treant .collapse-switch,
+.treant-node .collapse-switch,
+.Treant .collapsed .collapse-switch {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    border: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }

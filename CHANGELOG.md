@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **ARASAAC Search Upgrade & Multi-mode Intelligence** (`app/static/js/components/ArasaacSearch.js`):
+  - Added multi-criteria search modes: "Pertinence" (Smart ranking), "Exact" (Bestsearch / "Est"), "Commence par" (Prefix matching), and "Contient" (Substring matching).
+  - Added on-the-fly language selector dropdown (`FR`, `EN`, `ES`, `DE`, `IT`, `PT`) initialized automatically by default from the user's session locale (`window.CURRENT_LOCALE || 'fr'`).
+  - Replaced arbitrary alphabetical sorting with relevance-aware ranking (`filterAndRankPictograms`), ensuring relevant pictograms appear at the top.
+  - Implemented keyword matching (`findBestMatchingKeyword`) so the result title and Drag & Drop payload accurately display the searched concept rather than an arbitrary first synonym.
+  - Added display of secondary synonyms as muted subtitle tags to clarify pictogram concepts.
+  - Added comprehensive unit test suite in `tests/unit/arasaac_search.test.js` (10 passing tests), bringing the project JS unit tests total to 49 passing tests.
 - **Phase 3.2 - Modularization & Hardening of `builder.js`**:
   - `BuilderNode.js` (`app/static/js/components/BuilderNode.js`): Isolated tree canvas node component handling DOM element generation, hover tooltips, visual drag feedback, image fallback, and secure image URL resolution.
   - `BinderManager.js` (`app/static/js/components/BinderManager.js`): Component handling binder/profile composition, drag-and-drop tree reordering with real-time numeric indicators (`1.`, `2.`, ...), color palette selection (6 unified hex colors), avatar modal and picker, and API persistence via `ApiClient`.
@@ -35,6 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added full testing and linting chain in `Makefile` (`make test`) running `ruff check .`, `npx eslint .`, unit JS tests, unit/integration `pytest -v`, and Playwright E2E tests (`bash tests/e2e/run.sh`) sequentially, as well as modular targets (`make lint`, `make lint-py`, `make lint-js`, `make test-js`, `make pytest`, `make e2e`).
 
 ### Fixed
+- Fixed stray notch/mark in tree visualizer modal and PDF vector export:
+  - Treant.js collapse-switch element (`.collapse-switch`) at top-right of tree nodes was disabled (`collapsable: false` in `builder.js` and hidden in `custom.css`).
+  - Enhanced vector node rectangle rendering in `TreePdfExporter.js` with rounded corners (`rx="6" ry="6"`), clean `#b0b0b0` borders, and explicit connector path stroke styles.
 - Fixed list saving edge cases and race conditions on `/list` (`app/static/js/list.js`, `app/templates/list.html`):
   - Initialized `userLists`, `publicLists`, `userTrees`, `publicTrees`, and `currentUserId` in `ListBuilder` constructor, preventing `TypeError: Cannot read properties of undefined (reading 'find')` if saving before list fetch finishes.
   - Added immediate user ID resolution via DOM metadata (`#current-user-meta[data-user-id]`) in `list.html` to eliminate race condition where `this.currentUserId` was unset.

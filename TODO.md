@@ -140,6 +140,19 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Ajouter 3 suites de tests unitaires JS (`builder_node.test.js`, `binder_manager.test.js`, `tree_pdf_exporter.test.js` - total 39 tests unitaires JS).
   - [x] Valider l'ensemble avec `make test` (100% de succès sur Linters Ruff & ESLint, 39 tests JS, 56 tests Pytest, 11 tests E2E Playwright).
 
+## Phase 4 : Améliorations UX & Corrections ciblées (Visualiseur & ARASAAC)
+- [x] **Correction de la patte parasite sur le visualiseur d'arbre et l'export PDF** :
+  - [x] Désactivation du bouton Treant `collapsable: false` dans `builder.js`.
+  - [x] Masquage strict CSS `.collapse-switch` dans `custom.css` (suppression de la patte 3x3px noire en haut à droite des boîtes de nœuds).
+  - [x] Amélioration du rendu vectoriel SVG/PDF dans `TreePdfExporter.js` (bords arrondis `rx="6" ry="6"`, bordure `#b0b0b0`, préservation des connecteurs).
+- [x] **Refonte intelligente du composant de recherche ARASAAC** (`ArasaacSearch.js`) :
+  - [x] Ajout de sélecteurs compacts intégrés : Modes ("Pertinence / Intelligent", "Exact / Est", "Commence par", "Contient") et Langues (`FR`, `EN`, `ES`, `DE`, `IT`, `PT`).
+  - [x] Initialisation par défaut de la langue depuis la variable de session locale de l'application (`window.CURRENT_LOCALE || 'fr'`).
+  - [x] Suppression du tri alphabétique destructeur au profit d'un tri par pertinence réelle (`filterAndRankPictograms`).
+  - [x] Extraction automatique du mot-clé correspondant recherché (`findBestMatchingKeyword`) pour le titre, les métadonnées de drag-and-drop et l'affichage des synonymes secondaires.
+  - [x] Ajout d'une suite complète de tests unitaires JS (`tests/unit/arasaac_search.test.js`, 10 tests, portant le total à 49 tests JS).
+  - [x] Validation 100% sur `make test` (Ruff, ESLint, 49 tests JS, 56 Pytest, 11 E2E Playwright).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

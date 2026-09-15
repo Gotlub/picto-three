@@ -391,7 +391,7 @@ export class TreeBuilder {
                     type: 'step'
                 },
                 node: {
-                    collapsable: true,
+                    collapsable: false,
                     HTMLclass: 'treant-node'
                 },
                 scrollbar: 'fancy'
