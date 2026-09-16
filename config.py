@@ -64,7 +64,7 @@ class Config:
     MAX_ITEMS_LIMIT = int(os.environ.get('MAX_ITEMS_LIMIT', '5000'))  # Default to 5000 items
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    LANGUAGES = ('en', 'fr', 'es', 'de', 'it', 'nl', 'pl')
+    LANGUAGES = ('en', 'fr', 'es', 'de', 'it', 'nl', 'pl', 'pt')
 
     # Email configuration
     MAIL_SERVER = 'smtp-relay.brevo.com'

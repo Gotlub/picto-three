@@ -429,3 +429,42 @@ def test_folder_images_endpoint(client):
     data3 = res3.get_json()
     assert len(data3) == 1
     assert data3[0]['data']['name'] == 'private_img_lazy.png'
+
+
+def test_search_local_images_modes_and_description(client):
+    """Test that search_local_images searches both name and description across all modes."""
+    # Create test public images
+    img1 = Image(name='cat_apple.png', description='Feline eating fruit', is_public=True, path='test/cat.png')
+    img2 = Image(name='dog_ball.png', description='Cute cat playing', is_public=True, path='test/dog.png')
+    img3 = Image(name='bird.png', description='Animal flying high', is_public=True, path='test/bird.png')
+    db.session.add_all([img1, img2, img3])
+    db.session.commit()
+
+    # 1. Matches on description: searching 'feline' should return img1
+    res = client.get('/api/search_local_images?q=feline&mode=smart')
+    assert res.status_code == 200
+    data = res.get_json()
+    assert len(data) == 1
+    assert data[0]['data']['id'] == img1.id
+
+    # 2. Matches on description: searching 'cat' matches name of img1 AND description of img2
+    res_cat = client.get('/api/search_local_images?q=cat&mode=contains')
+    assert res_cat.status_code == 200
+    ids_cat = {item['data']['id'] for item in res_cat.get_json()}
+    assert img1.id in ids_cat
+    assert img2.id in ids_cat
+    assert img3.id not in ids_cat
+
+    # 3. Starts with mode: 'cat' starts name of img1, but does NOT start name or desc of img2 ("Cute cat...")
+    res_starts = client.get('/api/search_local_images?q=cat&mode=starts')
+    assert res_starts.status_code == 200
+    ids_starts = {item['data']['id'] for item in res_starts.get_json()}
+    assert img1.id in ids_starts
+    assert img2.id not in ids_starts
+
+    # 4. Exact mode: 'bird.png' matches exact name
+    res_exact = client.get('/api/search_local_images?q=bird.png&mode=exact')
+    assert res_exact.status_code == 200
+    assert len(res_exact.get_json()) == 1
+    assert res_exact.get_json()[0]['data']['id'] == img3.id
+

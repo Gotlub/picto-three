@@ -232,6 +232,7 @@ def folder_images(folder_id):
 @bp.route('/search_local_images')
 def search_local_images():
     q = request.args.get('q', '').strip()
+    mode = request.args.get('mode', 'smart').strip().lower()
     if len(q) < 1:
         return jsonify([])
         
@@ -241,8 +242,48 @@ def search_local_images():
     ]
     if current_user.is_authenticated:
         conditions.append(Image.user_id == current_user.id)
-        
-    images = Image.query.filter(or_(*conditions)).filter(Image.name.ilike(f'%{q}%')).limit(100).all()
+
+    base_query = Image.query.filter(or_(*conditions))
+
+    if mode == 'exact':
+        filter_clause = or_(
+            Image.name.ilike(q),
+            Image.description.ilike(q)
+        )
+        images = base_query.filter(filter_clause).order_by(Image.name).limit(100).all()
+    elif mode == 'starts':
+        filter_clause = or_(
+            Image.name.ilike(f'{q}%'),
+            Image.description.ilike(f'{q}%')
+        )
+        images = base_query.filter(filter_clause).order_by(Image.name).limit(100).all()
+    elif mode == 'contains':
+        filter_clause = or_(
+            Image.name.ilike(f'%{q}%'),
+            Image.description.ilike(f'%{q}%')
+        )
+        images = base_query.filter(filter_clause).order_by(Image.name).limit(100).all()
+    else:  # 'smart' / relevance
+        filter_clause = or_(
+            Image.name.ilike(f'%{q}%'),
+            Image.description.ilike(f'%{q}%')
+        )
+        raw_images = base_query.filter(filter_clause).limit(150).all()
+        q_lower = q.lower()
+
+        def rank_image(img):
+            name = (img.name or '').lower()
+            desc = (img.description or '').lower()
+            if name == q_lower or desc == q_lower:
+                return (0, len(name), name)
+            if name.startswith(q_lower) or desc.startswith(q_lower):
+                return (1, len(name), name)
+            if q_lower in name:
+                return (2, len(name), name)
+            return (3, len(desc), name)
+
+        images = sorted(raw_images, key=rank_image)[:100]
+
     results = [{'type': 'image', 'data': img.to_dict()} for img in images]
     return jsonify(results)
 @bp.route('/pictograms', methods=['GET'])

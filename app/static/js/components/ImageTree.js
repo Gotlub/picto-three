@@ -72,8 +72,11 @@ export default class ImageTree {
         });
     }
 
-    async filter(term = '') {
+    async filter(term = '', mode = 'smart') {
         term = typeof term === 'string' ? term.trim() : '';
+        mode = typeof mode === 'string' ? mode.trim() : 'smart';
+        this.currentSearchTerm = term;
+        this.currentSearchMode = mode;
 
         let searchResultsContainer = document.getElementById('image-tree-search-results');
         if (!searchResultsContainer) {
@@ -98,7 +101,7 @@ export default class ImageTree {
         searchResultsContainer.innerHTML = '<div class="spinner-border spinner-border-sm m-3"></div>';
 
         try {
-            const response = await fetch('/api/search_local_images?q=' + encodeURIComponent(term));
+            const response = await fetch(`/api/search_local_images?q=${encodeURIComponent(term)}&mode=${encodeURIComponent(mode)}`);
             if (!response.ok) throw new Error("Search failed");
             
             const results = await response.json();

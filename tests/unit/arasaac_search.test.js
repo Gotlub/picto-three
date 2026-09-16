@@ -15,15 +15,17 @@ describe('ArasaacSearch Unit Tests', () => {
             assert.equal(normalizeLocale('ES'), 'es');
             assert.equal(normalizeLocale('de-DE'), 'de');
             assert.equal(normalizeLocale('it'), 'it');
+            assert.equal(normalizeLocale('nl_NL'), 'nl');
+            assert.equal(normalizeLocale('pl_PL'), 'pl');
             assert.equal(normalizeLocale('pt_BR'), 'pt');
         });
 
-        it('falls back to "fr" for unsupported or invalid locales', () => {
-            assert.equal(normalizeLocale(''), 'fr');
-            assert.equal(normalizeLocale(null), 'fr');
-            assert.equal(normalizeLocale(undefined), 'fr');
-            assert.equal(normalizeLocale('zh_CN'), 'fr');
-            assert.equal(normalizeLocale('123'), 'fr');
+        it('falls back to "en" for unsupported or invalid locales', () => {
+            assert.equal(normalizeLocale(''), 'en');
+            assert.equal(normalizeLocale(null), 'en');
+            assert.equal(normalizeLocale(undefined), 'en');
+            assert.equal(normalizeLocale('zh_CN'), 'en');
+            assert.equal(normalizeLocale('123'), 'en');
         });
     });
 

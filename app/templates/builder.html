@@ -188,8 +188,19 @@
                 <div class="tab-pane fade show active h-100" id="local-images" role="tabpanel"
                     aria-labelledby="local-tab">
                     <div class="d-flex flex-column h-100">
-                        <input type="text" id="image-search" class="form-control mb-2 flex-shrink-0"
-                            placeholder="{{ _('Search local images...') }}">
+                        <div class="image-search-box mb-2 flex-shrink-0">
+                            <div class="input-group input-group-sm mb-1">
+                                <span class="input-group-text py-0 px-2" style="font-size: 13px;">🔍</span>
+                                <input type="text" id="image-search" class="form-control form-control-sm"
+                                    placeholder="{{ _('Search local images...') }}">
+                            </div>
+                            <select class="form-select form-select-sm" id="image-search-mode" style="font-size: 11px; padding: 2px 6px;" title="{{ _('Search mode') }}">
+                                <option value="smart">🎯 {{ _('Relevance') }}</option>
+                                <option value="exact">📌 {{ _('Exact ("Is")') }}</option>
+                                <option value="starts">🔤 {{ _('Starts with') }}</option>
+                                <option value="contains">🔍 {{ _('Contains') }}</option>
+                            </select>
+                        </div>
                         <div class="image-sidebar border p-3 flex-grow-1" id="image-sidebar-tree"
                             style="overflow: auto;">
                             <!-- The dynamic image tree will be built here -->

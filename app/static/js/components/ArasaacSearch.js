@@ -1,17 +1,17 @@
 /**
- * Normalise une chaîne locale pour ARASAAC (ex: "fr_FR" -> "fr", "en-US" -> "en").
+ * Normalizes a locale string for ARASAAC (e.g. "fr_FR" -> "fr", "en-US" -> "en").
  * @param {string|null|undefined} rawLocale
  * @returns {string}
  */
 export function normalizeLocale(rawLocale) {
-    if (!rawLocale || typeof rawLocale !== 'string') return 'fr';
+    if (!rawLocale || typeof rawLocale !== 'string') return 'en';
     const clean = rawLocale.trim().toLowerCase().slice(0, 2);
-    const supported = ['fr', 'en', 'es', 'de', 'it', 'pt'];
-    return supported.includes(clean) ? clean : 'fr';
+    const supported = ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl', 'pt'];
+    return supported.includes(clean) ? clean : 'en';
 }
 
 /**
- * Trouve le mot-clé le plus pertinent dans la liste de mots-clés d'un pictogramme.
+ * Finds the most relevant keyword in a pictogram's keyword array for a given query.
  * @param {Array} keywords
  * @param {string} query
  * @returns {string}
@@ -21,24 +21,24 @@ export function findBestMatchingKeyword(keywords, query) {
     const q = (query || '').trim().toLowerCase();
     if (!q) return keywords[0]?.keyword || '';
 
-    // 1. Correspondance exacte
+    // 1. Exact match
     const exact = keywords.find(k => k && k.keyword && k.keyword.trim().toLowerCase() === q);
     if (exact) return exact.keyword;
 
-    // 2. Commence par
+    // 2. Starts with
     const starts = keywords.find(k => k && k.keyword && k.keyword.trim().toLowerCase().startsWith(q));
     if (starts) return starts.keyword;
 
-    // 3. Contient
+    // 3. Contains
     const contains = keywords.find(k => k && k.keyword && k.keyword.trim().toLowerCase().includes(q));
     if (contains) return contains.keyword;
 
-    // Repli sur le premier mot-clé disponible
+    // Fallback to first available keyword
     return keywords[0]?.keyword || '';
 }
 
 /**
- * Filtre et ordonne les pictogrammes selon le mode de recherche choisi.
+ * Filters and ranks pictograms according to the selected search mode.
  * @param {Array} pictos
  * @param {string} query
  * @param {'smart'|'exact'|'starts'|'contains'} mode
@@ -86,7 +86,7 @@ export default class ArasaacSearch {
         this.dragStartCallback = dragStartCallback; // Callback to handle drag start in parent
         this.onClickCallback = onClickCallback; // Optional callback for click selection
         this.timeout = null;
-        this.selectedLocale = normalizeLocale(typeof window !== 'undefined' ? window.CURRENT_LOCALE : 'fr');
+        this.selectedLocale = normalizeLocale(typeof window !== 'undefined' ? window.CURRENT_LOCALE : 'en');
         this.searchMode = 'smart';
         this.render();
     }
@@ -98,28 +98,30 @@ export default class ArasaacSearch {
             <div class="arasaac-search-box mb-2 flex-shrink-0">
                 <div class="input-group input-group-sm mb-1">
                     <span class="input-group-text py-0 px-2" style="font-size: 13px;">🔍</span>
-                    <input type="text" class="form-control form-control-sm" placeholder="Rechercher ARASAAC..." id="arasaac-input-${this.container.id}">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search ARASAAC..." id="arasaac-input-${this.container.id}">
                 </div>
                 <div class="d-flex gap-1">
-                    <select class="form-select form-select-sm" id="arasaac-mode-${this.container.id}" style="font-size: 11px; padding: 2px 6px;" title="Mode de recherche">
-                        <option value="smart" ${this.searchMode === 'smart' ? 'selected' : ''}>🎯 Pertinence</option>
-                        <option value="exact" ${this.searchMode === 'exact' ? 'selected' : ''}>📌 Exact ("Est")</option>
-                        <option value="starts" ${this.searchMode === 'starts' ? 'selected' : ''}>🔤 Commence par</option>
-                        <option value="contains" ${this.searchMode === 'contains' ? 'selected' : ''}>🔍 Contient</option>
+                    <select class="form-select form-select-sm" id="arasaac-mode-${this.container.id}" style="font-size: 11px; padding: 2px 6px;" title="Search mode">
+                        <option value="smart" ${this.searchMode === 'smart' ? 'selected' : ''}>🎯 Relevance</option>
+                        <option value="exact" ${this.searchMode === 'exact' ? 'selected' : ''}>📌 Exact ("Is")</option>
+                        <option value="starts" ${this.searchMode === 'starts' ? 'selected' : ''}>🔤 Starts with</option>
+                        <option value="contains" ${this.searchMode === 'contains' ? 'selected' : ''}>🔍 Contains</option>
                     </select>
-                    <select class="form-select form-select-sm" id="arasaac-lang-${this.container.id}" style="font-size: 11px; width: 92px; flex-shrink: 0; padding: 2px 4px;" title="Langue">
-                        <option value="fr" ${this.selectedLocale === 'fr' ? 'selected' : ''}>🇫🇷 FR</option>
+                    <select class="form-select form-select-sm" id="arasaac-lang-${this.container.id}" style="font-size: 11px; width: 95px; flex-shrink: 0; padding: 2px 4px;" title="Language">
                         <option value="en" ${this.selectedLocale === 'en' ? 'selected' : ''}>🇬🇧 EN</option>
+                        <option value="fr" ${this.selectedLocale === 'fr' ? 'selected' : ''}>🇫🇷 FR</option>
                         <option value="es" ${this.selectedLocale === 'es' ? 'selected' : ''}>🇪🇸 ES</option>
                         <option value="de" ${this.selectedLocale === 'de' ? 'selected' : ''}>🇩🇪 DE</option>
                         <option value="it" ${this.selectedLocale === 'it' ? 'selected' : ''}>🇮🇹 IT</option>
+                        <option value="nl" ${this.selectedLocale === 'nl' ? 'selected' : ''}>🇳🇱 NL</option>
+                        <option value="pl" ${this.selectedLocale === 'pl' ? 'selected' : ''}>🇵🇱 PL</option>
                         <option value="pt" ${this.selectedLocale === 'pt' ? 'selected' : ''}>🇵🇹 PT</option>
                     </select>
                 </div>
             </div>
             <div class="arasaac-results flex-grow-1" id="arasaac-results-${this.container.id}" style="overflow-y: auto; display: flex; flex-direction: column; gap: 6px; align-content: flex-start; min-height: 0; padding-right: 5px;">
                 <!-- Results will appear here -->
-                <div class="text-muted small text-center w-100 mt-3">Recherchez des pictogrammes ARASAAC...</div>
+                <div class="text-muted small text-center w-100 mt-3">Search ARASAAC pictograms...</div>
             </div>
         `;
 
@@ -153,26 +155,26 @@ export default class ArasaacSearch {
     async search(query) {
         const trimmed = (query || '').trim();
         if (!trimmed || trimmed.length < 2) {
-            this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">Tapez au moins 2 caractères...</div>';
+            this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">Type at least 2 characters...</div>';
             return;
         }
 
-        this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3"><span class="spinner-border spinner-border-sm text-secondary me-1"></span>Recherche en cours...</div>';
+        this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3"><span class="spinner-border spinner-border-sm text-secondary me-1"></span>Searching...</div>';
 
         try {
-            const locale = this.selectedLocale || 'fr';
+            const locale = this.selectedLocale || 'en';
             const endpoint = this.searchMode === 'exact' ? 'bestsearch' : 'search';
             const url = `https://api.arasaac.org/api/pictograms/${locale}/${endpoint}/${encodeURIComponent(trimmed)}`;
 
             const response = await fetch(url);
 
             if (response.status === 404) {
-                this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">Aucun résultat trouvé.</div>';
+                this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">No results found.</div>';
                 return;
             }
 
             if (!response.ok) {
-                throw new Error(`Erreur API ARASAAC: ${response.status}`);
+                throw new Error(`ARASAAC API Error: ${response.status}`);
             }
 
             const rawData = await response.json();
@@ -186,7 +188,7 @@ export default class ArasaacSearch {
             const filteredData = filterAndRankPictograms(rawData, trimmed, this.searchMode);
 
             if (filteredData.length === 0) {
-                this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">Aucun résultat pour ce critère.</div>';
+                this.resultsContainer.innerHTML = '<div class="text-muted small text-center w-100 mt-3">No results match your criteria.</div>';
                 return;
             }
 
@@ -195,7 +197,7 @@ export default class ArasaacSearch {
 
             results.forEach(picto => {
                 const imgUrl = `https://static.arasaac.org/pictograms/${picto._id}/${picto._id}_300.png`;
-                const displayKeyword = picto._matchedKeyword || (picto.keywords && picto.keywords[0] ? picto.keywords[0].keyword : 'Symbole');
+                const displayKeyword = picto._matchedKeyword || (picto.keywords && picto.keywords[0] ? picto.keywords[0].keyword : 'Symbol');
 
                 // Collect other synonyms/keywords for secondary display
                 const otherKeywords = (picto.keywords || [])
@@ -297,7 +299,7 @@ export default class ArasaacSearch {
                 dlBtn.style.display = 'none';
                 dlBtn.style.cursor = 'pointer';
                 dlBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
-                dlBtn.title = 'Télécharger';
+                dlBtn.title = 'Download';
 
                 dlBtn.addEventListener('mousedown', (e) => e.stopPropagation());
 
@@ -345,7 +347,7 @@ export default class ArasaacSearch {
 
         } catch (error) {
             console.error('Arasaac search error:', error);
-            this.resultsContainer.innerHTML = '<div class="text-danger small text-center w-100 mt-3">Erreur lors de la récupération des résultats.</div>';
+            this.resultsContainer.innerHTML = '<div class="text-danger small text-center w-100 mt-3">Error retrieving results.</div>';
         }
     }
 }

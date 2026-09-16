@@ -7,9 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Portuguese (`pt`) Language Support & Internationalization (i18n)**:
+  - Added Portuguese (`pt`) to `config.py` (`LANGUAGES`) and language selector dropdown in `app/templates/base.html`.
+  - Extracted translation catalog `messages.pot`, initialized `app/translations/pt/LC_MESSAGES/messages.po`, translated all application messages into Portuguese, and compiled all catalogs to `.mo` binaries.
+  - Added translations for newly introduced search modes across all supported languages (`fr`, `es`, `de`, `it`, `nl`, `pl`, `pt`).
+- **Local Image Search Multi-field (Name & Description) & Modes**:
+  - Enhanced backend endpoint `/api/search_local_images` (`app/routes/api.py`) to query both `Image.name` and `Image.description` simultaneously.
+  - Added search modes (`smart` relevance ranking, `exact`, `starts`, `contains`) to local search in `ImageTree.js`, `builder.html`, `list.html`, `builder.js`, and `list.js` (intentionally keeping local search without language toggle).
+  - Added Pytest unit test `test_search_local_images_modes_and_description` (`tests/test_api.py`), bringing Python test suite to 57 passing tests.
 - **ARASAAC Search Upgrade & Multi-mode Intelligence** (`app/static/js/components/ArasaacSearch.js`):
-  - Added multi-criteria search modes: "Pertinence" (Smart ranking), "Exact" (Bestsearch / "Est"), "Commence par" (Prefix matching), and "Contient" (Substring matching).
-  - Added on-the-fly language selector dropdown (`FR`, `EN`, `ES`, `DE`, `IT`, `PT`) initialized automatically by default from the user's session locale (`window.CURRENT_LOCALE || 'fr'`).
+  - English-first interface: all labels, search modes ("Relevance", "Exact ('Is')", "Starts with", "Contains"), placeholders, and tooltips are English-first.
+  - Added support for Dutch (`nl`) and Polish (`pl`) alongside English (`en`), French (`fr`), Spanish (`es`), German (`de`), Italian (`it`), and Portuguese (`pt`), verified against ARASAAC API.
+  - Added multi-criteria search modes: "Relevance" (Smart ranking), "Exact" (Bestsearch / "Is"), "Starts with" (Prefix matching), and "Contains" (Substring matching).
+  - Added on-the-fly language selector dropdown (`EN`, `FR`, `ES`, `DE`, `IT`, `NL`, `PL`, `PT`) initialized automatically by default from the user's session locale (`window.CURRENT_LOCALE || 'en'`).
   - Replaced arbitrary alphabetical sorting with relevance-aware ranking (`filterAndRankPictograms`), ensuring relevant pictograms appear at the top.
   - Implemented keyword matching (`findBestMatchingKeyword`) so the result title and Drag & Drop payload accurately display the searched concept rather than an arbitrary first synonym.
   - Added display of secondary synonyms as muted subtitle tags to clarify pictogram concepts.

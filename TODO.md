@@ -146,12 +146,22 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Masquage strict CSS `.collapse-switch` dans `custom.css` (suppression de la patte 3x3px noire en haut à droite des boîtes de nœuds).
   - [x] Amélioration du rendu vectoriel SVG/PDF dans `TreePdfExporter.js` (bords arrondis `rx="6" ry="6"`, bordure `#b0b0b0`, préservation des connecteurs).
 - [x] **Refonte intelligente du composant de recherche ARASAAC** (`ArasaacSearch.js`) :
-  - [x] Ajout de sélecteurs compacts intégrés : Modes ("Pertinence / Intelligent", "Exact / Est", "Commence par", "Contient") et Langues (`FR`, `EN`, `ES`, `DE`, `IT`, `PT`).
-  - [x] Initialisation par défaut de la langue depuis la variable de session locale de l'application (`window.CURRENT_LOCALE || 'fr'`).
+  - [x] Interface English-first par défaut ("Relevance", 'Exact ("Is")', "Starts with", "Contains").
+  - [x] Ajout du support pour les langues NL (Néerlandais) et PL (Polonais) en plus de EN, FR, ES, DE, IT, PT.
+  - [x] Initialisation par défaut de la langue depuis la variable de session locale de l'application (`window.CURRENT_LOCALE || 'en'`).
   - [x] Suppression du tri alphabétique destructeur au profit d'un tri par pertinence réelle (`filterAndRankPictograms`).
   - [x] Extraction automatique du mot-clé correspondant recherché (`findBestMatchingKeyword`) pour le titre, les métadonnées de drag-and-drop et l'affichage des synonymes secondaires.
   - [x] Ajout d'une suite complète de tests unitaires JS (`tests/unit/arasaac_search.test.js`, 10 tests, portant le total à 49 tests JS).
-  - [x] Validation 100% sur `make test` (Ruff, ESLint, 49 tests JS, 56 Pytest, 11 E2E Playwright).
+- [x] **Recherche locale d'images (Nom et Description simultanés + Modes de recherche)** :
+  - [x] Vérification et correction de la recherche locale dans `app/routes/api.py` (`search_local_images`) pour filtrer simultanément sur `Image.name` et `Image.description`.
+  - [x] Intégration des modes de recherche ("Relevance", "Exact", "Starts with", "Contains") à la recherche locale dans `ImageTree.js`, `builder.html`, `list.html`, `builder.js`, `list.js` (sans sélecteur de langue).
+  - [x] Test Pytest dédié `test_search_local_images_modes_and_description` validant le filtrage sur le nom, la description et les 4 modes.
+- [x] **Internationalisation (i18n) et support du Portugais (`pt`)** :
+  - [x] Ajout de `'pt'` dans `config.py` (`LANGUAGES`).
+  - [x] Ajout de l'option Portugais dans la barre de navigation (`app/templates/base.html`).
+  - [x] Extraction Babel, initialisation du catalogue `app/translations/pt`, mise à jour et traduction de tous les messages dans les langues de l'application.
+  - [x] Compilation des fichiers `.mo` pour toutes les langues (`en`, `fr`, `es`, `de`, `it`, `nl`, `pl`, `pt`).
+  - [x] Validation 100% sur `make test` (Ruff, ESLint, 49 tests JS, 57 Pytest, 11 E2E Playwright).
 
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :

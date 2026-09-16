@@ -35,5 +35,5 @@ def test_list_js_contains_filter_logic(client):
 
     # Check that the key components of the filter logic exist in the file
     assert "filterImages" in js_content
-    assert "imageTree.filter(searchTerm)" in js_content
+    assert "imageTree.filter(searchTerm" in js_content
     assert "ImageTree.prototype.filter" not in js_content # Make sure it's on the instance

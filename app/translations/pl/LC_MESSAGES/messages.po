@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-30 02:18+0200\n"
+"POT-Creation-Date: 2026-09-16 00:31+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -19,181 +19,296 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes/api.py:58 app/routes/api.py:110 app/routes/api.py:268
-#: app/routes/api.py:448 app/routes/api.py:541 app/routes/api.py:645
+#: app/forms.py:19
+msgid "be at least 9 characters long"
+msgstr ""
+
+#: app/forms.py:21
+msgid "contain at least one uppercase letter"
+msgstr ""
+
+#: app/forms.py:23
+msgid "contain at least one digit"
+msgstr ""
+
+#: app/forms.py:26
+msgid "Password must"
+msgstr ""
+
+#: app/forms.py:30 app/forms.py:36 app/forms.py:63
+#, fuzzy
+msgid "Username"
+msgstr "Twoja nazwa użytkownika"
+
+#: app/forms.py:31 app/forms.py:38 app/forms.py:71
+#, fuzzy
+msgid "Password"
+msgstr "Zresetuj hasło"
+
+#: app/forms.py:32
+msgid "Remember Me"
+msgstr ""
+
+#: app/forms.py:33 app/templates/login.html:32 app/templates/register.html:84
+msgid "Sign In"
+msgstr "Zaloguj się"
+
+#: app/forms.py:37 app/forms.py:67 app/forms.py:77 app/forms.py:82
+#, fuzzy
+msgid "Email"
+msgstr "Twoja nazwa użytkownika"
+
+#: app/forms.py:40 app/forms.py:73
+#, fuzzy
+msgid "Repeat Password"
+msgstr "Zresetuj hasło"
+
+#: app/forms.py:41
+#, fuzzy
+msgid "I accept the Terms & Privacy Policy"
+msgstr "Warunki korzystania z usługi i Politykę prywatności"
+
+#: app/forms.py:41
+msgid "You must accept the terms and privacy policy to continue."
+msgstr ""
+
+#: app/forms.py:43 app/templates/register.html:33
+msgid "Register"
+msgstr "Zarejestruj się"
+
+#: app/forms.py:48
+msgid "Please use a different username."
+msgstr ""
+
+#: app/forms.py:53
+msgid "Please use a different email address."
+msgstr ""
+
+#: app/forms.py:56
+#, fuzzy
+msgid "Current Password"
+msgstr "Zresetuj hasło"
+
+#: app/forms.py:57
+#, fuzzy
+msgid "New Password"
+msgstr "Zmień hasło"
+
+#: app/forms.py:59
+#, fuzzy
+msgid "Repeat New Password"
+msgstr "Zresetuj hasło"
+
+#: app/forms.py:60 app/templates/account.html:10
+msgid "Change Password"
+msgstr "Zmień hasło"
+
+#: app/forms.py:64 app/templates/account.html:60
+msgid "Delete My Account"
+msgstr "Usuń moje konto"
+
+#: app/forms.py:68
+#, fuzzy
+msgid "Request Password Reset"
+msgstr "Zresetuj hasło"
+
+#: app/forms.py:74 app/templates/forgot_password.html:5
+msgid "Reset Password"
+msgstr "Zresetuj hasło"
+
+#: app/forms.py:78 app/templates/resend_confirmation_request.html:5
+msgid "Resend Confirmation Email"
+msgstr "Wyślij ponownie e-mail z potwierdzeniem"
+
+#: app/forms.py:81
+#, fuzzy
+msgid "Name"
+msgstr "Twoja nazwa użytkownika"
+
+#: app/forms.py:83
+#, fuzzy
+msgid "Message"
+msgstr "Obrazy"
+
+#: app/forms.py:85
+msgid "Send"
+msgstr ""
+
+#: app/routes/api.py:62 app/routes/api.py:114 app/routes/api.py:312
+#: app/routes/api.py:522 app/routes/api.py:620 app/routes/api.py:724
 msgid "Invalid data"
 msgstr "Nieprawidłowe dane"
 
-#: app/routes/api.py:65
+#: app/routes/api.py:69
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Brak wymaganych pól: list_name i payload są wymagane."
 
-#: app/routes/api.py:76 app/routes/api.py:122
+#: app/routes/api.py:80 app/routes/api.py:127
 msgid "List updated successfully"
 msgstr "Lista zaktualizowana pomyślnie"
 
-#: app/routes/api.py:87
+#: app/routes/api.py:91
 msgid "List saved successfully"
 msgstr "Lista zapisana pomyślnie"
 
-#: app/routes/api.py:104 app/routes/api.py:131
+#: app/routes/api.py:108 app/routes/api.py:136
 msgid "List not found"
 msgstr "Nie znaleziono listy"
 
-#: app/routes/api.py:106 app/routes/api.py:133 app/routes/api.py:153
-#: app/routes/api.py:498 app/routes/api.py:594
+#: app/routes/api.py:110 app/routes/api.py:138 app/routes/api.py:157
+#: app/routes/api.py:572 app/routes/api.py:673
 msgid "Unauthorized"
 msgstr "Nieautoryzowany"
 
-#: app/routes/api.py:138
+#: app/routes/api.py:143
 msgid "List deleted successfully"
 msgstr "Lista usunięta pomyślnie"
 
-#: app/routes/api.py:144
+#: app/routes/api.py:149
 msgid "parent_id is required"
 msgstr "parent_id jest wymagany"
 
-#: app/routes/api.py:148
+#: app/routes/api.py:153
 msgid "Folder not found"
 msgstr "Nie znaleziono folderu"
 
-#: app/routes/api.py:250
+#: app/routes/api.py:294
 msgid "Root folder not found"
 msgstr "Nie znaleziono folderu głównego"
 
-#: app/routes/api.py:264 app/routes/api.py:329
+#: app/routes/api.py:308 app/routes/api.py:385
 msgid "L'espace de stockage maximal est atteint pour ce compte."
 msgstr ""
 
-#: app/routes/api.py:275
+#: app/routes/api.py:319
 msgid "Parent folder not found or not owned by user"
 msgstr "Folder nadrzędny nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes/api.py:286
+#: app/routes/api.py:330
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Nie można utworzyć katalogu: %(error)s"
 
-#: app/routes/api.py:332
+#: app/routes/api.py:388
 msgid "No file part"
 msgstr "Brak części pliku"
 
-#: app/routes/api.py:336
+#: app/routes/api.py:392
 msgid "No selected file"
 msgstr "Nie wybrano pliku"
 
-#: app/routes/api.py:340
+#: app/routes/api.py:396
 msgid "No folder_id specified"
 msgstr "Nie określono folder_id"
 
-#: app/routes/api.py:344 app/routes/api.py:653
+#: app/routes/api.py:400 app/routes/api.py:732
 msgid "Folder not found or not owned by user"
 msgstr "Folder nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes/api.py:359
+#: app/routes/api.py:415
 msgid "Format de fichier non autorisé."
 msgstr ""
 
-#: app/routes/api.py:367
+#: app/routes/api.py:423
 msgid "Fichier image invalide ou potentiellement malveillant."
 msgstr ""
 
-#: app/routes/api.py:396
+#: app/routes/api.py:461
 msgid "File upload failed"
 msgstr "Przesyłanie pliku nie powiodło się"
 
-#: app/routes/api.py:407
+#: app/routes/api.py:472
 msgid "Image not found"
 msgstr "Nie znaleziono obrazu"
 
-#: app/routes/api.py:411
+#: app/routes/api.py:476
 msgid "Unauthorized to edit this image"
 msgstr "Brak uprawnień do edycji tego obrazu"
 
-#: app/routes/api.py:415
+#: app/routes/api.py:480
 msgid "Invalid JSON data"
 msgstr "Nieprawidłowe dane JSON"
 
-#: app/routes/api.py:428
+#: app/routes/api.py:502
 msgid "Image updated successfully"
 msgstr "Obraz zaktualizowany pomyślnie"
 
-#: app/routes/api.py:457
+#: app/routes/api.py:531
 msgid "Missing required fields"
 msgstr "Brak wymaganych pól"
 
-#: app/routes/api.py:468
+#: app/routes/api.py:542
 msgid "Tree updated successfully"
 msgstr "Drzewo zaktualizowane pomyślnie"
 
-#: app/routes/api.py:480
+#: app/routes/api.py:554
 msgid "Tree saved successfully"
 msgstr "Drzewo zapisane pomyślnie"
 
-#: app/routes/api.py:496
+#: app/routes/api.py:570
 #, fuzzy
 msgid "Tree not found"
 msgstr "Nie znaleziono listy"
 
-#: app/routes/api.py:503
+#: app/routes/api.py:580
 #, fuzzy
 msgid "Tree deleted successfully"
 msgstr "Drzewo zaktualizowane pomyślnie"
 
-#: app/routes/api.py:548
+#: app/routes/api.py:627
 msgid "Missing profile name"
 msgstr ""
 
-#: app/routes/api.py:556
+#: app/routes/api.py:635
 #, fuzzy
 msgid "Profile updated successfully"
 msgstr "Drzewo zaktualizowane pomyślnie"
 
-#: app/routes/api.py:562
+#: app/routes/api.py:641
 #, fuzzy
 msgid "Profile saved successfully"
 msgstr "Drzewo zapisane pomyślnie"
 
-#: app/routes/api.py:592
+#: app/routes/api.py:671
 #, fuzzy
 msgid "Profile not found"
 msgstr "Nie znaleziono folderu głównego"
 
-#: app/routes/api.py:599
+#: app/routes/api.py:678
 #, fuzzy
 msgid "Profile deleted successfully"
 msgstr "Lista usunięta pomyślnie"
 
-#: app/routes/api.py:656
+#: app/routes/api.py:735
 msgid "Cannot delete root folder"
 msgstr "Nie można usunąć folderu głównego"
 
-#: app/routes/api.py:660
+#: app/routes/api.py:739
 msgid "Folder and all its contents deleted"
 msgstr "Folder i cała jego zawartość usunięte"
 
-#: app/routes/api.py:665
+#: app/routes/api.py:744
 msgid "Image not found or not owned by user"
 msgstr "Obraz nie został znaleziony lub nie jest własnością użytkownika"
 
-#: app/routes/api.py:676
+#: app/routes/api.py:755
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Nie można usunąć pliku: %(error)s"
 
-#: app/routes/api.py:680
+#: app/routes/api.py:759
 msgid "Image deleted"
 msgstr "Obraz usunięty"
 
-#: app/routes/api.py:682
+#: app/routes/api.py:761
 msgid "Invalid item type"
 msgstr "Nieprawidłowy typ elementu"
 
-#: app/routes/auth.py:23
+#: app/routes/auth.py:39
 msgid "Invalid username or password"
 msgstr "Nieprawidłowa nazwa użytkownika lub hasło"
 
-#: app/routes/auth.py:27
+#: app/routes/auth.py:43
 #, python-format
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
@@ -202,101 +317,101 @@ msgstr ""
 "Twoje konto nie jest potwierdzone. Sprawdź swoją pocztę e-mail. <a "
 "href=\"%(url)s\">Wysłać ponownie e-mail z potwierdzeniem?</a>"
 
-#: app/routes/auth.py:56
+#: app/routes/auth.py:72
 msgid "A confirmation email has been sent to your email address."
 msgstr "Na Twój adres e-mail wysłano wiadomość z potwierdzeniem."
 
-#: app/routes/auth.py:59
+#: app/routes/auth.py:75
 msgid "Registration failed. Please check the errors below."
 msgstr "Rejestracja nie powiodła się. Sprawdź poniższe błędy."
 
-#: app/routes/auth.py:62 app/routes/auth.py:180
+#: app/routes/auth.py:78 app/routes/auth.py:196
 #, python-format
 msgid "Error in %(field)s: %(error)s"
 msgstr "Błąd w %(field)s: %(error)s"
 
-#: app/routes/auth.py:69
+#: app/routes/auth.py:85
 msgid "The confirmation link is invalid or has expired."
 msgstr "Link potwierdzający jest nieprawidłowy lub wygasł."
 
-#: app/routes/auth.py:74
+#: app/routes/auth.py:90
 msgid "Account already confirmed. Please login."
 msgstr "Konto już potwierdzone. Zaloguj się."
 
-#: app/routes/auth.py:96
+#: app/routes/auth.py:112
 msgid "Your account has been confirmed successfully!"
 msgstr "Twoje konto zostało pomyślnie potwierdzone!"
 
-#: app/routes/auth.py:108
+#: app/routes/auth.py:124
 msgid "This account is already confirmed. Please login."
 msgstr "To konto jest już potwierdzone. Zaloguj się."
 
-#: app/routes/auth.py:114
+#: app/routes/auth.py:130
 msgid "A new confirmation email has been sent."
 msgstr "Wysłano nową wiadomość e-mail z potwierdzeniem."
 
-#: app/routes/auth.py:117
+#: app/routes/auth.py:133
 msgid "No account found with that email address. Please register."
 msgstr "Nie znaleziono konta o podanym adresie e-mail. Zarejestruj się."
 
-#: app/routes/auth.py:131
+#: app/routes/auth.py:147
 msgid "An email with instructions to reset your password has been sent."
 msgstr "Wysłano wiadomość e-mail z instrukcjami dotyczącymi resetowania hasła."
 
-#: app/routes/auth.py:133
+#: app/routes/auth.py:149
 msgid "No account found with that email address."
 msgstr "Nie znaleziono konta o podanym adresie e-mail."
 
-#: app/routes/auth.py:143
+#: app/routes/auth.py:159
 msgid "The reset link is invalid or has expired."
 msgstr "Link do resetowania jest nieprawidłowy lub wygasł."
 
-#: app/routes/auth.py:151
+#: app/routes/auth.py:167
 msgid "Your password has been reset successfully."
 msgstr "Twoje hasło zostało pomyślnie zresetowane."
 
-#: app/routes/auth.py:174
+#: app/routes/auth.py:190
 msgid "Your password has been changed successfully."
 msgstr "Twoje hasło zostało pomyślnie zmienione."
 
-#: app/routes/auth.py:176
+#: app/routes/auth.py:192
 msgid "Invalid current password."
 msgstr "Nieprawidłowe bieżące hasło."
 
-#: app/routes/auth.py:209
+#: app/routes/auth.py:225
 msgid "Your account has been successfully deleted."
 msgstr "Twoje konto zostało pomyślnie usunięte."
 
-#: app/routes/auth.py:212
+#: app/routes/auth.py:228
 msgid "Invalid username confirmation. Account deletion cancelled."
 msgstr "Nieprawidłowe potwierdzenie nazwy użytkownika. Anulowano usuwanie konta."
 
-#: app/routes/auth.py:215
+#: app/routes/auth.py:231
 msgid "Invalid form submission."
 msgstr "Nieprawidłowe przesłanie formularza."
 
-#: app/routes/builder.py:19
+#: app/routes/builder.py:20
 msgid "Invalid tree data received."
 msgstr "Otrzymano nieprawidłowe dane drzewa."
 
-#: app/routes/main.py:16 app/templates/legal.html:34
+#: app/routes/main.py:26 app/templates/legal.html:34
 msgid "Legal Information"
 msgstr "Informacje Prawne"
 
-#: app/routes/main.py:33
+#: app/routes/main.py:43
 msgid "Your message has been sent successfully!"
 msgstr "Twoja wiadomość została pomyślnie wysłana!"
 
-#: app/routes/main.py:35 app/templates/about.html:32
+#: app/routes/main.py:45 app/templates/about.html:32
 #: app/templates/base.html:201
 msgid "About & Contact"
 msgstr "O nas i Kontakt"
 
-#: app/routes/main.py:53
+#: app/routes/main.py:63
 msgid "Your language has been updated."
 msgstr "Twój język został zaktualizowany."
 
-#: app/routes/main.py:57
+#: app/routes/main.py:67
 msgid "The language has been updated for this session."
 msgstr "Język został zaktualizowany dla tej sesji."
 
@@ -341,10 +456,6 @@ msgstr ""
 msgid "Account Management"
 msgstr "Zarządzanie kontem"
 
-#: app/templates/account.html:10
-msgid "Change Password"
-msgstr "Zmień hasło"
-
 #: app/templates/account.html:29 app/templates/account.html:32
 msgid "Delete Account"
 msgstr "Usuń konto"
@@ -379,23 +490,19 @@ msgstr "Twoja nazwa użytkownika"
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: app/templates/account.html:60
-msgid "Delete My Account"
-msgstr "Usuń moje konto"
-
 #: app/templates/base.html:7 app/templates/base.html:198
 msgid "PictoTree.eu"
 msgstr ""
 
-#: app/templates/base.html:117
+#: app/templates/base.html:115
 msgid "Toggle navigation"
 msgstr "Przełącz nawigację"
 
-#: app/templates/base.html:123
+#: app/templates/base.html:121
 msgid "Mobile Setup"
 msgstr ""
 
-#: app/templates/base.html:126
+#: app/templates/base.html:124
 msgid "Paper Tools"
 msgstr ""
 
@@ -475,7 +582,7 @@ msgstr "Zapisz drzewo"
 msgid "Load / Delete Tree"
 msgstr "Załaduj drzewo"
 
-#: app/templates/builder.html:32 app/templates/builder.html:249
+#: app/templates/builder.html:32 app/templates/builder.html:260
 #: app/templates/list.html:37
 msgid "Search trees..."
 msgstr "Szukaj drzew..."
@@ -563,7 +670,7 @@ msgstr ""
 msgid "Tree Builder"
 msgstr "Konstruktor drzewa"
 
-#: app/templates/builder.html:111 app/templates/builder.html:226
+#: app/templates/builder.html:111 app/templates/builder.html:237
 #, fuzzy
 msgid "Binder Builder"
 msgstr "Kreator segregatorów"
@@ -601,126 +708,142 @@ msgstr "Wprowadź opis węzła..."
 msgid "Images"
 msgstr "Obrazy"
 
-#: app/templates/builder.html:176 app/templates/builder.html:343
+#: app/templates/builder.html:176 app/templates/builder.html:354
 #: app/templates/list.html:272
 msgid "Local"
 msgstr ""
 
-#: app/templates/builder.html:192 app/templates/builder.html:352
-#: app/templates/list.html:288
+#: app/templates/builder.html:195 app/templates/builder.html:363
+#: app/templates/list.html:291
 #, fuzzy
 msgid "Search local images..."
 msgstr "Szukaj obrazów..."
 
-#: app/templates/builder.html:211
+#: app/templates/builder.html:197 app/templates/list.html:293
+msgid "Search mode"
+msgstr "Tryb wyszukiwania"
+
+#: app/templates/builder.html:198 app/templates/list.html:294
+msgid "Relevance"
+msgstr "Trafność"
+
+#: app/templates/builder.html:199 app/templates/list.html:295
+msgid "Exact (\"Is\")"
+msgstr "Dokładne (\"Jest\")"
+
+#: app/templates/builder.html:200 app/templates/list.html:296
+msgid "Starts with"
+msgstr "Zaczyna się od"
+
+#: app/templates/builder.html:201 app/templates/list.html:297
+msgid "Contains"
+msgstr "Zawiera"
+
+#: app/templates/builder.html:222
 msgid "Delete selected branch"
 msgstr "Usuń wybraną gałąź"
 
-#: app/templates/builder.html:212
+#: app/templates/builder.html:223
 msgid "New tree"
 msgstr "Nowe drzewo"
 
-#: app/templates/builder.html:227
+#: app/templates/builder.html:238
 #, fuzzy
 msgid "Change Avatar"
 msgstr "Zmień hasło"
 
-#: app/templates/builder.html:233
+#: app/templates/builder.html:244
 #, fuzzy
 msgid "New binder"
 msgstr "Nowy segregator"
 
-#: app/templates/builder.html:237
+#: app/templates/builder.html:248
 msgid "Drag and drop trees here to build your binder."
 msgstr "Przeciągnij i upuść drzewa tutaj, aby zbudować segregator."
 
-#: app/templates/builder.html:248
+#: app/templates/builder.html:259
 #, fuzzy
 msgid "Trees"
 msgstr "Źródło drzewa"
 
-#: app/templates/builder.html:267 app/templates/pictogram_bank.html:9
+#: app/templates/builder.html:278 app/templates/pictogram_bank.html:9
 msgid "My Pictograms"
 msgstr "Moje piktogramy"
 
-#: app/templates/builder.html:268 app/templates/pictogram_bank.html:12
+#: app/templates/builder.html:279 app/templates/pictogram_bank.html:12
 #, fuzzy
 msgid "Refresh"
 msgstr "Źródło drzewa"
 
-#: app/templates/builder.html:278 app/templates/pictogram_bank.html:23
+#: app/templates/builder.html:289 app/templates/pictogram_bank.html:23
 msgid "Create Folder"
 msgstr "Utwórz folder"
 
-#: app/templates/builder.html:280 app/templates/pictogram_bank.html:25
+#: app/templates/builder.html:291 app/templates/pictogram_bank.html:25
 msgid "Folder name"
 msgstr "Nazwa folderu"
 
-#: app/templates/builder.html:281 app/templates/pictogram_bank.html:26
+#: app/templates/builder.html:292 app/templates/pictogram_bank.html:26
 msgid "Create"
 msgstr "Utwórz"
 
-#: app/templates/builder.html:286 app/templates/pictogram_bank.html:31
+#: app/templates/builder.html:297 app/templates/pictogram_bank.html:31
 msgid "Import Image"
 msgstr "Importuj obraz"
 
-#: app/templates/builder.html:288 app/templates/pictogram_bank.html:33
+#: app/templates/builder.html:299 app/templates/pictogram_bank.html:33
 msgid "Upload from disk"
 msgstr "Prześlij z dysku"
 
-#: app/templates/builder.html:291 app/templates/pictogram_bank.html:36
+#: app/templates/builder.html:302 app/templates/pictogram_bank.html:36
 msgid "Choose File"
 msgstr "Wybierz plik"
 
-#: app/templates/builder.html:292 app/templates/pictogram_bank.html:37
+#: app/templates/builder.html:303 app/templates/pictogram_bank.html:37
 msgid "No file chosen"
 msgstr "Nie wybrano pliku"
 
-#: app/templates/builder.html:296 app/templates/pictogram_bank.html:41
+#: app/templates/builder.html:307 app/templates/pictogram_bank.html:41
 msgid "Description (optional)"
 msgstr "Opis (opcjonalnie)"
 
-#: app/templates/builder.html:299 app/templates/pictogram_bank.html:44
+#: app/templates/builder.html:310 app/templates/pictogram_bank.html:44
 msgid "Upload"
 msgstr "Prześlij"
 
-#: app/templates/builder.html:305 app/templates/builder.html:307
+#: app/templates/builder.html:316 app/templates/builder.html:318
 #: app/templates/pictogram_bank.html:50 app/templates/pictogram_bank.html:52
 msgid "Edit Selected Image"
 msgstr "Edytuj wybrany obraz"
 
-#: app/templates/builder.html:306 app/templates/pictogram_bank.html:51
+#: app/templates/builder.html:317 app/templates/pictogram_bank.html:51
 msgid "Edit Selected Folder"
 msgstr "Edytuj wybrany folder"
 
-#: app/templates/builder.html:310 app/templates/pictogram_bank.html:55
+#: app/templates/builder.html:321 app/templates/pictogram_bank.html:55
 msgid "Description"
 msgstr "Opis"
 
-#: app/templates/builder.html:314 app/templates/pictogram_bank.html:65
+#: app/templates/builder.html:325 app/templates/pictogram_bank.html:65
 msgid "Save Changes"
 msgstr "Zapisz zmiany"
 
-#: app/templates/builder.html:315 app/templates/pictogram_bank.html:66
+#: app/templates/builder.html:326 app/templates/pictogram_bank.html:66
 msgid "Delete"
 msgstr "Usuń"
 
-#: app/templates/builder.html:321 app/templates/pictogram_bank.html:72
+#: app/templates/builder.html:332 app/templates/pictogram_bank.html:72
 msgid "Export Image"
 msgstr "Eksportuj obraz"
 
-#: app/templates/builder.html:322 app/templates/pictogram_bank.html:73
+#: app/templates/builder.html:333 app/templates/pictogram_bank.html:73
 msgid "Download Selected Image"
 msgstr "Pobierz wybrany obraz"
 
-#: app/templates/builder.html:337
+#: app/templates/builder.html:348
 #, fuzzy
 msgid "Choose Binder Avatar"
 msgstr "Wybierz awatar segregatora"
-
-#: app/templates/forgot_password.html:5
-msgid "Reset Password"
-msgstr "Zresetuj hasło"
 
 #: app/templates/index.html:16
 msgid "PictoTree: A free, digital pictogram binder."
@@ -1364,38 +1487,34 @@ msgstr "Przeciągnij, aby skopiować do listy"
 msgid "Select from Images"
 msgstr "Wybierz z obrazów"
 
-#: app/templates/list.html:304
+#: app/templates/list.html:315
 msgid "Selected Link Description"
 msgstr "Opis wybranego linku"
 
-#: app/templates/list.html:306
+#: app/templates/list.html:317
 msgid "Select a link from the bottom list to edit its description..."
 msgstr "Wybierz link z dolnej listy, aby edytować jego opis..."
 
-#: app/templates/list.html:323
+#: app/templates/list.html:334
 msgid "Generate PDF"
 msgstr ""
 
-#: app/templates/list.html:343
+#: app/templates/list.html:354
 msgid "Chained List Builder"
 msgstr "Konstruktor listy połączonej"
 
-#: app/templates/list.html:346
+#: app/templates/list.html:357
 #, fuzzy
 msgid "Import Picture"
 msgstr "Importuj obraz"
 
-#: app/templates/list.html:348
+#: app/templates/list.html:359
 msgid "Delete Selected Link"
 msgstr "Usuń wybrany link"
 
-#: app/templates/list.html:349
+#: app/templates/list.html:360
 msgid "New Chain"
 msgstr "Nowy łańcuch"
-
-#: app/templates/login.html:32 app/templates/register.html:84
-msgid "Sign In"
-msgstr "Zaloguj się"
 
 #: app/templates/login.html:58
 msgid "New User?"
@@ -1417,10 +1536,6 @@ msgstr "Główny"
 msgid "Make image public"
 msgstr "Upublicznij obraz"
 
-#: app/templates/register.html:33
-msgid "Register"
-msgstr "Zarejestruj się"
-
 #: app/templates/register.html:73
 msgid "I accept the"
 msgstr "Akceptuję"
@@ -1432,10 +1547,6 @@ msgstr "Warunki korzystania z usługi i Politykę prywatności"
 #: app/templates/register.html:84
 msgid "Already have an account?"
 msgstr ""
-
-#: app/templates/resend_confirmation_request.html:5
-msgid "Resend Confirmation Email"
-msgstr "Wyślij ponownie e-mail z potwierdzeniem"
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""

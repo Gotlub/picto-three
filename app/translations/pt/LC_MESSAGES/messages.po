@@ -1,17 +1,18 @@
-# Translations template for PROJECT.
+# Portuguese translations for PROJECT.
 # Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-09-16 00:31+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2026-09-16 00:31+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,63 +20,63 @@ msgstr ""
 
 #: app/forms.py:19
 msgid "be at least 9 characters long"
-msgstr ""
+msgstr "ter pelo menos 9 caracteres"
 
 #: app/forms.py:21
 msgid "contain at least one uppercase letter"
-msgstr ""
+msgstr "conter pelo menos uma letra maiúscula"
 
 #: app/forms.py:23
 msgid "contain at least one digit"
-msgstr ""
+msgstr "conter pelo menos um dígito"
 
 #: app/forms.py:26
 msgid "Password must"
-msgstr ""
+msgstr "A palavra-passe deve"
 
 #: app/forms.py:30 app/forms.py:36 app/forms.py:63
 msgid "Username"
-msgstr ""
+msgstr "Nome de utilizador"
 
 #: app/forms.py:31 app/forms.py:38 app/forms.py:71
 msgid "Password"
-msgstr ""
+msgstr "Palavra-passe"
 
 #: app/forms.py:32
 msgid "Remember Me"
-msgstr ""
+msgstr "Lembrar-me"
 
 #: app/forms.py:33 app/templates/login.html:32 app/templates/register.html:84
 msgid "Sign In"
-msgstr ""
+msgstr "Iniciar sessão"
 
 #: app/forms.py:37 app/forms.py:67 app/forms.py:77 app/forms.py:82
 msgid "Email"
-msgstr ""
+msgstr "Correio eletrónico"
 
 #: app/forms.py:40 app/forms.py:73
 msgid "Repeat Password"
-msgstr ""
+msgstr "Confirmar palavra-passe"
 
 #: app/forms.py:41
 msgid "I accept the Terms & Privacy Policy"
-msgstr ""
+msgstr "Aceito os Termos e a Política de Privacidade"
 
 #: app/forms.py:41
 msgid "You must accept the terms and privacy policy to continue."
-msgstr ""
+msgstr "Deve aceitar os termos e a política de privacidade para continuar."
 
 #: app/forms.py:43 app/templates/register.html:33
 msgid "Register"
-msgstr ""
+msgstr "Registar"
 
 #: app/forms.py:48
 msgid "Please use a different username."
-msgstr ""
+msgstr "Por favor, utilize um nome de utilizador diferente."
 
 #: app/forms.py:53
 msgid "Please use a different email address."
-msgstr ""
+msgstr "Por favor, utilize um endereço de correio eletrónico diferente."
 
 #: app/forms.py:56
 msgid "Current Password"
@@ -99,7 +100,7 @@ msgstr ""
 
 #: app/forms.py:68
 msgid "Request Password Reset"
-msgstr ""
+msgstr "Pedir redefinição de palavra-passe"
 
 #: app/forms.py:74 app/templates/forgot_password.html:5
 msgid "Reset Password"
@@ -107,7 +108,7 @@ msgstr ""
 
 #: app/forms.py:78 app/templates/resend_confirmation_request.html:5
 msgid "Resend Confirmation Email"
-msgstr ""
+msgstr "Reenviar correio de confirmação"
 
 #: app/forms.py:81
 msgid "Name"
@@ -119,7 +120,7 @@ msgstr ""
 
 #: app/forms.py:85
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
 #: app/routes/api.py:62 app/routes/api.py:114 app/routes/api.py:312
 #: app/routes/api.py:522 app/routes/api.py:620 app/routes/api.py:724
@@ -136,20 +137,20 @@ msgstr ""
 
 #: app/routes/api.py:91
 msgid "List saved successfully"
-msgstr ""
+msgstr "Lista guardada com sucesso"
 
 #: app/routes/api.py:108 app/routes/api.py:136
 msgid "List not found"
-msgstr ""
+msgstr "Lista não encontrada"
 
 #: app/routes/api.py:110 app/routes/api.py:138 app/routes/api.py:157
 #: app/routes/api.py:572 app/routes/api.py:673
 msgid "Unauthorized"
-msgstr ""
+msgstr "Não autorizado"
 
 #: app/routes/api.py:143
 msgid "List deleted successfully"
-msgstr ""
+msgstr "Lista eliminada com sucesso"
 
 #: app/routes/api.py:149
 msgid "parent_id is required"
@@ -161,7 +162,7 @@ msgstr ""
 
 #: app/routes/api.py:294
 msgid "Root folder not found"
-msgstr ""
+msgstr "Pasta raiz não encontrada"
 
 #: app/routes/api.py:308 app/routes/api.py:385
 msgid "L'espace de stockage maximal est atteint pour ce compte."
@@ -218,7 +219,7 @@ msgstr ""
 
 #: app/routes/api.py:502
 msgid "Image updated successfully"
-msgstr ""
+msgstr "Imagem atualizada com sucesso"
 
 #: app/routes/api.py:531
 msgid "Missing required fields"
@@ -230,11 +231,11 @@ msgstr ""
 
 #: app/routes/api.py:554
 msgid "Tree saved successfully"
-msgstr ""
+msgstr "Árvore guardada com sucesso"
 
 #: app/routes/api.py:570
 msgid "Tree not found"
-msgstr ""
+msgstr "Árvore não encontrada"
 
 #: app/routes/api.py:580
 msgid "Tree deleted successfully"
@@ -379,12 +380,12 @@ msgstr ""
 
 #: app/routes/main.py:43
 msgid "Your message has been sent successfully!"
-msgstr ""
+msgstr "A sua mensagem foi enviada com sucesso!"
 
 #: app/routes/main.py:45 app/templates/about.html:32
 #: app/templates/base.html:201
 msgid "About & Contact"
-msgstr ""
+msgstr "Sobre e Contacto"
 
 #: app/routes/main.py:63
 msgid "Your language has been updated."
@@ -431,7 +432,7 @@ msgstr ""
 
 #: app/templates/account.html:29 app/templates/account.html:32
 msgid "Delete Account"
-msgstr ""
+msgstr "Eliminar conta"
 
 #: app/templates/account.html:30
 msgid "Once you delete your account, there is no going back. Please be certain."
@@ -458,7 +459,7 @@ msgstr ""
 
 #: app/templates/account.html:59
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: app/templates/base.html:7 app/templates/base.html:198
 msgid "PictoTree.eu"
@@ -466,7 +467,7 @@ msgstr ""
 
 #: app/templates/base.html:115
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Alternar navegação"
 
 #: app/templates/base.html:121
 msgid "Mobile Setup"
@@ -474,11 +475,11 @@ msgstr ""
 
 #: app/templates/base.html:124
 msgid "Paper Tools"
-msgstr ""
+msgstr "Ferramentas de Papel"
 
 #: app/templates/base.html:154
 msgid "Login"
-msgstr ""
+msgstr "Iniciar sessão"
 
 #: app/templates/base.html:158
 msgid "Account"
@@ -486,7 +487,7 @@ msgstr ""
 
 #: app/templates/base.html:161
 msgid "Logout"
-msgstr ""
+msgstr "Terminar sessão"
 
 #: app/templates/base.html:185
 #, python-format
@@ -617,7 +618,7 @@ msgstr ""
 
 #: app/templates/builder.html:108 app/templates/builder.html:127
 msgid "Tree Builder"
-msgstr ""
+msgstr "Construtor de Árvores"
 
 #: app/templates/builder.html:111 app/templates/builder.html:237
 msgid "Binder Builder"
@@ -625,7 +626,7 @@ msgstr ""
 
 #: app/templates/builder.html:115
 msgid "My Resources"
-msgstr ""
+msgstr "Os meus recursos"
 
 #: app/templates/builder.html:128
 msgid "Visualize Tree"
@@ -637,11 +638,11 @@ msgstr ""
 
 #: app/templates/builder.html:151
 msgid "Close"
-msgstr ""
+msgstr "Fechar"
 
 #: app/templates/builder.html:152 app/templates/list.html:86
 msgid "Export to PDF"
-msgstr ""
+msgstr "Exportar para PDF"
 
 #: app/templates/builder.html:163
 msgid "Node Description"
@@ -658,20 +659,20 @@ msgstr ""
 #: app/templates/builder.html:176 app/templates/builder.html:354
 #: app/templates/list.html:272
 msgid "Local"
-msgstr ""
+msgstr "Local"
 
 #: app/templates/builder.html:195 app/templates/builder.html:363
 #: app/templates/list.html:291
 msgid "Search local images..."
-msgstr ""
+msgstr "Pesquisar imagens locais..."
 
 #: app/templates/builder.html:197 app/templates/list.html:293
 msgid "Search mode"
-msgstr ""
+msgstr "Modo de pesquisa"
 
 #: app/templates/builder.html:198 app/templates/list.html:294
 msgid "Relevance"
-msgstr ""
+msgstr "Relevância"
 
 #: app/templates/builder.html:199 app/templates/list.html:295
 msgid "Exact (\"Is\")"
@@ -679,31 +680,31 @@ msgstr ""
 
 #: app/templates/builder.html:200 app/templates/list.html:296
 msgid "Starts with"
-msgstr ""
+msgstr "Começa com"
 
 #: app/templates/builder.html:201 app/templates/list.html:297
 msgid "Contains"
-msgstr ""
+msgstr "Contém"
 
 #: app/templates/builder.html:222
 msgid "Delete selected branch"
-msgstr ""
+msgstr "Eliminar ramo selecionado"
 
 #: app/templates/builder.html:223
 msgid "New tree"
-msgstr ""
+msgstr "Nova árvore"
 
 #: app/templates/builder.html:238
 msgid "Change Avatar"
-msgstr ""
+msgstr "Mudar avatar"
 
 #: app/templates/builder.html:244
 msgid "New binder"
-msgstr ""
+msgstr "Novo dossiê"
 
 #: app/templates/builder.html:248
 msgid "Drag and drop trees here to build your binder."
-msgstr ""
+msgstr "Arraste e solte árvores aqui para criar o seu dossiê."
 
 #: app/templates/builder.html:259
 msgid "Trees"
@@ -723,7 +724,7 @@ msgstr ""
 
 #: app/templates/builder.html:291 app/templates/pictogram_bank.html:25
 msgid "Folder name"
-msgstr ""
+msgstr "Nome da pasta"
 
 #: app/templates/builder.html:292 app/templates/pictogram_bank.html:26
 msgid "Create"
@@ -772,7 +773,7 @@ msgstr ""
 
 #: app/templates/builder.html:326 app/templates/pictogram_bank.html:66
 msgid "Delete"
-msgstr ""
+msgstr "Eliminar"
 
 #: app/templates/builder.html:332 app/templates/pictogram_bank.html:72
 msgid "Export Image"
@@ -1203,15 +1204,15 @@ msgstr ""
 
 #: app/templates/list.html:94
 msgid "Orientation"
-msgstr ""
+msgstr "Orientação"
 
 #: app/templates/list.html:97
 msgid "Portrait"
-msgstr ""
+msgstr "Vertical"
 
 #: app/templates/list.html:99
 msgid "Landscape"
-msgstr ""
+msgstr "Horizontal"
 
 #: app/templates/list.html:106
 msgid "Image Size"
@@ -1291,7 +1292,7 @@ msgstr ""
 
 #: app/templates/list.html:229
 msgid "Print"
-msgstr ""
+msgstr "Imprimir"
 
 #: app/templates/list.html:241
 msgid "Select from Tree"
@@ -1327,7 +1328,7 @@ msgstr ""
 
 #: app/templates/list.html:354
 msgid "Chained List Builder"
-msgstr ""
+msgstr "Construtor de Listas Sequenciais"
 
 #: app/templates/list.html:357
 msgid "Import Picture"
@@ -1381,7 +1382,7 @@ msgstr ""
 
 #: app/templates/reset_password_form.html:5
 msgid "Reset Your Password"
-msgstr ""
+msgstr "Redefinir a sua palavra-passe"
 
 #: app/templates/emails/confirm_email.html:1
 #: app/templates/emails/reset_password.html:1

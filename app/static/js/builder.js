@@ -10,6 +10,7 @@ import { TreePdfExporter } from './services/TreePdfExporter.js';
 export class TreeBuilder {
     constructor() {
         this.imageSearch = document.getElementById('image-search');
+        this.imageSearchMode = document.getElementById('image-search-mode');
         this.treeDisplay = document.getElementById('tree-display');
         this.leftSidebar = document.querySelector('.col-md-2.sidebar');
         this.rightSidebar = document.querySelector('.col-md-3.sidebar');
@@ -172,6 +173,9 @@ export class TreeBuilder {
 
         if (this.imageSearch) {
             this.imageSearch.addEventListener('input', () => this.filterImages());
+        }
+        if (this.imageSearchMode) {
+            this.imageSearchMode.addEventListener('change', () => this.filterImages());
         }
 
         const deleteBtn = document.getElementById('delete-btn');
@@ -809,7 +813,8 @@ export class TreeBuilder {
     filterImages() {
         if (!this.imageSearch) return;
         const searchTerm = this.imageSearch.value;
-        this.imageTree.filter(searchTerm);
+        const mode = this.imageSearchMode ? this.imageSearchMode.value : 'smart';
+        this.imageTree.filter(searchTerm, mode);
     }
 
     filterTrees() {

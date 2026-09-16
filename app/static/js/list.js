@@ -35,6 +35,7 @@ class ListBuilder {
 
         // Panneau Droit - Recherche d'images locales
         this.imageSearchInput = document.getElementById('image-search');
+        this.imageSearchMode = document.getElementById('image-search-mode');
         this.imageTree = new ImageTree('image-sidebar-tree');
 
         // Panneau Droit - Recherche ARASAAC
@@ -72,6 +73,7 @@ class ListBuilder {
 
         // Panneau Droit - Filtre d'images locales
         this.imageSearchInput?.addEventListener('input', () => this.filterImages());
+        this.imageSearchMode?.addEventListener('change', () => this.filterImages());
     }
 
     handleSourceDragStart(e, payload) {
@@ -82,7 +84,12 @@ class ListBuilder {
 
     filterImages() {
         const searchTerm = this.imageSearchInput?.value || '';
-        this.imageTree.filter(searchTerm);
+        const mode = this.imageSearchMode?.value || 'smart';
+        if (!mode || mode === 'smart') {
+            this.imageTree.filter(searchTerm);
+        } else {
+            this.imageTree.filter(searchTerm, mode);
+        }
     }
 
     // --- Sauvegarde et Chargement des Listes (Panneau Gauche) ---
