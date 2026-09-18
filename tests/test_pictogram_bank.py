@@ -384,3 +384,121 @@ def test_serve_pictogram_and_thumbnail_by_id(client, app):
     # Should get prohibit-bold.png (served from static/images)
     assert res_hacker.status_code == 200
     assert res_hacker.mimetype == 'image/png'
+
+
+def test_replace_image_file_success_and_preserves_id(client, app):
+    """Test that replacing an image file preserves its ID while updating hash, date, and thumbnail."""
+    user = create_user(client, 'testuser_replace_img', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_replace_img', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    # 1. Initial Upload
+    upload_res = client.post('/api/image/upload', data={
+        'folder_id': root_folder.id,
+        'file': (create_test_image_io(), 'initial_picto.jpg'),
+        'description': 'Initial Picto'
+    }, content_type='multipart/form-data')
+    assert upload_res.status_code == 200
+    img_data = upload_res.get_json()['image']
+    orig_id = img_data['id']
+    orig_hash = img_data['image_hash']
+
+    # 2. Replace with a distinct image (different size/color)
+    new_img = PILImage.new('RGB', (40, 40), color='blue')
+    new_io = BytesIO()
+    new_img.save(new_io, 'PNG')
+    new_io.seek(0)
+
+    replace_res = client.post(f'/api/image/{orig_id}/replace', data={
+        'file': (new_io, 'replaced_picto.png')
+    }, content_type='multipart/form-data')
+    assert replace_res.status_code == 200
+    replaced_data = replace_res.get_json()['image']
+
+    # Must preserve the exact same ID
+    assert replaced_data['id'] == orig_id
+    assert replaced_data['name'] == 'replaced_picto.png'
+    assert replaced_data['image_hash'] != orig_hash
+
+    # Verify serving by ID returns the new image (PNG)
+    serve_res = client.get(f'/pictograms/{orig_id}')
+    assert serve_res.status_code == 200
+    assert serve_res.mimetype == 'image/png'
+
+
+def test_replace_image_file_unauthorized(client, app):
+    """Test that a user cannot replace another user's image."""
+    victim = create_user(client, 'victim_replace', 'Password123', 'victim_replace@test.com')
+    confirm_user(client, victim.email)
+    login(client, 'victim_replace', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=victim.id, parent_id=None).first()
+
+    upload_res = client.post('/api/image/upload', data={
+        'folder_id': root_folder.id,
+        'file': (create_test_image_io(), 'victim_picto.jpg')
+    }, content_type='multipart/form-data')
+    img_id = upload_res.get_json()['image']['id']
+
+    # Switch to attacker
+    client.get('/logout', follow_redirects=True)
+    attacker = create_user(client, 'attacker_replace', 'Password123', 'attacker_replace@test.com')
+    confirm_user(client, attacker.email)
+    login(client, 'attacker_replace', 'Password123')
+
+    attacker_res = client.post(f'/api/image/{img_id}/replace', data={
+        'file': (create_test_image_io(), 'hacked.jpg')
+    }, content_type='multipart/form-data')
+    assert attacker_res.status_code == 403
+
+
+def test_get_image_usage(client, app):
+    """Test the /api/image/<id>/usage endpoint properly identifies trees containing the image."""
+    user = create_user(client, 'testuser_img_usage', 'Password123')
+    confirm_user(client, user.email)
+    login(client, 'testuser_img_usage', 'Password123')
+    root_folder = Folder.query.filter_by(user_id=user.id, parent_id=None).first()
+
+    # Upload an image
+    upload_res = client.post('/api/image/upload', data={
+        'folder_id': root_folder.id,
+        'file': (create_test_image_io(), 'usage_picto.jpg')
+    }, content_type='multipart/form-data')
+    img_id = upload_res.get_json()['image']['id']
+
+    # Initially not used in any tree
+    usage_res1 = client.get(f'/api/image/{img_id}/usage')
+    assert usage_res1.status_code == 200
+    assert usage_res1.get_json()['count'] == 0
+
+    # Save a tree containing this image ID
+    client.post('/api/tree/save', json={
+        'name': 'Tree With Image',
+        'root_id': 'root',
+        'json_data': {
+            'id': 'root',
+            'children': [
+                {'id': img_id, 'name': 'Picto Node'}
+            ]
+        }
+    })
+
+    # Save another tree without this image
+    client.post('/api/tree/save', json={
+        'name': 'Tree Without Image',
+        'root_id': 'root',
+        'json_data': {
+            'id': 'root',
+            'children': [
+                {'id': 99999, 'name': 'Other Node'}
+            ]
+        }
+    })
+
+    # Check usage again
+    usage_res2 = client.get(f'/api/image/{img_id}/usage')
+    assert usage_res2.status_code == 200
+    usage_data = usage_res2.get_json()
+    assert usage_data['count'] == 1
+    assert usage_data['trees'][0]['name'] == 'Tree With Image'
+

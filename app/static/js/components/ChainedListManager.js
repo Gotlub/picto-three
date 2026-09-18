@@ -323,17 +323,21 @@ export class ChainedListManager {
 
             if (dragData) {
                 if (dragData.type === 'tree-branch' && Array.isArray(dragData.data)) {
+                    let insertIndex = newIndex;
                     dragData.data.forEach(itemData => {
+                        const rawId = itemData.id;
+                        const validId = (rawId !== undefined && rawId !== 'root' && !isNaN(Number(rawId)))
+                            ? Number(rawId)
+                            : -1;
                         const newItemData = {
-                            image_id: itemData.id,
-                            name: itemData.name,
-                            path: itemData.path,
+                            image_id: validId,
+                            name: itemData.name || '',
+                            path: itemData.path || '',
                             description: itemData.description || ''
                         };
-                        if (!itemData.isRoot && newItemData.name !== 'Root') {
-                            const newListItem = new ChainedListItem(newItemData, this);
-                            this.items.splice(newIndex + 1, 0, newListItem);
-                        }
+                        const newListItem = new ChainedListItem(newItemData, this);
+                        this.items.splice(insertIndex, 0, newListItem);
+                        insertIndex++;
                     });
                 } else if (dragData.type === 'image-tree-node' || dragData.type === 'tree-node') {
                     const sourceData = dragData.data;
@@ -413,6 +417,10 @@ export class ChainedListManager {
 
             if (imageUrl && imageUrl.startsWith('http')) {
                 imageId = -1;
+            } else if (imageId === 'root' || isNaN(Number(imageId)) || Number(imageId) < 0) {
+                imageId = -1;
+            } else {
+                imageId = Number(imageId);
             }
 
             return {

@@ -51,6 +51,13 @@
                     data-folder-title="{{ _('Edit Selected Folder') }}">
                     {{ _('Edit Selected Image') }}
                 </h4>
+
+                <!-- Image preview thumbnail and usage container -->
+                <div id="edit-image-preview-container" class="text-center mb-3 p-2 border rounded bg-light" style="display: none;">
+                    <img id="edit-image-preview" src="" alt="{{ _('Selected Image Preview') }}" class="img-fluid rounded" style="max-height: 120px; object-fit: contain;">
+                    <div id="edit-image-usage" class="mt-2 text-muted small"></div>
+                </div>
+
                 <div id="edit-description-container" class="mb-3">
                     <label for="edit-image-description" class="form-label">{{ _('Description') }}</label>
                     <input type="text" id="edit-image-description" class="form-control">
@@ -64,6 +71,22 @@
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <button id="save-image-changes-btn" class="btn btn-success">{{ _('Save Changes') }}</button>
                     <button id="bank-delete-btn" class="btn btn-danger ms-auto">{{ _('Delete') }}</button>
+                </div>
+
+                <!-- Replace Image File Section -->
+                <div id="replace-image-container" class="mt-4 pt-3 border-top" style="display: none;">
+                    <h5>{{ _('Replace Image File') }}</h5>
+                    <p class="text-muted small mb-2">{{ _('Replaces this file while keeping its ID. All trees and lists using this image will automatically be updated.') }}</p>
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="file" id="replace-image-file" class="d-none" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp">
+                            <label for="replace-image-file" class="btn btn-outline-secondary btn-sm">{{ _('Choose New File') }}</label>
+                            <span class="form-control form-control-sm text-truncate" id="replace-file-chosen">{{ _('No file chosen') }}</span>
+                        </div>
+                    </div>
+                    <button id="replace-image-btn" class="btn btn-warning btn-sm w-100" disabled>
+                        <i class="bi bi-arrow-repeat"></i> {{ _('Replace Selected Image') }}
+                    </button>
                 </div>
             </div>
             <hr>

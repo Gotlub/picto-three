@@ -147,6 +147,26 @@ class PictogramBank {
         });
         document.getElementById('save-image-changes-btn').addEventListener('click', () => this.saveImageChanges());
 
+        const replaceFileInput = document.getElementById('replace-image-file');
+        if (replaceFileInput) {
+            replaceFileInput.addEventListener('change', (e) => {
+                const replaceFileChosen = document.getElementById('replace-file-chosen');
+                const replaceBtn = document.getElementById('replace-image-btn');
+                if (e.target.files.length > 0) {
+                    if (replaceFileChosen) replaceFileChosen.textContent = e.target.files[0].name;
+                    if (replaceBtn) replaceBtn.disabled = false;
+                } else {
+                    if (replaceFileChosen) replaceFileChosen.textContent = 'No file chosen';
+                    if (replaceBtn) replaceBtn.disabled = true;
+                }
+            });
+        }
+
+        const replaceBtn = document.getElementById('replace-image-btn');
+        if (replaceBtn) {
+            replaceBtn.addEventListener('click', () => this.replaceImageFile());
+        }
+
         const refreshBtn = document.getElementById('bank-refresh-btn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => this.refresh());
@@ -175,6 +195,12 @@ class PictogramBank {
         const publicContainer = document.getElementById('edit-public-container');
         const saveChangesBtn = document.getElementById('save-image-changes-btn');
         const sectionTitle = document.getElementById('edit-section-title');
+        const previewContainer = document.getElementById('edit-image-preview-container');
+        const previewImg = document.getElementById('edit-image-preview');
+        const replaceContainer = document.getElementById('replace-image-container');
+        const replaceFileInput = document.getElementById('replace-image-file');
+        const replaceFileChosen = document.getElementById('replace-file-chosen');
+        const replaceBtn = document.getElementById('replace-image-btn');
 
         if (this.selectedNode) {
             const isRoot = this.selectedNode.data.parent_id === null;
@@ -182,6 +208,8 @@ class PictogramBank {
                 // Root is a folder but cannot be edited or deleted
                 if (editSection) editSection.style.display = 'none';
                 if (exportBtn) exportBtn.disabled = true;
+                if (previewContainer) previewContainer.style.display = 'none';
+                if (replaceContainer) replaceContainer.style.display = 'none';
             } else if (this.selectedNode instanceof ImageNode) {
                 if (exportBtn) exportBtn.disabled = false;
                 if (editSection) editSection.style.display = 'block';
@@ -189,6 +217,24 @@ class PictogramBank {
                 if (publicContainer) publicContainer.style.display = 'block';
                 if (saveChangesBtn) saveChangesBtn.style.display = 'block';
                 if (sectionTitle) sectionTitle.textContent = sectionTitle.dataset.imageTitle;
+
+                const imageId = Number(this.selectedNode.data.id);
+                if (previewContainer && previewImg) {
+                    previewContainer.style.display = 'block';
+                    const timestamp = Date.now();
+                    previewImg.src = (!isNaN(imageId) && imageId >= 0)
+                        ? `/pictogramsmin/${imageId}?t=${timestamp}`
+                        : `/pictogramsmin/${this.selectedNode.data.path}?t=${timestamp}`;
+                }
+                if (replaceContainer) {
+                    replaceContainer.style.display = 'block';
+                    if (replaceFileInput) replaceFileInput.value = '';
+                    if (replaceFileChosen) replaceFileChosen.textContent = 'No file chosen';
+                    if (replaceBtn) replaceBtn.disabled = true;
+                }
+                if (!isNaN(imageId) && imageId >= 0) {
+                    this.loadImageUsage(imageId);
+                }
                 
                 const descInput = document.getElementById('edit-image-description');
                 if (descInput) descInput.value = this.selectedNode.data.description || '';
@@ -206,6 +252,8 @@ class PictogramBank {
                 if (descContainer) descContainer.style.display = 'none';
                 if (publicContainer) publicContainer.style.display = 'none';
                 if (saveChangesBtn) saveChangesBtn.style.display = 'none';
+                if (previewContainer) previewContainer.style.display = 'none';
+                if (replaceContainer) replaceContainer.style.display = 'none';
                 if (sectionTitle) sectionTitle.textContent = sectionTitle.dataset.folderTitle;
                 
                 if (deleteBtn) {
@@ -216,6 +264,8 @@ class PictogramBank {
         } else {
             if (editSection) editSection.style.display = 'none';
             if (exportBtn) exportBtn.disabled = true;
+            if (previewContainer) previewContainer.style.display = 'none';
+            if (replaceContainer) replaceContainer.style.display = 'none';
         }
     }
 
@@ -228,6 +278,10 @@ class PictogramBank {
         document.getElementById('bank-delete-btn').disabled = true;
         document.getElementById('export-image-btn').disabled = true;
         document.getElementById('edit-image-section').style.display = 'none';
+        const previewContainer = document.getElementById('edit-image-preview-container');
+        if (previewContainer) previewContainer.style.display = 'none';
+        const replaceContainer = document.getElementById('replace-image-container');
+        if (replaceContainer) replaceContainer.style.display = 'none';
     }
 
     selectRoot() {
@@ -457,6 +511,115 @@ class PictogramBank {
         } catch (e) {
             console.error('Erreur modification:', e);
             alert('La modification a échoué. Vérifiez votre connexion.');
+        }
+    }
+
+    async loadImageUsage(imageId) {
+        const usageContainer = document.getElementById('edit-image-usage');
+        if (!usageContainer) return;
+        usageContainer.textContent = '...';
+        try {
+            const response = await fetch(`/api/image/${imageId}/usage`);
+            if (!response.ok) {
+                usageContainer.textContent = '';
+                return;
+            }
+            const result = await response.json();
+            if (result.status === 'success') {
+                usageContainer.textContent = '';
+                if (result.count === 0) {
+                    usageContainer.textContent = '🌱 Non utilisé dans vos arbres';
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-secondary mb-1';
+                    badge.textContent = `🌳 Utilisé dans ${result.count} arbre(s)`;
+                    usageContainer.appendChild(badge);
+
+                    const div = document.createElement('div');
+                    div.className = 'text-truncate';
+                    div.textContent = result.trees.map(t => t.name).join(', ');
+                    usageContainer.appendChild(div);
+                }
+            }
+        } catch {
+            usageContainer.textContent = '';
+        }
+    }
+
+    async replaceImageFile() {
+        if (!this.selectedNode || !(this.selectedNode instanceof ImageNode)) {
+            alert('Veuillez sélectionner une image à remplacer.');
+            return;
+        }
+
+        const fileInput = document.getElementById('replace-image-file');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            alert('Veuillez choisir un nouveau fichier image.');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const maxBytes = (window.MAX_IMAGE_SIZE_KB || 5000) * 1024;
+        if (file.size > maxBytes) {
+            alert(`Le fichier dépasse la taille maximale autorisée (${window.MAX_IMAGE_SIZE_KB || 5000} KB).`);
+            return;
+        }
+
+        const imageId = this.selectedNode.data.id;
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+        const replaceBtn = document.getElementById('replace-image-btn');
+        if (replaceBtn) replaceBtn.disabled = true;
+
+        try {
+            const response = await fetch(`/api/image/${imageId}/replace`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Erreur serveur: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                this.selectedNode.data.path = result.image.path;
+                this.selectedNode.data.name = result.image.name;
+                this.selectedNode.data.updated_at = result.image.updated_at;
+                this.selectedNode.data.image_hash = result.image.image_hash;
+
+                // Update preview image with cache buster
+                const previewImg = document.getElementById('edit-image-preview');
+                const timestamp = Date.now();
+                if (previewImg) {
+                    previewImg.src = `/pictogramsmin/${imageId}?t=${timestamp}`;
+                }
+                // Update image in the tree element
+                const treeImg = this.selectedNode.element.querySelector('img');
+                if (treeImg) {
+                    treeImg.src = `/pictogramsmin/${imageId}?t=${timestamp}`;
+                }
+
+                // Reset file input
+                fileInput.value = '';
+                const replaceFileChosen = document.getElementById('replace-file-chosen');
+                if (replaceFileChosen) replaceFileChosen.textContent = 'No file chosen';
+
+                alert(result.message || 'Image remplacée avec succès !');
+            } else {
+                alert(`Erreur lors du remplacement : ${result.message}`);
+            }
+        } catch (e) {
+            console.error('Erreur remplacement image:', e);
+            alert(e.message || 'Le remplacement a échoué. Vérifiez votre connexion.');
+        } finally {
+            if (replaceBtn) replaceBtn.disabled = false;
         }
     }
 

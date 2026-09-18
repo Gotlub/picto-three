@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Drag & Drop of Root Node in `/list` (`ReadOnlyTreeViewer.js`, `ChainedListManager.js`)**:
+  - In `element` mode, drags only the root element itself by isolating the drag ghost via `setDragImage` on `.node-content`.
+  - In `branch` mode, prepends the root node to the branch array ahead of its descendants, falling back to the tree's name for description when blank.
+  - Transparently imports root nodes into the chained list, normalizing IDs to `-1` and using default folder iconography without payload distortion.
+  - Preserves exact sequential item order when dropping multi-node branches into the chained list.
+- **Multi-Border Printing & PDF Export (`ListPdfExporter.js`, `list.html`)**:
+  - Replaced single border switch with a 0 to 3 border count selector.
+  - Inverted concentric order: Border 1 = Inner, Border 2 = Middle, Border 3 = Outer.
+  - Outward Concentric Border Architecture: borders expand strictly outward using nested concentric wrapper `div`s with `box-sizing: content-box` and pure outward borders, eliminating `box-shadow: inset`.
+  - Strictly isolated inner image area: `innerBox` has fixed dimensions `imageSize x imageSize` with `overflow: hidden`, guaranteeing borders never encroach into, overlap, or sit under the pictogram image.
+  - Framed Box (Cartouche) text styling: positioned above the image (`z-index: 2`), opaque white background occluding the image, and strictly matching inner `imageSize` width without overlapping any borders.
+- **Save & Load Print Options with Database Table & Modal (`app/models.py`, `app/routes/api.py`, `ListPdfExporter.js`)**:
+  - Removed hardcoded default presets in favor of fully dynamic saved print options.
+  - Added "Save Print Options" button opening a Bootstrap 5 modal to enter a custom name with Cancel / Save actions.
+  - Added "Load Print Options" dropdown displaying only saved configurations.
+  - Introduced SQLAlchemy model `PrintOption` (`id`, `user_id`, `name`, `payload`, timestamps) with Alembic migration (`2686fc1c22ae_add_printoption_model.py`).
+  - Implemented REST API `/api/print_options` (GET, POST, DELETE) with user ownership checks, CSRF protection, and graceful `localStorage` offline fallback.
+  - Added full multilingual translations for all print options and dialog messages.
 - **Portuguese (`pt`) Language Support & Internationalization (i18n)**:
   - Added Portuguese (`pt`) to `config.py` (`LANGUAGES`) and language selector dropdown in `app/templates/base.html`.
   - Extracted translation catalog `messages.pot`, initialized `app/translations/pt/LC_MESSAGES/messages.po`, translated all application messages into Portuguese, and compiled all catalogs to `.mo` binaries.

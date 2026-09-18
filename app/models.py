@@ -203,3 +203,32 @@ class ProfileTree(db.Model):
 
     def __repr__(self):
         return f'<ProfileTree profile_id={self.profile_id} tree_id={self.tree_id}>'
+
+
+class PrintOption(db.Model):
+    __tablename__ = 'print_option'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    is_public = db.Column(db.Boolean, default=False, index=True)
+    payload = db.Column(db.Text, nullable=False)  # Storing print settings as JSON text
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+
+    user = db.relationship('User', backref=db.backref('print_options', lazy=True))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
+            'is_public': self.is_public,
+            'payload': self.payload,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+    def __repr__(self):
+        return f'<PrintOption {self.name}>'
+

@@ -1,4 +1,5 @@
 import { NotificationService } from './NotificationService.js';
+import { ApiClient } from './ApiClient.js';
 
 /**
  * ListPdfExporter - Service dédié au rendu d'impression et à l'export PDF de la liste de pictogrammes.
@@ -122,6 +123,344 @@ export class ListPdfExporter {
                 if (importLocalPicBtn) importLocalPicBtn.style.display = 'inline-block';
             });
         }
+
+        // Progressive Disclosure: Borders select (0 to 3)
+        const borderCountSelect = typeof document !== 'undefined' ? document.getElementById('print-border-count') : null;
+        const bordersContainer = typeof document !== 'undefined' ? document.getElementById('print-borders-container') : null;
+
+        const updateBorderVisibility = () => {
+            const count = parseInt(borderCountSelect?.value || 1, 10);
+            if (bordersContainer) {
+                bordersContainer.style.display = count === 0 ? 'none' : 'block';
+            }
+            for (let i = 1; i <= 3; i++) {
+                const settingDiv = document.getElementById(`border-settings-${i}`);
+                if (settingDiv) {
+                    settingDiv.style.display = i <= count ? 'block' : 'none';
+                }
+            }
+        };
+
+        if (borderCountSelect) {
+            borderCountSelect.addEventListener('change', () => {
+                updateBorderVisibility();
+                this.renderPreview();
+            });
+            updateBorderVisibility();
+        }
+
+        // Live input listeners for border widths and colors
+        for (let i = 1; i <= 3; i++) {
+            const widthInput = typeof document !== 'undefined' ? document.getElementById(`print-border-width-${i}`) : null;
+            const widthVal = typeof document !== 'undefined' ? document.getElementById(`print-border-width-val-${i}`) : null;
+            if (widthInput) {
+                widthInput.addEventListener('input', () => {
+                    if (widthVal) widthVal.textContent = widthInput.value + 'px';
+                    this.renderPreview();
+                });
+            }
+            if (typeof document !== 'undefined') {
+                const colorRadios = document.querySelectorAll(`input[name="print-border-color-${i}"]`);
+                colorRadios.forEach(radio => {
+                    radio.addEventListener('change', () => this.renderPreview());
+                });
+            }
+        }
+
+        // Progressive Disclosure: Text options toggle
+        const showTextSwitch = typeof document !== 'undefined' ? document.getElementById('print-show-text') : null;
+        const textOptionsContainer = typeof document !== 'undefined' ? document.getElementById('print-text-options-container') : null;
+        if (showTextSwitch && textOptionsContainer) {
+            showTextSwitch.addEventListener('change', () => {
+                textOptionsContainer.style.display = showTextSwitch.checked ? 'block' : 'none';
+                this.renderPreview();
+            });
+        }
+
+        const textBoxSwitch = typeof document !== 'undefined' ? document.getElementById('print-text-box') : null;
+        if (textBoxSwitch) {
+            textBoxSwitch.addEventListener('change', () => this.renderPreview());
+        }
+
+        this.initPresets();
+    }
+
+    initPresets() {
+        if (typeof document === 'undefined') return;
+
+        const presetSelect = document.getElementById('print-preset-select');
+        const btnOpenSaveModal = document.getElementById('btn-open-save-print-options');
+        const btnConfirmSave = document.getElementById('btn-confirm-save-print-option');
+        const btnDeletePreset = document.getElementById('btn-delete-preset');
+
+        if (!presetSelect) return;
+
+        this.loadSavedPrintOptions();
+
+        presetSelect.addEventListener('change', () => {
+            const presetKey = presetSelect.value;
+            if (presetKey) {
+                this.applyPreset(presetKey);
+                this.renderPreview();
+            }
+        });
+
+        btnOpenSaveModal?.addEventListener('click', () => {
+            const modalEl = document.getElementById('savePrintOptionModal');
+            const nameInput = document.getElementById('print-option-name');
+            if (nameInput) nameInput.value = '';
+            if (modalEl && typeof window !== 'undefined' && window.bootstrap?.Modal) {
+                const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            }
+        });
+
+        btnConfirmSave?.addEventListener('click', () => {
+            const nameInput = document.getElementById('print-option-name');
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) {
+                NotificationService.alert(window.translations?.enterOptionName || 'Please enter a name for the print options.');
+                return;
+            }
+
+            const currentSettings = this.readSettings();
+            currentSettings.name = name;
+
+            const saveLocal = (key, data) => {
+                const custom = this.getCustomPresets();
+                custom[key] = data;
+                try {
+                    localStorage.setItem('picto_print_presets', JSON.stringify(custom));
+                } catch (e) {
+                    console.warn('Could not save to localStorage', e);
+                }
+            };
+
+            const closeModal = () => {
+                const modalEl = document.getElementById('savePrintOptionModal');
+                if (modalEl && typeof window !== 'undefined' && window.bootstrap?.Modal) {
+                    const modal = window.bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+            };
+
+            const userMeta = document.getElementById('current-user-meta');
+            const userId = userMeta && userMeta.dataset.userId ? userMeta.dataset.userId : null;
+
+            if (userId) {
+                ApiClient.post('/api/print_options', { name, payload: currentSettings })
+                    .then((resp) => {
+                        const savedOpt = resp.print_option;
+                        const key = 'api_' + savedOpt.id;
+                        saveLocal(key, { ...currentSettings, id: savedOpt.id, apiId: savedOpt.id });
+                        this.populatePresetDropdown(key);
+                        closeModal();
+                        NotificationService.alert(window.translations?.presetSaved || `Print options "${name}" saved successfully!`);
+                    })
+                    .catch((err) => {
+                        console.warn('API save failed, falling back to local:', err);
+                        const key = 'custom_' + Date.now();
+                        saveLocal(key, currentSettings);
+                        this.populatePresetDropdown(key);
+                        closeModal();
+                        NotificationService.alert(window.translations?.presetSaved || `Print options "${name}" saved successfully!`);
+                    });
+            } else {
+                const key = 'custom_' + Date.now();
+                saveLocal(key, currentSettings);
+                this.populatePresetDropdown(key);
+                closeModal();
+                NotificationService.alert(window.translations?.presetSaved || `Print options "${name}" saved successfully!`);
+            }
+        });
+
+        btnDeletePreset?.addEventListener('click', () => {
+            const presetKey = presetSelect.value;
+            if (!presetKey) {
+                return;
+            }
+            if (!NotificationService.confirm(window.translations?.confirmDeletePreset || 'Delete this print option?')) {
+                return;
+            }
+
+            const customPresets = this.getCustomPresets();
+            const item = customPresets[presetKey];
+            const apiId = item?.apiId || (presetKey.startsWith('api_') ? presetKey.replace('api_', '') : null);
+
+            delete customPresets[presetKey];
+            try {
+                localStorage.setItem('picto_print_presets', JSON.stringify(customPresets));
+            } catch (e) {
+                console.warn('Could not update localStorage', e);
+            }
+
+            if (apiId) {
+                ApiClient.delete(`/api/print_options/${apiId}`).catch((err) => {
+                    console.warn('Could not delete print option on server', err);
+                });
+            }
+
+            this.populatePresetDropdown('');
+            this.renderPreview();
+        });
+    }
+
+    async loadSavedPrintOptions() {
+        if (typeof document === 'undefined') return;
+        const userMeta = document.getElementById('current-user-meta');
+        const userId = userMeta && userMeta.dataset.userId ? userMeta.dataset.userId : null;
+        if (userId) {
+            try {
+                const resp = await ApiClient.get('/api/print_options');
+                if (resp && Array.isArray(resp.print_options)) {
+                    const custom = this.getCustomPresets();
+                    resp.print_options.forEach((opt) => {
+                        const key = 'api_' + opt.id;
+                        let payloadData;
+                        try {
+                            payloadData = typeof opt.payload === 'string' ? JSON.parse(opt.payload) : opt.payload;
+                        } catch {
+                            payloadData = {};
+                        }
+                        custom[key] = {
+                            ...payloadData,
+                            name: opt.name,
+                            id: opt.id,
+                            apiId: opt.id
+                        };
+                    });
+                    try {
+                        localStorage.setItem('picto_print_presets', JSON.stringify(custom));
+                    } catch (e) {
+                        console.warn('Could not cache options in localStorage', e);
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not load remote print options:', err);
+            }
+        }
+        this.populatePresetDropdown('');
+    }
+
+    getDefaultPresets() {
+        return {};
+    }
+
+    getCustomPresets() {
+        if (typeof localStorage === 'undefined') return {};
+        try {
+            const raw = localStorage.getItem('picto_print_presets');
+            return raw ? JSON.parse(raw) : {};
+        } catch {
+            return {};
+        }
+    }
+
+    populatePresetDropdown(selectedKey = '') {
+        const presetSelect = document.getElementById('print-preset-select');
+        if (!presetSelect) return;
+        const currentVal = selectedKey !== null ? selectedKey : (presetSelect.value || '');
+        presetSelect.innerHTML = '';
+
+        const placeholderOpt = document.createElement('option');
+        placeholderOpt.value = '';
+        placeholderOpt.textContent = window.translations?.selectPrintOption || '-- Load print options --';
+        presetSelect.appendChild(placeholderOpt);
+
+        const customPresets = this.getCustomPresets();
+        const customKeys = Object.keys(customPresets);
+        for (const key of customKeys) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = customPresets[key].name || key;
+            presetSelect.appendChild(opt);
+        }
+
+        presetSelect.value = currentVal;
+    }
+
+    applyPreset(presetKey) {
+        const custom = this.getCustomPresets();
+        const preset = custom[presetKey];
+        if (!preset) return;
+
+        const orientRadio = document.querySelector(`input[name="print-orientation"][value="${preset.orientation}"]`);
+        if (orientRadio) orientRadio.checked = true;
+
+        if (this.printImageSize && preset.imageSize) {
+            this.printImageSize.value = preset.imageSize;
+            if (this.printSizePx) this.printSizePx.textContent = preset.imageSize;
+            if (this.printSizeCm) this.printSizeCm.textContent = (preset.imageSize / 37.8).toFixed(1);
+        }
+
+        const borderCountSelect = document.getElementById('print-border-count');
+        const bordersContainer = document.getElementById('print-borders-container');
+        const borderCount = preset.borderCount !== undefined ? preset.borderCount : (preset.showBorders === false ? 0 : 1);
+        if (borderCountSelect) {
+            borderCountSelect.value = String(borderCount);
+            if (bordersContainer) bordersContainer.style.display = borderCount === 0 ? 'none' : 'block';
+            for (let i = 1; i <= 3; i++) {
+                const settingDiv = document.getElementById(`border-settings-${i}`);
+                if (settingDiv) settingDiv.style.display = i <= borderCount ? 'block' : 'none';
+            }
+        }
+
+        if (Array.isArray(preset.borders)) {
+            preset.borders.forEach((b, idx) => {
+                const i = idx + 1;
+                const widthInput = document.getElementById(`print-border-width-${i}`);
+                const widthVal = document.getElementById(`print-border-width-val-${i}`);
+                if (widthInput && b.width !== undefined) {
+                    widthInput.value = b.width;
+                    if (widthVal) widthVal.textContent = b.width + 'px';
+                }
+                if (b.color) {
+                    const colorRadio = document.querySelector(`input[name="print-border-color-${i}"][value="${b.color}"]`);
+                    if (colorRadio) colorRadio.checked = true;
+                }
+            });
+        } else if (preset.borderWidth !== undefined) {
+            const widthInput = document.getElementById('print-border-width-1');
+            const widthVal = document.getElementById('print-border-width-val-1');
+            if (widthInput) {
+                widthInput.value = preset.borderWidth;
+                if (widthVal) widthVal.textContent = preset.borderWidth + 'px';
+            }
+            if (preset.borderColor) {
+                const colorRadio = document.querySelector(`input[name="print-border-color-1"][value="${preset.borderColor}"]`);
+                if (colorRadio) colorRadio.checked = true;
+            }
+        }
+
+        const showTextSwitch = document.getElementById('print-show-text');
+        const textOptionsContainer = document.getElementById('print-text-options-container');
+        if (showTextSwitch) {
+            showTextSwitch.checked = preset.showText ?? true;
+            if (textOptionsContainer) textOptionsContainer.style.display = showTextSwitch.checked ? 'block' : 'none';
+        }
+        const textBoxSwitch = document.getElementById('print-text-box');
+        if (textBoxSwitch) {
+            textBoxSwitch.checked = !!preset.textBox;
+        }
+        const textPosSelect = document.getElementById('print-text-position');
+        if (textPosSelect && preset.textPosition) textPosSelect.value = preset.textPosition;
+        const textPlacementSelect = document.getElementById('print-text-placement');
+        if (textPlacementSelect && preset.textPlacement) textPlacementSelect.value = preset.textPlacement;
+        const textSizeInput = document.getElementById('print-text-size');
+        if (textSizeInput && preset.textSize) textSizeInput.value = preset.textSize;
+
+        const modeRadio = document.querySelector(`input[name="print-mode"][value="${preset.mode}"]`);
+        if (modeRadio) modeRadio.checked = true;
+        const gridMultiplierInput = document.getElementById('print-grid-multiplier');
+        if (gridMultiplierInput && preset.gridMultiplier) gridMultiplierInput.value = preset.gridMultiplier;
+
+        const chainDirRadio = document.querySelector(`input[name="print-chain-direction"][value="${preset.chainDirection}"]`);
+        if (chainDirRadio) chainDirRadio.checked = true;
+
+        const marginXInput = document.getElementById('print-margin-x');
+        if (marginXInput && preset.marginX !== undefined) marginXInput.value = preset.marginX;
+        const marginYInput = document.getElementById('print-margin-y');
+        if (marginYInput && preset.marginY !== undefined) marginYInput.value = preset.marginY;
     }
 
     changeZoom(delta) {
@@ -143,14 +482,20 @@ export class ListPdfExporter {
             return {
                 orientation: 'portrait',
                 imageSize: 100,
-                borderWidth: 1,
+                showBorders: true,
+                borderCount: 1,
+                borders: [{ width: 2, color: '#000000' }],
+                effectiveBorderWidth: 2,
+                borderWidth: 2,
                 borderColor: '#000000',
                 showText: true,
+                textBox: false,
                 textPosition: 'bottom',
                 textPlacement: 'outside',
                 textSize: 14,
                 mode: 'grid',
                 gridMultiplier: 1,
+                chainDirection: 'horizontal',
                 marginX: 10,
                 marginY: 10
             };
@@ -159,10 +504,29 @@ export class ListPdfExporter {
         const orientRadios = document.querySelector('input[name="print-orientation"]:checked');
         const orientation = orientRadios ? orientRadios.value : 'portrait';
         const imageSize = parseInt(this.printImageSize?.value || 100, 10);
-        const borderWidth = parseInt(this.printBorderWidth?.value || 1, 10);
-        const colorRadios = document.querySelector('input[name="print-border-color"]:checked');
-        const borderColor = colorRadios ? colorRadios.value : '#000000';
+
+        const borderCount = parseInt(document.getElementById('print-border-count')?.value || 1, 10);
+        const showBorders = borderCount > 0;
+
+        const borders = [];
+        for (let i = 1; i <= 3; i++) {
+            const w = parseInt(document.getElementById(`print-border-width-${i}`)?.value || 2, 10);
+            const cRadio = document.querySelector(`input[name="print-border-color-${i}"]:checked`);
+            const c = cRadio ? cRadio.value : (i === 2 ? '#FFFFFF' : '#000000');
+            if (i <= borderCount) {
+                borders.push({ width: w, color: c });
+            }
+        }
+
+        const effectiveBorderWidth = showBorders
+            ? borders.reduce((acc, b) => acc + b.width, 0)
+            : 0;
+
+        const borderWidth = borders[0]?.width || 1;
+        const borderColor = borders[0]?.color || '#000000';
+
         const showText = document.getElementById('print-show-text')?.checked ?? true;
+        const textBox = document.getElementById('print-text-box')?.checked ?? false;
         const textPosition = document.getElementById('print-text-position')?.value || 'bottom';
         const textPlacement = document.getElementById('print-text-placement')?.value || 'outside';
         const textSizeInput = parseInt(document.getElementById('print-text-size')?.value, 10);
@@ -173,6 +537,9 @@ export class ListPdfExporter {
 
         const gridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value, 10) || 1;
 
+        const chainDirRadios = document.querySelector('input[name="print-chain-direction"]:checked');
+        const chainDirection = chainDirRadios ? chainDirRadios.value : 'horizontal';
+
         const rawMarginX = parseInt(document.getElementById('print-margin-x')?.value, 10);
         const marginX = isNaN(rawMarginX) ? 10 : rawMarginX;
 
@@ -182,14 +549,20 @@ export class ListPdfExporter {
         return {
             orientation,
             imageSize,
+            effectiveBorderWidth,
+            showBorders,
+            borderCount,
+            borders,
             borderWidth,
             borderColor,
             showText,
+            textBox,
             textPosition,
             textPlacement,
             textSize,
             mode,
             gridMultiplier,
+            chainDirection,
             marginX,
             marginY
         };
@@ -199,14 +572,20 @@ export class ListPdfExporter {
         const {
             orientation,
             imageSize,
-            borderWidth,
+            effectiveBorderWidth: rawEffectiveBorder,
+            borderWidth = 1,
+            showBorders = true,
+            borderCount = 1,
+            borders = [],
+            textBox = false,
+            chainDirection = 'horizontal',
             showText,
             textPlacement,
             textSize,
             mode,
-            gridMultiplier,
-            marginX,
-            marginY
+            gridMultiplier = 1,
+            marginX = 10,
+            marginY = 10
         } = settings;
 
         let itemsToRender = [];
@@ -229,9 +608,17 @@ export class ListPdfExporter {
         const availWidth = pageWidth - 2 * pagePadding;
         const availHeight = pageHeight - 2 * pagePadding;
 
+        let effectiveBorderWidth;
+        if (rawEffectiveBorder !== undefined) {
+            effectiveBorderWidth = rawEffectiveBorder;
+        } else if (borders && borders.length > 0) {
+            effectiveBorderWidth = showBorders ? borders.reduce((acc, b) => acc + b.width, 0) : 0;
+        } else {
+            effectiveBorderWidth = showBorders ? borderWidth : 0;
+        }
         const textHeight = showText ? (textSize + 10) : 0;
-        let itemTotalW = imageSize + 2 * borderWidth;
-        let itemTotalH = imageSize + 2 * borderWidth;
+        let itemTotalW = imageSize + 2 * effectiveBorderWidth;
+        let itemTotalH = imageSize + 2 * effectiveBorderWidth;
 
         if (textPlacement === 'outside') {
             itemTotalH += textHeight;
@@ -247,9 +634,14 @@ export class ListPdfExporter {
         }
 
         let cols, rows;
-        if (mode === 'chain' && orientation === 'portrait') {
-            rows = Math.max(1, Math.floor(availHeight / itemTotalH));
-            cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+        if (mode === 'chain') {
+            if (chainDirection === 'vertical') {
+                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+            } else {
+                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+            }
         } else {
             cols = Math.max(1, Math.floor(availWidth / itemTotalW));
             rows = Math.max(1, Math.floor(availHeight / itemTotalH));
@@ -266,7 +658,13 @@ export class ListPdfExporter {
             itemsPerPage,
             itemTotalW,
             itemTotalH,
-            textHeight
+            textHeight,
+            effectiveBorderWidth,
+            showBorders,
+            borderCount,
+            borders,
+            textBox,
+            chainDirection
         };
     }
 
@@ -302,19 +700,22 @@ export class ListPdfExporter {
         const {
             itemsToRender,
             pagePadding,
-            itemsPerPage
+            itemsPerPage,
+            effectiveBorderWidth
         } = layout;
 
         const {
             orientation,
             imageSize,
-            borderWidth,
-            borderColor,
+            showBorders,
+            borders = [],
             showText,
+            textBox,
             textPosition,
             textPlacement,
             textSize,
             mode,
+            chainDirection,
             marginX,
             marginY
         } = settings;
@@ -337,8 +738,10 @@ export class ListPdfExporter {
             } else {
                 contentDiv.style.columnGap = `${marginX}px`;
                 contentDiv.style.rowGap = `${marginY}px`;
-                if (orientation === 'portrait') {
+                if (chainDirection === 'vertical') {
                     contentDiv.style.flexDirection = 'column';
+                } else {
+                    contentDiv.style.flexDirection = 'row';
                 }
             }
 
@@ -348,24 +751,49 @@ export class ListPdfExporter {
                 itemContainer.style.display = 'flex';
                 itemContainer.style.flexDirection = 'column';
                 itemContainer.style.alignItems = 'center';
-                itemContainer.style.width = `${imageSize + 2 * borderWidth}px`;
+                itemContainer.style.width = `${imageSize + 2 * effectiveBorderWidth}px`;
 
-                const imgContainer = document.createElement('div');
-                imgContainer.style.border = `${borderWidth}px solid ${borderColor}`;
-                imgContainer.style.width = `${imageSize + 2 * borderWidth}px`;
-                imgContainer.style.height = `${imageSize + 2 * borderWidth}px`;
-                imgContainer.style.display = 'flex';
-                imgContainer.style.justifyContent = 'center';
-                imgContainer.style.alignItems = 'center';
-                imgContainer.style.backgroundColor = 'white';
-                imgContainer.style.overflow = 'hidden';
-                imgContainer.style.position = 'relative';
+                // Fixed inner box strictly sized to imageSize x imageSize.
+                // Ensures image area never shrinks, and borders never encroach inside or sit under/over the image.
+                const innerBox = document.createElement('div');
+                innerBox.style.width = `${imageSize}px`;
+                innerBox.style.height = `${imageSize}px`;
+                innerBox.style.display = 'flex';
+                innerBox.style.justifyContent = 'center';
+                innerBox.style.alignItems = 'center';
+                innerBox.style.backgroundColor = '#ffffff';
+                innerBox.style.position = 'relative';
+                innerBox.style.overflow = 'hidden';
+                innerBox.style.flexShrink = '0';
+                innerBox.style.boxSizing = 'border-box';
 
                 const img = document.createElement('img');
                 img.src = this.resolveImageUrl(item);
                 img.style.maxWidth = '100%';
                 img.style.maxHeight = '100%';
                 img.style.objectFit = 'contain';
+                img.style.position = 'relative';
+                img.style.zIndex = '1';
+                innerBox.appendChild(img);
+
+                // Multi-borders styling (Border 1: Inner, Border 2: Middle, Border 3: Outer)
+                // Wrap outward: Border 1 directly wraps innerBox, Border 2 wraps Border 1, Border 3 wraps Border 2.
+                let borderWrapper = innerBox;
+                if (showBorders && effectiveBorderWidth > 0 && borders && borders.length > 0) {
+                    for (let bIndex = 0; bIndex < borders.length; bIndex++) {
+                        const b = borders[bIndex];
+                        if (!b || b.width <= 0) continue;
+                        const bWrap = document.createElement('div');
+                        bWrap.style.display = 'flex';
+                        bWrap.style.justifyContent = 'center';
+                        bWrap.style.alignItems = 'center';
+                        bWrap.style.border = `${b.width}px solid ${b.color}`;
+                        bWrap.style.boxSizing = 'content-box';
+                        bWrap.style.flexShrink = '0';
+                        bWrap.appendChild(borderWrapper);
+                        borderWrapper = bWrap;
+                    }
+                }
 
                 const textSpan = document.createElement('span');
                 textSpan.textContent = itemData.description || itemData.name || '';
@@ -379,13 +807,25 @@ export class ListPdfExporter {
                 textSpan.style.display = 'block';
                 textSpan.style.height = `${textSize + 10}px`;
                 textSpan.style.lineHeight = `${textSize + 6}px`;
-                textSpan.style.padding = '2px';
+                textSpan.style.padding = '2px 4px';
+                textSpan.style.boxSizing = 'border-box';
+                textSpan.style.zIndex = '2';
+
+                const mainBorderColor = (borders && borders.length > 0) ? borders[0].color : '#000000';
+
+                if (textBox) {
+                    textSpan.style.backgroundColor = '#ffffff';
+                    textSpan.style.border = `1px solid ${mainBorderColor}`;
+                    textSpan.style.borderRadius = '3px';
+                } else if (textPlacement === 'inside') {
+                    textSpan.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+                }
 
                 if (textPlacement === 'inside') {
                     textSpan.style.position = 'absolute';
                     textSpan.style.left = '0';
                     textSpan.style.right = '0';
-                    textSpan.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                    textSpan.style.width = '100%';
 
                     if (textPosition === 'top') {
                         textSpan.style.top = '0';
@@ -393,20 +833,19 @@ export class ListPdfExporter {
                         textSpan.style.bottom = '0';
                     }
 
-                    imgContainer.appendChild(img);
-                    if (showText) imgContainer.appendChild(textSpan);
-                    itemContainer.appendChild(imgContainer);
+                    if (showText) innerBox.appendChild(textSpan);
+                    itemContainer.appendChild(borderWrapper);
                 } else {
-                    imgContainer.appendChild(img);
-
-                    if (showText && textPosition === 'top') {
-                        itemContainer.appendChild(textSpan);
-                    }
-
-                    itemContainer.appendChild(imgContainer);
-
-                    if (showText && textPosition === 'bottom') {
-                        itemContainer.appendChild(textSpan);
+                    if (showText) {
+                        if (textPosition === 'top') {
+                            itemContainer.appendChild(textSpan);
+                            itemContainer.appendChild(borderWrapper);
+                        } else {
+                            itemContainer.appendChild(borderWrapper);
+                            itemContainer.appendChild(textSpan);
+                        }
+                    } else {
+                        itemContainer.appendChild(borderWrapper);
                     }
                 }
 
@@ -439,13 +878,15 @@ export class ListPdfExporter {
             const {
                 orientation,
                 imageSize,
-                borderWidth,
-                borderColor,
+                showBorders,
+                borders = [],
                 showText,
+                textBox,
                 textPosition,
                 textPlacement,
                 textSize,
-                mode
+                mode,
+                chainDirection
             } = settings;
 
             const {
@@ -456,7 +897,8 @@ export class ListPdfExporter {
                 itemsPerPage,
                 itemTotalW,
                 itemTotalH,
-                textHeight
+                textHeight,
+                effectiveBorderWidth
             } = layout;
 
             const doc = new jsPDF({
@@ -499,7 +941,7 @@ export class ListPdfExporter {
 
                 const indexOnPage = i % itemsPerPage;
                 let col, row;
-                if (mode === 'chain' && orientation === 'portrait') {
+                if (mode === 'chain' && chainDirection === 'vertical') {
                     col = Math.floor(indexOnPage / rows);
                     row = indexOnPage % rows;
                 } else {
@@ -520,11 +962,28 @@ export class ListPdfExporter {
                     imgBoxY += textHeight;
                 }
 
-                if (borderWidth > 0) {
-                    doc.setDrawColor(borderColor);
-                    doc.setLineWidth(borderWidth);
+                const totalBoxW = imageSize + 2 * effectiveBorderWidth;
+                const totalBoxH = imageSize + 2 * effectiveBorderWidth;
+
+                if (showBorders && effectiveBorderWidth > 0 && borders && borders.length > 0) {
+                    let currentOffset = 0;
+                    // Draw outer to inner concentric filled rectangles (Border 3 down to Border 1)
+                    for (let bIndex = borders.length - 1; bIndex >= 0; bIndex--) {
+                        const b = borders[bIndex];
+                        doc.setFillColor(b.color);
+                        doc.rect(
+                            imgBoxX + currentOffset,
+                            imgBoxY + currentOffset,
+                            totalBoxW - 2 * currentOffset,
+                            totalBoxH - 2 * currentOffset,
+                            'F'
+                        );
+                        currentOffset += b.width;
+                    }
+
+                    // Background behind image inside innermost border
                     doc.setFillColor('#ffffff');
-                    doc.rect(imgBoxX, imgBoxY, imageSize + 2 * borderWidth, imageSize + 2 * borderWidth, 'FD');
+                    doc.rect(imgBoxX + effectiveBorderWidth, imgBoxY + effectiveBorderWidth, imageSize, imageSize, 'F');
                 } else {
                     doc.setFillColor('#ffffff');
                     doc.rect(imgBoxX, imgBoxY, imageSize, imageSize, 'F');
@@ -538,8 +997,8 @@ export class ListPdfExporter {
                     const w = iw * scale;
                     const h = ih * scale;
 
-                    const ix = imgBoxX + borderWidth + (innerSize - w) / 2;
-                    const iy = imgBoxY + borderWidth + (innerSize - h) / 2;
+                    const ix = imgBoxX + effectiveBorderWidth + (innerSize - w) / 2;
+                    const iy = imgBoxY + effectiveBorderWidth + (innerSize - h) / 2;
 
                     doc.addImage(imgElement, 'PNG', ix, iy, w, h);
                 }
@@ -548,26 +1007,48 @@ export class ListPdfExporter {
                     const textStr = itemData.description || itemData.name || '';
                     doc.setFontSize(textSize);
                     doc.setTextColor('#000000');
+                    const mainBorderColor = (borders && borders.length > 0) ? borders[0].color : '#000000';
 
                     if (textPlacement === 'inside') {
-                        doc.setFillColor('#ffffff');
                         const rectHeight = textSize + 6;
-                        const rectY = textPosition === 'top' ? imgBoxY : imgBoxY + imageSize + 2 * borderWidth - rectHeight;
-                        doc.rect(imgBoxX + borderWidth, rectY + borderWidth, imageSize, rectHeight, 'F');
+                        const rectX = imgBoxX + effectiveBorderWidth;
+                        const rectW = imageSize;
+                        const rectY = (textPosition === 'top')
+                            ? (imgBoxY + effectiveBorderWidth)
+                            : (imgBoxY + effectiveBorderWidth + imageSize - rectHeight);
 
-                        const textX = imgBoxX + borderWidth + imageSize / 2;
-                        const textY = textPosition === 'top' ? imgBoxY + borderWidth + textSize : imgBoxY + imageSize + 2 * borderWidth - 4;
-                        const splitTextInside = doc.splitTextToSize(textStr, imageSize);
+                        doc.setFillColor('#ffffff');
+                        if (textBox) {
+                            doc.setDrawColor(mainBorderColor);
+                            doc.setLineWidth(0.5);
+                            doc.rect(rectX, rectY, rectW, rectHeight, 'FD');
+                        } else {
+                            doc.rect(rectX, rectY, rectW, rectHeight, 'F');
+                        }
+
+                        const textX = rectX + rectW / 2;
+                        const textY = rectY + textSize;
+                        const splitTextInside = doc.splitTextToSize(textStr, rectW - 4);
                         doc.text(splitTextInside[0], textX, textY, { align: 'center' });
                     } else {
-                        const textX = imgBoxX + (imageSize + 2 * borderWidth) / 2;
-                        let textY;
+                        const textX = imgBoxX + totalBoxW / 2;
+                        const rectHeight = textSize + 6;
+                        let rectY;
                         if (textPosition === 'top') {
-                            textY = y + textSize + 4;
+                            rectY = y;
                         } else {
-                            textY = imgBoxY + imageSize + 2 * borderWidth + textSize + 4;
+                            rectY = imgBoxY + totalBoxW + 2;
                         }
-                        const splitTextOutside = doc.splitTextToSize(textStr, imageSize + 2 * borderWidth);
+
+                        if (textBox) {
+                            doc.setFillColor('#ffffff');
+                            doc.setDrawColor(mainBorderColor);
+                            doc.setLineWidth(0.5);
+                            doc.roundedRect(imgBoxX, rectY, totalBoxW, rectHeight, 2, 2, 'FD');
+                        }
+
+                        const textY = rectY + textSize;
+                        const splitTextOutside = doc.splitTextToSize(textStr, totalBoxW - 4);
                         doc.text(splitTextOutside[0], textX, textY, { align: 'center' });
                     }
                 }

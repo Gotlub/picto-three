@@ -270,6 +270,7 @@ class ListBuilder {
                     option.value = tree.id;
                     option.textContent = tree.username ? `${tree.username} - ${tree.name}` : tree.name;
                     option.dataset.treeData = tree.json_data;
+                    option.dataset.treeName = tree.name || '';
                     select.appendChild(option);
                 });
                 this.treeContainer.appendChild(select);
@@ -308,7 +309,8 @@ class ListBuilder {
 
         try {
             const treeData = JSON.parse(selectedOption.dataset.treeData);
-            this.treeViewer.rebuildTreeViewer(treeData);
+            const treeName = selectedOption.dataset.treeName || (selectedOption.textContent ? selectedOption.textContent.replace(/^.* - /, '').trim() : '');
+            this.treeViewer.rebuildTreeViewer(treeData, treeName);
         } catch (e) {
             console.error('Erreur de chargement de l\'arbre:', e);
             NotificationService.alert('Données corrompues.');

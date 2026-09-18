@@ -11,7 +11,16 @@ from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
 from app import db
-from app.models import Folder, Image, PictogramList, Profile, ProfileTree, Tree, User
+from app.models import (
+    Folder,
+    Image,
+    PictogramList,
+    PrintOption,
+    Profile,
+    ProfileTree,
+    Tree,
+    User,
+)
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -141,6 +150,84 @@ def delete_list(list_id):
     db.session.commit()
 
     return jsonify({'status': 'success', 'message': _('List deleted successfully')})
+
+
+@bp.route('/print_options', methods=['GET'])
+def get_print_options():
+    current_user_id = None
+    options = []
+    if current_user.is_authenticated:
+        options = PrintOption.query.filter(
+            or_(PrintOption.user_id == current_user.id, PrintOption.is_public == True)
+        ).order_by(PrintOption.name).all()
+        current_user_id = current_user.id
+    else:
+        demo_user = User.query.filter_by(username=current_app.config.get('DEMO_USERNAME', 'demo')).first()
+        if demo_user:
+            options = PrintOption.query.filter_by(user_id=demo_user.id).order_by(PrintOption.name).all()
+    return jsonify({
+        'print_options': [opt.to_dict() for opt in options],
+        'current_user_id': current_user_id
+    })
+
+
+@bp.route('/print_options', methods=['POST'])
+@login_required
+def save_print_option():
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': _('Invalid data')}), 400
+
+    name = data.get('name')
+    is_public = data.get('is_public', False)
+    payload = data.get('payload')
+
+    if not name or payload is None:
+        return jsonify({'status': 'error', 'message': _('Missing required fields: name and payload are required.')}), 400
+
+    payload_str = json.dumps(payload) if isinstance(payload, (dict, list)) else str(payload)
+
+    existing = PrintOption.query.filter_by(user_id=current_user.id, name=name).first()
+    if existing:
+        existing.is_public = is_public
+        existing.payload = payload_str
+        message = _('Print option updated successfully')
+        saved_option = existing
+    else:
+        new_option = PrintOption(
+            user_id=current_user.id,
+            name=name,
+            is_public=is_public,
+            payload=payload_str
+        )
+        db.session.add(new_option)
+        message = _('Print option saved successfully')
+        saved_option = new_option
+
+    db.session.commit()
+    return jsonify({
+        'status': 'success',
+        'message': message,
+        'print_option': saved_option.to_dict()
+    }), 201
+
+
+@bp.route('/print_options/<int:option_id>', methods=['DELETE'])
+@login_required
+def delete_print_option(option_id):
+    opt = db.session.get(PrintOption, option_id)
+    if opt is None:
+        return jsonify({'status': 'error', 'message': _('Print option not found')}), 404
+    if opt.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    db.session.delete(opt)
+    db.session.commit()
+    return jsonify({
+        'status': 'success',
+        'message': _('Print option deleted successfully')
+    })
+
 
 @bp.route('/folder/contents', methods=['GET'])
 def get_folder_contents():
@@ -503,16 +590,158 @@ def update_image_details(image_id):
         'image': image.to_dict()
     })
 
+
+@bp.route('/image/<int:image_id>/replace', methods=['POST'])
+@login_required
+def replace_image_file(image_id):
+    """
+    Replace the physical image file of an existing image while preserving its ID.
+    Updates the file content, regenerates thumbnail, recalculates hash and updated_at.
+    """
+    image = db.session.get(Image, image_id)
+    if not image:
+        return jsonify({'status': 'error', 'message': _('Image not found')}), 404
+
+    if image.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': _('Unauthorized to edit this image')}), 403
+
+    if 'file' not in request.files:
+        return jsonify({'status': 'error', 'message': _('No file part')}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'status': 'error', 'message': _('No selected file')}), 400
+
+    allowed_mimetypes = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
+    if file.mimetype not in allowed_mimetypes:
+        return jsonify({'status': 'error', 'message': _('Format de fichier non autorisé.')}), 400
+
+    # Deep magic-byte verification
+    try:
+        pil_img = PILImage.open(file)
+        pil_img.verify()
+        file.seek(0)
+    except (OSError, SyntaxError, ValueError):
+        return jsonify({'status': 'error', 'message': _('Fichier image invalide ou potentiellement malveillant.')}), 400
+
+    base_path = Path(current_app.config['PICTOGRAMS_PATH'])
+    thumb_base = Path(current_app.config.get('PICTOGRAMS_PATH_MIN', current_app.config['PICTOGRAMS_PATH']))
+
+    old_physical_path = base_path / image.path
+    old_thumb_path = thumb_base / Path(image.path).with_suffix('.png')
+
+    filename = secure_filename(file.filename)
+    folder_path = Path(image.path).parent
+    new_relative_path = str(folder_path / filename).replace('\\', '/')
+    new_physical_path = base_path / folder_path / filename
+
+    # If physical path changed (e.g. extension changed or different filename), remove old physical files
+    if new_physical_path != old_physical_path and old_physical_path.exists():
+        try:
+            old_physical_path.unlink()
+        except OSError as e:
+            current_app.logger.warning(f"Failed to remove old image file {old_physical_path}: {e}")
+        if old_thumb_path.exists():
+            try:
+                old_thumb_path.unlink()
+            except OSError as e:
+                current_app.logger.warning(f"Failed to remove old thumbnail {old_thumb_path}: {e}")
+
+    new_physical_path.parent.mkdir(parents=True, exist_ok=True)
+    file.save(new_physical_path)
+
+    image.name = filename
+    image.path = new_relative_path
+    image.updated_at = datetime.now(UTC)
+
+    try:
+        image.image_hash = calculate_image_hash(new_physical_path, image.description)
+    except (OSError, TypeError, ValueError) as e:
+        current_app.logger.error(f"Error rehashing image on replace: {e}")
+
+    # Regenerate thumbnail
+    try:
+        create_thumbnail_for_upload(image.path)
+    except (OSError, ValueError) as e:
+        current_app.logger.error(f"Failed to recreate thumbnail for {image.path}: {e}")
+
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': _('Image replaced successfully'),
+        'image': image.to_dict()
+    })
+
+
+@bp.route('/image/<int:image_id>/usage', methods=['GET'])
+@login_required
+def get_image_usage(image_id):
+    """
+    Returns the list of user-owned trees that contain this image.
+    """
+    image = db.session.get(Image, image_id)
+    if not image:
+        return jsonify({'status': 'error', 'message': _('Image not found')}), 404
+
+    if image.user_id != current_user.id and not image.is_public:
+        return jsonify({'status': 'error', 'message': _('Unauthorized')}), 403
+
+    trees = Tree.query.filter_by(user_id=current_user.id).order_by(Tree.name).all()
+    used_in_trees = []
+
+    for tree in trees:
+        if not tree.json_data:
+            continue
+        try:
+            data = json.loads(tree.json_data)
+            ids = get_image_ids_from_tree(data)
+            if image_id in ids or tree.root_id == image_id:
+                used_in_trees.append({
+                    'id': tree.id,
+                    'name': tree.name
+                })
+        except (json.JSONDecodeError, TypeError, ValueError):
+            if f'"id": {image_id}' in tree.json_data or f'"id": "{image_id}"' in tree.json_data:
+                used_in_trees.append({
+                    'id': tree.id,
+                    'name': tree.name
+                })
+
+    return jsonify({
+        'status': 'success',
+        'image_id': image_id,
+        'count': len(used_in_trees),
+        'trees': used_in_trees
+    })
+
+
 def get_image_ids_from_tree(nodes):
     """Recursively extracts all image IDs from a tree structure."""
     image_ids = set()
+    if not isinstance(nodes, list):
+        nodes = [nodes]
     for node in nodes:
-        # The 'id' in the tree data corresponds to the image ID
-        if 'id' in node and node['id'] != -1:
-            image_ids.add(node['id'])
+        if not isinstance(node, dict):
+            continue
+        node_id = node.get('id')
+        if node_id not in (None, -1, 'root', '-1'):
+            try:
+                image_ids.add(int(node_id))
+            except (ValueError, TypeError):
+                pass
+        img_obj = node.get('image')
+        if isinstance(img_obj, dict):
+            img_id = img_obj.get('id')
+            if img_id not in (None, -1, 'root', '-1'):
+                try:
+                    image_ids.add(int(img_id))
+                except (ValueError, TypeError):
+                    pass
         if node.get('children'):
             image_ids.update(get_image_ids_from_tree(node['children']))
     return image_ids
+
 
 @bp.route('/tree/save', methods=['POST'])
 @login_required

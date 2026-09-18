@@ -468,3 +468,64 @@ def test_search_local_images_modes_and_description(client):
     assert len(res_exact.get_json()) == 1
     assert res_exact.get_json()[0]['data']['id'] == img3.id
 
+
+def test_print_options_crud(client):
+    """Test creating, listing, updating and deleting print options."""
+    # Unauthenticated GET
+    res = client.get('/api/print_options')
+    assert res.status_code == 200
+    assert 'print_options' in res.get_json()
+
+    # Unauthenticated POST -> 401 or redirect to login
+    res_unauth = client.post('/api/print_options', json={'name': 'My Preset', 'payload': {'imageSize': 120}})
+    assert res_unauth.status_code in (401, 302)
+
+    # Register and login
+    client.post(
+        '/register',
+        data={
+            'username': 'printuser',
+            'email': 'print@test.com',
+            'password': 'Password123!',
+            'password2': 'Password123!',
+            'accept_terms': 'y',
+        },
+    )
+    confirm_user(client, 'print@test.com')
+    login(client, 'printuser', 'Password123!')
+
+    # Create new print option
+    payload_dict = {
+        'imageSize': 120,
+        'borderCount': 2,
+        'borders': [{'width': 2, 'color': '#000000'}, {'width': 3, 'color': '#FFFFFF'}],
+    }
+    res_create = client.post('/api/print_options', json={'name': 'Custom Grid', 'payload': payload_dict})
+    assert res_create.status_code == 201
+    created_data = res_create.get_json()
+    assert created_data['status'] == 'success'
+    option_id = created_data['print_option']['id']
+    assert created_data['print_option']['name'] == 'Custom Grid'
+
+    # List print options
+    res_list = client.get('/api/print_options')
+    assert res_list.status_code == 200
+    options = res_list.get_json()['print_options']
+    assert any(opt['id'] == option_id and opt['name'] == 'Custom Grid' for opt in options)
+
+    # Update existing by same name
+    payload_dict['imageSize'] = 140
+    res_update = client.post('/api/print_options', json={'name': 'Custom Grid', 'payload': payload_dict})
+    assert res_update.status_code == 201
+    assert '140' in res_update.get_json()['print_option']['payload']
+
+    # Delete
+    res_del = client.delete(f'/api/print_options/{option_id}')
+    assert res_del.status_code == 200
+    assert res_del.get_json()['status'] == 'success'
+
+    # Check deleted
+    res_list2 = client.get('/api/print_options')
+    assert not any(opt['id'] == option_id for opt in res_list2.get_json()['print_options'])
+
+

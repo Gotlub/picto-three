@@ -110,59 +110,145 @@
 
                             <!-- Borders -->
                             <div class="mb-3">
-                                <label class="form-label form-label-sm fw-bold">{{ _('Borders') }}</label>
+                                <label class="form-label form-label-sm fw-bold mb-1">{{ _('Borders') }}</label>
                                 <div class="input-group input-group-sm mb-2">
-                                    <span class="input-group-text">{{ _('Thickness') }}</span>
-                                    <input type="range" class="form-range form-control" id="print-border-width" value="1" min="0" max="10" style="padding: 0.5rem;">
-                                    <span class="input-group-text" id="print-border-width-val">1px</span>
+                                    <span class="input-group-text">{{ _('Border Count') }}</span>
+                                    <select class="form-select form-select-sm" id="print-border-count">
+                                        <option value="0">0 ({{ _('None') }})</option>
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                    </select>
                                 </div>
-                                <div class="color-palette d-flex justify-content-between mt-2">
-                                    <!-- Radio buttons mapped to circles via CSS -->
-                                    <input type="radio" name="print-border-color" id="color-black" value="#000000" checked hidden>
-                                    <label for="color-black" class="color-circle" style="background-color: #000000;"></label>
-                                    
-                                    <input type="radio" name="print-border-color" id="color-yellow" value="#FFEB3B" hidden>
-                                    <label for="color-yellow" class="color-circle" style="background-color: #FFEB3B;"></label>
-                                    
-                                    <input type="radio" name="print-border-color" id="color-green" value="#4CAF50" hidden>
-                                    <label for="color-green" class="color-circle" style="background-color: #4CAF50;"></label>
-                                    
-                                    <input type="radio" name="print-border-color" id="color-orange" value="#FF9800" hidden>
-                                    <label for="color-orange" class="color-circle" style="background-color: #FF9800;"></label>
-                                    
-                                    <input type="radio" name="print-border-color" id="color-blue" value="#2196F3" hidden>
-                                    <label for="color-blue" class="color-circle" style="background-color: #2196F3;"></label>
-                                    
-                                    <input type="radio" name="print-border-color" id="color-pink" value="#E91E63" hidden>
-                                    <label for="color-pink" class="color-circle" style="background-color: #E91E63;"></label>
+                                <div id="print-borders-container">
+                                    <!-- Border 1 -->
+                                    <div id="border-settings-1" class="border p-2 rounded mb-2 bg-light">
+                                        <span class="fw-bold small d-block mb-1">{{ _('Border 1 (Inner)') }}</span>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <span class="input-group-text">{{ _('Thickness') }}</span>
+                                            <input type="range" class="form-range form-control" id="print-border-width-1" value="2" min="1" max="10" style="padding: 0.5rem;">
+                                            <span class="input-group-text" id="print-border-width-val-1">2px</span>
+                                        </div>
+                                        <div class="color-palette d-flex justify-content-between">
+                                            <input type="radio" name="print-border-color-1" id="color-1-black" value="#000000" checked hidden>
+                                            <label for="color-1-black" class="color-circle" style="background-color: #000000;" title="{{ _('Black') }}"></label>
+
+                                            <input type="radio" name="print-border-color-1" id="color-1-white" value="#FFFFFF" hidden>
+                                            <label for="color-1-white" class="color-circle" style="background-color: #FFFFFF; border: 2px solid #ccc;" title="{{ _('White') }}"></label>
+
+                                            <input type="radio" name="print-border-color-1" id="color-1-yellow" value="#FFEB3B" hidden>
+                                            <label for="color-1-yellow" class="color-circle" style="background-color: #FFEB3B;" title="{{ _('Yellow') }}"></label>
+
+                                            <input type="radio" name="print-border-color-1" id="color-1-green" value="#4CAF50" hidden>
+                                            <label for="color-1-green" class="color-circle" style="background-color: #4CAF50;" title="{{ _('Green') }}"></label>
+
+                                            <input type="radio" name="print-border-color-1" id="color-1-orange" value="#FF9800" hidden>
+                                            <label for="color-1-orange" class="color-circle" style="background-color: #FF9800;" title="{{ _('Orange') }}"></label>
+
+                                            <input type="radio" name="print-border-color-1" id="color-1-blue" value="#2196F3" hidden>
+                                            <label for="color-1-blue" class="color-circle" style="background-color: #2196F3;" title="{{ _('Blue') }}"></label>
+
+                                            <input type="radio" name="print-border-color-1" id="color-1-pink" value="#E91E63" hidden>
+                                            <label for="color-1-pink" class="color-circle" style="background-color: #E91E63;" title="{{ _('Pink') }}"></label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Border 2 -->
+                                    <div id="border-settings-2" class="border p-2 rounded mb-2 bg-light" style="display: none;">
+                                        <span class="fw-bold small d-block mb-1">{{ _('Border 2 (Middle)') }}</span>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <span class="input-group-text">{{ _('Thickness') }}</span>
+                                            <input type="range" class="form-range form-control" id="print-border-width-2" value="2" min="1" max="10" style="padding: 0.5rem;">
+                                            <span class="input-group-text" id="print-border-width-val-2">2px</span>
+                                        </div>
+                                        <div class="color-palette d-flex justify-content-between">
+                                            <input type="radio" name="print-border-color-2" id="color-2-black" value="#000000" hidden>
+                                            <label for="color-2-black" class="color-circle" style="background-color: #000000;" title="{{ _('Black') }}"></label>
+
+                                            <input type="radio" name="print-border-color-2" id="color-2-white" value="#FFFFFF" checked hidden>
+                                            <label for="color-2-white" class="color-circle" style="background-color: #FFFFFF; border: 2px solid #ccc;" title="{{ _('White') }}"></label>
+
+                                            <input type="radio" name="print-border-color-2" id="color-2-yellow" value="#FFEB3B" hidden>
+                                            <label for="color-2-yellow" class="color-circle" style="background-color: #FFEB3B;" title="{{ _('Yellow') }}"></label>
+
+                                            <input type="radio" name="print-border-color-2" id="color-2-green" value="#4CAF50" hidden>
+                                            <label for="color-2-green" class="color-circle" style="background-color: #4CAF50;" title="{{ _('Green') }}"></label>
+
+                                            <input type="radio" name="print-border-color-2" id="color-2-orange" value="#FF9800" hidden>
+                                            <label for="color-2-orange" class="color-circle" style="background-color: #FF9800;" title="{{ _('Orange') }}"></label>
+
+                                            <input type="radio" name="print-border-color-2" id="color-2-blue" value="#2196F3" hidden>
+                                            <label for="color-2-blue" class="color-circle" style="background-color: #2196F3;" title="{{ _('Blue') }}"></label>
+
+                                            <input type="radio" name="print-border-color-2" id="color-2-pink" value="#E91E63" hidden>
+                                            <label for="color-2-pink" class="color-circle" style="background-color: #E91E63;" title="{{ _('Pink') }}"></label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Border 3 -->
+                                    <div id="border-settings-3" class="border p-2 rounded mb-2 bg-light" style="display: none;">
+                                        <span class="fw-bold small d-block mb-1">{{ _('Border 3 (Outer)') }}</span>
+                                        <div class="input-group input-group-sm mb-2">
+                                            <span class="input-group-text">{{ _('Thickness') }}</span>
+                                            <input type="range" class="form-range form-control" id="print-border-width-3" value="1" min="1" max="10" style="padding: 0.5rem;">
+                                            <span class="input-group-text" id="print-border-width-val-3">1px</span>
+                                        </div>
+                                        <div class="color-palette d-flex justify-content-between">
+                                            <input type="radio" name="print-border-color-3" id="color-3-black" value="#000000" checked hidden>
+                                            <label for="color-3-black" class="color-circle" style="background-color: #000000;" title="{{ _('Black') }}"></label>
+
+                                            <input type="radio" name="print-border-color-3" id="color-3-white" value="#FFFFFF" hidden>
+                                            <label for="color-3-white" class="color-circle" style="background-color: #FFFFFF; border: 2px solid #ccc;" title="{{ _('White') }}"></label>
+
+                                            <input type="radio" name="print-border-color-3" id="color-3-yellow" value="#FFEB3B" hidden>
+                                            <label for="color-3-yellow" class="color-circle" style="background-color: #FFEB3B;" title="{{ _('Yellow') }}"></label>
+
+                                            <input type="radio" name="print-border-color-3" id="color-3-green" value="#4CAF50" hidden>
+                                            <label for="color-3-green" class="color-circle" style="background-color: #4CAF50;" title="{{ _('Green') }}"></label>
+
+                                            <input type="radio" name="print-border-color-3" id="color-3-orange" value="#FF9800" hidden>
+                                            <label for="color-3-orange" class="color-circle" style="background-color: #FF9800;" title="{{ _('Orange') }}"></label>
+
+                                            <input type="radio" name="print-border-color-3" id="color-3-blue" value="#2196F3" hidden>
+                                            <label for="color-3-blue" class="color-circle" style="background-color: #2196F3;" title="{{ _('Blue') }}"></label>
+
+                                            <input type="radio" name="print-border-color-3" id="color-3-pink" value="#E91E63" hidden>
+                                            <label for="color-3-pink" class="color-circle" style="background-color: #E91E63;" title="{{ _('Pink') }}"></label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Text -->
                             <div class="mb-3">
-                                <label class="form-label form-label-sm fw-bold">{{ _('Text') }}</label>
                                 <div class="form-check form-switch mb-1">
                                     <input class="form-check-input" type="checkbox" id="print-show-text" checked>
-                                    <label class="form-check-label form-label-sm" for="print-show-text">{{ _('Show description') }}</label>
+                                    <label class="form-check-label form-label-sm fw-bold" for="print-show-text">{{ _('Show description') }}</label>
                                 </div>
-                                <div class="input-group input-group-sm mb-1">
-                                    <span class="input-group-text">{{ _('Position') }}</span>
-                                    <select class="form-select form-select-sm" id="print-text-position">
-                                        <option value="bottom" selected>{{ _('Bottom') }}</option>
-                                        <option value="top">{{ _('Top') }}</option>
-                                    </select>
-                                </div>
-                                <div class="input-group input-group-sm mb-1">
-                                    <span class="input-group-text">{{ _('Placement') }}</span>
-                                    <select class="form-select form-select-sm" id="print-text-placement">
-                                        <option value="outside" selected>{{ _('Outside border') }}</option>
-                                        <option value="inside">{{ _('Inside border') }}</option>
-                                    </select>
-                                </div>
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">{{ _('Size') }}</span>
-                                    <input type="number" class="form-control" id="print-text-size" value="14" min="8" max="48">
-                                    <span class="input-group-text">px</span>
+                                <div id="print-text-options-container">
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" id="print-text-box">
+                                        <label class="form-check-label form-label-sm" for="print-text-box">{{ _('Framed Box (Cartouche)') }}</label>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text">{{ _('Position') }}</span>
+                                        <select class="form-select form-select-sm" id="print-text-position">
+                                            <option value="bottom" selected>{{ _('Bottom') }}</option>
+                                            <option value="top">{{ _('Top') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-1">
+                                        <span class="input-group-text">{{ _('Placement') }}</span>
+                                        <select class="form-select form-select-sm" id="print-text-placement">
+                                            <option value="outside" selected>{{ _('Outside border') }}</option>
+                                            <option value="inside">{{ _('Inside border') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">{{ _('Size') }}</span>
+                                        <input type="number" class="form-control" id="print-text-size" value="14" min="8" max="48">
+                                        <span class="input-group-text">px</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -193,6 +279,20 @@
                                     </h2>
                                     <div id="collapseChainMode" class="accordion-collapse collapse" aria-labelledby="headingChainMode" data-bs-parent="#printModesAccordion">
                                         <div class="accordion-body p-2">
+                                            <!-- Strip Direction -->
+                                            <div class="mb-2">
+                                                <label class="form-label form-label-sm fw-bold mb-1">{{ _('Strip Direction') }}</label>
+                                                <div class="btn-group w-100" role="group">
+                                                    <input type="radio" class="btn-check" name="print-chain-direction" id="print-chain-dir-horiz" value="horizontal" checked>
+                                                    <label class="btn btn-outline-secondary btn-sm py-1" for="print-chain-dir-horiz" title="{{ _('Left to right') }}">
+                                                        <i class="bi bi-arrow-right"></i> {{ _('Horizontal') }}
+                                                    </label>
+                                                    <input type="radio" class="btn-check" name="print-chain-direction" id="print-chain-dir-vert" value="vertical">
+                                                    <label class="btn btn-outline-secondary btn-sm py-1" for="print-chain-dir-vert" title="{{ _('Top to bottom') }}">
+                                                        <i class="bi bi-arrow-down"></i> {{ _('Vertical') }}
+                                                    </label>
+                                                </div>
+                                            </div>
                                             <div class="input-group input-group-sm mb-1">
                                                 <span class="input-group-text">{{ _('Horiz. Margin') }}</span>
                                                 <input type="number" class="form-control" id="print-margin-x" value="10" min="0" max="100">
@@ -205,6 +305,22 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Print Options Section (relocated to bottom) -->
+                            <div class="mb-3 p-2 bg-light rounded border">
+                                <button class="btn btn-sm btn-outline-primary w-100 mb-2 fw-semibold" id="btn-open-save-print-options" type="button">
+                                    <i class="bi bi-floppy"></i> {{ _('Save Print Options') }}
+                                </button>
+                                <label class="form-label form-label-sm fw-bold mb-1">{{ _('Load Print Options') }}</label>
+                                <div class="input-group input-group-sm mb-1">
+                                    <select class="form-select form-select-sm" id="print-preset-select">
+                                        <option value="" selected>-- {{ _('Select saved options') }} --</option>
+                                    </select>
+                                    <button class="btn btn-outline-danger" id="btn-delete-preset" type="button" title="{{ _('Delete Option') }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </div>
 
@@ -388,6 +504,29 @@
 
 
 <div id="current-user-meta" data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}" class="d-none"></div>
+
+<!-- Modal: Save Print Options -->
+<div class="modal fade" id="savePrintOptionModal" tabindex="-1" aria-labelledby="savePrintOptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="savePrintOptionModalLabel">{{ _('Save Print Options') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="print-option-name" class="form-label fw-semibold">{{ _('Option Name') }}</label>
+                    <input type="text" class="form-control" id="print-option-name" placeholder="{{ _('e.g. My Custom Strip') }}" required autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-save-print-option">{{ _('Save') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/list.js', v='1.4') }}"></script>
 {% endblock %}

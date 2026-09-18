@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-16 00:31+0200\n"
+"POT-Creation-Date: 2026-09-18 22:45+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: app/forms.py:19
 msgid "be at least 9 characters long"
@@ -133,173 +133,205 @@ msgstr "Images"
 msgid "Send"
 msgstr ""
 
-#: app/routes/api.py:62 app/routes/api.py:114 app/routes/api.py:312
-#: app/routes/api.py:522 app/routes/api.py:620 app/routes/api.py:724
+#: app/routes/api.py:71 app/routes/api.py:123 app/routes/api.py:179
+#: app/routes/api.py:399 app/routes/api.py:751 app/routes/api.py:849
+#: app/routes/api.py:953
 msgid "Invalid data"
 msgstr "Données invalides"
 
-#: app/routes/api.py:69
+#: app/routes/api.py:78
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Champs obligatoires manquants : nom de la liste et charge utile requis."
 
-#: app/routes/api.py:80 app/routes/api.py:127
+#: app/routes/api.py:89 app/routes/api.py:136
 msgid "List updated successfully"
 msgstr "Liste mise à jour avec succès"
 
-#: app/routes/api.py:91
+#: app/routes/api.py:100
 msgid "List saved successfully"
 msgstr "Liste enregistrée avec succès"
 
-#: app/routes/api.py:108 app/routes/api.py:136
+#: app/routes/api.py:117 app/routes/api.py:145
 msgid "List not found"
 msgstr "Liste non trouvée"
 
-#: app/routes/api.py:110 app/routes/api.py:138 app/routes/api.py:157
-#: app/routes/api.py:572 app/routes/api.py:673
+#: app/routes/api.py:119 app/routes/api.py:147 app/routes/api.py:222
+#: app/routes/api.py:244 app/routes/api.py:688 app/routes/api.py:801
+#: app/routes/api.py:902
 msgid "Unauthorized"
 msgstr "Non autorisé"
 
-#: app/routes/api.py:143
+#: app/routes/api.py:152
 msgid "List deleted successfully"
 msgstr "Liste supprimée avec succès"
 
-#: app/routes/api.py:149
+#: app/routes/api.py:186
+#, fuzzy
+msgid "Missing required fields: name and payload are required."
+msgstr "Champs obligatoires manquants : nom de la liste et charge utile requis."
+
+#: app/routes/api.py:194
+#, fuzzy
+msgid "Print option updated successfully"
+msgstr "Arbre mis à jour avec succès"
+
+#: app/routes/api.py:204
+#, fuzzy
+msgid "Print option saved successfully"
+msgstr "Arbre enregistré avec succès"
+
+#: app/routes/api.py:220
+#, fuzzy
+msgid "Print option not found"
+msgstr "Dossier racine non trouvé"
+
+#: app/routes/api.py:228
+#, fuzzy
+msgid "Print option deleted successfully"
+msgstr "Liste supprimée avec succès"
+
+#: app/routes/api.py:236
 msgid "parent_id is required"
 msgstr "parent_id est requis"
 
-#: app/routes/api.py:153
+#: app/routes/api.py:240
 msgid "Folder not found"
 msgstr "Dossier non trouvé"
 
-#: app/routes/api.py:294
+#: app/routes/api.py:381
 msgid "Root folder not found"
 msgstr "Dossier racine non trouvé"
 
-#: app/routes/api.py:308 app/routes/api.py:385
+#: app/routes/api.py:395 app/routes/api.py:472
 msgid "L'espace de stockage maximal est atteint pour ce compte."
 msgstr ""
 
-#: app/routes/api.py:319
+#: app/routes/api.py:406
 msgid "Parent folder not found or not owned by user"
 msgstr "Dossier parent non trouvé ou n'appartenant pas à l'utilisateur"
 
-#: app/routes/api.py:330
+#: app/routes/api.py:417
 #, python-format
 msgid "Could not create directory: %(error)s"
 msgstr "Impossible de créer le répertoire : %(error)s"
 
-#: app/routes/api.py:388
+#: app/routes/api.py:475 app/routes/api.py:609
 msgid "No file part"
 msgstr "Aucune partie de fichier"
 
-#: app/routes/api.py:392
+#: app/routes/api.py:479 app/routes/api.py:613
 msgid "No selected file"
 msgstr "Aucun fichier sélectionné"
 
-#: app/routes/api.py:396
+#: app/routes/api.py:483
 msgid "No folder_id specified"
 msgstr "Aucun folder_id spécifié"
 
-#: app/routes/api.py:400 app/routes/api.py:732
+#: app/routes/api.py:487 app/routes/api.py:961
 msgid "Folder not found or not owned by user"
 msgstr "Dossier non trouvé ou n'appartenant pas à l'utilisateur"
 
-#: app/routes/api.py:415
+#: app/routes/api.py:502 app/routes/api.py:617
 msgid "Format de fichier non autorisé."
 msgstr ""
 
-#: app/routes/api.py:423
+#: app/routes/api.py:510 app/routes/api.py:625
 msgid "Fichier image invalide ou potentiellement malveillant."
 msgstr ""
 
-#: app/routes/api.py:461
+#: app/routes/api.py:548
 msgid "File upload failed"
 msgstr "Échec du téléchargement du fichier"
 
-#: app/routes/api.py:472
+#: app/routes/api.py:559 app/routes/api.py:603 app/routes/api.py:685
 msgid "Image not found"
 msgstr "Image non trouvée"
 
-#: app/routes/api.py:476
+#: app/routes/api.py:563 app/routes/api.py:606
 msgid "Unauthorized to edit this image"
 msgstr "Non autorisé à modifier cette image"
 
-#: app/routes/api.py:480
+#: app/routes/api.py:567
 msgid "Invalid JSON data"
 msgstr "Données JSON non valides"
 
-#: app/routes/api.py:502
+#: app/routes/api.py:589
 msgid "Image updated successfully"
 msgstr "Image mise à jour avec succès"
 
-#: app/routes/api.py:531
+#: app/routes/api.py:672
+#, fuzzy
+msgid "Image replaced successfully"
+msgstr "Image mise à jour avec succès"
+
+#: app/routes/api.py:760
 msgid "Missing required fields"
 msgstr "Champs obligatoires manquants"
 
-#: app/routes/api.py:542
+#: app/routes/api.py:771
 msgid "Tree updated successfully"
 msgstr "Arbre mis à jour avec succès"
 
-#: app/routes/api.py:554
+#: app/routes/api.py:783
 msgid "Tree saved successfully"
 msgstr "Arbre enregistré avec succès"
 
-#: app/routes/api.py:570
+#: app/routes/api.py:799
 #, fuzzy
 msgid "Tree not found"
 msgstr "Liste non trouvée"
 
-#: app/routes/api.py:580
+#: app/routes/api.py:809
 #, fuzzy
 msgid "Tree deleted successfully"
 msgstr "Arbre mis à jour avec succès"
 
-#: app/routes/api.py:627
+#: app/routes/api.py:856
 msgid "Missing profile name"
 msgstr ""
 
-#: app/routes/api.py:635
+#: app/routes/api.py:864
 #, fuzzy
 msgid "Profile updated successfully"
 msgstr "Arbre mis à jour avec succès"
 
-#: app/routes/api.py:641
+#: app/routes/api.py:870
 #, fuzzy
 msgid "Profile saved successfully"
 msgstr "Arbre enregistré avec succès"
 
-#: app/routes/api.py:671
+#: app/routes/api.py:900
 #, fuzzy
 msgid "Profile not found"
 msgstr "Dossier racine non trouvé"
 
-#: app/routes/api.py:678
+#: app/routes/api.py:907
 #, fuzzy
 msgid "Profile deleted successfully"
 msgstr "Liste supprimée avec succès"
 
-#: app/routes/api.py:735
+#: app/routes/api.py:964
 msgid "Cannot delete root folder"
 msgstr "Impossible de supprimer le dossier racine"
 
-#: app/routes/api.py:739
+#: app/routes/api.py:968
 msgid "Folder and all its contents deleted"
 msgstr "Le dossier et tout son contenu ont été supprimés"
 
-#: app/routes/api.py:744
+#: app/routes/api.py:973
 msgid "Image not found or not owned by user"
 msgstr "Image non trouvée ou n'appartenant pas à l'utilisateur"
 
-#: app/routes/api.py:755
+#: app/routes/api.py:984
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr "Impossible de supprimer le fichier : %(error)s"
 
-#: app/routes/api.py:759
+#: app/routes/api.py:988
 msgid "Image deleted"
 msgstr "Image supprimée"
 
-#: app/routes/api.py:761
+#: app/routes/api.py:990
 msgid "Invalid item type"
 msgstr "Type d'élément non valide"
 
@@ -488,7 +520,7 @@ msgstr "Pour confirmer, veuillez taper votre nom d'utilisateur ci-dessous :"
 msgid "Your username"
 msgstr "Votre nom d'utilisateur"
 
-#: app/templates/account.html:59
+#: app/templates/account.html:59 app/templates/list.html:523
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -557,6 +589,22 @@ msgstr "Modifier l'image sélectionnée"
 #: app/templates/base.html:223
 msgid "You must create an account to use this feature."
 msgstr ""
+
+#: app/templates/base.html:224
+msgid "Load print options"
+msgstr "Charger les options d'impression"
+
+#: app/templates/base.html:225
+msgid "Please enter a name for the print options."
+msgstr "Veuillez saisir un nom pour les options d'impression."
+
+#: app/templates/base.html:226
+msgid "Print options saved successfully!"
+msgstr "Options d'impression enregistrées avec succès !"
+
+#: app/templates/base.html:227
+msgid "Delete this print option?"
+msgstr "Supprimer cette option d'impression ?"
 
 #: app/templates/builder.html:16
 #, fuzzy
@@ -691,7 +739,7 @@ msgstr "Visualiser l'arbre"
 msgid "Interactive Tree Visualization"
 msgstr "Visualisation interactive de l'arbre"
 
-#: app/templates/builder.html:151
+#: app/templates/builder.html:151 app/templates/list.html:514
 msgid "Close"
 msgstr "Fermer"
 
@@ -712,33 +760,33 @@ msgid "Images"
 msgstr "Images"
 
 #: app/templates/builder.html:176 app/templates/builder.html:354
-#: app/templates/list.html:272
+#: app/templates/list.html:388
 msgid "Local"
 msgstr ""
 
 #: app/templates/builder.html:195 app/templates/builder.html:363
-#: app/templates/list.html:291
+#: app/templates/list.html:407
 #, fuzzy
 msgid "Search local images..."
 msgstr "Rechercher des images..."
 
-#: app/templates/builder.html:197 app/templates/list.html:293
+#: app/templates/builder.html:197 app/templates/list.html:409
 msgid "Search mode"
 msgstr "Mode de recherche"
 
-#: app/templates/builder.html:198 app/templates/list.html:294
+#: app/templates/builder.html:198 app/templates/list.html:410
 msgid "Relevance"
 msgstr "Pertinence"
 
-#: app/templates/builder.html:199 app/templates/list.html:295
+#: app/templates/builder.html:199 app/templates/list.html:411
 msgid "Exact (\"Is\")"
 msgstr "Exact (\"Est\")"
 
-#: app/templates/builder.html:200 app/templates/list.html:296
+#: app/templates/builder.html:200 app/templates/list.html:412
 msgid "Starts with"
 msgstr "Commence par"
 
-#: app/templates/builder.html:201 app/templates/list.html:297
+#: app/templates/builder.html:201 app/templates/list.html:413
 msgid "Contains"
 msgstr "Contient"
 
@@ -803,6 +851,7 @@ msgid "Choose File"
 msgstr "Choisir un fichier"
 
 #: app/templates/builder.html:303 app/templates/pictogram_bank.html:37
+#: app/templates/pictogram_bank.html:84
 msgid "No file chosen"
 msgstr "Aucun fichier choisi"
 
@@ -823,23 +872,23 @@ msgstr "Modifier l'image sélectionnée"
 msgid "Edit Selected Folder"
 msgstr "Modifier le dossier sélectionné"
 
-#: app/templates/builder.html:321 app/templates/pictogram_bank.html:55
+#: app/templates/builder.html:321 app/templates/pictogram_bank.html:62
 msgid "Description"
 msgstr "Description"
 
-#: app/templates/builder.html:325 app/templates/pictogram_bank.html:65
+#: app/templates/builder.html:325 app/templates/pictogram_bank.html:72
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
-#: app/templates/builder.html:326 app/templates/pictogram_bank.html:66
+#: app/templates/builder.html:326 app/templates/pictogram_bank.html:73
 msgid "Delete"
 msgstr "Supprimer"
 
-#: app/templates/builder.html:332 app/templates/pictogram_bank.html:72
+#: app/templates/builder.html:332 app/templates/pictogram_bank.html:95
 msgid "Export Image"
 msgstr "Exporter l'image"
 
-#: app/templates/builder.html:333 app/templates/pictogram_bank.html:73
+#: app/templates/builder.html:333 app/templates/pictogram_bank.html:96
 msgid "Download Selected Image"
 msgstr "Télécharger l'image sélectionnée"
 
@@ -1399,133 +1448,234 @@ msgstr "Images"
 
 #: app/templates/list.html:113
 msgid "Borders"
-msgstr ""
+msgstr "Bordures"
 
 #: app/templates/list.html:115
+msgid "Border Count"
+msgstr "Nombre de bordures"
+
+#: app/templates/list.html:117
+msgid "None"
+msgstr "Aucune"
+
+#: app/templates/list.html:126
+#, fuzzy
+msgid "Border 1 (Inner)"
+msgstr "Bordure 3 (Intérieure)"
+
+#: app/templates/list.html:128 app/templates/list.html:160
+#: app/templates/list.html:192
 msgid "Thickness"
-msgstr ""
+msgstr "Épaisseur"
 
-#: app/templates/list.html:143
-#, fuzzy
-msgid "Text"
-msgstr "Exporter"
+#: app/templates/list.html:134 app/templates/list.html:166
+#: app/templates/list.html:198
+msgid "Black"
+msgstr "Noir"
 
-#: app/templates/list.html:146
-#, fuzzy
-msgid "Show description"
-msgstr "Description"
+#: app/templates/list.html:137 app/templates/list.html:169
+#: app/templates/list.html:201
+msgid "White"
+msgstr "Blanc"
 
-#: app/templates/list.html:149
-#, fuzzy
-msgid "Position"
-msgstr "Description"
+#: app/templates/list.html:140 app/templates/list.html:172
+#: app/templates/list.html:204
+msgid "Yellow"
+msgstr "Jaune"
 
-#: app/templates/list.html:151
-msgid "Bottom"
-msgstr ""
+#: app/templates/list.html:143 app/templates/list.html:175
+#: app/templates/list.html:207
+msgid "Green"
+msgstr "Vert"
 
-#: app/templates/list.html:152
-msgid "Top"
-msgstr ""
+#: app/templates/list.html:146 app/templates/list.html:178
+#: app/templates/list.html:210
+msgid "Orange"
+msgstr "Orange"
 
-#: app/templates/list.html:156
-#, fuzzy
-msgid "Placement"
-msgstr "Élément"
+#: app/templates/list.html:149 app/templates/list.html:181
+#: app/templates/list.html:213
+msgid "Blue"
+msgstr "Bleu"
+
+#: app/templates/list.html:152 app/templates/list.html:184
+#: app/templates/list.html:216
+msgid "Pink"
+msgstr "Rose"
 
 #: app/templates/list.html:158
-msgid "Outside border"
-msgstr ""
+msgid "Border 2 (Middle)"
+msgstr "Bordure 2 (Intermédiaire)"
 
-#: app/templates/list.html:159
-msgid "Inside border"
-msgstr ""
-
-#: app/templates/list.html:163
-msgid "Size"
-msgstr ""
-
-#: app/templates/list.html:176
-msgid "Grid Fill Mode"
-msgstr ""
-
-#: app/templates/list.html:181
-msgid "Multiplier (Repeats per image)"
-msgstr ""
-
-#: app/templates/list.html:191
+#: app/templates/list.html:190
 #, fuzzy
-msgid "Chained List Mode"
-msgstr "Constructeur de listes chaînées"
-
-#: app/templates/list.html:197
-msgid "Horiz. Margin"
-msgstr ""
-
-#: app/templates/list.html:202
-msgid "Vert. Margin"
-msgstr ""
-
-#: app/templates/list.html:213
-msgid "Show / Update Preview"
-msgstr ""
+msgid "Border 3 (Outer)"
+msgstr "Bordure 1 (Extérieure)"
 
 #: app/templates/list.html:226
-msgid "Import and Describe"
-msgstr ""
+msgid "Show description"
+msgstr "Afficher la description"
 
-#: app/templates/list.html:229
-msgid "Print"
-msgstr ""
+#: app/templates/list.html:231
+msgid "Framed Box (Cartouche)"
+msgstr "Cartouche encadré"
+
+#: app/templates/list.html:234
+msgid "Position"
+msgstr "Position"
+
+#: app/templates/list.html:236
+msgid "Bottom"
+msgstr "Bas"
+
+#: app/templates/list.html:237
+msgid "Top"
+msgstr "Haut"
 
 #: app/templates/list.html:241
+msgid "Placement"
+msgstr "Disposition"
+
+#: app/templates/list.html:243
+msgid "Outside border"
+msgstr "Hors de la bordure"
+
+#: app/templates/list.html:244
+msgid "Inside border"
+msgstr "Dans la bordure"
+
+#: app/templates/list.html:248
+msgid "Size"
+msgstr "Taille"
+
+#: app/templates/list.html:262
+msgid "Grid Fill Mode"
+msgstr "Mode grille"
+
+#: app/templates/list.html:267
+msgid "Multiplier (Repeats per image)"
+msgstr "Multiplicateur (Répétitions par image)"
+
+#: app/templates/list.html:277
+msgid "Chained List Mode"
+msgstr "Mode liste chaînée"
+
+#: app/templates/list.html:284
+msgid "Strip Direction"
+msgstr "Direction de la bande"
+
+#: app/templates/list.html:287
+msgid "Left to right"
+msgstr "De gauche à droite"
+
+#: app/templates/list.html:288
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: app/templates/list.html:291
+msgid "Top to bottom"
+msgstr "De haut en bas"
+
+#: app/templates/list.html:292
+msgid "Vertical"
+msgstr "Vertical"
+
+#: app/templates/list.html:297
+msgid "Horiz. Margin"
+msgstr "Marge horiz."
+
+#: app/templates/list.html:302
+msgid "Vert. Margin"
+msgstr "Marge vert."
+
+#: app/templates/list.html:314 app/templates/list.html:513
+msgid "Save Print Options"
+msgstr "Enregistrer les options d'impression"
+
+#: app/templates/list.html:316
+msgid "Load Print Options"
+msgstr "Charger les options d'impression"
+
+#: app/templates/list.html:319
+msgid "Select saved options"
+msgstr "Sélectionner des options sauvegardées"
+
+#: app/templates/list.html:321
+msgid "Delete Option"
+msgstr "Supprimer l'option"
+
+#: app/templates/list.html:329
+msgid "Show / Update Preview"
+msgstr "Afficher / Actualiser l'aperçu"
+
+#: app/templates/list.html:342
+msgid "Import and Describe"
+msgstr "Importer et décrire"
+
+#: app/templates/list.html:345
+msgid "Print"
+msgstr "Imprimer"
+
+#: app/templates/list.html:357
 msgid "Select from Tree"
 msgstr "Sélectionner depuis l'arbre"
 
-#: app/templates/list.html:246
+#: app/templates/list.html:362
 msgid "Element"
 msgstr "Élément"
 
-#: app/templates/list.html:251
+#: app/templates/list.html:367
 msgid "Branch"
 msgstr "Branche"
 
-#: app/templates/list.html:254 app/templates/list.html:265
+#: app/templates/list.html:370 app/templates/list.html:381
 msgid "Drag to copy to list"
 msgstr "Glisser pour copier dans la liste"
 
-#: app/templates/list.html:264
+#: app/templates/list.html:380
 msgid "Select from Images"
 msgstr "Sélectionner parmi les images"
 
-#: app/templates/list.html:315
+#: app/templates/list.html:431
 msgid "Selected Link Description"
 msgstr "Description du lien sélectionné"
 
-#: app/templates/list.html:317
+#: app/templates/list.html:433
 msgid "Select a link from the bottom list to edit its description..."
 msgstr "Sélectionnez un lien dans la liste du bas pour modifier sa description..."
 
-#: app/templates/list.html:334
+#: app/templates/list.html:450
 msgid "Generate PDF"
 msgstr ""
 
-#: app/templates/list.html:354
+#: app/templates/list.html:470
 msgid "Chained List Builder"
 msgstr "Constructeur de listes chaînées"
 
-#: app/templates/list.html:357
+#: app/templates/list.html:473
 #, fuzzy
 msgid "Import Picture"
 msgstr "Importer une image"
 
-#: app/templates/list.html:359
+#: app/templates/list.html:475
 msgid "Delete Selected Link"
 msgstr "Supprimer le lien sélectionné"
 
-#: app/templates/list.html:360
+#: app/templates/list.html:476
 msgid "New Chain"
 msgstr "Nouvelle chaîne"
+
+#: app/templates/list.html:518
+msgid "Option Name"
+msgstr "Nom de l'option"
+
+#: app/templates/list.html:519
+msgid "e.g. My Custom Strip"
+msgstr "ex. Ma bande personnalisée"
+
+#: app/templates/list.html:524
+msgid "Save"
+msgstr "Enregistrer"
 
 #: app/templates/login.html:58
 msgid "New User?"
@@ -1543,9 +1693,34 @@ msgstr "Mot de passe oublié ?"
 msgid "Root"
 msgstr "Racine"
 
-#: app/templates/pictogram_bank.html:61
+#: app/templates/pictogram_bank.html:57
+#, fuzzy
+msgid "Selected Image Preview"
+msgstr "Modifier l'image sélectionnée"
+
+#: app/templates/pictogram_bank.html:68
 msgid "Make image public"
 msgstr "Rendre l'image publique"
+
+#: app/templates/pictogram_bank.html:78
+msgid "Replace Image File"
+msgstr ""
+
+#: app/templates/pictogram_bank.html:79
+msgid ""
+"Replaces this file while keeping its ID. All trees and lists using this "
+"image will automatically be updated."
+msgstr ""
+
+#: app/templates/pictogram_bank.html:83
+#, fuzzy
+msgid "Choose New File"
+msgstr "Choisir un fichier"
+
+#: app/templates/pictogram_bank.html:88
+#, fuzzy
+msgid "Replace Selected Image"
+msgstr "Modifier l'image sélectionnée"
 
 #: app/templates/register.html:73
 msgid "I accept the"
@@ -2361,4 +2536,28 @@ msgstr "Si vous n'avez pas fait cette demande, veuillez ignorer cet e-mail."
 #~ msgid_plural "Field must be at least %(min)d characters long."
 #~ msgstr[0] ""
 #~ msgstr[1] ""
+
+#~ msgid "Text"
+#~ msgstr "Exporter"
+
+#~ msgid "Preset saved successfully!"
+#~ msgstr "Préréglage enregistré avec succès !"
+
+#~ msgid "Cannot delete built-in presets."
+#~ msgstr "Impossible de supprimer les préréglages intégrés."
+
+#~ msgid "Print Preset"
+#~ msgstr "Préréglage d'impression"
+
+#~ msgid "Larnay Strip (Triple Border)"
+#~ msgstr "Bande Larnay (Triple bordure)"
+
+#~ msgid "Standard Grid (3x3)"
+#~ msgstr "Grille standard (3x3)"
+
+#~ msgid "Vertical Schedule"
+#~ msgstr "Planning vertical"
+
+#~ msgid "Save Current as Preset"
+#~ msgstr "Enregistrer comme préréglage"
 

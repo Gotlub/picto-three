@@ -163,6 +163,30 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Compilation des fichiers `.mo` pour toutes les langues (`en`, `fr`, `es`, `de`, `it`, `nl`, `pl`, `pt`).
   - [x] Validation 100% sur `make test` (Ruff, ESLint, 49 tests JS, 57 Pytest, 11 E2E Playwright).
 
+## Phase 5 : Améliorations de la Page /list & Options d'Impression Avancées
+- [x] **Gestion du Nœud Racine (Root) en Drag & Drop (`/list`)** :
+  - [x] Correction en mode `element` : restriction du fantôme visuel de drag au seul `.node-content` (`setDragImage`), sans entraîner les nœuds enfants.
+  - [x] Importation transparente du nœud racine dans la liste séquentielle (`ChainedListManager.js`) avec normalisation ID (`-1`) et chemin par défaut (`folder-open-bold.png`).
+  - [x] En mode `branch` : inclusion du nœud racine en tête de liste avant ses descendants, avec description de secours égale au nom de l'arbre (`ReadOnlyTreeViewer.js`).
+  - [x] Maintien de l'ordre d'insertion séquentiel (`insertIndex++`) lors du drop de branches.
+  - [x] Suite de tests unitaires JS mise à jour (`tests/unit/chained_list_manager.test.js`).
+- [x] **Refonte des Bordures Multiples & Rendu d'Impression (`ListPdfExporter.js`, `list.html`)** :
+  - [x] Inversion de l'ordre concentrique : Bordure 1 = Intérieure (Inner), Bordure 2 = Intermédiaire (Middle), Bordure 3 = Extérieure (Outer).
+  - [x] Taille intérieure minimum fixe : la bordure 1 n'empiète jamais sur l'image (`imageSize` fixe au centre).
+  - [x] Emboîtement concentrique vers l'extérieur sans superposition : la bordure 2 tient compte de la bordure 1, la bordure 3 tient compte de la bordure 1 et 2, dans l'aperçu CSS (`box-shadow: inset`) et l'export vectoriel jsPDF.
+  - [x] Cartouche encadré (Framed Box) : positionné au-dessus de l'image (`z-index: 2`), fond blanc opaque occultant, et largeur stricte indexée sur `imageSize`.
+- [x] **Gestion des Options d'Impression ("Save / Load Print Options") & Modèle BDD** :
+  - [x] Suppression des presets codés en dur au profit d'options sauvegardées dynamiques.
+  - [x] Remplacement par "Save Print Options" (bouton ouvrant une modale Bootstrap popup avec saisie de nom + Annuler / Enregistrer) et "Load Print Options" (menu déroulant filtré sur les options sauvegardées).
+  - [x] Modèle SQLAlchemy `PrintOption` (`id`, `user_id`, `name`, `payload`, `created_at`, `updated_at`) avec migration Alembic.
+  - [x] Endpoints API REST `/api/print_options` (GET, POST, DELETE) avec vérification de session/propriétaire, compatible multi-utilisateurs et extensible public.
+  - [x] Double persistance transparente : API backend pour les utilisateurs authentifiés + repli/cache `localStorage`.
+- [x] **Internationalisation (i18n) & Validation globale** :
+  - [x] Extraction Babel et compilation des catalogues `.mo` pour toutes les nouvelles chaînes d'options d'impression et de modale.
+  - [x] Suite de tests unitaires JS : 53 tests passants (`make test-js`).
+  - [x] Suite de tests unitaires & intégration Python portée à 61 tests passants (`make pytest`).
+  - [x] Validation intégrale avec `make test` (Ruff, ESLint, 53 tests JS, 61 tests Pytest, 11 tests E2E Playwright - 100% succès).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

@@ -12,16 +12,38 @@ export class ReadOnlyNode {
         this.parent = null;
         this.isRoot = isRoot;
         this.isDefaultRoot = (this.isRoot && (image.id === 'root' || (!nodeData || !nodeData.url)));
-        this.description = nodeData.description || image.description || '';
+        this.description = nodeData.description || image.description || (this.isRoot ? this.treeViewer.currentTreeName : '') || '';
         this.element = this.createElement();
 
         this.element.setAttribute('draggable', 'true');
         this.element.addEventListener('dragstart', (e) => {
             e.stopPropagation();
 
+            // When dragging in element mode, constrain drag ghost image to .node-content
+            // so children are not dragged/ghosted along with the node
+            if (this.treeViewer.selectionMode === 'element') {
+                const content = this.contentElement || this.element.querySelector('.node-content');
+                if (content && e.dataTransfer && typeof e.dataTransfer.setDragImage === 'function') {
+                    e.dataTransfer.setDragImage(content, 25, 25);
+                }
+            }
+
+            const getNodeData = (node) => {
+                const effectiveDesc = node.description || (node.isRoot ? this.treeViewer.currentTreeName : '') || node.image.name || '';
+                return {
+                    ...node.image,
+                    id: (node.image.id !== undefined && node.image.id !== 'root') ? node.image.id : -1,
+                    name: (node.isRoot && (node.image.name === 'Root' || !node.image.name) && this.treeViewer.currentTreeName)
+                        ? this.treeViewer.currentTreeName
+                        : (node.image.name || 'Root'),
+                    path: node.image.path || '/static/images/folder-open-bold.png',
+                    description: effectiveDesc,
+                    isRoot: node.isRoot
+                };
+            };
+
             const collectBranchData = (node) => {
-                const nData = { ...node.image, description: node.description, isRoot: node.isRoot };
-                let branch = [nData];
+                let branch = [getNodeData(node)];
                 if (node.children && node.children.length > 0) {
                     node.children.forEach(child => {
                         branch = branch.concat(collectBranchData(child));
@@ -34,8 +56,7 @@ export class ReadOnlyNode {
             if (this.treeViewer.selectionMode === 'branch') {
                 branchData = collectBranchData(this);
             } else {
-                const nData = { ...this.image, description: this.description, isRoot: this.isRoot };
-                branchData = [nData];
+                branchData = [getNodeData(this)];
             }
 
             const payload = {
@@ -57,6 +78,7 @@ export class ReadOnlyNode {
         nodeElement.classList.add('node');
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
+        this.contentElement = contentElement;
         const imgElement = document.createElement('img');
         if (this.image.path) {
             const imageId = Number(this.image.id);
@@ -165,8 +187,10 @@ export class ReadOnlyTreeViewer {
         this.selectedNode = null;
     }
 
-    rebuildTreeViewer(treeData) {
+    rebuildTreeViewer(treeData, treeName = '') {
         if (!this.treeDisplay) return;
+
+        this.currentTreeName = treeName || '';
 
         const buildNode = (nodeData) => {
             let image;
@@ -207,9 +231,9 @@ export class ReadOnlyTreeViewer {
             const rootImage = {
                 id: rootImageId !== undefined ? rootImageId : 'root',
                 real_id: rootData.real_id,
-                name: rootData.name || 'Root',
+                name: rootData.name || this.currentTreeName || 'Root',
                 path: rootData.url || '/static/images/folder-open-bold.png',
-                description: rootData.description || rootData.name
+                description: rootData.description || this.currentTreeName || rootData.name || 'Root'
             };
             this.treeRoot = new ReadOnlyNode(rootData, rootImage, this, true);
 
@@ -220,7 +244,12 @@ export class ReadOnlyTreeViewer {
                 });
             }
         } else if (treeData && treeData.roots && treeData.roots.length > 1) {
-            const rootDisplayData = { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png', description: 'Root' };
+            const rootDisplayData = {
+                id: 'root',
+                name: this.currentTreeName || 'Root',
+                path: '/static/images/folder-open-bold.png',
+                description: this.currentTreeName || 'Root'
+            };
             this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this, true);
 
             treeData.roots.forEach(rootData => {
@@ -228,7 +257,12 @@ export class ReadOnlyTreeViewer {
                 if (rootNode) this.treeRoot.addChild(rootNode);
             });
         } else {
-            const rootDisplayData = { id: 'root', name: 'Root', path: '/static/images/folder-open-bold.png', description: 'Root' };
+            const rootDisplayData = {
+                id: 'root',
+                name: this.currentTreeName || 'Root',
+                path: '/static/images/folder-open-bold.png',
+                description: this.currentTreeName || 'Root'
+            };
             this.treeRoot = new ReadOnlyNode(rootDisplayData, rootDisplayData, this, true);
         }
 
