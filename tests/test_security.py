@@ -1,7 +1,7 @@
 import pytest
 
 from app import db
-from app.models import Image, User
+from app.models import Folder, Image, User
 from tests.conftest import login
 
 
@@ -15,6 +15,7 @@ def seeded_db(client):
         # It's good practice to start with a clean slate, though the app
         # fixture's teardown should handle this.
         db.session.query(Image).delete()
+        db.session.query(Folder).delete()
         db.session.query(User).delete()
         db.session.commit()
 
@@ -28,6 +29,11 @@ def seeded_db(client):
 
         db.session.add_all([user1, user2])
         db.session.commit() # Commit to assign IDs to user1 and user2
+
+        # Create user1 root folder
+        user1_root_folder = Folder(name='user1', path='user1', user_id=user1.id, parent_id=None)
+        db.session.add(user1_root_folder)
+        db.session.commit()
 
         # --- Create Images ---
         # We can now use the generated user IDs.
@@ -108,3 +114,64 @@ def test_mobile_pictogram_path_traversal(seeded_db):
     # Test path traversal in mini pictograms
     response_min = client.get('/api/v1/mobile/pictogramsmin/user1\\..\\admin\\secret.png', headers=headers)
     assert response_min.status_code == 403
+
+
+def test_create_folder_path_traversal_blocked(seeded_db):
+    """Test that path traversal attempts in folder creation are strictly rejected."""
+    client = seeded_db
+    login(client, 'user1', 'password')
+
+    with client.application.app_context():
+        user1 = User.query.filter_by(username='user1').first()
+        root_folder = Folder.query.filter_by(user_id=user1.id, parent_id=None).first()
+        root_folder_id = root_folder.id
+
+    # Test invalid folder names attempting traversal
+    traversal_names = ['../escaped', '..\\escaped', 'sub/folder', 'sub\\folder', '.hidden', '..']
+    for bad_name in traversal_names:
+        response = client.post('/api/folder/create', json={
+            'parent_id': root_folder_id,
+            'name': bad_name
+        })
+        assert response.status_code == 400
+        assert 'Invalid folder name' in response.get_json().get('message', '')
+
+
+def test_registration_username_restrictions(client):
+    """Test that username validation in RegistrationForm blocks special chars and reserved words."""
+    from wtforms.validators import ValidationError
+
+    from app.forms import RegistrationForm
+
+    with client.application.test_request_context():
+        # Valid username
+        form = RegistrationForm(username='valid_user-123')
+        form.validate_username(form.username)  # Should not raise
+
+        # Invalid: reserved word
+        with pytest.raises(ValidationError) as exc_info:
+            form_reserved = RegistrationForm(username='admin')
+            form_reserved.validate_username(form_reserved.username)
+        assert 'reserved' in str(exc_info.value).lower()
+
+        # Invalid: path traversal characters
+        for bad in ['user/slash', 'user..dot', 'user\\back', 'a', 'ab']:
+            with pytest.raises(ValidationError):
+                f = RegistrationForm(username=bad)
+                f.validate_username(f.username)
+
+
+def test_security_headers_enforced(client):
+    """Test that modern security headers (nosniff, frame options, CSP) are present on responses."""
+    response = client.get('/')
+    assert response.status_code == 200
+
+    assert response.headers.get('X-Content-Type-Options') == 'nosniff'
+    assert response.headers.get('X-Frame-Options') == 'SAMEORIGIN'
+    assert response.headers.get('Referrer-Policy') == 'strict-origin-when-cross-origin'
+    assert 'geolocation=()' in response.headers.get('Permissions-Policy', '')
+
+    csp = response.headers.get('Content-Security-Policy', '')
+    assert "default-src 'self'" in csp
+    assert "object-src 'none'" in csp
+

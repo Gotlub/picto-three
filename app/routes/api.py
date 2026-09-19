@@ -1,4 +1,6 @@
 import hashlib
+import os
+import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -401,20 +403,29 @@ def create_folder():
     parent_id = data.get('parent_id')
     name = data.get('name').strip()
 
+    # Validate folder name against directory traversal and invalid characters
+    if not re.match(r'^[^\\/:\*\?"<>\|\x00-\x1f]+$', name) or name.startswith('.') or len(name) > 100:
+        return jsonify({'status': 'error', 'message': _('Invalid folder name')}), 400
+
     parent_folder = db.session.get(Folder, parent_id)
     if not parent_folder or parent_folder.user_id != current_user.id:
         return jsonify({'status': 'error', 'message': _('Parent folder not found or not owned by user')}), 404
 
     # The parent path from DB is relative. Combine it with the base path for physical operations.
-    base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-    parent_physical_path = base_path / parent_folder.path
+    base_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+    parent_physical_path = (base_path / parent_folder.path).resolve()
+
+    # Path traversal defense in depth: ensure new path stays within parent directory
+    new_physical_path = (parent_physical_path / name).resolve()
+    if not new_physical_path.is_relative_to(parent_physical_path) or not new_physical_path.is_relative_to(base_path):
+        return jsonify({'status': 'error', 'message': _('Invalid folder name')}), 400
 
     # Create physical directory
-    new_physical_path = parent_physical_path / name
     try:
         new_physical_path.mkdir(exist_ok=True)
     except OSError as e:
-        return jsonify({'status': 'error', 'message': _('Could not create directory: %(error)s', error=e)}), 500
+        current_app.logger.error(f"Could not create directory {new_physical_path}: {e}")
+        return jsonify({'status': 'error', 'message': _('Could not create directory.')}), 500
 
     # The new path for the DB is also relative.
     new_relative_path = Path(parent_folder.path) / name
@@ -500,6 +511,14 @@ def upload_image():
         allowed_mimetypes = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
         if file.mimetype not in allowed_mimetypes:
             return jsonify({'status': 'error', 'message': _('Format de fichier non autorisé.')}), 400
+
+        # Check individual file size limit
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
+        file.seek(0)
+        max_bytes = current_app.config.get('MAX_IMAGE_SIZE_KB', 2048) * 1024
+        if file_length > max_bytes:
+            return jsonify({'status': 'error', 'message': _('File size exceeds allowed limit.')}), 400
 
         # Deep magic-byte verification (Defense in depth vs Fake Extensions)
         try:
@@ -615,6 +634,14 @@ def replace_image_file(image_id):
     allowed_mimetypes = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
     if file.mimetype not in allowed_mimetypes:
         return jsonify({'status': 'error', 'message': _('Format de fichier non autorisé.')}), 400
+
+    # Check individual file size limit
+    file.seek(0, os.SEEK_END)
+    file_length = file.tell()
+    file.seek(0)
+    max_bytes = current_app.config.get('MAX_IMAGE_SIZE_KB', 2048) * 1024
+    if file_length > max_bytes:
+        return jsonify({'status': 'error', 'message': _('File size exceeds allowed limit.')}), 400
 
     # Deep magic-byte verification
     try:
@@ -983,9 +1010,10 @@ def delete_item():
             base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
             physical_path_min = base_path_min / image.path
             physical_path_min = physical_path_min.with_suffix('.png')
-            physical_path_min.unlink()
+            physical_path_min.unlink(missing_ok=True)
         except OSError as e:
-            return jsonify({'status': 'error', 'message': _('Could not delete file: %(error)s', error=e)}), 500
+            current_app.logger.error(f"Error deleting physical files for image {image.id}: {e}")
+            return jsonify({'status': 'error', 'message': _('Could not delete file.')}), 500
 
         db.session.delete(image)
         db.session.commit()

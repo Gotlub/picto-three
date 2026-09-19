@@ -6,6 +6,7 @@ export default [
   {
     ignores: [
       "venv/",
+      ".venv/",
       "app/static/vendor/",
       "app/static/js/lib/",
       "tests/e2e/artifacts/"

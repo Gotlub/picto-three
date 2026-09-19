@@ -106,7 +106,7 @@
 </div>
 
 <script id="pictogram-data" type="application/json">
-    {{ pictograms_json | safe }}
+    {{ (pictograms_data if pictograms_data is defined else pictograms_json) | tojson }}
 </script>
 <script>
     window.MAX_IMAGE_SIZE_KB = parseInt("{{ config.MAX_IMAGE_SIZE_KB }}", 10);

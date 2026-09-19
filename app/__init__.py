@@ -107,6 +107,30 @@ def create_app(config_override=None):
         except (OSError, RuntimeError) as e:
             print(f"❌ Erreur lors de la génération du sitemap : {e}")
 
+    # Warn if default insecure secret key is used in non-testing environment
+    if app.config.get('SECRET_KEY') == 'you-will-never-guess' and not app.testing and not app.debug:
+        app.logger.warning("SECURITY WARNING: Using default insecure SECRET_KEY. Set SECRET_KEY environment variable in production!")
+
+    @app.after_request
+    def set_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy'] = 'geolocation=(), camera=(), microphone=()'
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.google.com https://www.gstatic.com; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+            "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; "
+            "img-src 'self' data: blob: https://api.arasaac.org https://commons.wikimedia.org; "
+            "connect-src 'self' https://api.arasaac.org; "
+            "frame-src 'self' https://www.youtube.com https://www.google.com; "
+            "object-src 'none'; "
+            "base-uri 'self';"
+        )
+        response.headers['Content-Security-Policy'] = csp
+        return response
+
     # Expose get_locale to templates
     app.jinja_env.globals.update(get_locale=get_locale)
 

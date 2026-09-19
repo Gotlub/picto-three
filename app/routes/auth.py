@@ -5,7 +5,7 @@ from pathlib import Path
 from flask import Blueprint, current_app, flash, redirect, render_template, url_for
 from flask_babel import _
 from flask_login import current_user, login_required, login_user, logout_user
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 from app import db
 from app.forms import (
@@ -40,7 +40,9 @@ def login():
             return redirect(url_for('auth.login'))
 
         if not user.confirmed:
-            flash(Markup(_('Your account is not confirmed. Please check your emails. <a href="%(url)s">Resend confirmation email?</a>', url=url_for('auth.resend_confirmation_request'))), 'warning')
+            resend_url = escape(url_for('auth.resend_confirmation_request'))
+            msg = _('Your account is not confirmed. Please check your emails. <a href="%(url)s">Resend confirmation email?</a>', url=resend_url)
+            flash(Markup(msg), 'warning')  # nosec B704
             return redirect(url_for('auth.login'))
 
         login_user(user, remember=form.remember_me.data)

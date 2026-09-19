@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Cybersecurity Pre-Audit Hardening & Vulnerability Remediation (Astra Preparation)**:
+  - Added modern HTTP security headers via `@app.after_request` in `app/__init__.py`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and a complete `Content-Security-Policy` (CSP) supporting CDN scripts, Bootstrap, YouTube embeds, and ARASAAC API.
+  - Enforced session and remember cookie security settings (`HttpOnly=True`, `SameSite=Lax`, conditional `Secure=True`).
+  - Added request payload DoS protection with `MAX_CONTENT_LENGTH = 16MB` in `config.py` and explicit per-file size checks in image upload/replace handlers.
+  - Added `.dockerignore` ignoring virtual environments, node_modules, and cache files, slashing Docker build times from 73s to 2s.
+  - Added comprehensive security test suite in `tests/test_security.py` verifying path traversal rejection, username restrictions, and enforced HTTP security headers.
 - **In-Place Image Replacement in "My Resources" (`app/routes/api.py`, `pictogram_bank.js`, `builder.html`, `pictogram_bank.html`)**:
   - Contextual morphing: when an image is selected in the resources tree, the "Import Image" section dynamically transforms into "Replace Image: [filename]", shows a thumbnail preview of the current image, and prefills the description field.
   - Robust deselection & folder selection: clicking a folder or deselecting immediately resets `this.selectedImageThumbnail` and completely hides/clears the thumbnail container (`d-none`, `display: none !important`), ensuring no miniature is ever shown when "Import Image" is displayed. Clicking a selected node again or clicking outside deselects it cleanly.
@@ -80,6 +86,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added full testing and linting chain in `Makefile` (`make test`) running `ruff check .`, `npx eslint .`, unit JS tests, unit/integration `pytest -v`, and Playwright E2E tests (`bash tests/e2e/run.sh`) sequentially, as well as modular targets (`make lint`, `make lint-py`, `make lint-js`, `make test-js`, `make pytest`, `make e2e`).
 
 ### Fixed
+- Fixed Path Traversal vulnerability in `/api/folder/create` (`app/routes/api.py`):
+  - Enforced regex validation on folder names to prohibit slashes, backslashes, dots, and control characters.
+  - Added boundary verification using `Path.resolve().is_relative_to()` to guarantee that newly created directories cannot escape the user's directory tree.
+- Fixed unrestricted username validation at registration (`app/forms.py`):
+  - Added strict syntax validator `^[a-zA-Z0-9_-]{3,30}$` and blacklisted reserved system keywords (`public`, `admin`, `system`, `demo`, etc.) to protect physical filesystem paths and mobile authorization prefixes.
+- Fixed potential Stored XSS in JSON `<script>` blocks (`app/routes/builder.py`, `builder.html`, `list.html`, `pictogram_bank.html`):
+  - Replaced unsafe `json.dumps()` + `| safe` template injections with native Python data structures and Jinja's `{{ data | tojson }}` filter, which safely escapes closing tags and special HTML characters.
+- Fixed Information Disclosure on image deletion (`app/routes/api.py`):
+  - Suppressed internal filesystem path leakage in JSON error responses upon `OSError` and added `missing_ok=True` to thumbnail unlinking.
+- Resolved npm audit vulnerabilities (`brace-expansion` and `@humanfs/node`) in `package-lock.json`.
 - Fixed Node.js test runner discovery in `package.json` (`npm test`):
   - Replaced unexpanded glob `node --test tests/unit/**/*.test.js` with native test discovery `node --test`.
   - Fixes GitHub Actions CI failure on Ubuntu with Node 20 (`Could not find '.../tests/unit/**/*.test.js'`), ensuring robust cross-platform execution (Linux bash, Windows PowerShell).

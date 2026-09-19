@@ -203,6 +203,23 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Synchronisation en temps réel inter-onglets via `CustomEvent` (`pictogram:replaced`) : mise à jour instantanée sans rechargement de page dans l'onglet "Tree Builder" (barre latérale de gauche `ImageTree` et nœuds de l'arbre central).
   - [x] Validation intégrale avec `make test` (Ruff, ESLint, 54 tests JS, 61 tests Pytest, 11 tests E2E Playwright - 100% succès).
 
+## Phase 7 : Pré-Audit Cybersécurité & Durcissement (Préparation Astra)
+- [x] **Scans & Audits Automatisés** :
+  - [x] Audit des dépendances frontend : `npm audit fix` (0 vulnérabilité, correction de `brace-expansion` et `@humanfs/node`).
+  - [x] Audit des dépendances Python : `pip-audit` validé (0 CVE).
+  - [x] Scan statique Bandit : 0 issue (correction de l'avertissement B704 sur `Markup` et faux positif de sel B105).
+- [x] **Remédiation des Failles & Durcissement Applicatif** :
+  - [x] Protection stricte anti-Path Traversal sur la création de dossier (`/api/folder/create`) : validation regex du nom, interdiction des slashes/antislashs/points et vérification d'étanchéité via `Path.resolve().is_relative_to()`.
+  - [x] Restriction stricte des noms d'utilisateurs (`RegistrationForm`) : regex `^[a-zA-Z0-9_-]{3,30}$` et liste noire de noms réservés (`public`, `admin`, `system`, `demo`, etc.).
+  - [x] Élimination du risque Stored XSS dans `<script type="application/json">` : abandon de `json.dumps()` + `| safe` au profit de structures Python et du filtre natif `{{ data | tojson }}` auto-échappant les balises fermantes.
+  - [x] Protection DoS contre les uploads démesurés : configuration de `MAX_CONTENT_LENGTH = 16MB` et validation individuelle de taille de fichier dans `upload_image` et `replace_image_file`.
+  - [x] Élimination des fuites d'informations système dans `/api/item/delete` : messages d'erreur génériques sans fuite de chemins locaux et suppression avec `missing_ok=True`.
+  - [x] En-têtes HTTP de sécurité modernes (`app/__init__.py`) : `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, et `Content-Security-Policy` complet (support Bootstrap, CDN, YouTube, ARASAAC).
+  - [x] Durcissement des cookies de session (`config.py`) : `HttpOnly`, `SameSite=Lax`, `Secure` et alerte de sécurité sur la clé secrète par défaut.
+  - [x] Optimisation Docker : création de `.dockerignore` réduisant le temps de build de 73s à 2s.
+  - [x] Nouveaux tests de sécurité dans `tests/test_security.py` (6 tests de sécurité passants, total Pytest porté à 64 tests).
+  - [x] Validation intégrale avec `make test` (Ruff, ESLint, 54 tests JS, 64 tests Pytest, 11 tests E2E Playwright - 100% succès).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

@@ -62,6 +62,15 @@ class Config:
     # Upload limits
     MAX_IMAGE_SIZE_KB = int(os.environ.get('MAX_IMAGE_SIZE_KB', '2048'))  # Default to 2MB
     MAX_ITEMS_LIMIT = int(os.environ.get('MAX_ITEMS_LIMIT', '5000'))  # Default to 5000 items
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', str(16 * 1024 * 1024)))  # 16MB max payload
+
+    # Cookie & Session Security
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SAMESITE = 'Lax'
+    REMEMBER_COOKIE_SECURE = SESSION_COOKIE_SECURE
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LANGUAGES = ('en', 'fr', 'es', 'de', 'it', 'nl', 'pl', 'pt')

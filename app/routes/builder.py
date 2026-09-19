@@ -32,22 +32,20 @@ def builder():
             initial_folders.append(user_root.to_dict())
 
     # The initial data for the right sidebar tree
-    initial_tree_data_json = json.dumps(initial_folders)
-
-    pictograms_json = None
+    pictograms_data = None
     if current_user.is_authenticated:
         root_folder = Folder.query.filter_by(user_id=current_user.id, parent_id=None).first()
         if not root_folder:
-            pictograms_json = json.dumps({'id': 'root', 'type': 'folder', 'name': 'root', 'children': []})
+            pictograms_data = {'id': 'root', 'type': 'folder', 'name': 'root', 'children': []}
         else:
-            pictograms_json = json.dumps(root_folder.to_dict(include_children=True))
+            pictograms_data = root_folder.to_dict(include_children=True)
 
     return render_template(
         'builder.html',
         title='Mobile Setup',
-        initial_tree_data_json=initial_tree_data_json,
+        initial_folders=initial_folders,
         tree_data_from_post=tree_data_from_post,
-        pictograms_json=pictograms_json
+        pictograms_data=pictograms_data
     )
 
 @bp.route('/pictogram-bank')
@@ -72,10 +70,8 @@ def list_page():
         if user_root:
             initial_folders.append(user_root.to_dict())
 
-    initial_tree_data_json = json.dumps(initial_folders)
-
     return render_template(
         'list.html',
         title='List Builder',
-        initial_tree_data_json=initial_tree_data_json
+        initial_folders=initial_folders
     )

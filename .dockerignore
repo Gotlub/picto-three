@@ -1,0 +1,10 @@
+.venv/
+venv/
+node_modules/
+tests/e2e/node_modules/
+tests/e2e/artifacts/
+.git/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/

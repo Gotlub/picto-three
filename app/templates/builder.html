@@ -381,11 +381,11 @@
 </div>
 
 <script id="initial-tree-data" type="application/json">
-    {{ initial_tree_data_json | safe }}
+    {{ initial_folders | tojson }}
 </script>
 
 <script id="tree-data-from-post" type="application/json">
-    {{ tree_data_from_post | tojson | safe }}
+    {{ tree_data_from_post | tojson }}
 </script>
 
 <!-- Treant.js CSS -->
@@ -407,7 +407,7 @@
 
 {% if current_user.is_authenticated %}
 <script id="pictogram-data" type="application/json">
-    {{ pictograms_json | safe }}
+    {{ pictograms_data | tojson }}
 </script>
 <script>
     window.MAX_IMAGE_SIZE_KB = parseInt("{{ config.MAX_IMAGE_SIZE_KB }}", 10);

@@ -42,8 +42,18 @@ class RegistrationForm(FlaskForm):
     recaptcha = RecaptchaField()
     submit = SubmitField(_l('Register'))
 
+    RESERVED_USERNAMES = frozenset({
+        'public', 'admin', 'administrator', 'system', 'root',
+        'demo', 'api', 'static', 'data', 'default', 'user', 'pictograms', 'pictogramsmin'
+    })
+
     def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+        val = username.data or ''
+        if not re.match(r'^[a-zA-Z0-9_-]{3,30}$', val):
+            raise ValidationError(_l('Username must be 3-30 characters and contain only letters, numbers, hyphens or underscores.'))
+        if val.lower() in self.RESERVED_USERNAMES:
+            raise ValidationError(_l('This username is reserved. Please choose another one.'))
+        user = User.query.filter_by(username=val).first()
         if user is not None:
             raise ValidationError(_l('Please use a different username.'))
 

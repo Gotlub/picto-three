@@ -8,7 +8,7 @@ from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from app import mail
 
 EMAIL_CONFIRMATION_SALT = 'email-confirmation-salt'
-PASSWORD_RESET_SALT = 'password-reset-salt'
+PASSWORD_RESET_SALT = 'password-reset-salt'  # nosec B105
 EMAIL_REGEX = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 def send_email(to, subject, template, **kwargs):
