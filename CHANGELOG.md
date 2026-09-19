@@ -80,6 +80,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added full testing and linting chain in `Makefile` (`make test`) running `ruff check .`, `npx eslint .`, unit JS tests, unit/integration `pytest -v`, and Playwright E2E tests (`bash tests/e2e/run.sh`) sequentially, as well as modular targets (`make lint`, `make lint-py`, `make lint-js`, `make test-js`, `make pytest`, `make e2e`).
 
 ### Fixed
+- Fixed Node.js test runner discovery in `package.json` (`npm test`):
+  - Replaced unexpanded glob `node --test tests/unit/**/*.test.js` with native test discovery `node --test`.
+  - Fixes GitHub Actions CI failure on Ubuntu with Node 20 (`Could not find '.../tests/unit/**/*.test.js'`), ensuring robust cross-platform execution (Linux bash, Windows PowerShell).
 - Fixed stray notch/mark in tree visualizer modal and PDF vector export:
   - Treant.js collapse-switch element (`.collapse-switch`) at top-right of tree nodes was disabled (`collapsable: false` in `builder.js` and hidden in `custom.css`).
   - Enhanced vector node rectangle rendering in `TreePdfExporter.js` with rounded corners (`rx="6" ry="6"`), clean `#b0b0b0` borders, and explicit connector path stroke styles.
