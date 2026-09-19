@@ -15,6 +15,19 @@ export default class ImageTree {
             FOLDER: ImageTreeFolderNode,
             IMAGE: ImageTreeImageNode
         };
+
+        if (typeof window !== 'undefined') {
+            window.addEventListener('pictogram:replaced', (e) => {
+                if (e.detail && e.detail.imageId) {
+                    this.updateImageNode(
+                        e.detail.imageId,
+                        e.detail.name,
+                        e.detail.description,
+                        e.detail.timestamp || Date.now()
+                    );
+                }
+            });
+        }
         
         this.init().catch(err => {
             console.error('ImageTree init failed :', err);
@@ -180,5 +193,55 @@ export default class ImageTree {
             console.error(e);
             searchResultsContainer.innerHTML = '<p class="text-danger m-3">Error performing search.</p>';
         }
+    }
+
+    updateImageNode(imageId, newName, newDesc, timestamp) {
+        if (!imageId) return;
+        const selector = `.image-tree-node.image[data-id="${imageId}"]`;
+        const updateElement = (nodeEl) => {
+            const img = nodeEl.querySelector('img');
+            if (img) {
+                img.src = `/pictogramsmin/${imageId}?t=${timestamp}`;
+            }
+            const span = nodeEl.querySelector('span');
+            if (span && newName) {
+                span.textContent = newName;
+            }
+            const dlBtn = nodeEl.querySelector('a');
+            if (dlBtn) {
+                dlBtn.href = `/pictograms/${imageId}?t=${timestamp}`;
+                if (newName) dlBtn.download = newName;
+            }
+        };
+
+        if (this.container) {
+            this.container.querySelectorAll(selector).forEach(updateElement);
+        }
+
+        const searchContainer = document.getElementById('image-tree-search-results');
+        if (searchContainer) {
+            searchContainer.querySelectorAll(selector).forEach(updateElement);
+        }
+
+        const updateModelRecursively = (folder) => {
+            if (!folder || !folder.children) return;
+            folder.children.forEach(child => {
+                if (child.nodeTypes) {
+                    updateModelRecursively(child);
+                } else if (Number(child.data?.id) === Number(imageId)) {
+                    if (newName) child.data.name = newName;
+                    if (newDesc !== undefined) child.data.description = newDesc;
+                    const img = child.element?.querySelector('img');
+                    if (img) {
+                        img.src = `/pictogramsmin/${imageId}?t=${timestamp}`;
+                    }
+                    const span = child.element?.querySelector('span');
+                    if (span && newName) {
+                        span.textContent = newName;
+                    }
+                }
+            });
+        };
+        this.rootNodes.forEach(root => updateModelRecursively(root));
     }
 }

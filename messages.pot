@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-18 22:45+0000\n"
+"POT-Creation-Date: 2026-09-19 01:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -122,8 +122,8 @@ msgid "Send"
 msgstr ""
 
 #: app/routes/api.py:71 app/routes/api.py:123 app/routes/api.py:179
-#: app/routes/api.py:399 app/routes/api.py:751 app/routes/api.py:849
-#: app/routes/api.py:953
+#: app/routes/api.py:399 app/routes/api.py:755 app/routes/api.py:853
+#: app/routes/api.py:957
 msgid "Invalid data"
 msgstr ""
 
@@ -144,8 +144,8 @@ msgid "List not found"
 msgstr ""
 
 #: app/routes/api.py:119 app/routes/api.py:147 app/routes/api.py:222
-#: app/routes/api.py:244 app/routes/api.py:688 app/routes/api.py:801
-#: app/routes/api.py:902
+#: app/routes/api.py:244 app/routes/api.py:692 app/routes/api.py:805
+#: app/routes/api.py:906
 msgid "Unauthorized"
 msgstr ""
 
@@ -210,7 +210,7 @@ msgstr ""
 msgid "No folder_id specified"
 msgstr ""
 
-#: app/routes/api.py:487 app/routes/api.py:961
+#: app/routes/api.py:487 app/routes/api.py:965
 msgid "Folder not found or not owned by user"
 msgstr ""
 
@@ -226,7 +226,7 @@ msgstr ""
 msgid "File upload failed"
 msgstr ""
 
-#: app/routes/api.py:559 app/routes/api.py:603 app/routes/api.py:685
+#: app/routes/api.py:559 app/routes/api.py:603 app/routes/api.py:689
 msgid "Image not found"
 msgstr ""
 
@@ -242,72 +242,72 @@ msgstr ""
 msgid "Image updated successfully"
 msgstr ""
 
-#: app/routes/api.py:672
+#: app/routes/api.py:676
 msgid "Image replaced successfully"
 msgstr ""
 
-#: app/routes/api.py:760
+#: app/routes/api.py:764
 msgid "Missing required fields"
 msgstr ""
 
-#: app/routes/api.py:771
+#: app/routes/api.py:775
 msgid "Tree updated successfully"
 msgstr ""
 
-#: app/routes/api.py:783
+#: app/routes/api.py:787
 msgid "Tree saved successfully"
 msgstr ""
 
-#: app/routes/api.py:799
+#: app/routes/api.py:803
 msgid "Tree not found"
 msgstr ""
 
-#: app/routes/api.py:809
+#: app/routes/api.py:813
 msgid "Tree deleted successfully"
 msgstr ""
 
-#: app/routes/api.py:856
+#: app/routes/api.py:860
 msgid "Missing profile name"
 msgstr ""
 
-#: app/routes/api.py:864
+#: app/routes/api.py:868
 msgid "Profile updated successfully"
 msgstr ""
 
-#: app/routes/api.py:870
+#: app/routes/api.py:874
 msgid "Profile saved successfully"
 msgstr ""
 
-#: app/routes/api.py:900
+#: app/routes/api.py:904
 msgid "Profile not found"
 msgstr ""
 
-#: app/routes/api.py:907
+#: app/routes/api.py:911
 msgid "Profile deleted successfully"
 msgstr ""
 
-#: app/routes/api.py:964
+#: app/routes/api.py:968
 msgid "Cannot delete root folder"
 msgstr ""
 
-#: app/routes/api.py:968
+#: app/routes/api.py:972
 msgid "Folder and all its contents deleted"
 msgstr ""
 
-#: app/routes/api.py:973
+#: app/routes/api.py:977
 msgid "Image not found or not owned by user"
 msgstr ""
 
-#: app/routes/api.py:984
+#: app/routes/api.py:988
 #, python-format
 msgid "Could not delete file: %(error)s"
 msgstr ""
 
-#: app/routes/api.py:988
+#: app/routes/api.py:992
 msgid "Image deleted"
 msgstr ""
 
-#: app/routes/api.py:990
+#: app/routes/api.py:994
 msgid "Invalid item type"
 msgstr ""
 
@@ -482,7 +482,7 @@ msgstr ""
 msgid "Your username"
 msgstr ""
 
-#: app/templates/account.html:59 app/templates/list.html:523
+#: app/templates/account.html:59 app/templates/list.html:518
 msgid "Cancel"
 msgstr ""
 
@@ -677,7 +677,7 @@ msgstr ""
 msgid "Interactive Tree Visualization"
 msgstr ""
 
-#: app/templates/builder.html:151 app/templates/list.html:514
+#: app/templates/builder.html:151 app/templates/list.html:509
 msgid "Close"
 msgstr ""
 
@@ -697,33 +697,33 @@ msgstr ""
 msgid "Images"
 msgstr ""
 
-#: app/templates/builder.html:176 app/templates/builder.html:354
-#: app/templates/list.html:388
+#: app/templates/builder.html:176 app/templates/builder.html:361
+#: app/templates/list.html:383
 msgid "Local"
 msgstr ""
 
-#: app/templates/builder.html:195 app/templates/builder.html:363
-#: app/templates/list.html:407
+#: app/templates/builder.html:195 app/templates/builder.html:370
+#: app/templates/list.html:402
 msgid "Search local images..."
 msgstr ""
 
-#: app/templates/builder.html:197 app/templates/list.html:409
+#: app/templates/builder.html:197 app/templates/list.html:404
 msgid "Search mode"
 msgstr ""
 
-#: app/templates/builder.html:198 app/templates/list.html:410
+#: app/templates/builder.html:198 app/templates/list.html:405
 msgid "Relevance"
 msgstr ""
 
-#: app/templates/builder.html:199 app/templates/list.html:411
+#: app/templates/builder.html:199 app/templates/list.html:406
 msgid "Exact (\"Is\")"
 msgstr ""
 
-#: app/templates/builder.html:200 app/templates/list.html:412
+#: app/templates/builder.html:200 app/templates/list.html:407
 msgid "Starts with"
 msgstr ""
 
-#: app/templates/builder.html:201 app/templates/list.html:413
+#: app/templates/builder.html:201 app/templates/list.html:408
 msgid "Contains"
 msgstr ""
 
@@ -775,57 +775,71 @@ msgstr ""
 msgid "Import Image"
 msgstr ""
 
+#: app/templates/builder.html:297 app/templates/builder.html:317
+#: app/templates/pictogram_bank.html:31 app/templates/pictogram_bank.html:51
+msgid "Replace Image"
+msgstr ""
+
 #: app/templates/builder.html:299 app/templates/pictogram_bank.html:33
+#: app/templates/pictogram_bank.html:64
+msgid "Selected Image Preview"
+msgstr ""
+
+#: app/templates/builder.html:306 app/templates/pictogram_bank.html:40
 msgid "Upload from disk"
 msgstr ""
 
-#: app/templates/builder.html:302 app/templates/pictogram_bank.html:36
+#: app/templates/builder.html:306 app/templates/pictogram_bank.html:40
+msgid "Choose replacement file"
+msgstr ""
+
+#: app/templates/builder.html:309 app/templates/pictogram_bank.html:43
 msgid "Choose File"
 msgstr ""
 
-#: app/templates/builder.html:303 app/templates/pictogram_bank.html:37
-#: app/templates/pictogram_bank.html:84
+#: app/templates/builder.html:310 app/templates/pictogram_bank.html:44
+#: app/templates/pictogram_bank.html:91
 msgid "No file chosen"
 msgstr ""
 
-#: app/templates/builder.html:307 app/templates/pictogram_bank.html:41
+#: app/templates/builder.html:314 app/templates/pictogram_bank.html:48
 msgid "Description (optional)"
 msgstr ""
 
-#: app/templates/builder.html:310 app/templates/pictogram_bank.html:44
+#: app/templates/builder.html:317 app/templates/pictogram_bank.html:51
 msgid "Upload"
 msgstr ""
 
-#: app/templates/builder.html:316 app/templates/builder.html:318
-#: app/templates/pictogram_bank.html:50 app/templates/pictogram_bank.html:52
+#: app/templates/builder.html:323 app/templates/builder.html:325
+#: app/templates/pictogram_bank.html:57 app/templates/pictogram_bank.html:59
 msgid "Edit Selected Image"
 msgstr ""
 
-#: app/templates/builder.html:317 app/templates/pictogram_bank.html:51
+#: app/templates/builder.html:324 app/templates/pictogram_bank.html:58
 msgid "Edit Selected Folder"
 msgstr ""
 
-#: app/templates/builder.html:321 app/templates/pictogram_bank.html:62
+#: app/templates/builder.html:328 app/templates/pictogram_bank.html:69
 msgid "Description"
 msgstr ""
 
-#: app/templates/builder.html:325 app/templates/pictogram_bank.html:72
+#: app/templates/builder.html:332 app/templates/pictogram_bank.html:79
 msgid "Save Changes"
 msgstr ""
 
-#: app/templates/builder.html:326 app/templates/pictogram_bank.html:73
+#: app/templates/builder.html:333 app/templates/pictogram_bank.html:80
 msgid "Delete"
 msgstr ""
 
-#: app/templates/builder.html:332 app/templates/pictogram_bank.html:95
+#: app/templates/builder.html:339 app/templates/pictogram_bank.html:102
 msgid "Export Image"
 msgstr ""
 
-#: app/templates/builder.html:333 app/templates/pictogram_bank.html:96
+#: app/templates/builder.html:340 app/templates/pictogram_bank.html:103
 msgid "Download Selected Image"
 msgstr ""
 
-#: app/templates/builder.html:348
+#: app/templates/builder.html:355
 msgid "Choose Binder Avatar"
 msgstr ""
 
@@ -1400,7 +1414,7 @@ msgstr ""
 msgid "Vert. Margin"
 msgstr ""
 
-#: app/templates/list.html:314 app/templates/list.html:513
+#: app/templates/list.html:314 app/templates/list.html:508
 msgid "Save Print Options"
 msgstr ""
 
@@ -1416,75 +1430,71 @@ msgstr ""
 msgid "Delete Option"
 msgstr ""
 
-#: app/templates/list.html:329
-msgid "Show / Update Preview"
-msgstr ""
-
-#: app/templates/list.html:342
+#: app/templates/list.html:337
 msgid "Import and Describe"
 msgstr ""
 
-#: app/templates/list.html:345
+#: app/templates/list.html:340
 msgid "Print"
 msgstr ""
 
-#: app/templates/list.html:357
+#: app/templates/list.html:352
 msgid "Select from Tree"
 msgstr ""
 
-#: app/templates/list.html:362
+#: app/templates/list.html:357
 msgid "Element"
 msgstr ""
 
-#: app/templates/list.html:367
+#: app/templates/list.html:362
 msgid "Branch"
 msgstr ""
 
-#: app/templates/list.html:370 app/templates/list.html:381
+#: app/templates/list.html:365 app/templates/list.html:376
 msgid "Drag to copy to list"
 msgstr ""
 
-#: app/templates/list.html:380
+#: app/templates/list.html:375
 msgid "Select from Images"
 msgstr ""
 
-#: app/templates/list.html:431
+#: app/templates/list.html:426
 msgid "Selected Link Description"
 msgstr ""
 
-#: app/templates/list.html:433
+#: app/templates/list.html:428
 msgid "Select a link from the bottom list to edit its description..."
 msgstr ""
 
-#: app/templates/list.html:450
+#: app/templates/list.html:445
 msgid "Generate PDF"
 msgstr ""
 
-#: app/templates/list.html:470
+#: app/templates/list.html:465
 msgid "Chained List Builder"
 msgstr ""
 
-#: app/templates/list.html:473
+#: app/templates/list.html:468
 msgid "Import Picture"
 msgstr ""
 
-#: app/templates/list.html:475
+#: app/templates/list.html:470
 msgid "Delete Selected Link"
 msgstr ""
 
-#: app/templates/list.html:476
+#: app/templates/list.html:471
 msgid "New Chain"
 msgstr ""
 
-#: app/templates/list.html:518
+#: app/templates/list.html:513
 msgid "Option Name"
 msgstr ""
 
-#: app/templates/list.html:519
+#: app/templates/list.html:514
 msgid "e.g. My Custom Strip"
 msgstr ""
 
-#: app/templates/list.html:524
+#: app/templates/list.html:519
 msgid "Save"
 msgstr ""
 
@@ -1504,29 +1514,25 @@ msgstr ""
 msgid "Root"
 msgstr ""
 
-#: app/templates/pictogram_bank.html:57
-msgid "Selected Image Preview"
-msgstr ""
-
-#: app/templates/pictogram_bank.html:68
+#: app/templates/pictogram_bank.html:75
 msgid "Make image public"
 msgstr ""
 
-#: app/templates/pictogram_bank.html:78
+#: app/templates/pictogram_bank.html:85
 msgid "Replace Image File"
 msgstr ""
 
-#: app/templates/pictogram_bank.html:79
+#: app/templates/pictogram_bank.html:86
 msgid ""
 "Replaces this file while keeping its ID. All trees and lists using this "
 "image will automatically be updated."
 msgstr ""
 
-#: app/templates/pictogram_bank.html:83
+#: app/templates/pictogram_bank.html:90
 msgid "Choose New File"
 msgstr ""
 
-#: app/templates/pictogram_bank.html:88
+#: app/templates/pictogram_bank.html:95
 msgid "Replace Selected Image"
 msgstr ""
 

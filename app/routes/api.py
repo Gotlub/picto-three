@@ -654,6 +654,10 @@ def replace_image_file(image_id):
     image.path = new_relative_path
     image.updated_at = datetime.now(UTC)
 
+    description = request.form.get('description')
+    if description is not None and description.strip():
+        image.description = description.strip()
+
     try:
         image.image_hash = calculate_image_hash(new_physical_path, image.description)
     except (OSError, TypeError, ValueError) as e:

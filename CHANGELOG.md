@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **In-Place Image Replacement in "My Resources" (`app/routes/api.py`, `pictogram_bank.js`, `builder.html`, `pictogram_bank.html`)**:
+  - Contextual morphing: when an image is selected in the resources tree, the "Import Image" section dynamically transforms into "Replace Image: [filename]", shows a thumbnail preview of the current image, and prefills the description field.
+  - Robust deselection & folder selection: clicking a folder or deselecting immediately resets `this.selectedImageThumbnail` and completely hides/clears the thumbnail container (`d-none`, `display: none !important`), ensuring no miniature is ever shown when "Import Image" is displayed. Clicking a selected node again or clicking outside deselects it cleanly.
+  - Safe replacement workflow: prompts user confirmation before replacing, calls `/api/image/<id>/replace` preserving the primary key (`Image.id`) across all trees and lists, deletes old physical files/thumbnails, generates new Pillow thumbnails, and recalculates SHA256 hashes and modification timestamps.
+  - Real-time cache busting: injects `?t=${Date.now()}` on tree and sidebar image sources to immediately reflect the replaced visual without requiring manual browser cache clearing.
+  - Cross-tab live synchronization: dispatches a custom browser event `pictogram:replaced` upon replacement. Listened to by `ImageTree` (left sidebar library) and `builder.js` (central tree canvas) to immediately update matching pictogram thumbnails, labels, and download URLs across the "Tree Builder" tab without needing to reload the page.
 - **Drag & Drop of Root Node in `/list` (`ReadOnlyTreeViewer.js`, `ChainedListManager.js`)**:
   - In `element` mode, drags only the root element itself by isolating the drag ghost via `setDragImage` on `.node-content`.
   - In `branch` mode, prepends the root node to the branch array ahead of its descendants, falling back to the tree's name for description when blank.

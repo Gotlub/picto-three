@@ -254,6 +254,47 @@ export class TreeBuilder {
                 }
             });
         }
+
+        // Live update when an image is replaced in My Resources tab
+        window.addEventListener('pictogram:replaced', (e) => {
+            if (!e.detail || !e.detail.imageId) return;
+            const { imageId, name, description, timestamp } = e.detail;
+
+            // 1. Update left sidebar ImageTree
+            if (this.imageTree && typeof this.imageTree.updateImageNode === 'function') {
+                this.imageTree.updateImageNode(imageId, name, description, timestamp);
+            }
+
+            // 2. Update active canvas tree (rootNode and descendants)
+            this.updateImageInTree(this.rootNode, imageId, name, description, timestamp);
+
+            // 3. Update description textarea if currently selected node matches
+            if (this.selectedNode && Number(this.selectedNode.image?.id) === Number(imageId)) {
+                if (this.nodeDescriptionTextarea && (!this.selectedNode.description || this.selectedNode.description === name)) {
+                    this.nodeDescriptionTextarea.value = description || name || '';
+                }
+            }
+        });
+    }
+
+    updateImageInTree(node, imageId, newName, newDesc, timestamp) {
+        if (!node) return;
+        if (Number(node.image?.id) === Number(imageId)) {
+            if (newName) node.image.name = newName;
+            if (newDesc !== undefined) node.image.description = newDesc;
+            const img = node.element?.querySelector('img');
+            if (img) {
+                img.src = `/pictograms/${imageId}?t=${timestamp}`;
+            }
+            if (node.nameElement && !node.isDefaultRoot) {
+                if (!node.description || node.description === newName) {
+                    node.nameElement.textContent = newDesc || newName;
+                }
+            }
+        }
+        if (node.children && Array.isArray(node.children)) {
+            node.children.forEach(child => this.updateImageInTree(child, imageId, newName, newDesc, timestamp));
+        }
     }
 
     initPanAndZoom() {

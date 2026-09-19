@@ -27,10 +27,17 @@
             </div>
             <hr>
 
-            <!-- Upload Image Section -->
-            <h4>{{ _('Import Image') }}</h4>
+            <!-- Upload / Replace Image Section -->
+            <h4 id="import-section-title" data-import-title="{{ _('Import Image') }}" data-replace-title="{{ _('Replace Image') }}">{{ _('Import Image') }}</h4>
+            <div id="import-current-thumbnail-container" class="mb-3 p-2 border rounded bg-light align-items-center gap-2 d-none" style="display: none;">
+                <img id="import-current-thumbnail-img" src="" alt="{{ _('Selected Image Preview') }}" class="rounded border bg-white" style="width: 50px; height: 50px; object-fit: contain;">
+                <div class="overflow-hidden">
+                    <div class="small fw-bold text-truncate" id="import-current-name"></div>
+                    <div class="text-muted small text-truncate" id="import-current-desc"></div>
+                </div>
+            </div>
             <div class="mb-3">
-                <label for="image-upload-file" class="form-label">{{ _('Upload from disk') }}</label>
+                <label for="image-upload-file" class="form-label" id="image-upload-label" data-import-label="{{ _('Upload from disk') }}" data-replace-label="{{ _('Choose replacement file') }}">{{ _('Upload from disk') }}</label>
                 <div class="input-group">
                     <input type="file" id="image-upload-file" class="d-none" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp">
                     <label for="image-upload-file" class="btn btn-outline-secondary">{{ _('Choose File') }}</label>
@@ -41,7 +48,7 @@
                 <label for="image-description" class="form-label">{{ _('Description (optional)') }}</label>
                 <input type="text" id="image-description" class="form-control">
             </div>
-            <button id="upload-image-btn" class="btn btn-secondary mt-2">{{ _('Upload') }}</button>
+            <button id="upload-image-btn" class="btn btn-secondary mt-2" data-upload-text="{{ _('Upload') }}" data-replace-text="{{ _('Replace Image') }}">{{ _('Upload') }}</button>
             <hr>
 
             <!-- Edit Image Section (hidden by default) -->

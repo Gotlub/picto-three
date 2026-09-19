@@ -411,7 +411,8 @@ def test_replace_image_file_success_and_preserves_id(client, app):
     new_io.seek(0)
 
     replace_res = client.post(f'/api/image/{orig_id}/replace', data={
-        'file': (new_io, 'replaced_picto.png')
+        'file': (new_io, 'replaced_picto.png'),
+        'description': 'Updated Picto Description'
     }, content_type='multipart/form-data')
     assert replace_res.status_code == 200
     replaced_data = replace_res.get_json()['image']
@@ -419,6 +420,7 @@ def test_replace_image_file_success_and_preserves_id(client, app):
     # Must preserve the exact same ID
     assert replaced_data['id'] == orig_id
     assert replaced_data['name'] == 'replaced_picto.png'
+    assert replaced_data['description'] == 'Updated Picto Description'
     assert replaced_data['image_hash'] != orig_hash
 
     # Verify serving by ID returns the new image (PNG)

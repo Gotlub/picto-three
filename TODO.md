@@ -191,6 +191,18 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Suite de tests unitaires & intégration Python portée à 61 tests passants (`make pytest`).
   - [x] Validation intégrale avec `make test` (Ruff, ESLint, 54 tests JS, 61 tests Pytest, 11 tests E2E Playwright - 100% succès).
 
+## Phase 6 : Remplacement d'Images & Gestion Avancée des Ressources
+- [x] **Remplacement d'Images en Place dans "My Resources" (`app/routes/api.py`, `pictogram_bank.js`, `builder.html`, `pictogram_bank.html`)** :
+  - [x] Morphing dynamique : passage contextuel de "Import Image" à "Replace Image : [nom]" lors de la sélection d'une image.
+  - [x] Affichage d'une vignette miniature de l'image actuelle et pré-remplissage du champ description avec la valeur existante.
+  - [x] Désélection et sélection de dossiers : reset systématique de la variable de miniature (`this.selectedImageThumbnail = null`), suppression complète du conteneur de miniature (`d-none`, `display: none !important`), et masquage strict de la miniature dès que le mode "Import Image" est actif.
+  - [x] Boîte de confirmation préalable "Are you sure..." avant le remplacement effectif.
+  - [x] Endpoint backend `/api/image/<id>/replace` : conservation stricte de l'ID BDD, suppression de l'ancien fichier/miniature sur disque, sauvegarde du nouveau fichier, génération de la miniature et recalcul du hash SHA256 / date de modification.
+  - [x] Support de la mise à jour de description lors du remplacement de fichier.
+  - [x] Invalidation de cache (`?t=timestamp`) sur les miniatures dans l'arbre pour affichage immédiat.
+  - [x] Synchronisation en temps réel inter-onglets via `CustomEvent` (`pictogram:replaced`) : mise à jour instantanée sans rechargement de page dans l'onglet "Tree Builder" (barre latérale de gauche `ImageTree` et nœuds de l'arbre central).
+  - [x] Validation intégrale avec `make test` (Ruff, ESLint, 54 tests JS, 61 tests Pytest, 11 tests E2E Playwright - 100% succès).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

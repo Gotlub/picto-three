@@ -46,3 +46,29 @@ jobs:
 
       - name: 🕵️‍♂️ Analyse du code JavaScript (ESLint)
         run: npx eslint "app/static/js/**/*.js"
+
+      # Étape 7 : Tests unitaires JavaScript
+      - name: 🧪 Tests unitaires JavaScript (Node test runner)
+        run: npm test
+
+  e2e:
+    name: E2E Chromium / PostgreSQL 15
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      # Separate checkout: pytest currently mutates a static image fixture.
+      - uses: actions/checkout@v4
+
+      - name: Run isolated E2E stack
+        run: bash tests/e2e/run.sh
+
+      - name: Upload E2E reports and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-chromium-postgresql
+          path: tests/e2e/artifacts/
+          retention-days: 7
+          if-no-files-found: warn

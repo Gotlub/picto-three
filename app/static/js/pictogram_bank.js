@@ -43,9 +43,16 @@ class FolderNode extends BaseNode {
 
         nodeElement.appendChild(contentElement);
 
-        nodeElement.addEventListener('click', (e) => {
+        contentElement.addEventListener('click', (e) => {
             e.stopPropagation();
             this.bank.selectNode(this);
+        });
+
+        nodeElement.addEventListener('click', (e) => {
+            if (e.target === nodeElement) {
+                e.stopPropagation();
+                this.bank.selectNode(this);
+            }
         });
 
         return nodeElement;
@@ -114,9 +121,11 @@ class PictogramBank {
         this.rootNode = new FolderNode(this.initialData, this);
         this.selectedNode = null;
         this.rootSelected = false;
+        this.selectedImageThumbnail = null;
 
         this.initEventListeners();
         this.renderTree();
+        this.updateImportSectionState();
     }
 
     initEventListeners() {
@@ -126,21 +135,23 @@ class PictogramBank {
         document.getElementById('export-image-btn').addEventListener('click', () => this.exportImage());
         document.getElementById('image-upload-file').addEventListener('change', (e) => {
             const fileChosen = document.getElementById('file-chosen');
+            const isReplaceMode = this.selectedNode && (this.selectedNode instanceof ImageNode);
             if (e.target.files.length > 0) {
                 const filename = e.target.files[0].name;
                 fileChosen.textContent = filename;
                 
                 // Automatically suggest description (filename without extension)
-                const lastDotIndex = filename.lastIndexOf('.');
-                const nameWithoutExt = lastDotIndex !== -1 ? filename.substring(0, lastDotIndex) : filename;
+                // only if not in replace mode, or if description is currently empty
                 const descInput = document.getElementById('image-description');
-                if (descInput) {
+                if (descInput && (!isReplaceMode || !descInput.value.trim())) {
+                    const lastDotIndex = filename.lastIndexOf('.');
+                    const nameWithoutExt = lastDotIndex !== -1 ? filename.substring(0, lastDotIndex) : filename;
                     descInput.value = nameWithoutExt;
                 }
             } else {
                 fileChosen.textContent = fileChosen.dataset.defaultText;
                 const descInput = document.getElementById('image-description');
-                if (descInput) {
+                if (descInput && !isReplaceMode) {
                     descInput.value = '';
                 }
             }
@@ -172,14 +183,120 @@ class PictogramBank {
             refreshBtn.addEventListener('click', () => this.refresh());
         }
 
-        this.display.addEventListener('click', (e) => {
-            if (e.target === this.display) {
+        if (this.display) {
+            this.display.addEventListener('click', (e) => {
+                if (!e.target.closest('.node-content')) {
+                    this.deselectAllNodes();
+                }
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            const isClickInsideDisplay = this.display && this.display.contains(e.target);
+            const isClickInsideSidebar = e.target.closest('.sidebar');
+            const isClickInsideModal = e.target.closest('.modal');
+            if (!isClickInsideDisplay && !isClickInsideSidebar && !isClickInsideModal) {
                 this.deselectAllNodes();
             }
         });
     }
 
+    updateImportSectionState() {
+        const importSectionTitle = document.getElementById('import-section-title');
+        const importThumbContainer = document.getElementById('import-current-thumbnail-container');
+        const importThumbImg = document.getElementById('import-current-thumbnail-img');
+        const importCurrentName = document.getElementById('import-current-name');
+        const importCurrentDesc = document.getElementById('import-current-desc');
+        const uploadBtn = document.getElementById('upload-image-btn');
+        const uploadLabel = document.getElementById('image-upload-label');
+        const descInput = document.getElementById('image-description');
+        const fileInput = document.getElementById('image-upload-file');
+        const fileChosen = document.getElementById('file-chosen');
+
+        const isImage = this.selectedNode && (this.selectedNode instanceof ImageNode);
+
+        if (isImage) {
+            const imageId = Number(this.selectedNode.data.id);
+            const imageName = this.selectedNode.data.name || '';
+            const imageDesc = this.selectedNode.data.description || '';
+            const timestamp = Date.now();
+            const thumbUrl = (!isNaN(imageId) && imageId >= 0)
+                ? `/pictogramsmin/${imageId}?t=${timestamp}`
+                : `/pictogramsmin/${this.selectedNode.data.path}?t=${timestamp}`;
+
+            this.selectedImageThumbnail = thumbUrl;
+
+            if (importSectionTitle) {
+                const replacePrefix = importSectionTitle.dataset.replaceTitle || 'Replace Image';
+                importSectionTitle.textContent = `${replacePrefix} : ${imageName}`;
+            }
+            if (importThumbContainer && importThumbImg) {
+                importThumbContainer.classList.remove('d-none');
+                importThumbContainer.classList.add('d-flex');
+                importThumbContainer.style.setProperty('display', 'flex', 'important');
+                importThumbImg.src = thumbUrl;
+                if (importCurrentName) importCurrentName.textContent = imageName;
+                if (importCurrentDesc) importCurrentDesc.textContent = imageDesc;
+            }
+            if (descInput) {
+                descInput.value = imageDesc;
+            }
+            if (uploadBtn) {
+                uploadBtn.textContent = uploadBtn.dataset.replaceText || 'Replace Image';
+                uploadBtn.classList.remove('btn-secondary');
+                uploadBtn.classList.add('btn-warning');
+            }
+            if (uploadLabel) {
+                uploadLabel.textContent = uploadLabel.dataset.replaceLabel || 'Choose replacement file';
+            }
+        } else {
+            // Folder selected, or no selection (Import Image mode) -> Reset miniature variable and hide thumbnail
+            this.selectedImageThumbnail = null;
+
+            if (importSectionTitle) {
+                importSectionTitle.textContent = importSectionTitle.dataset.importTitle || 'Import Image';
+            }
+            if (importThumbContainer) {
+                importThumbContainer.classList.remove('d-flex');
+                importThumbContainer.classList.add('d-none');
+                importThumbContainer.style.setProperty('display', 'none', 'important');
+            }
+            if (importThumbImg) {
+                importThumbImg.removeAttribute('src');
+                importThumbImg.src = '';
+            }
+            if (importCurrentName) {
+                importCurrentName.textContent = '';
+            }
+            if (importCurrentDesc) {
+                importCurrentDesc.textContent = '';
+            }
+            if (uploadBtn) {
+                uploadBtn.textContent = uploadBtn.dataset.uploadText || 'Upload';
+                uploadBtn.classList.remove('btn-warning');
+                uploadBtn.classList.add('btn-secondary');
+            }
+            if (uploadLabel) {
+                uploadLabel.textContent = uploadLabel.dataset.importLabel || 'Upload from disk';
+            }
+            if (descInput) {
+                descInput.value = '';
+            }
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            if (fileChosen) {
+                fileChosen.textContent = fileChosen.dataset.defaultText || 'No file chosen';
+            }
+        }
+    }
+
     selectNode(node) {
+        if (this.selectedNode === node) {
+            this.deselectAllNodes();
+            return;
+        }
+
         this.deselectAllNodes();
         this.selectedNode = node;
         if (this.selectedNode) {
@@ -208,7 +325,13 @@ class PictogramBank {
                 // Root is a folder but cannot be edited or deleted
                 if (editSection) editSection.style.display = 'none';
                 if (exportBtn) exportBtn.disabled = true;
-                if (previewContainer) previewContainer.style.display = 'none';
+                if (previewContainer) {
+                    previewContainer.style.display = 'none';
+                    if (previewImg) {
+                        previewImg.removeAttribute('src');
+                        previewImg.src = '';
+                    }
+                }
                 if (replaceContainer) replaceContainer.style.display = 'none';
             } else if (this.selectedNode instanceof ImageNode) {
                 if (exportBtn) exportBtn.disabled = false;
@@ -252,7 +375,13 @@ class PictogramBank {
                 if (descContainer) descContainer.style.display = 'none';
                 if (publicContainer) publicContainer.style.display = 'none';
                 if (saveChangesBtn) saveChangesBtn.style.display = 'none';
-                if (previewContainer) previewContainer.style.display = 'none';
+                if (previewContainer) {
+                    previewContainer.style.display = 'none';
+                    if (previewImg) {
+                        previewImg.removeAttribute('src');
+                        previewImg.src = '';
+                    }
+                }
                 if (replaceContainer) replaceContainer.style.display = 'none';
                 if (sectionTitle) sectionTitle.textContent = sectionTitle.dataset.folderTitle;
                 
@@ -264,9 +393,17 @@ class PictogramBank {
         } else {
             if (editSection) editSection.style.display = 'none';
             if (exportBtn) exportBtn.disabled = true;
-            if (previewContainer) previewContainer.style.display = 'none';
+            if (previewContainer) {
+                previewContainer.style.display = 'none';
+                if (previewImg) {
+                    previewImg.removeAttribute('src');
+                    previewImg.src = '';
+                }
+            }
             if (replaceContainer) replaceContainer.style.display = 'none';
         }
+
+        this.updateImportSectionState();
     }
 
     deselectAllNodes() {
@@ -275,13 +412,23 @@ class PictogramBank {
         }
         this.selectedNode = null;
         this.rootSelected = false;
+        this.selectedImageThumbnail = null;
         document.getElementById('bank-delete-btn').disabled = true;
         document.getElementById('export-image-btn').disabled = true;
         document.getElementById('edit-image-section').style.display = 'none';
         const previewContainer = document.getElementById('edit-image-preview-container');
-        if (previewContainer) previewContainer.style.display = 'none';
+        if (previewContainer) {
+            previewContainer.style.display = 'none';
+            const previewImg = document.getElementById('edit-image-preview');
+            if (previewImg) {
+                previewImg.removeAttribute('src');
+                previewImg.src = '';
+            }
+        }
         const replaceContainer = document.getElementById('replace-image-container');
         if (replaceContainer) replaceContainer.style.display = 'none';
+
+        this.updateImportSectionState();
     }
 
     selectRoot() {
@@ -289,6 +436,7 @@ class PictogramBank {
         this.rootSelected = true;
         this.rootNode.element.querySelector('.node-content').classList.add('selected');
         this.selectedNode = this.rootNode;
+        this.updateImportSectionState();
     }
 
     countItems(node) {
@@ -353,13 +501,6 @@ class PictogramBank {
     }
 
     async uploadImage() {
-        const totalItems = this.countItems(this.rootNode);
-        const maxItems = window.MAX_ITEMS_LIMIT || 500;
-        if (totalItems >= maxItems) {
-            alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
-            return;
-        }
-
         const fileInput = document.getElementById('image-upload-file');
         const file = fileInput.files[0];
         if (!file) {
@@ -367,7 +508,7 @@ class PictogramBank {
             return;
         }
 
-        const maxKb = window.MAX_IMAGE_SIZE_KB || 500;
+        const maxKb = window.MAX_IMAGE_SIZE_KB || 5000;
         if (file.size > maxKb * 1024) {
             alert(`The image size cannot exceed ${maxKb} KB.`);
             return;
@@ -379,11 +520,103 @@ class PictogramBank {
             return;
         }
 
+        const isReplaceMode = this.selectedNode && (this.selectedNode instanceof ImageNode);
+
+        if (isReplaceMode) {
+            if (!confirm('Are you sure you want to replace this image? This action cannot be undone.')) {
+                return;
+            }
+
+            const imageId = this.selectedNode.data.id;
+            const descriptionInput = document.getElementById('image-description');
+            const description = descriptionInput ? descriptionInput.value.trim() : '';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('description', description);
+
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+            const uploadBtn = document.getElementById('upload-image-btn');
+            if (uploadBtn) uploadBtn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/image/${imageId}/replace`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Erreur serveur: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    this.selectedNode.data.path = result.image.path;
+                    this.selectedNode.data.name = result.image.name;
+                    this.selectedNode.data.description = result.image.description;
+                    this.selectedNode.data.updated_at = result.image.updated_at;
+                    this.selectedNode.data.image_hash = result.image.image_hash;
+
+                    // Update image in the tree element with cache buster
+                    const timestamp = Date.now();
+                    const treeImg = this.selectedNode.element.querySelector('img');
+                    if (treeImg) {
+                        treeImg.src = `/pictogramsmin/${imageId}?t=${timestamp}`;
+                    }
+                    const treeSpan = this.selectedNode.element.querySelector('span');
+                    if (treeSpan) {
+                        treeSpan.textContent = result.image.name;
+                    }
+
+                    // Reset file input
+                    fileInput.value = '';
+                    const fileChosen = document.getElementById('file-chosen');
+                    if (fileChosen) {
+                        fileChosen.textContent = fileChosen.dataset.defaultText || 'No file chosen';
+                    }
+
+                    // Update the sidebar state
+                    this.updateImportSectionState();
+
+                    // Notify other tabs and components (Tree Builder, ImageTree, etc.)
+                    window.dispatchEvent(new CustomEvent('pictogram:replaced', {
+                        detail: {
+                            imageId: Number(imageId),
+                            name: result.image.name,
+                            description: result.image.description,
+                            path: result.image.path,
+                            timestamp: timestamp
+                        }
+                    }));
+
+                    alert(result.message || 'Image replaced successfully!');
+                } else {
+                    alert(`Error replacing image: ${result.message}`);
+                }
+            } catch (e) {
+                console.error('Erreur remplacement image:', e);
+                alert(e.message || 'Le remplacement a échoué. Vérifiez votre connexion.');
+            } finally {
+                if (uploadBtn) uploadBtn.disabled = false;
+            }
+            return;
+        }
+
+        // Standard Upload Mode (into folder)
+        const totalItems = this.countItems(this.rootNode);
+        const maxItems = window.MAX_ITEMS_LIMIT || 500;
+        if (totalItems >= maxItems) {
+            alert(`You have reached the maximum limit of ${maxItems} items (folders and images).`);
+            return;
+        }
+
         let parentId;
         if (this.selectedNode && this.selectedNode instanceof FolderNode) {
             parentId = this.selectedNode.data.id;
-        } else if (this.selectedNode && this.selectedNode instanceof ImageNode) {
-            parentId = this.selectedNode.data.folder_id;
         } else {
             alert('Please select a parent folder.');
             return;
@@ -414,6 +647,10 @@ class PictogramBank {
                 const newImageNode = new ImageNode(result.image, this);
                 this.addNodeToTree(newImageNode, parentId);
                 fileInput.value = '';
+                const fileChosen = document.getElementById('file-chosen');
+                if (fileChosen) fileChosen.textContent = fileChosen.dataset.defaultText || 'No file chosen';
+                if (descriptionInput) descriptionInput.value = '';
+                this.updateImportSectionState();
             } else {
                 alert(`Error uploading image: ${result.message}`);
             }
@@ -610,6 +847,17 @@ class PictogramBank {
                 fileInput.value = '';
                 const replaceFileChosen = document.getElementById('replace-file-chosen');
                 if (replaceFileChosen) replaceFileChosen.textContent = 'No file chosen';
+
+                // Notify other tabs and components (Tree Builder, ImageTree, etc.)
+                window.dispatchEvent(new CustomEvent('pictogram:replaced', {
+                    detail: {
+                        imageId: Number(imageId),
+                        name: result.image.name,
+                        description: this.selectedNode.data.description || '',
+                        path: result.image.path,
+                        timestamp: timestamp
+                    }
+                }));
 
                 alert(result.message || 'Image remplacée avec succès !');
             } else {
