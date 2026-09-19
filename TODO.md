@@ -220,6 +220,28 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Nouveaux tests de sécurité dans `tests/test_security.py` (6 tests de sécurité passants, total Pytest porté à 64 tests).
   - [x] Validation intégrale avec `make test` (Ruff, ESLint, 54 tests JS, 64 tests Pytest, 11 tests E2E Playwright - 100% succès).
 
+## Phase 8 : Remédiation de l'Audit Cybersécurité Astra (Lots 1 à 4)
+- [x] **Lot 1 : Hygiène & CSP** :
+  - [x] Ajout de `.env*` dans `.dockerignore` pour éliminer le risque d'embarquer des secrets locaux dans les images.
+  - [x] Mise à jour de la CSP dans `app/__init__.py` : ajout de `https://static.arasaac.org` dans `img-src`, ainsi que `frame-ancestors 'self'` et `form-action 'self'`.
+  - [x] Fail-fast en production dans `config.py` : levée d'une `RuntimeError` si la clé secrète par défaut est utilisée en environnement de production.
+- [x] **Lot 2 : Contraintes SQL, Confinement Physique & Atomicité** :
+  - [x] Cohérence des tailles de colonnes BDD : restriction des noms de dossiers à 64 caractères (`Folder.name VARCHAR(64)`), noms d'images à 64 (`Image.name VARCHAR(64)`) et descriptions à 256 (`Image.description VARCHAR(256)`).
+  - [x] Confinement physique strict : vérification systématique via `Path.resolve().is_relative_to()` dans `create_folder`, `upload_image`, `replace_image_file`, `delete_item`, `delete_folder_recursive`, `files.py` et `mobile_api.py`.
+  - [x] Compensation transactionnelle : suppression des fichiers nouvellement créés sur le disque en cas d'échec du `db.session.commit()`.
+- [x] **Lot 3 : Tokens à Usage Unique & Nettoyage Intégral du Compte** :
+  - [x] Tokens de réinitialisation de mot de passe à usage unique : inclusion d'une empreinte SHA-256 du hash de mot de passe dans le jeton, invalidant automatiquement les liens consommés ou obsolètes dès le mot de passe modifié.
+  - [x] Suppression intégrale de compte utilisateur (`delete_account`) : nettoyage en cascade de `ProfileTree`, `Profile` et `PrintOption` avant la suppression de l'utilisateur pour éviter les violations de clés étrangères et les données orphelines.
+- [x] **Lot 4 : Budgets de Ressources & Isolation Client** :
+  - [x] Dédoublonnage des arbres associés à un profil dans `save_profile` et bornage des longueurs (nom et URL d'avatar).
+  - [x] Plafonnement défensif du multiplicateur de grille (`gridMultiplier` borné entre 1 et 50) dans `ListPdfExporter.js`.
+  - [x] Isolation du stockage `localStorage` des présets d'impression (`picto_print_presets_${userId}`).
+  - [x] Échappement des URL d'images Treant avant interpolation dans le template HTML.
+- [x] **Validation & Tests** :
+  - [x] Nouveaux tests de sécurité pour les bornes de dossier, profils et dédoublonnage (`tests/test_security.py`).
+  - [x] Tests de non-rejouabilité du token de reset et nettoyage complet du compte (`tests/test_auth.py`).
+  - [x] Suite complète validée avec succès : `make test` (Ruff, ESLint, 54 tests JS, 66 tests Pytest, 11 tests Playwright E2E - 100% succès).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

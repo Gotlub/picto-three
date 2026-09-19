@@ -34,7 +34,11 @@ def serve_pictogram(img_id):
     if image.user_id is not None and (not current_user.is_authenticated or image.user_id != current_user.id):
         return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
             
-    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
+    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+    target_path = (pictograms_path / image.path).resolve()
+    if not target_path.is_relative_to(pictograms_path):
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+
     response = send_from_directory(pictograms_path, image.path)
     response.headers['X-Image-Description'] = quote(image.description or '')
     response.headers['X-Image-Name'] = quote(image.name or '')
@@ -60,7 +64,11 @@ def serve_pictogram_min(img_id):
             
     filepath_min, _ = os.path.splitext(image.path)
     filepath_min = filepath_min + ".png"
-    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH_MIN']).resolve()
+    target_path = (pictograms_path / filepath_min).resolve()
+    if not target_path.is_relative_to(pictograms_path):
+        return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
+
     response = send_from_directory(pictograms_path, filepath_min)
     response.headers['X-Image-Description'] = quote(image.description or '')
     response.headers['X-Image-Name'] = quote(image.name or '')

@@ -120,6 +120,21 @@ def test_password_strength_and_account_deletion(client):
         login_response = login(client, 'strongpassworduser', 'StrongPassword123')
         assert b'Logout' in login_response.data
 
+        # Create related records (Tree, Profile, ProfileTree, PrintOption) to verify complete cascade cleanup
+        with client.application.app_context():
+            from app.models import PrintOption, Profile, ProfileTree, Tree
+            t = Tree(name='test_tree', user_id=user.id, json_data='{}')
+            db.session.add(t)
+            db.session.commit()
+            p = Profile(name='test_profile', user_id=user.id)
+            db.session.add(p)
+            db.session.commit()
+            pt = ProfileTree(profile_id=p.id, tree_id=t.id, user_id=user.id)
+            db.session.add(pt)
+            po = PrintOption(name='test_opt', user_id=user.id, payload='{}')
+            db.session.add(po)
+            db.session.commit()
+
         # Get CSRF token from a form on a protected page (e.g., account page)
         client.get('/account')
 
@@ -131,6 +146,12 @@ def test_password_strength_and_account_deletion(client):
         assert b'Your account has been successfully deleted.' in delete_response.data
         deleted_user = User.query.filter_by(username='strongpassworduser').first()
         assert deleted_user is None
+        with client.application.app_context():
+            from app.models import PrintOption, Profile, ProfileTree
+            assert Profile.query.filter_by(user_id=user.id).count() == 0
+            assert ProfileTree.query.filter_by(user_id=user.id).count() == 0
+            assert PrintOption.query.filter_by(user_id=user.id).count() == 0
+
 
 def test_registration_sends_confirmation_email(client, monkeypatch):
     sent_emails = []
@@ -223,6 +244,10 @@ def test_password_reset_flow(client, monkeypatch):
     db.session.refresh(user)
     assert user.check_password('NewPassword123')
     assert not user.check_password('OldPassword123')
+
+    # 4. Reusing the token must fail (single-use validation)
+    reuse_response = client.get(f'/reset/{token}', follow_redirects=True)
+    assert 'The reset link is invalid or has expired.' in reuse_response.data.decode('utf-8')
 
 def test_resend_confirmation_request(client, monkeypatch):
     # 1. Register a user

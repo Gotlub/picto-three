@@ -252,7 +252,7 @@ export class ListPdfExporter {
                 const custom = this.getCustomPresets();
                 custom[key] = data;
                 try {
-                    localStorage.setItem('picto_print_presets', JSON.stringify(custom));
+                    localStorage.setItem(this.getPresetStorageKey(), JSON.stringify(custom));
                 } catch (e) {
                     console.warn('Could not save to localStorage', e);
                 }
@@ -311,7 +311,7 @@ export class ListPdfExporter {
 
             delete customPresets[presetKey];
             try {
-                localStorage.setItem('picto_print_presets', JSON.stringify(customPresets));
+                localStorage.setItem(this.getPresetStorageKey(), JSON.stringify(customPresets));
             } catch (e) {
                 console.warn('Could not update localStorage', e);
             }
@@ -352,7 +352,7 @@ export class ListPdfExporter {
                         };
                     });
                     try {
-                        localStorage.setItem('picto_print_presets', JSON.stringify(custom));
+                        localStorage.setItem(this.getPresetStorageKey(), JSON.stringify(custom));
                     } catch (e) {
                         console.warn('Could not cache options in localStorage', e);
                     }
@@ -364,6 +364,13 @@ export class ListPdfExporter {
         this.populatePresetDropdown('');
     }
 
+    getPresetStorageKey() {
+        if (typeof document === 'undefined') return 'picto_print_presets_anon';
+        const userMeta = document.getElementById('current-user-meta');
+        const userId = userMeta && userMeta.dataset.userId ? userMeta.dataset.userId : 'anon';
+        return `picto_print_presets_${userId}`;
+    }
+
     getDefaultPresets() {
         return {};
     }
@@ -371,7 +378,8 @@ export class ListPdfExporter {
     getCustomPresets() {
         if (typeof localStorage === 'undefined') return {};
         try {
-            const raw = localStorage.getItem('picto_print_presets');
+            const key = this.getPresetStorageKey();
+            const raw = localStorage.getItem(key) || (key !== 'picto_print_presets_anon' ? localStorage.getItem('picto_print_presets') : null);
             return raw ? JSON.parse(raw) : {};
         } catch {
             return {};
@@ -557,7 +565,8 @@ export class ListPdfExporter {
         const modeRadios = document.querySelector('input[name="print-mode"]:checked');
         const mode = modeRadios ? modeRadios.value : 'grid';
 
-        const gridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value, 10) || 1;
+        const rawGridMultiplier = parseInt(document.getElementById('print-grid-multiplier')?.value, 10);
+        const gridMultiplier = isNaN(rawGridMultiplier) ? 1 : Math.max(1, Math.min(50, rawGridMultiplier));
 
         const chainDirRadios = document.querySelector('input[name="print-chain-direction"]:checked');
         const chainDirection = chainDirRadios ? chainDirRadios.value : 'horizontal';
@@ -610,10 +619,11 @@ export class ListPdfExporter {
             marginY = 10
         } = settings;
 
+        const safeMultiplier = Math.max(1, Math.min(50, parseInt(gridMultiplier, 10) || 1));
         let itemsToRender = [];
         if (mode === 'grid') {
             for (const item of items) {
-                for (let i = 0; i < gridMultiplier; i++) {
+                for (let i = 0; i < safeMultiplier; i++) {
                     itemsToRender.push(item);
                 }
             }

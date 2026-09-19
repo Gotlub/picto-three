@@ -230,7 +230,10 @@ def serve_mobile_pictogram(filepath):
             if not current_user_id or image.user_id != int(current_user_id):
                 return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
                 
-        pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
+        pictograms_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+        target_path = (pictograms_path / image.path).resolve()
+        if not target_path.is_relative_to(pictograms_path):
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
         response = send_from_directory(pictograms_path, image.path)
         response.headers['X-Image-Description'] = quote(image.description or '')
         response.headers['X-Image-Name'] = quote(image.name or '')
@@ -245,7 +248,10 @@ def serve_mobile_pictogram(filepath):
     if filepath.startswith('..') or posixpath.isabs(filepath):
         return jsonify({"error": "Invalid path"}), 400
 
-    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH'])
+    pictograms_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+    target_path = (pictograms_path / filepath).resolve()
+    if not target_path.is_relative_to(pictograms_path):
+        return jsonify({"error": "Invalid path"}), 400
     
     if filepath.startswith('public/'):
         response = send_from_directory(pictograms_path, filepath)
@@ -299,7 +305,10 @@ def serve_mobile_pictogram_min(filepath):
                 
         filepath_min, _ = os.path.splitext(image.path)
         filepath_min = filepath_min + ".png"
-        pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+        pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN']).resolve()
+        target_path = (pictograms_min_path / filepath_min).resolve()
+        if not target_path.is_relative_to(pictograms_min_path):
+            return send_from_directory(current_app.static_folder, 'images/prohibit-bold.png')
         response = send_from_directory(pictograms_min_path, filepath_min)
         response.headers['X-Image-Description'] = quote(image.description or '')
         response.headers['X-Image-Name'] = quote(image.name or '')
@@ -317,7 +326,10 @@ def serve_mobile_pictogram_min(filepath):
     thumb_filename,_= os.path.splitext(filepath)
     thumb_path_relative = thumb_filename + ".png"
     
-    pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+    pictograms_min_path = Path(current_app.config['PICTOGRAMS_PATH_MIN']).resolve()
+    target_path = (pictograms_min_path / thumb_path_relative).resolve()
+    if not target_path.is_relative_to(pictograms_min_path):
+        return jsonify({"error": "Invalid path"}), 400
     
     if filepath.startswith('public/'):
         response = send_from_directory(pictograms_min_path, thumb_path_relative)

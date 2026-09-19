@@ -8,3 +8,7 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+
+# Keep the private audit and local env secrets out of application images as well as Git.
+AUDIT_CYBER_LOCAL.md
+.env*

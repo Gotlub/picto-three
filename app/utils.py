@@ -57,15 +57,40 @@ def confirm_token(token, expiration=3600):
         current_app.logger.error(f"Erreur inattendue lors de la validation du token : {type(e).__name__}")
         return False
 
-def generate_password_reset_token(email):
+def _pwd_fingerprint(pwd_hash):
+    if not pwd_hash:
+        return ""
+    import hashlib
+    return hashlib.sha256(pwd_hash.encode()).hexdigest()[:16]
+
+def generate_password_reset_token(user_or_email, pwd_hash=None):
     serializer = URLSafeTimedSerializer(_get_token_secret())
-    return serializer.dumps(email, salt=PASSWORD_RESET_SALT)
+    if hasattr(user_or_email, 'email'):
+        email = user_or_email.email
+        h = _pwd_fingerprint(user_or_email.password_hash)
+    else:
+        email = user_or_email
+        h = _pwd_fingerprint(pwd_hash)
+    return serializer.dumps({'email': email, 'pwd_hash': h}, salt=PASSWORD_RESET_SALT)
 
 def confirm_password_reset_token(token, expiration=3600):
     serializer = URLSafeTimedSerializer(_get_token_secret())
     try:
-        email = serializer.loads(token, salt=PASSWORD_RESET_SALT, max_age=expiration)
-        return email
+        data = serializer.loads(token, salt=PASSWORD_RESET_SALT, max_age=expiration)
+        if isinstance(data, dict):
+            email = data.get('email')
+            expected_hash = data.get('pwd_hash')
+            if not email:
+                return False
+            from app.models import User
+            user = User.query.filter_by(email=email).first()
+            if not user or _pwd_fingerprint(user.password_hash) != expected_hash:
+                current_app.logger.warning("Token de reset invalide ou déjà consommé.")
+                return False
+            return email
+        elif isinstance(data, str):
+            return data
+        return False
     # SignatureExpired DOIT être avant BadSignature
     except SignatureExpired:
         current_app.logger.info("Token de reset expiré.")

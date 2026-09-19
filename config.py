@@ -7,6 +7,8 @@ basedir = Path(__file__).parent.resolve()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    if os.environ.get('FLASK_ENV', '').lower() == 'production' and SECRET_KEY == 'you-will-never-guess':
+        raise RuntimeError("Insecure default SECRET_KEY cannot be used in production environment!")
     
     import hashlib
     # Derivation of a distinct token secret key to prevent exposing SECRET_KEY weaknesses

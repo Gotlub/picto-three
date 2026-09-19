@@ -365,9 +365,10 @@ export class TreeBuilder {
 
             const rawDescription = builderNode.description || builderNode.image.name || '';
             const safeDescription = DomUtils ? DomUtils.escapeHtml(rawDescription) : rawDescription;
+            const safeImageSrc = DomUtils ? DomUtils.escapeHtml(treantNode.image || '') : (treantNode.image || '');
             const rawHTML = `
                 <div class="node-content-wrapper">
-                    <img src="${treantNode.image}" />
+                    <img src="${safeImageSrc}" />
                     <p class="node-name">${safeDescription}</p>
                 </div>
             `;

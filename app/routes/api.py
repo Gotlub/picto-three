@@ -10,6 +10,7 @@ from flask_babel import _
 from flask_login import current_user, login_required
 from PIL import Image as PILImage
 from sqlalchemy import or_
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 
 from app import db
@@ -403,8 +404,8 @@ def create_folder():
     parent_id = data.get('parent_id')
     name = data.get('name').strip()
 
-    # Validate folder name against directory traversal and invalid characters
-    if not re.match(r'^[^\\/:\*\?"<>\|\x00-\x1f]+$', name) or name.startswith('.') or len(name) > 100:
+    # Validate folder name against directory traversal and invalid characters (DB column varchar(64))
+    if not re.match(r'^[^\\/:\*\?"<>\|\x00-\x1f]+$', name) or name.startswith('.') or len(name) > 64:
         return jsonify({'status': 'error', 'message': _('Invalid folder name')}), 400
 
     parent_folder = db.session.get(Folder, parent_id)
@@ -438,7 +439,17 @@ def create_folder():
         path=str(new_relative_path).replace('\\', '/')
     )
     db.session.add(new_folder)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        try:
+            if new_physical_path.exists():
+                shutil.rmtree(new_physical_path)
+        except OSError:
+            pass
+        current_app.logger.error(f"DB error creating folder: {e}")
+        return jsonify({'status': 'error', 'message': _('Could not create folder.')}), 500
 
     return jsonify({'status': 'success', 'folder': new_folder.to_dict(include_children=False)})
 
@@ -499,10 +510,23 @@ def upload_image():
 
     if file:
         filename = secure_filename(file.filename)
+        if not filename or len(filename) > 64:
+            return jsonify({'status': 'error', 'message': _('Nom de fichier invalide.')}), 400
+
+        # Description validation (DB column varchar(256))
+        description = request.form.get('description', '').strip()
+        if not description:
+            description = Path(filename).stem
+        if len(description) > 256:
+            return jsonify({'status': 'error', 'message': _('La description ne doit pas dépasser 256 caractères.')}), 400
 
         # The folder path from DB is relative. Combine it with the base path for physical operations.
-        base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-        physical_path = base_path / folder.path / filename
+        base_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+        folder_physical_path = (base_path / folder.path).resolve()
+        physical_path = (folder_physical_path / filename).resolve()
+
+        if not physical_path.is_relative_to(folder_physical_path) or not physical_path.is_relative_to(base_path):
+            return jsonify({'status': 'error', 'message': _('Chemin de fichier invalide.')}), 400
 
         # The new path for the DB is also relative.
         relative_path = Path(folder.path) / filename
@@ -528,12 +552,11 @@ def upload_image():
         except (OSError, SyntaxError, ValueError):
             return jsonify({'status': 'error', 'message': _('Fichier image invalide ou potentiellement malveillant.')}), 400
 
-        file.save(physical_path)
-
-        # Get description from form, fall back to name without extension
-        description = request.form.get('description', '').strip()
-        if not description:
-            description = Path(filename).stem
+        try:
+            file.save(physical_path)
+        except OSError as e:
+            current_app.logger.error(f"Error saving image {physical_path}: {e}")
+            return jsonify({'status': 'error', 'message': _('Erreur lors de l\'enregistrement du fichier.')}), 500
 
         # Calculate hash
         try:
@@ -553,7 +576,16 @@ def upload_image():
             updated_at=datetime.now(UTC)
         )
         db.session.add(new_image)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            try:
+                physical_path.unlink(missing_ok=True)
+            except OSError:
+                pass
+            current_app.logger.error(f"Error committing uploaded image to DB: {e}")
+            return jsonify({'status': 'error', 'message': _('Database error.')}), 500
 
         # --- AJOUTER L'APPEL POUR CRÉER LA MINIATURE ---
         try:
@@ -587,7 +619,10 @@ def update_image_details(image_id):
 
     # Update fields if they are present in the request payload
     if 'description' in data:
-        image.description = data['description']
+        desc = data['description']
+        if desc is not None and len(str(desc)) > 256:
+            return jsonify({'status': 'error', 'message': _('La description ne doit pas dépasser 256 caractères.')}), 400
+        image.description = desc
 
     # is_public is forced to False for security - no public user images
     image.is_public = False
@@ -631,6 +666,10 @@ def replace_image_file(image_id):
     if file.filename == '':
         return jsonify({'status': 'error', 'message': _('No selected file')}), 400
 
+    filename = secure_filename(file.filename)
+    if not filename or len(filename) > 64:
+        return jsonify({'status': 'error', 'message': _('Nom de fichier invalide.')}), 400
+
     allowed_mimetypes = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
     if file.mimetype not in allowed_mimetypes:
         return jsonify({'status': 'error', 'message': _('Format de fichier non autorisé.')}), 400
@@ -651,16 +690,20 @@ def replace_image_file(image_id):
     except (OSError, SyntaxError, ValueError):
         return jsonify({'status': 'error', 'message': _('Fichier image invalide ou potentiellement malveillant.')}), 400
 
-    base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-    thumb_base = Path(current_app.config.get('PICTOGRAMS_PATH_MIN', current_app.config['PICTOGRAMS_PATH']))
+    base_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+    thumb_base = Path(current_app.config.get('PICTOGRAMS_PATH_MIN', current_app.config['PICTOGRAMS_PATH'])).resolve()
 
-    old_physical_path = base_path / image.path
-    old_thumb_path = thumb_base / Path(image.path).with_suffix('.png')
+    old_physical_path = (base_path / image.path).resolve()
+    old_thumb_path = (thumb_base / Path(image.path).with_suffix('.png')).resolve()
 
-    filename = secure_filename(file.filename)
     folder_path = Path(image.path).parent
+    folder_physical_path = (base_path / folder_path).resolve()
+    new_physical_path = (folder_physical_path / filename).resolve()
+
+    if not new_physical_path.is_relative_to(folder_physical_path) or not new_physical_path.is_relative_to(base_path):
+        return jsonify({'status': 'error', 'message': _('Chemin de fichier invalide.')}), 400
+
     new_relative_path = str(folder_path / filename).replace('\\', '/')
-    new_physical_path = base_path / folder_path / filename
 
     # If physical path changed (e.g. extension changed or different filename), remove old physical files
     if new_physical_path != old_physical_path and old_physical_path.exists():
@@ -674,8 +717,12 @@ def replace_image_file(image_id):
             except OSError as e:
                 current_app.logger.warning(f"Failed to remove old thumbnail {old_thumb_path}: {e}")
 
-    new_physical_path.parent.mkdir(parents=True, exist_ok=True)
-    file.save(new_physical_path)
+    try:
+        new_physical_path.parent.mkdir(parents=True, exist_ok=True)
+        file.save(new_physical_path)
+    except OSError as e:
+        current_app.logger.error(f"Error saving replaced image {new_physical_path}: {e}")
+        return jsonify({'status': 'error', 'message': _('Erreur lors de l\'enregistrement du fichier.')}), 500
 
     image.name = filename
     image.path = new_relative_path
@@ -683,7 +730,10 @@ def replace_image_file(image_id):
 
     description = request.form.get('description')
     if description is not None and description.strip():
-        image.description = description.strip()
+        desc_clean = description.strip()
+        if len(desc_clean) > 256:
+            return jsonify({'status': 'error', 'message': _('La description ne doit pas dépasser 256 caractères.')}), 400
+        image.description = desc_clean
 
     try:
         image.image_hash = calculate_image_hash(new_physical_path, image.description)
@@ -696,7 +746,12 @@ def replace_image_file(image_id):
     except (OSError, ValueError) as e:
         current_app.logger.error(f"Failed to recreate thumbnail for {image.path}: {e}")
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        current_app.logger.error(f"DB commit error on image replacement: {e}")
+        return jsonify({'status': 'error', 'message': _('Database error.')}), 500
 
     return jsonify({
         'status': 'success',
@@ -883,8 +938,12 @@ def save_profile():
     remote_avatar_url = data.get('remote_avatar_url')
     trees_data = data.get('trees', [])
 
-    if not profile_name:
-        return jsonify({'status': 'error', 'message': _('Missing profile name')}), 400
+    if not profile_name or len(profile_name.strip()) == 0 or len(profile_name.strip()) > 64:
+        return jsonify({'status': 'error', 'message': _('Nom de profil invalide (1 à 64 caractères).')}), 400
+
+    profile_name = profile_name.strip()
+    if remote_avatar_url and len(str(remote_avatar_url)) > 256:
+        return jsonify({'status': 'error', 'message': _('URL de l\'avatar trop longue.')}), 400
 
     profile = Profile.query.filter_by(user_id=current_user.id, name=profile_name).first()
 
@@ -903,17 +962,21 @@ def save_profile():
     tree_ids = [t.get('treeId') for t in trees_data if t.get('treeId')]
     valid_trees = {t.id for t in Tree.query.filter(Tree.id.in_(tree_ids), Tree.user_id == current_user.id).all()} if tree_ids else set()
 
-    for index, t_data in enumerate(trees_data):
+    seen_tree_ids = set()
+    order = 1
+    for t_data in trees_data:
         tid = t_data.get('treeId')
-        if tid in valid_trees:
+        if tid in valid_trees and tid not in seen_tree_ids:
+            seen_tree_ids.add(tid)
             tree_assoc = ProfileTree(
                 profile_id=profile.id,
                 tree_id=tid,
                 user_id=current_user.id,
-                display_order=index + 1,
+                display_order=order,
                 colorCode=t_data.get('colorCode', '#000000')
             )
             db.session.add(tree_assoc)
+            order += 1
 
     db.session.commit()
 
@@ -938,9 +1001,9 @@ def delete_profile(profile_id):
     return jsonify({'status': 'success', 'message': _('Profile deleted successfully')})
 
 def delete_folder_recursive(folder):
-    # The path from DB is relative. Combine it with the base path for physical operations.
-    base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-    base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
+    base_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+    base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN']).resolve()
+
     # Recursively delete children folders
     for sub_folder in folder.children:
         delete_folder_recursive(sub_folder)
@@ -948,30 +1011,31 @@ def delete_folder_recursive(folder):
     # Delete images in the folder
     for image in folder.images:
         try:
-            physical_path = base_path / image.path
-            physical_path.unlink(missing_ok=True)
-            physical_path_min = base_path_min / image.path
-            physical_path_min = physical_path_min.with_suffix('.png')
-            physical_path_min.unlink(missing_ok=True)
+            physical_path = (base_path / image.path).resolve()
+            if physical_path.is_relative_to(base_path):
+                physical_path.unlink(missing_ok=True)
+            physical_path_min = (base_path_min / image.path).with_suffix('.png').resolve()
+            if physical_path_min.is_relative_to(base_path_min):
+                physical_path_min.unlink(missing_ok=True)
         except OSError as e:
-            print(f"Error deleting file {physical_path}: {e}") # Or use proper logging
+            current_app.logger.warning(f"Error deleting file for image {image.id}: {e}")
         db.session.delete(image)
 
     # Delete the folder directory itself
     try:
-        physical_path = base_path / folder.path
-        if physical_path.exists():
+        physical_path = (base_path / folder.path).resolve()
+        if physical_path.is_relative_to(base_path) and physical_path.exists():
             shutil.rmtree(physical_path)
     except OSError as e:
-        print(f"Error deleting directory {physical_path}: {e}")
+        current_app.logger.warning(f"Error deleting directory {physical_path}: {e}")
 
     # Delete the miniature folder directory itself
     try:
-        physical_path_min = base_path_min / folder.path
-        if physical_path_min.exists():
+        physical_path_min = (base_path_min / folder.path).resolve()
+        if physical_path_min.is_relative_to(base_path_min) and physical_path_min.exists():
             shutil.rmtree(physical_path_min)
     except OSError as e:
-        print(f"Error deleting directory {physical_path_min}: {e}")
+        current_app.logger.warning(f"Error deleting directory {physical_path_min}: {e}")
 
     # Delete the folder from DB
     db.session.delete(folder)
@@ -1003,13 +1067,16 @@ def delete_item():
         if not image or image.user_id != current_user.id:
             return jsonify({'status': 'error', 'message': _('Image not found or not owned by user')}), 404
 
+        base_path = Path(current_app.config['PICTOGRAMS_PATH']).resolve()
+        physical_path = (base_path / image.path).resolve()
+        base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN']).resolve()
+        physical_path_min = (base_path_min / image.path).with_suffix('.png').resolve()
+
+        if not physical_path.is_relative_to(base_path) or not physical_path_min.is_relative_to(base_path_min):
+            return jsonify({'status': 'error', 'message': _('Chemin de fichier invalide.')}), 400
+
         try:
-            base_path = Path(current_app.config['PICTOGRAMS_PATH'])
-            physical_path = base_path / image.path
             physical_path.unlink(missing_ok=True)
-            base_path_min = Path(current_app.config['PICTOGRAMS_PATH_MIN'])
-            physical_path_min = base_path_min / image.path
-            physical_path_min = physical_path_min.with_suffix('.png')
             physical_path_min.unlink(missing_ok=True)
         except OSError as e:
             current_app.logger.error(f"Error deleting physical files for image {image.id}: {e}")

@@ -174,4 +174,65 @@ def test_security_headers_enforced(client):
     csp = response.headers.get('Content-Security-Policy', '')
     assert "default-src 'self'" in csp
     assert "object-src 'none'" in csp
+    assert "https://static.arasaac.org" in csp
+    assert "frame-ancestors 'self'" in csp
+    assert "form-action 'self'" in csp
+
+
+def test_create_folder_bounds(seeded_db):
+    """Test that folder name length > 64 characters is rejected."""
+    client = seeded_db
+    login(client, 'user1', 'password')
+
+    with client.application.app_context():
+        user1 = User.query.filter_by(username='user1').first()
+        root_folder = Folder.query.filter_by(user_id=user1.id, parent_id=None).first()
+        root_folder_id = root_folder.id
+
+    long_name = 'a' * 65
+    response = client.post('/api/folder/create', json={
+        'parent_id': root_folder_id,
+        'name': long_name
+    })
+    assert response.status_code == 400
+    assert 'Invalid folder name' in response.get_json().get('message', '')
+
+
+def test_save_profile_bounds_and_deduplication(seeded_db):
+    """Test that profile name length is constrained and duplicated tree associations are deduplicated."""
+    from app.models import ProfileTree, Tree
+    client = seeded_db
+    login(client, 'user1', 'password')
+
+    with client.application.app_context():
+        user1 = User.query.filter_by(username='user1').first()
+        tree1 = Tree(name='tree1', user_id=user1.id, json_data='{}')
+        db.session.add(tree1)
+        db.session.commit()
+        tree1_id = tree1.id
+
+    # 1. Reject overlong profile name (> 64)
+    resp = client.post('/api/profile/save', json={
+        'name': 'P' * 65,
+        'trees': [{'treeId': tree1_id}]
+    })
+    assert resp.status_code == 400
+
+    # 2. Save profile with duplicate tree references
+    resp = client.post('/api/profile/save', json={
+        'name': 'MyProfile',
+        'trees': [
+            {'treeId': tree1_id, 'colorCode': '#111111'},
+            {'treeId': tree1_id, 'colorCode': '#222222'}
+        ]
+    })
+    assert resp.status_code == 200
+    profile_id = resp.get_json().get('profile_id')
+
+    with client.application.app_context():
+        assocs = ProfileTree.query.filter_by(profile_id=profile_id).all()
+        # Should be deduplicated to exactly 1 association
+        assert len(assocs) == 1
+        assert assocs[0].tree_id == tree1_id
+
 

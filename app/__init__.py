@@ -122,9 +122,11 @@ def create_app(config_override=None):
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.google.com https://www.gstatic.com; "
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
             "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; "
-            "img-src 'self' data: blob: https://api.arasaac.org https://commons.wikimedia.org; "
+            "img-src 'self' data: blob: https://api.arasaac.org https://static.arasaac.org https://commons.wikimedia.org; "
             "connect-src 'self' https://api.arasaac.org; "
             "frame-src 'self' https://www.youtube.com https://www.google.com; "
+            "frame-ancestors 'self'; "
+            "form-action 'self'; "
             "object-src 'none'; "
             "base-uri 'self';"
         )

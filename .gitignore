@@ -146,3 +146,6 @@ shelf/
 
 # Isolated Playwright reports, traces and downloads
 tests/e2e/artifacts/
+
+# Private local security audit; do not commit this report.
+/AUDIT_CYBER_LOCAL.md

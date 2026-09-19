@@ -17,7 +17,16 @@ from app.forms import (
     ResendConfirmationForm,
     ResetPasswordForm,
 )
-from app.models import Folder, Image, PictogramList, Tree, User
+from app.models import (
+    Folder,
+    Image,
+    PictogramList,
+    PrintOption,
+    Profile,
+    ProfileTree,
+    Tree,
+    User,
+)
 from app.utils import (
     confirm_password_reset_token,
     confirm_token,
@@ -143,7 +152,7 @@ def forgot_password():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            token = generate_password_reset_token(user.email)
+            token = generate_password_reset_token(user)
             reset_url = url_for('auth.reset_with_token_route', token=token, _external=True)
             send_email(user.email, 'Reset Your Password', 'emails/reset_password.html', reset_url=reset_url)
             flash(_('An email with instructions to reset your password has been sent.'), 'info')
@@ -205,22 +214,26 @@ def delete_account():
     if form.validate_on_submit():
         if form.username_confirm.data == current_user.username:
             user = current_user
-            # 1. Delete all trees of the user
+            # 1. Delete cross-reference relations and profile data
+            ProfileTree.query.filter_by(user_id=user.id).delete()
+            Profile.query.filter_by(user_id=user.id).delete()
+            PrintOption.query.filter_by(user_id=user.id).delete()
+            # 2. Delete all trees of the user
             Tree.query.filter_by(user_id=user.id).delete()
-            # 2. Delete all lists of the user
+            # 3. Delete all lists of the user
             PictogramList.query.filter_by(user_id=user.id).delete()
-            # 3. Delete all images belonging to the user
+            # 4. Delete all images belonging to the user
             Image.query.filter_by(user_id=user.id).delete()
-            # 4. Delete the user's pictogram directory
+            # 5. Delete the user's pictogram directory
             user_pictogram_folder = Path(current_app.config['PICTOGRAMS_PATH']) / user.username
             if user_pictogram_folder.exists():
                 shutil.rmtree(user_pictogram_folder)
             user_pictogram_min_folder = Path(current_app.config['PICTOGRAMS_PATH_MIN']) / user.username
             if user_pictogram_min_folder.exists():
                 shutil.rmtree(user_pictogram_min_folder)
-            # 5. Delete all folders of the user
+            # 6. Delete all folders of the user
             Folder.query.filter_by(user_id=user.id).delete()
-            # 6. Delete the user account
+            # 7. Delete the user account
             db.session.delete(user)
             db.session.commit()
             logout_user()
