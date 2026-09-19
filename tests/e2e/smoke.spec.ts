@@ -151,7 +151,6 @@ test('List imports a local PNG, edits its description, previews landscape, saves
   await expect(page.locator('#print')).toBeVisible();
   await page.locator('#collapseExportPdf label[for="print-orient-landscape"]').click();
   await expect(page.locator('#print-orient-landscape')).toBeChecked();
-  await page.locator('#collapseExportPdf #btn-render-preview').click();
   const preview = page.locator('#print-pages-wrapper .a4-page');
   await expect(preview).toHaveCount(1);
   await expect(preview).toHaveClass('a4-page landscape');
@@ -209,7 +208,6 @@ test('List loads the seeded saved list in order and previews both pictograms', a
 
   await page.locator('#print-tab').click();
   await expect(page.locator('#print')).toBeVisible();
-  await page.locator('#collapseExportPdf #btn-render-preview').click();
   const preview = page.locator('#print-pages-wrapper .a4-page');
   await expect(preview).toHaveCount(1);
   await expect(preview).toHaveClass('a4-page portrait');

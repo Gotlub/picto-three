@@ -341,7 +341,6 @@ test('List reorders local images, deletes a link, cancels New Chain, and downloa
   await expect(items.locator('p')).toHaveText(['Third', 'Second']);
 
   await page.locator('#print-tab').click();
-  await page.locator('#collapseExportPdf #btn-render-preview').click();
   const preview = page.locator('#print-pages-wrapper .a4-page');
   await expect(preview).toHaveCount(1);
   await expect(preview).toHaveClass('a4-page portrait');

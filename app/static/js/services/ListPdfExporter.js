@@ -33,8 +33,27 @@ export class ListPdfExporter {
         this.getItemsCallback = getItemsCallback;
 
         this.currentZoom = 1.0;
+        this._previewTimer = null;
 
         this.initEventListeners();
+    }
+
+    schedulePreview() {
+        if (this._previewTimer) {
+            if (typeof cancelAnimationFrame !== 'undefined') {
+                cancelAnimationFrame(this._previewTimer);
+            } else {
+                clearTimeout(this._previewTimer);
+            }
+        }
+        if (typeof requestAnimationFrame !== 'undefined') {
+            this._previewTimer = requestAnimationFrame(() => {
+                this._previewTimer = null;
+                this.renderPreview();
+            });
+        } else {
+            this.renderPreview();
+        }
     }
 
     initEventListeners() {
@@ -63,10 +82,11 @@ export class ListPdfExporter {
                     const modeChain = document.getElementById('mode-chain');
                     if (modeChain) modeChain.checked = true;
                 }
+                this.renderPreview();
             });
         }
 
-        // Tab <-> Accordion Synchronization
+        // Tab <-> Accordion Synchronization & Live rendering on tab switch
         const constructAccordion = typeof document !== 'undefined' ? document.getElementById('collapseConstruct') : null;
         const exportAccordion = typeof document !== 'undefined' ? document.getElementById('collapseExportPdf') : null;
         const importTabBtn = typeof document !== 'undefined' ? document.getElementById('import-describe-tab') : null;
@@ -87,6 +107,7 @@ export class ListPdfExporter {
                 isSyncing = true;
                 bootstrap.Tab.getOrCreateInstance(printTabBtn).show();
                 isSyncing = false;
+                this.renderPreview();
             });
 
             importTabBtn.addEventListener('show.bs.tab', () => {
@@ -101,6 +122,19 @@ export class ListPdfExporter {
                 isSyncing = true;
                 bootstrap.Collapse.getOrCreateInstance(exportAccordion).show();
                 isSyncing = false;
+            });
+        }
+
+        // Real-time WYSIWYG auto-rendering on any print option modification
+        if (exportAccordion) {
+            exportAccordion.addEventListener('change', (e) => {
+                if (e.target.closest && e.target.closest('#savePrintOptionModal')) return;
+                this.renderPreview();
+            });
+
+            exportAccordion.addEventListener('input', (e) => {
+                if (e.target.closest && e.target.closest('#savePrintOptionModal')) return;
+                this.schedulePreview();
             });
         }
 
@@ -156,13 +190,6 @@ export class ListPdfExporter {
             if (widthInput) {
                 widthInput.addEventListener('input', () => {
                     if (widthVal) widthVal.textContent = widthInput.value + 'px';
-                    this.renderPreview();
-                });
-            }
-            if (typeof document !== 'undefined') {
-                const colorRadios = document.querySelectorAll(`input[name="print-border-color-${i}"]`);
-                colorRadios.forEach(radio => {
-                    radio.addEventListener('change', () => this.renderPreview());
                 });
             }
         }
@@ -175,11 +202,6 @@ export class ListPdfExporter {
                 textOptionsContainer.style.display = showTextSwitch.checked ? 'block' : 'none';
                 this.renderPreview();
             });
-        }
-
-        const textBoxSwitch = typeof document !== 'undefined' ? document.getElementById('print-text-box') : null;
-        if (textBoxSwitch) {
-            textBoxSwitch.addEventListener('change', () => this.renderPreview());
         }
 
         this.initPresets();

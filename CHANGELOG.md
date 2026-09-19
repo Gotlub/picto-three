@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Outward Concentric Border Architecture: borders expand strictly outward using nested concentric wrapper `div`s with `box-sizing: content-box` and pure outward borders, eliminating `box-shadow: inset`.
   - Strictly isolated inner image area: `innerBox` has fixed dimensions `imageSize x imageSize` with `overflow: hidden`, guaranteeing borders never encroach into, overlap, or sit under the pictogram image.
   - Framed Box (Cartouche) text styling: positioned above the image (`z-index: 2`), opaque white background occluding the image, and strictly matching inner `imageSize` width without overlapping any borders.
+- **Real-Time WYSIWYG Print Preview Auto-Rendering (`ListPdfExporter.js`, `list.html`)**:
+  - Removed the manual "Show / Update Preview" button (`#btn-render-preview`) to streamline the UI.
+  - Implemented automatic live listeners (`change` and continuous `input` with `requestAnimationFrame` scheduling) across all print and layout controls (orientation, image size, concentric borders, text placement/size/cartouche, grid/chain modes, margins, and preset loading).
+  - Updated Playwright E2E tests (`smoke.spec.ts`, `regression.spec.ts`) to validate direct real-time preview updates without manual intervention.
 - **Save & Load Print Options with Database Table & Modal (`app/models.py`, `app/routes/api.py`, `ListPdfExporter.js`)**:
   - Removed hardcoded default presets in favor of fully dynamic saved print options.
   - Added "Save Print Options" button opening a Bootstrap 5 modal to enter a custom name with Cancel / Save actions.

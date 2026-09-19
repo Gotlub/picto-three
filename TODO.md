@@ -181,11 +181,15 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Modèle SQLAlchemy `PrintOption` (`id`, `user_id`, `name`, `payload`, `created_at`, `updated_at`) avec migration Alembic.
   - [x] Endpoints API REST `/api/print_options` (GET, POST, DELETE) avec vérification de session/propriétaire, compatible multi-utilisateurs et extensible public.
   - [x] Double persistance transparente : API backend pour les utilisateurs authentifiés + repli/cache `localStorage`.
+- [x] **Aperçu d'Impression WYSIWYG en Temps Réel (`ListPdfExporter.js`, `list.html`)** :
+  - [x] Suppression du bouton manuel "Show / Update Preview" (`#btn-render-preview`) pour une interface épurée.
+  - [x] Écouteurs d'événements en direct (`change` et `input` avec ordonnancement `requestAnimationFrame` à 60 FPS) sur l'ensemble des contrôles (orientation, taille, bordures, texte, cartouche, modes grille/bande, marges, chargement de presets).
+  - [x] Tests E2E Playwright adaptés et validés en temps réel.
 - [x] **Internationalisation (i18n) & Validation globale** :
   - [x] Extraction Babel et compilation des catalogues `.mo` pour toutes les nouvelles chaînes d'options d'impression et de modale.
-  - [x] Suite de tests unitaires JS : 53 tests passants (`make test-js`).
+  - [x] Suite de tests unitaires JS : 54 tests passants (`make test-js`).
   - [x] Suite de tests unitaires & intégration Python portée à 61 tests passants (`make pytest`).
-  - [x] Validation intégrale avec `make test` (Ruff, ESLint, 53 tests JS, 61 tests Pytest, 11 tests E2E Playwright - 100% succès).
+  - [x] Validation intégrale avec `make test` (Ruff, ESLint, 54 tests JS, 61 tests Pytest, 11 tests E2E Playwright - 100% succès).
 
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
