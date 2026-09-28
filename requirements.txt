@@ -18,3 +18,4 @@ Jinja2
 requests
 Flask-JWT-Extended
 psycopg2-binary
+psycopg[binary]

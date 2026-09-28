@@ -34,79 +34,95 @@
     </div>
 </div>
 
-<div class="row g-5">
-    <!-- 1. The Tree Builder -->
-    <div class="col-lg-6">
-        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
-            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
-                <iframe src="https://www.youtube.com/embed/qkd-dN8ngwA" title="Tree Builder Demo" allowfullscreen class="border-0"></iframe>
-            </div>
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">1</div>
-                    <h3 class="card-title h4 text-primary m-0">{{ _('The Tree Builder (Web)') }}</h3>
-                </div>
-                <p class="card-text text-secondary">
-                    {{ _("Construct and organize your communication structures using a hierarchical interface. Drag and drop pictograms to build logical paths tailored to the user's specific needs. Once saved, these trees can be easily imported into the mobile application.") }}
-                </p>
-            </div>
-        </div>
-    </div>
+{% set user_lang = (local if local is defined else (locale if locale is defined else get_locale())) or 'fr' %}
+{% set active_lang = (user_lang | string).split('_')[0].split('-')[0].lower() %}
+{% if active_lang not in ['en', 'fr', 'es', 'de', 'it', 'nl', 'pl', 'pt'] %}
+    {% set active_lang = 'fr' %}
+{% endif %}
 
-    <!-- 2. PictoTree Mobile App (Video swapped with 4) -->
-    <div class="col-lg-6">
-        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
-            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
-                <iframe src="https://www.youtube.com/embed/vUW_iqguNBg" title="Mobile App Demo" allowfullscreen class="border-0"></iframe>
-            </div>
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">2</div>
-                    <h3 class="card-title h4 text-primary m-0">{{ _('PictoTree Mobile App (Android)') }}</h3>
-                </div>
-                <p class="card-text text-secondary">
-                    {{ _("The native mobile application uses a spatial navigation system (View 4) to browse through imported trees. It includes integrated Text-to-Speech (TTS) for vocal feedback and works fully offline to ensure communication is always available.") }}
-                </p>
+<!-- Presentation of the 3 main features in alternating 2-column showcase -->
+<section class="feature-presentation mb-5">
+    <!-- Bloc 1: Mobile Setup (Texte gauche / Vidéo desktop droite) -->
+    <article class="feature-row">
+        <div class="feature-text">
+            <h3 class="feature-title">
+                <i class="bi bi-diagram-3 text-primary"></i>
+                {{ _('Mobile Setup') }}
+            </h3>
+            <p class="feature-desc">{{ _('Build your digital binders for the mobile app.') }}</p>
+        </div>
+        <div class="feature-media">
+            <div class="video-container">
+                <video controls preload="metadata" playsinline width="100%">
+                    <source src="{{ url_for('static', filename='media/mobile-setup.mp4') }}" type="video/mp4">
+                    <track kind="subtitles" srclang="fr" label="Français" src="{{ url_for('static', filename='media/subtitles/mobile-setup.fr.vtt') }}"{% if active_lang == 'fr' %} default{% endif %}>
+                    <track kind="subtitles" srclang="en" label="English" src="{{ url_for('static', filename='media/subtitles/mobile-setup.en.vtt') }}"{% if active_lang == 'en' %} default{% endif %}>
+                    <track kind="subtitles" srclang="es" label="Español" src="{{ url_for('static', filename='media/subtitles/mobile-setup.es.vtt') }}"{% if active_lang == 'es' %} default{% endif %}>
+                    <track kind="subtitles" srclang="de" label="Deutsch" src="{{ url_for('static', filename='media/subtitles/mobile-setup.de.vtt') }}"{% if active_lang == 'de' %} default{% endif %}>
+                    <track kind="subtitles" srclang="it" label="Italiano" src="{{ url_for('static', filename='media/subtitles/mobile-setup.it.vtt') }}"{% if active_lang == 'it' %} default{% endif %}>
+                    <track kind="subtitles" srclang="nl" label="Nederlands" src="{{ url_for('static', filename='media/subtitles/mobile-setup.nl.vtt') }}"{% if active_lang == 'nl' %} default{% endif %}>
+                    <track kind="subtitles" srclang="pl" label="Polski" src="{{ url_for('static', filename='media/subtitles/mobile-setup.pl.vtt') }}"{% if active_lang == 'pl' %} default{% endif %}>
+                    <track kind="subtitles" srclang="pt" label="Português" src="{{ url_for('static', filename='media/subtitles/mobile-setup.pt.vtt') }}"{% if active_lang == 'pt' %} default{% endif %}>
+                    {{ _('Your browser does not support the video tag.') }}
+                </video>
             </div>
         </div>
-    </div>
+    </article>
 
-    <!-- 3. Pictogram Bank -->
-    <div class="col-lg-6">
-        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
-            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
-                <iframe src="https://www.youtube.com/embed/rmOlZieS948" title="Pictogram Bank Demo" allowfullscreen class="border-0"></iframe>
-            </div>
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">3</div>
-                    <h3 class="card-title h4 text-primary m-0">{{ _('Pictogram Bank (Management)') }}</h3>
-                </div>
-                <p class="card-text text-secondary">
-                    {{ _("Centralize your visual vocabulary. Search and import icons from the ARASAAC database or upload your own personal images. Organize them into folders to keep your library structured and ready for use in your trees or lists.") }}
-                </p>
+    <!-- Bloc 2: App Mobile (Vidéo gauche / Texte droite) -->
+    <article class="feature-row flex-row-reverse">
+        <div class="feature-text">
+            <h3 class="feature-title">
+                <i class="bi bi-phone text-success"></i>
+                {{ _('The Mobile App') }}
+            </h3>
+            <p class="feature-desc">{{ _('Carry your Time Timer and pictograms anywhere.') }}</p>
+        </div>
+        <div class="feature-media">
+            <div class="video-container">
+                <video controls preload="metadata" playsinline width="100%">
+                    <source src="{{ url_for('static', filename='media/mobile-app.mp4') }}" type="video/mp4">
+                    <track kind="subtitles" srclang="fr" label="Français" src="{{ url_for('static', filename='media/subtitles/mobile-app.fr.vtt') }}"{% if active_lang == 'fr' %} default{% endif %}>
+                    <track kind="subtitles" srclang="en" label="English" src="{{ url_for('static', filename='media/subtitles/mobile-app.en.vtt') }}"{% if active_lang == 'en' %} default{% endif %}>
+                    <track kind="subtitles" srclang="es" label="Español" src="{{ url_for('static', filename='media/subtitles/mobile-app.es.vtt') }}"{% if active_lang == 'es' %} default{% endif %}>
+                    <track kind="subtitles" srclang="de" label="Deutsch" src="{{ url_for('static', filename='media/subtitles/mobile-app.de.vtt') }}"{% if active_lang == 'de' %} default{% endif %}>
+                    <track kind="subtitles" srclang="it" label="Italiano" src="{{ url_for('static', filename='media/subtitles/mobile-app.it.vtt') }}"{% if active_lang == 'it' %} default{% endif %}>
+                    <track kind="subtitles" srclang="nl" label="Nederlands" src="{{ url_for('static', filename='media/subtitles/mobile-app.nl.vtt') }}"{% if active_lang == 'nl' %} default{% endif %}>
+                    <track kind="subtitles" srclang="pl" label="Polski" src="{{ url_for('static', filename='media/subtitles/mobile-app.pl.vtt') }}"{% if active_lang == 'pl' %} default{% endif %}>
+                    <track kind="subtitles" srclang="pt" label="Português" src="{{ url_for('static', filename='media/subtitles/mobile-app.pt.vtt') }}"{% if active_lang == 'pt' %} default{% endif %}>
+                    {{ _('Your browser does not support the video tag.') }}
+                </video>
             </div>
         </div>
-    </div>
+    </article>
 
-    <!-- 4. List & Print Tool (Video swapped with 2) -->
-    <div class="col-lg-6">
-        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
-            <div class="ratio ratio-16x9 shadow-sm rounded-top overflow-hidden">
-                <iframe src="https://www.youtube.com/embed/Ff0TDFh9q64" title="List Builder Demo" allowfullscreen class="border-0"></iframe>
-            </div>
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">4</div>
-                    <h3 class="card-title h4 text-primary m-0">{{ _('List & Print Tool (Paper Support)') }}</h3>
-                </div>
-                <p class="card-text text-secondary">
-                    {{ _("Generate customizable pictogram lists designed for printing. This tool provides various layout options to create physical communication boards, schedules, or educational materials directly from your digital collection.") }}
-                </p>
+    <!-- Bloc 3: Paper Tools (Texte gauche / Vidéo droite) -->
+    <article class="feature-row">
+        <div class="feature-text">
+            <h3 class="feature-title">
+                <i class="bi bi-printer text-warning"></i>
+                {{ _('Paper Tools') }}
+            </h3>
+            <p class="feature-desc">{{ _('Simplify printing your pictograms.') }}</p>
+        </div>
+        <div class="feature-media">
+            <div class="video-container">
+                <video controls preload="metadata" playsinline width="100%">
+                    <source src="{{ url_for('static', filename='media/paper-tools.mp4') }}" type="video/mp4">
+                    <track kind="subtitles" srclang="fr" label="Français" src="{{ url_for('static', filename='media/subtitles/paper-tools.fr.vtt') }}"{% if active_lang == 'fr' %} default{% endif %}>
+                    <track kind="subtitles" srclang="en" label="English" src="{{ url_for('static', filename='media/subtitles/paper-tools.en.vtt') }}"{% if active_lang == 'en' %} default{% endif %}>
+                    <track kind="subtitles" srclang="es" label="Español" src="{{ url_for('static', filename='media/subtitles/paper-tools.es.vtt') }}"{% if active_lang == 'es' %} default{% endif %}>
+                    <track kind="subtitles" srclang="de" label="Deutsch" src="{{ url_for('static', filename='media/subtitles/paper-tools.de.vtt') }}"{% if active_lang == 'de' %} default{% endif %}>
+                    <track kind="subtitles" srclang="it" label="Italiano" src="{{ url_for('static', filename='media/subtitles/paper-tools.it.vtt') }}"{% if active_lang == 'it' %} default{% endif %}>
+                    <track kind="subtitles" srclang="nl" label="Nederlands" src="{{ url_for('static', filename='media/subtitles/paper-tools.nl.vtt') }}"{% if active_lang == 'nl' %} default{% endif %}>
+                    <track kind="subtitles" srclang="pl" label="Polski" src="{{ url_for('static', filename='media/subtitles/paper-tools.pl.vtt') }}"{% if active_lang == 'pl' %} default{% endif %}>
+                    <track kind="subtitles" srclang="pt" label="Português" src="{{ url_for('static', filename='media/subtitles/paper-tools.pt.vtt') }}"{% if active_lang == 'pt' %} default{% endif %}>
+                    {{ _('Your browser does not support the video tag.') }}
+                </video>
             </div>
         </div>
-    </div>
-</div>
+    </article>
+</section>
 
 <style>
     .intro-header {
@@ -120,15 +136,162 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.6); /* Sombre pour faire ressortir le texte blanc */
+        background: rgba(0, 0, 0, 0.6);
         z-index: 1;
     }
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+    
+    /* 1. Conteneur principal */
+    .feature-presentation {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 40px 20px;
     }
-    .transition {
-        transition: all 0.3s ease;
+
+    /* 2. Structure 2 colonnes avec vidéos 1.3x plus grandes (max 728px) */
+    .feature-row {
+        display: flex;
+        align-items: center;
+        gap: 48px;
+        margin-bottom: 80px;
+    }
+
+    .feature-row:last-child {
+        margin-bottom: 20px;
+    }
+
+    .feature-row.flex-row-reverse {
+        flex-direction: row-reverse;
+    }
+
+    .feature-text {
+        flex: 1 1 380px;
+    }
+
+    .feature-media {
+        flex: 1.3 1 540px;
+        max-width: 728px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 4. Style du texte */
+    .feature-title {
+        font-family: 'Outfit', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        line-height: 1.3;
+    }
+
+    .feature-desc {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 1.15rem;
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    /* 3. Style des lecteurs vidéo (taille uniforme pour les 3 vidéos) */
+    .video-container {
+        width: 100%;
+        max-width: 728px;
+        background: #090d16;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        line-height: 0;
+    }
+
+    .video-container video {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 11px;
+    }
+
+    video::cue {
+        background-color: rgba(15, 23, 42, 0.88);
+        color: #ffffff;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: clamp(14px, 1.4vw, 18px);
+        line-height: 1.45;
+        border-radius: 4px;
+        padding: 0.2em 0.5em;
+    }
+
+    /* Responsive < 900px : 1 seule colonne verticale */
+    @media (max-width: 900px) {
+        .feature-presentation {
+            padding: 20px 15px;
+        }
+
+        .feature-row,
+        .feature-row.flex-row-reverse {
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .feature-title {
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .feature-desc {
+            font-size: 1.05rem;
+        }
+
+        .feature-media {
+            width: 100%;
+            max-width: 728px;
+        }
+
+        .video-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var activeLang = "{{ active_lang }}";
+    var videos = document.querySelectorAll('.feature-presentation video');
+
+    function syncVideoSubtitles(video) {
+        if (!video.textTracks || video.textTracks.length === 0) return;
+        for (var i = 0; i < video.textTracks.length; i++) {
+            var track = video.textTracks[i];
+            if (track.language === activeLang) {
+                track.mode = 'showing';
+            } else {
+                track.mode = 'disabled';
+            }
+        }
+    }
+
+    videos.forEach(function (video) {
+        syncVideoSubtitles(video);
+
+        video.addEventListener('loadedmetadata', function () {
+            syncVideoSubtitles(video);
+        });
+
+        video.addEventListener('play', function () {
+            if (!video.dataset.subtitlesActivated) {
+                syncVideoSubtitles(video);
+                video.dataset.subtitlesActivated = 'true';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
