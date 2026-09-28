@@ -242,6 +242,15 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Tests de non-rejouabilité du token de reset et nettoyage complet du compte (`tests/test_auth.py`).
   - [x] Suite complète validée avec succès : `make test` (Ruff, ESLint, 54 tests JS, 66 tests Pytest, 11 tests Playwright E2E - 100% succès).
 
+## Phase 9 : Audit & Harmonisation UX du Drag & Drop dans le Tree Builder
+- [x] **Audit et synchronisation du Drag & Drop dans le Tree Builder (`/builder`)** :
+  - [x] Élimination du décalage et des secousses visuelles lors du survol : suppression de la transition CSS `transition: margin-bottom` et du `margin-bottom: 35px` intempestif sur `.node-content.drag-over-child`.
+  - [x] Alignement géométrique rigoureux du trait coudé vert (`└`) : positionné à `left: 20px; top: 100%;` en parfaite continuité avec la ligne de tronc des nœuds enfants (`.children::before`).
+  - [x] Affichage net et stable au contact des éléments pour les déposes au-dessus (`drag-over-before`) et au-dessous (`drag-over-after`) via pseudo-éléments `::before` et `::after` (barre verte 4px sans distorsion ni variation de hauteur du nœud).
+  - [x] Remplacement du contour destructeur par `outline: 2px dashed` pour `drag-over-child` et `drag-over-replace` afin de préserver l'intégrité du box-model.
+  - [x] Optimisation de la capture d'événements (`BuilderNode.js`) : ciblage de `contentElement` avec étanchéité `contains(e.relatedTarget)` pour éradiquer le clignotement `dragleave` sur les enfants internes (`img`, `span`).
+  - [x] Uniformisation parfaite affichage/capture (`builder.js`) : détection prioritaire de l'indicateur visuel actif lors du `drop` et nettoyage automatique des indicateurs orphelins lors du survol.
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

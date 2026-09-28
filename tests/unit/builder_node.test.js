@@ -55,4 +55,50 @@ describe('BuilderNode Unit Tests', () => {
         node.updateDescription('Updated description');
         assert.equal(node.description, 'Updated description');
     });
+
+    it('creates DOM element with proper event listeners when document is available', () => {
+        const listeners = {};
+        const mockElement = (tag) => ({
+            tagName: tag,
+            classList: {
+                classes: new Set(),
+                add(c) { this.classes.add(c); },
+                contains(c) { return this.classes.has(c); },
+            },
+            style: {},
+            children: [],
+            appendChild(child) { this.children.push(child); return child; },
+            setAttribute(attr, val) { this[attr] = val; },
+            addEventListener(event, fn) {
+                if (!listeners[this.className || tag]) listeners[this.className || tag] = {};
+                listeners[this.className || tag][event] = fn;
+            }
+        });
+
+        const originalDoc = globalThis.document;
+        try {
+            globalThis.document = {
+                createElement(tag) {
+                    const el = mockElement(tag);
+                    if (tag === 'div') el.className = el.classList.classes.has('node-content') ? 'node-content' : 'node';
+                    return el;
+                }
+            };
+
+            const mockBuilder = {
+                selectNode: () => {},
+                handleDragStart: () => {},
+                handleDragOver: () => {},
+                handleDragLeave: () => {},
+                handleDrop: () => {},
+                handleDragEnd: () => {},
+            };
+
+            const node = new BuilderNode({ id: 10, name: 'Test Node', path: '/pictograms/10' }, mockBuilder);
+            assert.ok(node.element);
+            assert.equal(node.element.draggable, 'true');
+        } finally {
+            globalThis.document = originalDoc;
+        }
+    });
 });

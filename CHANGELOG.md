@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Tree Builder Drag & Drop Alignment & Zone Capture Harmonization (`builder.css`, `BuilderNode.js`, `builder.js`)**:
+  - Fixed visual offset and layout jumping during node hover: eliminated `transition: margin-bottom` and destabilizing `margin-bottom: 35px` on `.node-content.drag-over-child`, ensuring stable element geometry under the cursor.
+  - Aligned L-shaped green branch connector (`└`) accurately at `left: 20px; top: 100%;` directly matching the tree's vertical trunk line (`.children::before`) and pointing directly into the child indentation.
+  - Positioned crisp insertion bars right in contact with the element for drop above (`drag-over-before` with `::before` at `top: -2px`) and drop below (`drag-over-after` with `::after` at `bottom: -2px`), preventing node height expansion and content shifting.
+  - Adopted non-disruptive `outline: 2px dashed` for `drag-over-child` and `drag-over-replace` to preserve box-model dimensions.
+  - Bound precise dragover and drop handling directly to `contentElement` with `contains(e.relatedTarget)` guard to prevent flickering when cursor traverses child icons/text.
+  - Harmonized drop capture in `builder.js` by prioritizing the active visual indicator class on release and cleaning up any stale drag-over classes across the tree canvas.
+
 ### Added
 - **Astra Cybersecurity Local Audit Remediation (Lots 1 to 4)**:
   - **Lot 1 (Hygiene & CSP)**: Added `.env*` to `.dockerignore` to prevent local environment secret leakage into Docker images; updated CSP `img-src` to include `https://static.arasaac.org` alongside `https://api.arasaac.org`; added `frame-ancestors 'self'` and `form-action 'self'` to CSP; enforced fail-fast `RuntimeError` in `config.py` if default insecure secret key is used in production.

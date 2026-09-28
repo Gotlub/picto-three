@@ -492,6 +492,16 @@ export class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
+                // S'assurer qu'aucun autre nœud ne conserve une classe d'indicateur active
+                if (this.treeDisplay) {
+                    const activeElements = this.treeDisplay.querySelectorAll('.drag-over-before, .drag-over-after, .drag-over-child, .drag-over-replace');
+                    activeElements.forEach(el => {
+                        if (el !== targetContent) {
+                            el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
+                        }
+                    });
+                }
+
                 targetContent.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
 
                 const rect = targetContent.getBoundingClientRect();
@@ -528,18 +538,30 @@ export class TreeBuilder {
         let zone = 'child';
         const targetContent = targetNode.element.querySelector('.node-content');
         if (targetContent) {
-            const rect = targetContent.getBoundingClientRect();
-            const offsetY = e.clientY - rect.top;
-            const height = rect.height;
-            if (targetNode.isRoot) {
-                zone = offsetY < height / 2 ? 'replace' : 'child';
+            // Priorité absolue à l'indicateur visuel actuellement affiché à l'écran
+            if (targetContent.classList.contains('drag-over-before')) {
+                zone = 'before';
+            } else if (targetContent.classList.contains('drag-over-after')) {
+                zone = 'after';
+            } else if (targetContent.classList.contains('drag-over-replace')) {
+                zone = 'replace';
+            } else if (targetContent.classList.contains('drag-over-child')) {
+                zone = 'child';
             } else {
-                if (offsetY < height * 0.25) {
-                    zone = 'before';
-                } else if (offsetY > height * 0.75) {
-                    zone = 'after';
+                // Repli sur les coordonnées (ex: tests automatisés déclenchant drop sans dragover)
+                const rect = targetContent.getBoundingClientRect();
+                const offsetY = e.clientY - rect.top;
+                const height = rect.height;
+                if (targetNode.isRoot) {
+                    zone = offsetY < height / 2 ? 'replace' : 'child';
                 } else {
-                    zone = 'child';
+                    if (offsetY < height * 0.25) {
+                        zone = 'before';
+                    } else if (offsetY > height * 0.75) {
+                        zone = 'after';
+                    } else {
+                        zone = 'child';
+                    }
                 }
             }
         }
