@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-19 01:09+0000\n"
+"POT-Creation-Date: 2026-09-28 03:20+0200\n"
 "PO-Revision-Date: 2025-09-04 07:05+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: app/forms.py:19
 msgid "be at least 9 characters long"
@@ -34,12 +34,12 @@ msgstr ""
 msgid "Password must"
 msgstr ""
 
-#: app/forms.py:30 app/forms.py:36 app/forms.py:63
+#: app/forms.py:30 app/forms.py:36 app/forms.py:73
 #, fuzzy
 msgid "Username"
 msgstr "Ihr Benutzername"
 
-#: app/forms.py:31 app/forms.py:38 app/forms.py:71
+#: app/forms.py:31 app/forms.py:38 app/forms.py:81
 #, fuzzy
 msgid "Password"
 msgstr "Passwort zurücksetzen"
@@ -52,12 +52,12 @@ msgstr ""
 msgid "Sign In"
 msgstr "Anmelden"
 
-#: app/forms.py:37 app/forms.py:67 app/forms.py:77 app/forms.py:82
+#: app/forms.py:37 app/forms.py:77 app/forms.py:87 app/forms.py:92
 #, fuzzy
 msgid "Email"
 msgstr "Ihr Benutzername"
 
-#: app/forms.py:40 app/forms.py:73
+#: app/forms.py:40 app/forms.py:83
 #, fuzzy
 msgid "Repeat Password"
 msgstr "Passwort zurücksetzen"
@@ -75,271 +75,319 @@ msgstr ""
 msgid "Register"
 msgstr "Registrieren"
 
-#: app/forms.py:48
+#: app/forms.py:53
+msgid ""
+"Username must be 3-30 characters and contain only letters, numbers, hyphens "
+"or underscores."
+msgstr ""
+
+#: app/forms.py:55
+msgid "This username is reserved. Please choose another one."
+msgstr ""
+
+#: app/forms.py:58
 msgid "Please use a different username."
 msgstr ""
 
-#: app/forms.py:53
+#: app/forms.py:63
 msgid "Please use a different email address."
 msgstr ""
 
-#: app/forms.py:56
+#: app/forms.py:66
 #, fuzzy
 msgid "Current Password"
 msgstr "Passwort zurücksetzen"
 
-#: app/forms.py:57
+#: app/forms.py:67
 #, fuzzy
 msgid "New Password"
 msgstr "Passwort ändern"
 
-#: app/forms.py:59
+#: app/forms.py:69
 #, fuzzy
 msgid "Repeat New Password"
 msgstr "Passwort zurücksetzen"
 
-#: app/forms.py:60 app/templates/account.html:10
+#: app/forms.py:70 app/templates/account.html:10
 msgid "Change Password"
 msgstr "Passwort ändern"
 
-#: app/forms.py:64 app/templates/account.html:60
+#: app/forms.py:74 app/templates/account.html:60
 msgid "Delete My Account"
 msgstr "Mein Konto löschen"
 
-#: app/forms.py:68
+#: app/forms.py:78
 #, fuzzy
 msgid "Request Password Reset"
 msgstr "Passwort zurücksetzen"
 
-#: app/forms.py:74 app/templates/forgot_password.html:5
+#: app/forms.py:84 app/templates/forgot_password.html:5
 msgid "Reset Password"
 msgstr "Passwort zurücksetzen"
 
-#: app/forms.py:78 app/templates/resend_confirmation_request.html:5
+#: app/forms.py:88 app/templates/resend_confirmation_request.html:5
 msgid "Resend Confirmation Email"
 msgstr "Bestätigungs-E-Mail erneut senden"
 
-#: app/forms.py:81
+#: app/forms.py:91
 #, fuzzy
 msgid "Name"
 msgstr "Ihr Benutzername"
 
-#: app/forms.py:83
+#: app/forms.py:93
 #, fuzzy
 msgid "Message"
 msgstr "Bilder"
 
-#: app/forms.py:85
+#: app/forms.py:95
 msgid "Send"
 msgstr ""
 
-#: app/routes/api.py:71 app/routes/api.py:123 app/routes/api.py:179
-#: app/routes/api.py:399 app/routes/api.py:755 app/routes/api.py:853
-#: app/routes/api.py:957
+#: app/routes/api.py:74 app/routes/api.py:126 app/routes/api.py:182
+#: app/routes/api.py:402 app/routes/api.py:837 app/routes/api.py:935
+#: app/routes/api.py:1048
 msgid "Invalid data"
 msgstr "Ungültige Daten"
 
-#: app/routes/api.py:78
+#: app/routes/api.py:81
 msgid "Missing required fields: list_name and payload are required."
 msgstr "Fehlende erforderliche Felder: list_name und payload sind erforderlich."
 
-#: app/routes/api.py:89 app/routes/api.py:136
+#: app/routes/api.py:92 app/routes/api.py:139
 msgid "List updated successfully"
 msgstr "Liste erfolgreich aktualisiert"
 
-#: app/routes/api.py:100
+#: app/routes/api.py:103
 msgid "List saved successfully"
 msgstr "Liste erfolgreich gespeichert"
 
-#: app/routes/api.py:117 app/routes/api.py:145
+#: app/routes/api.py:120 app/routes/api.py:148
 msgid "List not found"
 msgstr "Liste nicht gefunden"
 
-#: app/routes/api.py:119 app/routes/api.py:147 app/routes/api.py:222
-#: app/routes/api.py:244 app/routes/api.py:692 app/routes/api.py:805
-#: app/routes/api.py:906
+#: app/routes/api.py:122 app/routes/api.py:150 app/routes/api.py:225
+#: app/routes/api.py:247 app/routes/api.py:774 app/routes/api.py:887
+#: app/routes/api.py:996
 msgid "Unauthorized"
 msgstr "Unbefugt"
 
-#: app/routes/api.py:152
+#: app/routes/api.py:155
 msgid "List deleted successfully"
 msgstr "Liste erfolgreich gelöscht"
 
-#: app/routes/api.py:186
+#: app/routes/api.py:189
 #, fuzzy
 msgid "Missing required fields: name and payload are required."
 msgstr "Fehlende erforderliche Felder: list_name und payload sind erforderlich."
 
-#: app/routes/api.py:194
+#: app/routes/api.py:197
 #, fuzzy
 msgid "Print option updated successfully"
 msgstr "Baum erfolgreich aktualisiert"
 
-#: app/routes/api.py:204
+#: app/routes/api.py:207
 #, fuzzy
 msgid "Print option saved successfully"
 msgstr "Baum erfolgreich gespeichert"
 
-#: app/routes/api.py:220
+#: app/routes/api.py:223
 #, fuzzy
 msgid "Print option not found"
 msgstr "Stammordner nicht gefunden"
 
-#: app/routes/api.py:228
+#: app/routes/api.py:231
 #, fuzzy
 msgid "Print option deleted successfully"
 msgstr "Liste erfolgreich gelöscht"
 
-#: app/routes/api.py:236
+#: app/routes/api.py:239
 msgid "parent_id is required"
 msgstr "parent_id ist erforderlich"
 
-#: app/routes/api.py:240
+#: app/routes/api.py:243
 msgid "Folder not found"
 msgstr "Ordner nicht gefunden"
 
-#: app/routes/api.py:381
+#: app/routes/api.py:384
 msgid "Root folder not found"
 msgstr "Stammordner nicht gefunden"
 
-#: app/routes/api.py:395 app/routes/api.py:472
+#: app/routes/api.py:398 app/routes/api.py:494
 msgid "L'espace de stockage maximal est atteint pour ce compte."
 msgstr ""
 
-#: app/routes/api.py:406
+#: app/routes/api.py:409 app/routes/api.py:422
+#, fuzzy
+msgid "Invalid folder name"
+msgstr "Ordnername"
+
+#: app/routes/api.py:413
 msgid "Parent folder not found or not owned by user"
 msgstr "Übergeordneter Ordner nicht gefunden oder gehört nicht dem Benutzer"
 
-#: app/routes/api.py:417
-#, python-format
-msgid "Could not create directory: %(error)s"
+#: app/routes/api.py:429
+#, fuzzy
+msgid "Could not create directory."
 msgstr "Verzeichnis konnte nicht erstellt werden: %(error)s"
 
-#: app/routes/api.py:475 app/routes/api.py:609
+#: app/routes/api.py:452
+#, fuzzy
+msgid "Could not create folder."
+msgstr "Ordner erstellen"
+
+#: app/routes/api.py:497 app/routes/api.py:663
 msgid "No file part"
 msgstr "Kein Dateiteil"
 
-#: app/routes/api.py:479 app/routes/api.py:613
+#: app/routes/api.py:501 app/routes/api.py:667
 msgid "No selected file"
 msgstr "Keine Datei ausgewählt"
 
-#: app/routes/api.py:483
+#: app/routes/api.py:505
 msgid "No folder_id specified"
 msgstr "Keine folder_id angegeben"
 
-#: app/routes/api.py:487 app/routes/api.py:965
+#: app/routes/api.py:509 app/routes/api.py:1056
 msgid "Folder not found or not owned by user"
 msgstr "Ordner nicht gefunden oder gehört nicht dem Benutzer"
 
-#: app/routes/api.py:502 app/routes/api.py:617
+#: app/routes/api.py:514 app/routes/api.py:671
+msgid "Nom de fichier invalide."
+msgstr ""
+
+#: app/routes/api.py:521 app/routes/api.py:624 app/routes/api.py:735
+msgid "La description ne doit pas dépasser 256 caractères."
+msgstr ""
+
+#: app/routes/api.py:529 app/routes/api.py:704 app/routes/api.py:1076
+msgid "Chemin de fichier invalide."
+msgstr ""
+
+#: app/routes/api.py:537 app/routes/api.py:675
 msgid "Format de fichier non autorisé."
 msgstr ""
 
-#: app/routes/api.py:510 app/routes/api.py:625
+#: app/routes/api.py:545 app/routes/api.py:683
+msgid "File size exceeds allowed limit."
+msgstr ""
+
+#: app/routes/api.py:553 app/routes/api.py:691
 msgid "Fichier image invalide ou potentiellement malveillant."
 msgstr ""
 
-#: app/routes/api.py:548
+#: app/routes/api.py:559 app/routes/api.py:725
+msgid "Erreur lors de l'enregistrement du fichier."
+msgstr ""
+
+#: app/routes/api.py:588 app/routes/api.py:754
+msgid "Database error."
+msgstr ""
+
+#: app/routes/api.py:599
 msgid "File upload failed"
 msgstr "Datei-Upload fehlgeschlagen"
 
-#: app/routes/api.py:559 app/routes/api.py:603 app/routes/api.py:689
+#: app/routes/api.py:610 app/routes/api.py:657 app/routes/api.py:771
 msgid "Image not found"
 msgstr "Bild nicht gefunden"
 
-#: app/routes/api.py:563 app/routes/api.py:606
+#: app/routes/api.py:614 app/routes/api.py:660
 msgid "Unauthorized to edit this image"
 msgstr "Unbefugt, dieses Bild zu bearbeiten"
 
-#: app/routes/api.py:567
+#: app/routes/api.py:618
 msgid "Invalid JSON data"
 msgstr "Ungültige JSON-Daten"
 
-#: app/routes/api.py:589
+#: app/routes/api.py:643
 msgid "Image updated successfully"
 msgstr "Bild erfolgreich aktualisiert"
 
-#: app/routes/api.py:676
+#: app/routes/api.py:758
 #, fuzzy
 msgid "Image replaced successfully"
 msgstr "Bild erfolgreich aktualisiert"
 
-#: app/routes/api.py:764
+#: app/routes/api.py:846
 msgid "Missing required fields"
 msgstr "Fehlende erforderliche Felder"
 
-#: app/routes/api.py:775
+#: app/routes/api.py:857
 msgid "Tree updated successfully"
 msgstr "Baum erfolgreich aktualisiert"
 
-#: app/routes/api.py:787
+#: app/routes/api.py:869
 msgid "Tree saved successfully"
 msgstr "Baum erfolgreich gespeichert"
 
-#: app/routes/api.py:803
+#: app/routes/api.py:885
 #, fuzzy
 msgid "Tree not found"
 msgstr "Liste nicht gefunden"
 
-#: app/routes/api.py:813
+#: app/routes/api.py:895
 #, fuzzy
 msgid "Tree deleted successfully"
 msgstr "Baum erfolgreich aktualisiert"
 
-#: app/routes/api.py:860
-msgid "Missing profile name"
+#: app/routes/api.py:942
+msgid "Nom de profil invalide (1 à 64 caractères)."
 msgstr ""
 
-#: app/routes/api.py:868
+#: app/routes/api.py:946
+msgid "URL de l'avatar trop longue."
+msgstr ""
+
+#: app/routes/api.py:954
 #, fuzzy
 msgid "Profile updated successfully"
 msgstr "Baum erfolgreich aktualisiert"
 
-#: app/routes/api.py:874
+#: app/routes/api.py:960
 #, fuzzy
 msgid "Profile saved successfully"
 msgstr "Baum erfolgreich gespeichert"
 
-#: app/routes/api.py:904
+#: app/routes/api.py:994
 #, fuzzy
 msgid "Profile not found"
 msgstr "Stammordner nicht gefunden"
 
-#: app/routes/api.py:911
+#: app/routes/api.py:1001
 #, fuzzy
 msgid "Profile deleted successfully"
 msgstr "Liste erfolgreich gelöscht"
 
-#: app/routes/api.py:968
+#: app/routes/api.py:1059
 msgid "Cannot delete root folder"
 msgstr "Stammordner kann nicht gelöscht werden"
 
-#: app/routes/api.py:972
+#: app/routes/api.py:1063
 msgid "Folder and all its contents deleted"
 msgstr "Ordner und sein gesamter Inhalt gelöscht"
 
-#: app/routes/api.py:977
+#: app/routes/api.py:1068
 msgid "Image not found or not owned by user"
 msgstr "Bild nicht gefunden oder gehört nicht dem Benutzer"
 
-#: app/routes/api.py:988
-#, python-format
-msgid "Could not delete file: %(error)s"
+#: app/routes/api.py:1083
+#, fuzzy
+msgid "Could not delete file."
 msgstr "Datei konnte nicht gelöscht werden: %(error)s"
 
-#: app/routes/api.py:992
+#: app/routes/api.py:1087
 msgid "Image deleted"
 msgstr "Bild gelöscht"
 
-#: app/routes/api.py:994
+#: app/routes/api.py:1089
 msgid "Invalid item type"
 msgstr "Ungültiger Elementtyp"
 
-#: app/routes/auth.py:39
+#: app/routes/auth.py:48
 msgid "Invalid username or password"
 msgstr "Ungültiger Benutzername oder Passwort"
 
-#: app/routes/auth.py:43
+#: app/routes/auth.py:53
 #, python-format
 msgid ""
 "Your account is not confirmed. Please check your emails. <a "
@@ -348,80 +396,76 @@ msgstr ""
 "Ihr Konto ist nicht bestätigt. Bitte überprüfen Sie Ihre E-Mails. <a "
 "href=\"%(url)s\">Bestätigungs-E-Mail erneut senden?</a>"
 
-#: app/routes/auth.py:72
+#: app/routes/auth.py:83
 msgid "A confirmation email has been sent to your email address."
 msgstr "Eine Bestätigungs-E-Mail wurde an Ihre E-Mail-Adresse gesendet."
 
-#: app/routes/auth.py:75
+#: app/routes/auth.py:86
 msgid "Registration failed. Please check the errors below."
 msgstr "Registrierung fehlgeschlagen. Bitte überprüfen Sie die folgenden Fehler."
 
-#: app/routes/auth.py:78 app/routes/auth.py:196
+#: app/routes/auth.py:89 app/routes/auth.py:207
 #, python-format
 msgid "Error in %(field)s: %(error)s"
 msgstr "Fehler in %(field)s: %(error)s"
 
-#: app/routes/auth.py:85
+#: app/routes/auth.py:96
 msgid "The confirmation link is invalid or has expired."
 msgstr "Der Bestätigungslink ist ungültig oder abgelaufen."
 
-#: app/routes/auth.py:90
+#: app/routes/auth.py:101
 msgid "Account already confirmed. Please login."
 msgstr "Konto bereits bestätigt. Bitte einloggen."
 
-#: app/routes/auth.py:112
+#: app/routes/auth.py:123
 msgid "Your account has been confirmed successfully!"
 msgstr "Ihr Konto wurde erfolgreich bestätigt!"
 
-#: app/routes/auth.py:124
+#: app/routes/auth.py:135
 msgid "This account is already confirmed. Please login."
 msgstr "Dieses Konto ist bereits bestätigt. Bitte einloggen."
 
-#: app/routes/auth.py:130
+#: app/routes/auth.py:141
 msgid "A new confirmation email has been sent."
 msgstr "Eine neue Bestätigungs-E-Mail wurde gesendet."
 
-#: app/routes/auth.py:133
+#: app/routes/auth.py:144
 msgid "No account found with that email address. Please register."
-msgstr ""
-"Kein Konto mit dieser E-Mail-Adresse gefunden. Bitte registrieren Sie "
-"sich."
+msgstr "Kein Konto mit dieser E-Mail-Adresse gefunden. Bitte registrieren Sie sich."
 
-#: app/routes/auth.py:147
+#: app/routes/auth.py:158
 msgid "An email with instructions to reset your password has been sent."
-msgstr ""
-"Eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts wurde "
-"gesendet."
+msgstr "Eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts wurde gesendet."
 
-#: app/routes/auth.py:149
+#: app/routes/auth.py:160
 msgid "No account found with that email address."
 msgstr "Kein Konto mit dieser E-Mail-Adresse gefunden."
 
-#: app/routes/auth.py:159
+#: app/routes/auth.py:170
 msgid "The reset link is invalid or has expired."
 msgstr "Der Reset-Link ist ungültig oder abgelaufen."
 
-#: app/routes/auth.py:167
+#: app/routes/auth.py:178
 msgid "Your password has been reset successfully."
 msgstr "Ihr Passwort wurde erfolgreich zurückgesetzt."
 
-#: app/routes/auth.py:190
+#: app/routes/auth.py:201
 msgid "Your password has been changed successfully."
 msgstr "Ihr Passwort wurde erfolgreich geändert."
 
-#: app/routes/auth.py:192
+#: app/routes/auth.py:203
 msgid "Invalid current password."
 msgstr "Ungültiges aktuelles Passwort."
 
-#: app/routes/auth.py:225
+#: app/routes/auth.py:240
 msgid "Your account has been successfully deleted."
 msgstr "Ihr Konto wurde erfolgreich gelöscht."
 
-#: app/routes/auth.py:228
+#: app/routes/auth.py:243
 msgid "Invalid username confirmation. Account deletion cancelled."
 msgstr "Ungültige Bestätigung des Benutzernamens. Löschung des Kontos abgebrochen."
 
-#: app/routes/auth.py:231
+#: app/routes/auth.py:246
 msgid "Invalid form submission."
 msgstr "Ungültige Formularübermittlung."
 
@@ -437,8 +481,7 @@ msgstr "Rechtliche Hinweise"
 msgid "Your message has been sent successfully!"
 msgstr "Ihre Nachricht wurde erfolgreich gesendet!"
 
-#: app/routes/main.py:45 app/templates/about.html:32
-#: app/templates/base.html:201
+#: app/routes/main.py:45 app/templates/about.html:32 app/templates/base.html:201
 msgid "About & Contact"
 msgstr "Über & Kontakt"
 
@@ -456,13 +499,13 @@ msgstr "Open Source"
 
 #: app/templates/about.html:38
 msgid ""
-"This project is open source and proudly hosted on GitHub. You are free to"
-" view the source code, contribute, or reuse it under the terms of the GNU"
-" AGPL v3 license."
+"This project is open source and proudly hosted on GitHub. You are free to "
+"view the source code, contribute, or reuse it under the terms of the GNU "
+"AGPL v3 license."
 msgstr ""
-"Dieses Projekt ist Open Source und wird stolz auf GitHub gehostet. Es "
-"steht Ihnen frei, den Quellcode einzusehen, beizutragen oder ihn gemäß "
-"den Bedingungen der GNU AGPL v3-Lizenz weiterzuverwenden."
+"Dieses Projekt ist Open Source und wird stolz auf GitHub gehostet. Es steht "
+"Ihnen frei, den Quellcode einzusehen, beizutragen oder ihn gemäß den "
+"Bedingungen der GNU AGPL v3-Lizenz weiterzuverwenden."
 
 #: app/templates/about.html:42
 msgid "View Source Code on GitHub"
@@ -497,8 +540,8 @@ msgstr "Konto löschen"
 #: app/templates/account.html:30
 msgid "Once you delete your account, there is no going back. Please be certain."
 msgstr ""
-"Wenn Sie Ihr Konto einmal gelöscht haben, gibt es kein Zurück mehr. Bitte"
-" seien Sie sich sicher."
+"Wenn Sie Ihr Konto einmal gelöscht haben, gibt es kein Zurück mehr. Bitte "
+"seien Sie sich sicher."
 
 #: app/templates/account.html:44
 msgid "Confirm Account Deletion"
@@ -507,13 +550,12 @@ msgstr "Kontolöschung bestätigen"
 #: app/templates/account.html:48
 #, fuzzy
 msgid ""
-"Are you sure you want to delete your account? This action cannot be "
-"undone. All your data will\n"
+"Are you sure you want to delete your account? This action cannot be undone. "
+"All your data will\n"
 "                    be permanently lost."
 msgstr ""
-"Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann "
-"nicht rückgängig gemacht werden. Alle Ihre Daten gehen dauerhaft "
-"verloren."
+"Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht"
+" rückgängig gemacht werden. Alle Ihre Daten gehen dauerhaft verloren."
 
 #: app/templates/account.html:50
 msgid "To confirm, please type your username below:"
@@ -535,11 +577,11 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr "Navigation umschalten"
 
-#: app/templates/base.html:121
+#: app/templates/base.html:121 app/templates/index.html:43
 msgid "Mobile Setup"
 msgstr ""
 
-#: app/templates/base.html:124
+#: app/templates/base.html:124 app/templates/index.html:87
 msgid "Paper Tools"
 msgstr ""
 
@@ -716,11 +758,11 @@ msgstr "Ressourcen verwalten"
 
 #: app/templates/builder.html:95
 msgid ""
-"Use the tab content to manage folders, upload pictures, and organize your"
-" resource library."
+"Use the tab content to manage folders, upload pictures, and organize your "
+"resource library."
 msgstr ""
-"Verwenden Sie den Inhalt der Registerkarte, um Ordner zu verwalten, "
-"Bilder hochzuladen und Ihre Ressourcenbibliothek zu organisieren."
+"Verwenden Sie den Inhalt der Registerkarte, um Ordner zu verwalten, Bilder "
+"hochzuladen und Ihre Ressourcenbibliothek zu organisieren."
 
 #: app/templates/builder.html:108 app/templates/builder.html:127
 msgid "Tree Builder"
@@ -935,9 +977,9 @@ msgid ""
 "privacy."
 msgstr ""
 "PictoTree ist ein Werkzeug, das den täglichen Gebrauch von "
-"Kommunikationsordnern (wie PECS) vereinfacht. Ziel ist es nicht, Papier "
-"zu ersetzen, sondern eine praktische mobile Alternative anzubieten, die "
-"völlig kostenlos ist und Ihre Privatsphäre respektiert."
+"Kommunikationsordnern (wie PECS) vereinfacht. Ziel ist es nicht, Papier zu "
+"ersetzen, sondern eine praktische mobile Alternative anzubieten, die völlig "
+"kostenlos ist und Ihre Privatsphäre respektiert."
 
 #: app/templates/index.html:21
 msgid "What the app offers:"
@@ -949,12 +991,11 @@ msgstr "Taschenformat (offline):"
 
 #: app/templates/index.html:23
 msgid ""
-"Always have your binder on your phone to communicate outside (in stores, "
-"on walks), without needing an internet connection."
+"Always have your binder on your phone to communicate outside (in stores, on "
+"walks), without needing an internet connection."
 msgstr ""
-"Haben Sie Ihren Ordner immer auf dem Telefon, um draußen (in Geschäften, "
-"auf Spaziergängen) zu kommunizieren, ohne eine Internetverbindung zu "
-"benötigen."
+"Haben Sie Ihren Ordner immer auf dem Telefon, um draußen (in Geschäften, auf"
+" Spaziergängen) zu kommunizieren, ohne eine Internetverbindung zu benötigen."
 
 #: app/templates/index.html:24
 msgid "Built-in Arasaac search:"
@@ -977,8 +1018,8 @@ msgid ""
 "A secure import system to use photos of your surroundings or objects as "
 "private pictograms."
 msgstr ""
-"Ein sicheres Importsystem, um Fotos aus Ihrer Umgebung oder von Objekten "
-"als private Piktogramme zu verwenden."
+"Ein sicheres Importsystem, um Fotos aus Ihrer Umgebung oder von Objekten als"
+" private Piktogramme zu verwenden."
 
 #: app/templates/index.html:26
 msgid "PDF Generator:"
@@ -989,83 +1030,33 @@ msgid ""
 "A tool to easily create and print pictogram boards to update your actual "
 "physical binder."
 msgstr ""
-"Ein Werkzeug, um einfach Piktogrammtafeln zu erstellen und zu drucken, um"
-" Ihren physischen Ordner zu aktualisieren."
+"Ein Werkzeug, um einfach Piktogrammtafeln zu erstellen und zu drucken, um "
+"Ihren physischen Ordner zu aktualisieren."
 
 #: app/templates/index.html:31
 msgid "Login / Register"
 msgstr "Anmelden / Registrieren"
 
-#: app/templates/index.html:47
-#, fuzzy
-msgid "The Tree Builder (Web)"
-msgstr "1. Der Baum-Editor (Web)"
+#: app/templates/index.html:44
+msgid "Build your digital binders for the mobile app."
+msgstr "Erstellen Sie Ihre digitalen Ordner für die mobile App."
 
-#: app/templates/index.html:50
-msgid ""
-"Construct and organize your communication structures using a hierarchical"
-" interface. Drag and drop pictograms to build logical paths tailored to "
-"the user's specific needs. Once saved, these trees can be easily imported"
-" into the mobile application."
-msgstr ""
-"Konstruieren und organisieren Sie Ihre Kommunikationsstrukturen übereine "
-"hierarchische Benutzeroberfläche. Ziehen Sie Piktogramme perDrag-and-"
-"Drop, um logische Pfade zu erstellen, die auf diespezifischen Bedürfnisse"
-" des Nutzers zugeschnitten sind. Einmalgespeichert, können diese Bäume "
-"einfach in die mobile Anwendungimportiert werden."
+#: app/templates/index.html:57 app/templates/index.html:79
+#: app/templates/index.html:101
+msgid "Your browser does not support the video tag."
+msgstr "Ihr Browser unterstützt das Video-Tag nicht."
 
 #: app/templates/index.html:65
-#, fuzzy
-msgid "PictoTree Mobile App (Android)"
-msgstr "2. PictoTree Mobile App (Android)"
+msgid "The Mobile App"
+msgstr "Die mobile App"
 
-#: app/templates/index.html:68
-msgid ""
-"The native mobile application uses a spatial navigation system (View 4) "
-"to browse through imported trees. It includes integrated Text-to-Speech "
-"(TTS) for vocal feedback and works fully offline to ensure communication "
-"is always available."
-msgstr ""
-"Die native mobile Anwendung nutzt ein räumliches "
-"Navigationssystem(Ansicht 4), um durch importierte Bäume zu blättern. Sie"
-" verfügt übereine integrierte Text-zu-Sprache-Funktion (TTS) für "
-"akustischesFeedback und arbeitet vollständig offline, um sicherzustellen,"
-" dassdie Kommunikation jederzeit möglich ist."
+#: app/templates/index.html:66
+msgid "Carry your Time Timer and pictograms anywhere."
+msgstr "Nehmen Sie Ihren Time Timer und Ihre Piktogramme überallhin mit."
 
-#: app/templates/index.html:83
-#, fuzzy
-msgid "Pictogram Bank (Management)"
-msgstr "3. Piktogramm-Datenbank (Verwaltung)"
-
-#: app/templates/index.html:86
-msgid ""
-"Centralize your visual vocabulary. Search and import icons from the "
-"ARASAAC database or upload your own personal images. Organize them into "
-"folders to keep your library structured and ready for use in your trees "
-"or lists."
-msgstr ""
-"Zentralisieren Sie Ihr visuelles Vokabular. Suchen und importieren "
-"SieSymbole aus der ARASAAC-Datenbank oder laden Sie Ihre "
-"eigenenpersönlichen Bilder hoch. Organisieren Sie diese in Ordnern, um "
-"IhreBibliothek strukturiert und bereit für den Einsatz in Ihren "
-"Bäumenoder Listen zu halten."
-
-#: app/templates/index.html:101
-#, fuzzy
-msgid "List & Print Tool (Paper Support)"
-msgstr "4. Listen- & Druckwerkzeug (Papierunterstützung)"
-
-#: app/templates/index.html:104
-msgid ""
-"Generate customizable pictogram lists designed for printing. This tool "
-"provides various layout options to create physical communication boards, "
-"schedules, or educational materials directly from your digital "
-"collection."
-msgstr ""
-"Erstellen Sie anpassbare Piktogrammlisten für den Druck. Dieses "
-"Toolbietet verschiedene Layout-Optionen zur Erstellung "
-"physischerKommunikationstafeln, Zeitpläne oder Lernmaterialien direkt aus"
-" Ihrerdigitalen Sammlung."
+#: app/templates/index.html:88
+msgid "Simplify printing your pictograms."
+msgstr "Vereinfachen Sie das Drucken Ihrer Piktogramme."
 
 #: app/templates/legal.html:38
 msgid "TERMS OF SERVICE"
@@ -1081,13 +1072,13 @@ msgstr "25. April 2026"
 
 #: app/templates/legal.html:40
 msgid ""
-"Please read these Terms of Service (\"Terms\") carefully before using the"
-" https://pictotree.eu website (the \"Service\") operated by the "
-"Pictotree.eu team (\"us\", \"we\", or \"our\")."
+"Please read these Terms of Service (\"Terms\") carefully before using the "
+"https://pictotree.eu website (the \"Service\") operated by the Pictotree.eu "
+"team (\"us\", \"we\", or \"our\")."
 msgstr ""
-"Bitte lesen Sie diese Nutzungsbedingungen („Bedingungen“) sorgfältig "
-"durch, bevor Sie die Website https://pictotree.eu (der „Dienst“) nutzen, "
-"die vom Team von Pictotree.eu („uns“, „wir“ oder „unser“) betrieben wird."
+"Bitte lesen Sie diese Nutzungsbedingungen („Bedingungen“) sorgfältig durch, "
+"bevor Sie die Website https://pictotree.eu (der „Dienst“) nutzen, die vom "
+"Team von Pictotree.eu („uns“, „wir“ oder „unser“) betrieben wird."
 
 #: app/templates/legal.html:42
 msgid "1. Acceptance of Terms"
@@ -1095,14 +1086,14 @@ msgstr "1. Annahme der Bedingungen"
 
 #: app/templates/legal.html:43
 msgid ""
-"By accessing or using the Service, you agree to be bound by these Terms. "
-"If you disagree with any part of the terms, then you may not access the "
+"By accessing or using the Service, you agree to be bound by these Terms. If "
+"you disagree with any part of the terms, then you may not access the "
 "Service."
 msgstr ""
-"Durch den Zugriff auf oder die Nutzung des Dienstes erklären Sie sich "
-"damit einverstanden, an diese Bedingungen gebunden zu sein. Wenn Sie mit "
-"einem Teil der Bedingungen nicht einverstanden sind, dürfen Sie nicht auf"
-" den Dienst zugreifen."
+"Durch den Zugriff auf oder die Nutzung des Dienstes erklären Sie sich damit "
+"einverstanden, an diese Bedingungen gebunden zu sein. Wenn Sie mit einem "
+"Teil der Bedingungen nicht einverstanden sind, dürfen Sie nicht auf den "
+"Dienst zugreifen."
 
 #: app/templates/legal.html:45
 msgid "2. User Accounts"
@@ -1110,22 +1101,20 @@ msgstr "2. Benutzerkonten"
 
 #: app/templates/legal.html:46
 msgid ""
-"To access certain features of the Service, you must register for an "
-"account. You are responsible for safeguarding your password and for all "
-"activities that occur under your account. You may terminate your account "
-"at any time through your user settings. Upon termination, a cascading "
-"deletion process will be initiated, which permanently erases your account"
-" details, all images you have uploaded, and any associated database "
-"entries."
+"To access certain features of the Service, you must register for an account."
+" You are responsible for safeguarding your password and for all activities "
+"that occur under your account. You may terminate your account at any time "
+"through your user settings. Upon termination, a cascading deletion process "
+"will be initiated, which permanently erases your account details, all images"
+" you have uploaded, and any associated database entries."
 msgstr ""
 "Um auf bestimmte Funktionen des Dienstes zugreifen zu können, müssen Sie "
-"sich für ein Konto registrieren. Sie sind für den Schutz Ihres Passworts "
-"und für alle Aktivitäten verantwortlich, die unter Ihrem Konto "
-"stattfinden. Sie können Ihr Konto jederzeit über Ihre "
-"Benutzereinstellungen kündigen. Nach der Kündigung wird ein "
-"kaskadierender Löschvorgang eingeleitet, der Ihre Kontodaten, alle von "
-"Ihnen hochgeladenen Bilder und alle zugehörigen Datenbankeinträge "
-"dauerhaft löscht."
+"sich für ein Konto registrieren. Sie sind für den Schutz Ihres Passworts und"
+" für alle Aktivitäten verantwortlich, die unter Ihrem Konto stattfinden. Sie"
+" können Ihr Konto jederzeit über Ihre Benutzereinstellungen kündigen. Nach "
+"der Kündigung wird ein kaskadierender Löschvorgang eingeleitet, der Ihre "
+"Kontodaten, alle von Ihnen hochgeladenen Bilder und alle zugehörigen "
+"Datenbankeinträge dauerhaft löscht."
 
 #: app/templates/legal.html:48
 msgid "3. User-Generated Content"
@@ -1149,16 +1138,16 @@ msgid ""
 "threatening, or promotes discrimination, bigotry, racism, or hatred."
 msgstr ""
 "rechtswidrig, diffamierend, verleumderisch, obszön, pornografisch, "
-"belästigend, bedrohlich ist oder Diskriminierung, Bigotterie, Rassismus "
-"oder Hass fördert."
+"belästigend, bedrohlich ist oder Diskriminierung, Bigotterie, Rassismus oder"
+" Hass fördert."
 
 #: app/templates/legal.html:53
 msgid ""
-"Violates any third-party's right, including any intellectual property "
-"rights or rights of privacy."
+"Violates any third-party's right, including any intellectual property rights"
+" or rights of privacy."
 msgstr ""
-"die Rechte Dritter verletzt, einschließlich aller geistigen "
-"Eigentumsrechte oder Datenschutzrechte."
+"die Rechte Dritter verletzt, einschließlich aller geistigen Eigentumsrechte "
+"oder Datenschutzrechte."
 
 #: app/templates/legal.html:56
 msgid "4. Prohibited Conduct"
@@ -1171,8 +1160,8 @@ msgid ""
 "malicious code, or attempting to breach security measures."
 msgstr ""
 "Sie stimmen zu, den Dienst nicht zu missbrauchen oder anderen dabei zu "
-"helfen. Dies beinhaltet, ist aber nicht beschränkt auf, die Störung "
-"unseres Dienstes, das Hochladen von bösartigem Code oder den Versuch, "
+"helfen. Dies beinhaltet, ist aber nicht beschränkt auf, die Störung unseres "
+"Dienstes, das Hochladen von bösartigem Code oder den Versuch, "
 "Sicherheitsmaßnahmen zu umgehen."
 
 #: app/templates/legal.html:59
@@ -1181,19 +1170,19 @@ msgstr "5. Moderation und Durchsetzung"
 
 #: app/templates/legal.html:60
 msgid ""
-"We reserve the right, but are not obligated, to review and remove any "
-"User Content or terminate user accounts that, in our sole judgment, "
-"violate these Terms. We may take any action we deem necessary, including "
-"reporting illegal activities to the relevant law enforcement authorities "
-"and pursuing legal action against violators."
+"We reserve the right, but are not obligated, to review and remove any User "
+"Content or terminate user accounts that, in our sole judgment, violate these"
+" Terms. We may take any action we deem necessary, including reporting "
+"illegal activities to the relevant law enforcement authorities and pursuing "
+"legal action against violators."
 msgstr ""
 "Wir behalten uns das Recht vor, sind aber nicht dazu verpflichtet, "
 "Benutzerinhalte zu überprüfen und zu entfernen oder Benutzerkonten zu "
 "kündigen, die nach unserem alleinigen Ermessen gegen diese Bedingungen "
 "verstoßen. Wir können alle Maßnahmen ergreifen, die wir für notwendig "
-"halten, einschließlich der Meldung illegaler Aktivitäten an die "
-"zuständigen Strafverfolgungsbehörden und der Einleitung rechtlicher "
-"Schritte gegen Zuwiderhandelnde."
+"halten, einschließlich der Meldung illegaler Aktivitäten an die zuständigen "
+"Strafverfolgungsbehörden und der Einleitung rechtlicher Schritte gegen "
+"Zuwiderhandelnde."
 
 #: app/templates/legal.html:62
 msgid "6. Disclaimer of Warranties"
@@ -1201,13 +1190,12 @@ msgstr "6. Gewährleistungsausschluss"
 
 #: app/templates/legal.html:63
 msgid ""
-"The Service is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. We "
-"make no warranty that the Service will be uninterrupted, timely, or "
-"error-free."
+"The Service is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. We make "
+"no warranty that the Service will be uninterrupted, timely, or error-free."
 msgstr ""
 "Der Dienst wird „WIE BESEHEN“ und „WIE VERFÜGBAR“ bereitgestellt. Wir "
-"übernehmen keine Gewähr dafür, dass der Dienst ununterbrochen, "
-"zeitgerecht oder fehlerfrei ist."
+"übernehmen keine Gewähr dafür, dass der Dienst ununterbrochen, zeitgerecht "
+"oder fehlerfrei ist."
 
 #: app/templates/legal.html:65
 msgid "7. License"
@@ -1227,17 +1215,17 @@ msgstr "1. Einleitung"
 
 #: app/templates/legal.html:76
 msgid ""
-"This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
-" uses, and protects your personal data. We are committed to protecting "
-"your privacy in compliance with the General Data Protection Regulation "
-"(GDPR). The data controller for this Service is the Pictotree.eu team, "
-"reachable at the form contact."
+"This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects, "
+"uses, and protects your personal data. We are committed to protecting your "
+"privacy in compliance with the General Data Protection Regulation (GDPR). "
+"The data controller for this Service is the Pictotree.eu team, reachable at "
+"the form contact."
 msgstr ""
-"Diese Datenschutzerklärung beschreibt, wie Pictotree.eu (der „Dienst“) "
-"Ihre personenbezogenen Daten sammelt, verwendet und schützt. Wir "
-"verpflichten uns, Ihre Privatsphäre gemäß der Datenschutz-Grundverordnung"
-" (DSGVO) zu schützen. Der Datenverantwortliche für diesen Dienst ist das "
-"Team von Pictotree.eu, das über das Kontaktformular erreichbar ist."
+"Diese Datenschutzerklärung beschreibt, wie Pictotree.eu (der „Dienst“) Ihre "
+"personenbezogenen Daten sammelt, verwendet und schützt. Wir verpflichten "
+"uns, Ihre Privatsphäre gemäß der Datenschutz-Grundverordnung (DSGVO) zu "
+"schützen. Der Datenverantwortliche für diesen Dienst ist das Team von "
+"Pictotree.eu, das über das Kontaktformular erreichbar ist."
 
 #: app/templates/legal.html:78
 msgid "2. Personal Data We Collect"
@@ -1257,10 +1245,9 @@ msgid ""
 "address. The lawful basis for this processing is the performance of a "
 "contract (our Terms of Service)."
 msgstr ""
-"Informationen, die Sie bei der Registrierung angeben, wie z. B. "
-"Benutzername und E-Mail-Adresse. Die Rechtsgrundlage für diese "
-"Verarbeitung ist die Erfüllung eines Vertrags (unsere "
-"Nutzungsbedingungen)."
+"Informationen, die Sie bei der Registrierung angeben, wie z. B. Benutzername"
+" und E-Mail-Adresse. Die Rechtsgrundlage für diese Verarbeitung ist die "
+"Erfüllung eines Vertrags (unsere Nutzungsbedingungen)."
 
 #: app/templates/legal.html:82
 msgid "User-Generated Content:"
@@ -1269,12 +1256,12 @@ msgstr "Benutzergenerierte Inhalte:"
 #: app/templates/legal.html:82
 msgid ""
 "Images and other data you voluntarily upload to the Service. The lawful "
-"basis is your consent and our legitimate interest in providing the "
-"Service's core functionality."
+"basis is your consent and our legitimate interest in providing the Service's"
+" core functionality."
 msgstr ""
-"Bilder und andere Daten, die Sie freiwillig auf den Dienst hochladen. Die"
-" Rechtsgrundlage ist Ihre Einwilligung und unser berechtigtes Interesse "
-"an der Bereitstellung der Kernfunktionalität des Dienstes."
+"Bilder und andere Daten, die Sie freiwillig auf den Dienst hochladen. Die "
+"Rechtsgrundlage ist Ihre Einwilligung und unser berechtigtes Interesse an "
+"der Bereitstellung der Kernfunktionalität des Dienstes."
 
 #: app/templates/legal.html:83 app/templates/legal.html:89
 msgid "Technical Log Data:"
@@ -1282,16 +1269,16 @@ msgstr "Technische Protokolldaten:"
 
 #: app/templates/legal.html:83
 msgid ""
-"For the purpose of maintaining the security and integrity of our systems,"
-" we process server logs which may include your IP address, user-agent "
-"string, and timestamps of access. The lawful basis for this processing is"
-" our legitimate interest in preventing fraud and securing our Service."
+"For the purpose of maintaining the security and integrity of our systems, we"
+" process server logs which may include your IP address, user-agent string, "
+"and timestamps of access. The lawful basis for this processing is our "
+"legitimate interest in preventing fraud and securing our Service."
 msgstr ""
 "Zum Zweck der Aufrechterhaltung der Sicherheit und Integrität unserer "
 "Systeme verarbeiten wir Serverprotokolle, die Ihre IP-Adresse, den User-"
 "Agent-String und Zeitstempel des Zugriffs enthalten können. Die "
-"Rechtsgrundlage für diese Verarbeitung ist unser berechtigtes Interesse "
-"an der Betrugsprävention und der Sicherung unseres Dienstes."
+"Rechtsgrundlage für diese Verarbeitung ist unser berechtigtes Interesse an "
+"der Betrugsprävention und der Sicherung unseres Dienstes."
 
 #: app/templates/legal.html:86
 msgid "3. Data Retention"
@@ -1303,12 +1290,12 @@ msgstr "Konto- und benutzergenerierte Inhalte:"
 
 #: app/templates/legal.html:88
 msgid ""
-"This data is retained for the duration of your account's existence. It is"
-" permanently and irrevocably deleted upon your request to terminate the "
+"This data is retained for the duration of your account's existence. It is "
+"permanently and irrevocably deleted upon your request to terminate the "
 "account."
 msgstr ""
-"Diese Daten werden für die Dauer des Bestehens Ihres Kontos gespeichert. "
-"Sie werden auf Ihre Anfrage zur Kündigung des Kontos dauerhaft und "
+"Diese Daten werden für die Dauer des Bestehens Ihres Kontos gespeichert. Sie"
+" werden auf Ihre Anfrage zur Kündigung des Kontos dauerhaft und "
 "unwiderruflich gelöscht."
 
 #: app/templates/legal.html:89
@@ -1322,9 +1309,7 @@ msgid "4. Your Rights as a Data Subject"
 msgstr "4. Ihre Rechte als betroffene Person"
 
 #: app/templates/legal.html:93
-msgid ""
-"Under the GDPR, you have the following rights regarding your personal "
-"data:"
+msgid "Under the GDPR, you have the following rights regarding your personal data:"
 msgstr ""
 "Gemäß der DSGVO haben Sie die folgenden Rechte in Bezug auf Ihre "
 "personenbezogenen Daten:"
@@ -1337,34 +1322,34 @@ msgstr ""
 
 #: app/templates/legal.html:96
 msgid ""
-"The right to rectification: You can request that we correct any "
-"information you believe is inaccurate."
+"The right to rectification: You can request that we correct any information "
+"you believe is inaccurate."
 msgstr ""
 "Das Recht auf Berichtigung: Sie können verlangen, dass wir Informationen "
 "korrigieren, die Sie für unrichtig halten."
 
 #: app/templates/legal.html:97
 msgid ""
-"The right to erasure (right to be forgotten): You can request the erasure"
-" of your personal data. This is actioned by deleting your account."
+"The right to erasure (right to be forgotten): You can request the erasure of"
+" your personal data. This is actioned by deleting your account."
 msgstr ""
-"Das Recht auf Löschung (Recht auf Vergessenwerden): Sie können die "
-"Löschung Ihrer personenbezogenen Daten verlangen. Dies geschieht durch "
-"Löschen Ihres Kontos."
+"Das Recht auf Löschung (Recht auf Vergessenwerden): Sie können die Löschung "
+"Ihrer personenbezogenen Daten verlangen. Dies geschieht durch Löschen Ihres "
+"Kontos."
 
 #: app/templates/legal.html:98
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
 msgstr ""
-"Das Recht auf Einschränkung der Verarbeitung: Sie können verlangen, dass "
-"wir die Verarbeitung Ihrer personenbezogenen Daten unter bestimmten "
-"Bedingungen einschränken."
+"Das Recht auf Einschränkung der Verarbeitung: Sie können verlangen, dass wir"
+" die Verarbeitung Ihrer personenbezogenen Daten unter bestimmten Bedingungen"
+" einschränken."
 
 #: app/templates/legal.html:99
 msgid ""
-"The right to object to processing: You can object to our processing of "
-"your personal data."
+"The right to object to processing: You can object to our processing of your "
+"personal data."
 msgstr ""
 "Das Recht auf Widerspruch gegen die Verarbeitung: Sie können der "
 "Verarbeitung Ihrer personenbezogenen Daten durch uns widersprechen."
@@ -1374,15 +1359,15 @@ msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
 msgstr ""
-"Das Recht auf Datenübertragbarkeit: Sie können verlangen, dass wir die "
-"von uns erhobenen Daten an eine andere Organisation oder direkt an Sie "
+"Das Recht auf Datenübertragbarkeit: Sie können verlangen, dass wir die von "
+"uns erhobenen Daten an eine andere Organisation oder direkt an Sie "
 "übertragen."
 
 #: app/templates/legal.html:102
 msgid ""
-"To exercise any of these rights, please contact us with the form contact."
-" You also have the right to lodge a complaint with a supervisory "
-"authority (such as the CNIL in France)."
+"To exercise any of these rights, please contact us with the form contact. "
+"You also have the right to lodge a complaint with a supervisory authority "
+"(such as the CNIL in France)."
 msgstr ""
 "Um eines dieser Rechte auszuüben, kontaktieren Sie uns bitte über das "
 "Kontaktformular. Sie haben auch das Recht, eine Beschwerde bei einer "
@@ -1394,16 +1379,15 @@ msgstr "5. Datensicherheit & -übertragung"
 
 #: app/templates/legal.html:105
 msgid ""
-"We implement appropriate technical and organizational measures to ensure "
-"a level of security appropriate to the risk. Your data is stored on "
-"servers located within the European Union. We do not sell or share your "
-"personal data with third parties for marketing purposes."
+"We implement appropriate technical and organizational measures to ensure a "
+"level of security appropriate to the risk. Your data is stored on servers "
+"located within the European Union. We do not sell or share your personal "
+"data with third parties for marketing purposes."
 msgstr ""
-"Wir ergreifen geeignete technische und organisatorische Maßnahmen, um ein"
-" dem Risiko angemessenes Sicherheitsniveau zu gewährleisten. Ihre Daten "
-"werden auf Servern in der Europäischen Union gespeichert. Wir verkaufen "
-"oder teilen Ihre personenbezogenen Daten nicht zu Marketingzwecken mit "
-"Dritten."
+"Wir ergreifen geeignete technische und organisatorische Maßnahmen, um ein "
+"dem Risiko angemessenes Sicherheitsniveau zu gewährleisten. Ihre Daten "
+"werden auf Servern in der Europäischen Union gespeichert. Wir verkaufen oder"
+" teilen Ihre personenbezogenen Daten nicht zu Marketingzwecken mit Dritten."
 
 #: app/templates/list.html:22
 msgid "Construct & Import"
@@ -1677,8 +1661,8 @@ msgstr "Beschreibung des ausgewählten Links"
 #: app/templates/list.html:428
 msgid "Select a link from the bottom list to edit its description..."
 msgstr ""
-"Wählen Sie einen Link aus der unteren Liste aus, um seine Beschreibung zu"
-" bearbeiten..."
+"Wählen Sie einen Link aus der unteren Liste aus, um seine Beschreibung zu "
+"bearbeiten..."
 
 #: app/templates/list.html:445
 msgid "Generate PDF"
@@ -1769,8 +1753,8 @@ msgstr ""
 
 #: app/templates/resend_confirmation_request.html:6
 msgid ""
-"Please enter your account's email address. If a matching account is found"
-" and is not yet confirmed, we will send a new confirmation email."
+"Please enter your account's email address. If a matching account is found "
+"and is not yet confirmed, we will send a new confirmation email."
 msgstr ""
 "Bitte geben Sie die E-Mail-Adresse Ihres Kontos ein. Wenn ein passendes "
 "Konto gefunden wird und noch nicht bestätigt ist, senden wir eine neue "
@@ -1790,8 +1774,8 @@ msgid ""
 "Thank you for registering. Please click the link below to activate your "
 "account:"
 msgstr ""
-"Danke für Ihre Registrierung. Bitte klicken Sie auf den folgenden Link, "
-"um Ihr Konto zu aktivieren:"
+"Danke für Ihre Registrierung. Bitte klicken Sie auf den folgenden Link, um "
+"Ihr Konto zu aktivieren:"
 
 #: app/templates/emails/reset_password.html:2
 msgid "You have requested a password reset. Click the following link to continue:"
@@ -1831,20 +1815,19 @@ msgstr ""
 
 #~ msgid ""
 #~ "This site uses only connection data "
-#~ "(server logs) for security and "
-#~ "maintenance purposes. No personal information"
-#~ " is collected via tracking or "
-#~ "advertising cookies. By continuing your "
-#~ "navigation, you accept our <a "
-#~ "href=\"#\">privacy policy</a>."
+#~ "(server logs) for security and maintenance"
+#~ " purposes. No personal information is "
+#~ "collected via tracking or advertising "
+#~ "cookies. By continuing your navigation, you"
+#~ " accept our <a href=\"#\">privacy policy</a>."
 #~ msgstr ""
-#~ "Diese Website verwendet nur Verbindungsdaten"
-#~ " (Server-Protokolle) für Sicherheits- und"
-#~ " Wartungszwecke. Es werden keine "
-#~ "persönlichen Informationen über Tracking- oder"
-#~ " Werbe-Cookies gesammelt. Indem Sie "
-#~ "Ihre Navigation fortsetzen, akzeptieren Sie"
-#~ " unsere <a href=\"#\">Datenschutzrichtlinie</a>."
+#~ "Diese Website verwendet nur Verbindungsdaten "
+#~ "(Server-Protokolle) für Sicherheits- und "
+#~ "Wartungszwecke. Es werden keine persönlichen "
+#~ "Informationen über Tracking- oder Werbe-"
+#~ "Cookies gesammelt. Indem Sie Ihre "
+#~ "Navigation fortsetzen, akzeptieren Sie unsere "
+#~ "<a href=\"#\">Datenschutzrichtlinie</a>."
 
 #~ msgid "I understand"
 #~ msgstr "Ich verstehe"
@@ -1874,26 +1857,22 @@ msgstr ""
 #~ msgstr "Loslegen"
 
 #~ msgid ""
-#~ "Easily build your own pictogram trees"
-#~ " with our intuitive drag-and-drop "
+#~ "Easily build your own pictogram trees "
+#~ "with our intuitive drag-and-drop "
 #~ "interface."
 #~ msgstr ""
-#~ "Erstellen Sie ganz einfach Ihre eigenen"
-#~ " Piktogramm-Bäume mit unserer intuitiven"
-#~ " Drag-and-Drop-Oberfläche."
+#~ "Erstellen Sie ganz einfach Ihre eigenen "
+#~ "Piktogramm-Bäume mit unserer intuitiven "
+#~ "Drag-and-Drop-Oberfläche."
 
 #~ msgid "Share"
 #~ msgstr "Teilen"
 
 #~ msgid "Share your creations with others by making them public."
-#~ msgstr ""
-#~ "Teilen Sie Ihre Kreationen mit anderen,"
-#~ " indem Sie sie öffentlich machen."
+#~ msgstr "Teilen Sie Ihre Kreationen mit anderen, indem Sie sie öffentlich machen."
 
 #~ msgid "Export your trees as JSON files to use them anywhere."
-#~ msgstr ""
-#~ "Exportieren Sie Ihre Bäume als JSON-"
-#~ "Dateien, um sie überall zu verwenden."
+#~ msgstr "Exportieren Sie Ihre Bäume als JSON-Dateien, um sie überall zu verwenden."
 
 #~ msgid "Load Selected Tree"
 #~ msgstr "Ausgewählten Baum laden"
@@ -1968,30 +1947,29 @@ msgstr ""
 #~ msgstr "PictoTree AAC-Plattform"
 
 #~ msgid ""
-#~ "PictoTree is a comprehensive platform "
-#~ "(Web Backend + Native Mobile App) "
-#~ "designed for Augmentative and Alternative "
+#~ "PictoTree is a comprehensive platform (Web"
+#~ " Backend + Native Mobile App) designed"
+#~ " for Augmentative and Alternative "
 #~ "Communication (AAC). Our goal is to "
 #~ "empower users to create, manage, and "
-#~ "display personalized communication 'trees' "
-#~ "using pictograms (leveraging the open-"
-#~ "source ARASAAC library or personal "
-#~ "imports). Currently under development, the "
-#~ "system is hosted in production and "
-#~ "accessible at pictotree.eu."
+#~ "display personalized communication 'trees' using"
+#~ " pictograms (leveraging the open-source "
+#~ "ARASAAC library or personal imports). "
+#~ "Currently under development, the system is"
+#~ " hosted in production and accessible at"
+#~ " pictotree.eu."
 #~ msgstr ""
 #~ "PictoTree ist eine umfassende Plattform "
 #~ "(Web-Backend + Native MobileApp), die "
 #~ "für Unterstützte Kommunikation (UK) entwickelt"
-#~ " wurde. UnserZiel ist es, Nutzer zu"
-#~ " befähigen,personalisierte Kommunikations-„Bäume“ "
-#~ "mithilfe von Piktogrammen(unter Nutzung der"
-#~ " Open-Source-ARASAAC-Bibliothek oder "
-#~ "eigenerImporte) zu erstellen, zu verwalten "
-#~ "und anzuzeigen. Das Systembefindet sich "
-#~ "derzeit in der Entwicklung, wird in "
-#~ "der Produktiongehostet und ist unter "
-#~ "pictotree.eu erreichbar."
+#~ " wurde. UnserZiel ist es, Nutzer zu "
+#~ "befähigen,personalisierte Kommunikations-„Bäume“ mithilfe "
+#~ "von Piktogrammen(unter Nutzung der Open-"
+#~ "Source-ARASAAC-Bibliothek oder eigenerImporte) "
+#~ "zu erstellen, zu verwalten und anzuzeigen."
+#~ " Das Systembefindet sich derzeit in der"
+#~ " Entwicklung, wird in der Produktiongehostet"
+#~ " und ist unter pictotree.eu erreichbar."
 
 #~ msgid "{editor}: Editing failed"
 #~ msgstr ""
@@ -2034,8 +2012,8 @@ msgstr ""
 #~ msgstr[1] ""
 
 #~ msgid ""
-#~ "DeprecationWarning: The {param_type} {name!r} "
-#~ "is deprecated.{extra_message}"
+#~ "DeprecationWarning: The {param_type} {name!r} is"
+#~ " deprecated.{extra_message}"
 #~ msgstr ""
 
 #~ msgid "env var: {var}"
@@ -2317,16 +2295,16 @@ msgstr ""
 #~ msgid ""
 #~ "PictoTree is a free and secure "
 #~ "platform that puts your communication "
-#~ "binder right in your pocket. No "
-#~ "more lost icons, no more bulk—just "
-#~ "the essentials, always at hand."
+#~ "binder right in your pocket. No more"
+#~ " lost icons, no more bulk—just the "
+#~ "essentials, always at hand."
 #~ msgstr ""
-#~ "PictoTree ist eine kostenlose und "
-#~ "sichere Plattform, die Ihren "
-#~ "Kommunikationsordner direkt in Ihre Tasche "
-#~ "bringt. Keine verlorenen Symbole mehr, "
-#~ "keine unnötige Last – nur das "
-#~ "Wesentliche, immer griffbereit."
+#~ "PictoTree ist eine kostenlose und sichere"
+#~ " Plattform, die Ihren Kommunikationsordner "
+#~ "direkt in Ihre Tasche bringt. Keine "
+#~ "verlorenen Symbole mehr, keine unnötige "
+#~ "Last – nur das Wesentliche, immer "
+#~ "griffbereit."
 
 #~ msgid "Why use PictoTree?"
 #~ msgstr "Warum PictoTree verwenden?"
@@ -2363,39 +2341,39 @@ msgstr ""
 
 #~ msgid ""
 #~ "A dedicated web platform to build "
-#~ "your \"trees\" and manage your library"
-#~ " with ease, paired with a native "
-#~ "mobile app to take your communication"
-#~ " everywhere you go."
+#~ "your \"trees\" and manage your library "
+#~ "with ease, paired with a native "
+#~ "mobile app to take your communication "
+#~ "everywhere you go."
 #~ msgstr ""
-#~ "Eine dedizierte Web-Plattform, um Ihre"
-#~ " \"Bäume\" zu erstellen und Ihre "
-#~ "Bibliothek einfach zu verwalten, kombiniert"
-#~ " mit einer nativen mobilen App, um"
-#~ " Ihre Kommunikation überallhin mitzunehmen."
+#~ "Eine dedizierte Web-Plattform, um Ihre "
+#~ "\"Bäume\" zu erstellen und Ihre Bibliothek"
+#~ " einfach zu verwalten, kombiniert mit "
+#~ "einer nativen mobilen App, um Ihre "
+#~ "Kommunikation überallhin mitzunehmen."
 
 #~ msgid ""
 #~ "Public lists can only contain global "
-#~ "public images. Please remove any "
-#~ "user-owned images before saving publicly."
+#~ "public images. Please remove any user-"
+#~ "owned images before saving publicly."
 #~ msgstr ""
 #~ "Öffentliche Listen können nur globale "
-#~ "öffentliche Bilder enthalten. Bitte entfernen"
-#~ " Sie alle benutzereigenen Bilder, bevor "
-#~ "Sie sie öffentlich speichern."
+#~ "öffentliche Bilder enthalten. Bitte entfernen "
+#~ "Sie alle benutzereigenen Bilder, bevor Sie"
+#~ " sie öffentlich speichern."
 
 #~ msgid "Cannot save an empty tree as public."
 #~ msgstr "Ein leerer Baum kann nicht als öffentlich gespeichert werden."
 
 #~ msgid ""
 #~ "Public trees can only contain global "
-#~ "public images. Please remove any "
-#~ "user-owned images before saving publicly."
+#~ "public images. Please remove any user-"
+#~ "owned images before saving publicly."
 #~ msgstr ""
 #~ "Öffentliche Bäume können nur globale "
-#~ "öffentliche Bilder enthalten. Bitte entfernen"
-#~ " Sie alle benutzereigenen Bilder, bevor "
-#~ "Sie sie öffentlich speichern."
+#~ "öffentliche Bilder enthalten. Bitte entfernen "
+#~ "Sie alle benutzereigenen Bilder, bevor Sie"
+#~ " sie öffentlich speichern."
 
 #~ msgid "File Operations"
 #~ msgstr "Dateioperationen"
@@ -2604,4 +2582,86 @@ msgstr ""
 
 #~ msgid "Show / Update Preview"
 #~ msgstr ""
+
+#~ msgid "Missing profile name"
+#~ msgstr ""
+
+#~ msgid "The Tree Builder (Web)"
+#~ msgstr "1. Der Baum-Editor (Web)"
+
+#~ msgid ""
+#~ "Construct and organize your communication "
+#~ "structures using a hierarchical interface. "
+#~ "Drag and drop pictograms to build "
+#~ "logical paths tailored to the user's "
+#~ "specific needs. Once saved, these trees "
+#~ "can be easily imported into the "
+#~ "mobile application."
+#~ msgstr ""
+#~ "Konstruieren und organisieren Sie Ihre "
+#~ "Kommunikationsstrukturen übereine hierarchische "
+#~ "Benutzeroberfläche. Ziehen Sie Piktogramme "
+#~ "perDrag-and-Drop, um logische Pfade zu"
+#~ " erstellen, die auf diespezifischen "
+#~ "Bedürfnisse des Nutzers zugeschnitten sind. "
+#~ "Einmalgespeichert, können diese Bäume einfach "
+#~ "in die mobile Anwendungimportiert werden."
+
+#~ msgid "PictoTree Mobile App (Android)"
+#~ msgstr "2. PictoTree Mobile App (Android)"
+
+#~ msgid ""
+#~ "The native mobile application uses a "
+#~ "spatial navigation system (View 4) to "
+#~ "browse through imported trees. It includes"
+#~ " integrated Text-to-Speech (TTS) for "
+#~ "vocal feedback and works fully offline "
+#~ "to ensure communication is always "
+#~ "available."
+#~ msgstr ""
+#~ "Die native mobile Anwendung nutzt ein "
+#~ "räumliches Navigationssystem(Ansicht 4), um durch"
+#~ " importierte Bäume zu blättern. Sie "
+#~ "verfügt übereine integrierte Text-zu-"
+#~ "Sprache-Funktion (TTS) für akustischesFeedback "
+#~ "und arbeitet vollständig offline, um "
+#~ "sicherzustellen, dassdie Kommunikation jederzeit "
+#~ "möglich ist."
+
+#~ msgid "Pictogram Bank (Management)"
+#~ msgstr "3. Piktogramm-Datenbank (Verwaltung)"
+
+#~ msgid ""
+#~ "Centralize your visual vocabulary. Search "
+#~ "and import icons from the ARASAAC "
+#~ "database or upload your own personal "
+#~ "images. Organize them into folders to "
+#~ "keep your library structured and ready "
+#~ "for use in your trees or lists."
+#~ msgstr ""
+#~ "Zentralisieren Sie Ihr visuelles Vokabular. "
+#~ "Suchen und importieren SieSymbole aus der"
+#~ " ARASAAC-Datenbank oder laden Sie Ihre"
+#~ " eigenenpersönlichen Bilder hoch. Organisieren "
+#~ "Sie diese in Ordnern, um IhreBibliothek "
+#~ "strukturiert und bereit für den Einsatz "
+#~ "in Ihren Bäumenoder Listen zu halten."
+
+#~ msgid "List & Print Tool (Paper Support)"
+#~ msgstr "4. Listen- & Druckwerkzeug (Papierunterstützung)"
+
+#~ msgid ""
+#~ "Generate customizable pictogram lists designed"
+#~ " for printing. This tool provides "
+#~ "various layout options to create physical"
+#~ " communication boards, schedules, or "
+#~ "educational materials directly from your "
+#~ "digital collection."
+#~ msgstr ""
+#~ "Erstellen Sie anpassbare Piktogrammlisten für "
+#~ "den Druck. Dieses Toolbietet verschiedene "
+#~ "Layout-Optionen zur Erstellung "
+#~ "physischerKommunikationstafeln, Zeitpläne oder "
+#~ "Lernmaterialien direkt aus Ihrerdigitalen "
+#~ "Sammlung."
 

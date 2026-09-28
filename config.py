@@ -38,8 +38,15 @@ class Config:
     data_dir = DATA_DIR
     db_path = DATA_DIR / "app.db"
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        f'sqlite:///{db_path}'
+    _raw_db_url = os.environ.get('DATABASE_URL')
+    if _raw_db_url:
+        if _raw_db_url.startswith('postgres://'):
+            _raw_db_url = _raw_db_url.replace('postgres://', 'postgresql+psycopg2://', 1)
+        elif _raw_db_url.startswith('postgresql://'):
+            _raw_db_url = _raw_db_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
+        SQLALCHEMY_DATABASE_URI = _raw_db_url
+    else:
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
 
     # Path for storing uploaded pictograms
     if os.environ.get('PICTOGRAMS_PATH'):

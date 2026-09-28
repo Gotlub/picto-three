@@ -80,3 +80,14 @@ body {
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* Accessible Subtitles Styling */
+video::cue {
+    background-color: rgba(15, 23, 42, 0.88);
+    color: #ffffff;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: clamp(14px, 1.4vw, 18px);
+    line-height: 1.45;
+    border-radius: 4px;
+    padding: 0.2em 0.5em;
+}
