@@ -8,12 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - **Tree Builder Drag & Drop Alignment & Zone Capture Harmonization (`builder.css`, `BuilderNode.js`, `builder.js`)**:
-  - Fixed visual offset and layout jumping during node hover: eliminated `transition: margin-bottom` and destabilizing `margin-bottom: 35px` on `.node-content.drag-over-child`, ensuring stable element geometry under the cursor.
+  - Restored and stabilized reserved vertical spacing (`margin-bottom: 35px` with smooth transition `0.15s` on `.node-content.drag-over-child`), pushing the subtree down and providing clear visual volume so the L-shaped connector does not overlap the icon below.
   - Aligned L-shaped green branch connector (`└`) accurately at `left: 20px; top: 100%;` directly matching the tree's vertical trunk line (`.children::before`) and pointing directly into the child indentation.
   - Positioned crisp insertion bars right in contact with the element for drop above (`drag-over-before` with `::before` at `top: -2px`) and drop below (`drag-over-after` with `::after` at `bottom: -2px`), preventing node height expansion and content shifting.
   - Adopted non-disruptive `outline: 2px dashed` for `drag-over-child` and `drag-over-replace` to preserve box-model dimensions.
-  - Bound precise dragover and drop handling directly to `contentElement` with `contains(e.relatedTarget)` guard to prevent flickering when cursor traverses child icons/text.
-  - Harmonized drop capture in `builder.js` by prioritizing the active visual indicator class on release and cleaning up any stale drag-over classes across the tree canvas.
+  - Harmonized drop capture in `builder.js` by prioritizing the active visual indicator class on release, adjusting thresholds (`before` < 25%, `child` 25%-65%, `after` > 65%), and cleaning up any stale drag-over classes across the tree canvas.
+  - Resolved drop zone below the last tree element: removed the child-mode trap condition, attached `_builderNode` back-references to DOM elements, and extended canvas proximity capture up to 40px below the last item so users can smoothly drop and insert items directly below (`after`) without being forced inside.
 
 ### Added
 - **Astra Cybersecurity Local Audit Remediation (Lots 1 to 4)**:

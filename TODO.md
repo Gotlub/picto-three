@@ -244,12 +244,13 @@ Liste des jalons et tâches à réaliser par les agents IA.
 
 ## Phase 9 : Audit & Harmonisation UX du Drag & Drop dans le Tree Builder
 - [x] **Audit et synchronisation du Drag & Drop dans le Tree Builder (`/builder`)** :
-  - [x] Élimination du décalage et des secousses visuelles lors du survol : suppression de la transition CSS `transition: margin-bottom` et du `margin-bottom: 35px` intempestif sur `.node-content.drag-over-child`.
+  - [x] Rétablissement et stabilisation de l'espace factice (`margin-bottom: 35px` et `transition: margin-bottom 0.15s ease-out` sur `.node-content.drag-over-child`) : crée un volume réservé sous le nœud parent pour accueillir le connecteur coudé sans chevaucher l'icône suivante.
   - [x] Alignement géométrique rigoureux du trait coudé vert (`└`) : positionné à `left: 20px; top: 100%;` en parfaite continuité avec la ligne de tronc des nœuds enfants (`.children::before`).
   - [x] Affichage net et stable au contact des éléments pour les déposes au-dessus (`drag-over-before`) et au-dessous (`drag-over-after`) via pseudo-éléments `::before` et `::after` (barre verte 4px sans distorsion ni variation de hauteur du nœud).
   - [x] Remplacement du contour destructeur par `outline: 2px dashed` pour `drag-over-child` et `drag-over-replace` afin de préserver l'intégrité du box-model.
-  - [x] Optimisation de la capture d'événements (`BuilderNode.js`) : ciblage de `contentElement` avec étanchéité `contains(e.relatedTarget)` pour éradiquer le clignotement `dragleave` sur les enfants internes (`img`, `span`).
-  - [x] Uniformisation parfaite affichage/capture (`builder.js`) : détection prioritaire de l'indicateur visuel actif lors du `drop` et nettoyage automatique des indicateurs orphelins lors du survol.
+  - [x] Optimisation de la capture d'événements (`BuilderNode.js`) : ciblage de `contentElement` avec étanchéité `nodeElement.contains(e.relatedTarget)` pour éradiquer le clignotement `dragleave` lors du survol de l'espace réservé au connecteur ou des éléments internes (`img`, `span`).
+  - [x] Uniformisation parfaite affichage/capture (`builder.js`) : détection prioritaire de l'indicateur visuel actif lors du `drop`, nettoyage automatique des indicateurs orphelins et seuillage précis `before` (< 25%), `child` (25%-65%), `after` (> 65%).
+  - [x] Résolution de la dépose sous le dernier élément de l'arbre : levée du blocage en mode `child`, association `_builderNode` et extension de confort de la zone de dépose du canvas (jusqu'à 40px sous le dernier nœud) permettant de glisser et insérer immédiatement en-dessous (`after`) sans être contraint d'insérer à l'intérieur.
 
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :

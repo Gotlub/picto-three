@@ -44,6 +44,7 @@
     cursor: pointer;
     position: relative;
     box-sizing: border-box;
+    transition: margin-bottom 0.15s ease-out;
 }
 
 .node-content:hover {
@@ -124,6 +125,7 @@
     outline: 2px dashed #28a745;
     outline-offset: -2px;
     border-radius: 4px;
+    margin-bottom: 35px; /* Décalage pour faire glisser le reste de l'arbre et loger le connecteur sans juxtaposition */
 }
 
 /* L-shaped branch connector for child insertion └ */

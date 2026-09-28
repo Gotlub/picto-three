@@ -62,9 +62,11 @@ export class BuilderNode {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
         nodeElement.setAttribute('draggable', (!this.isRoot).toString());
+        nodeElement._builderNode = this;
 
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
+        contentElement._builderNode = this;
 
         const imgElement = document.createElement('img');
         imgElement.src = resolveBuilderImageUrl(this.image);
@@ -156,7 +158,10 @@ export class BuilderNode {
         });
         contentElement.addEventListener('dragleave', (e) => {
             e.stopPropagation();
-            if (!contentElement.contains(e.relatedTarget)) {
+            const isInside = nodeElement && typeof nodeElement.contains === 'function'
+                ? nodeElement.contains(e.relatedTarget)
+                : false;
+            if (!isInside) {
                 if (builder && typeof builder.handleDragLeave === 'function') {
                     builder.handleDragLeave(e, this);
                 }
