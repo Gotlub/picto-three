@@ -91,3 +91,110 @@ video::cue {
     border-radius: 4px;
     padding: 0.2em 0.5em;
 }
+
+/* 2-Column Video Showcase Presentation (Homepage) */
+.feature-presentation {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.feature-row {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    margin-bottom: 80px;
+}
+
+.feature-row:last-child {
+    margin-bottom: 20px;
+}
+
+.feature-row.flex-row-reverse {
+    flex-direction: row-reverse;
+}
+
+.feature-text {
+    flex: 1 1 380px;
+}
+
+.feature-media {
+    flex: 1.3 1 540px;
+    max-width: 728px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.feature-title {
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    line-height: 1.3;
+}
+
+.feature-desc {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.15rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.video-container {
+    width: 100%;
+    max-width: 728px;
+    background: #090d16;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    line-height: 0;
+}
+
+.video-container video {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 11px;
+}
+
+@media (max-width: 900px) {
+    .feature-presentation {
+        padding: 20px 15px;
+    }
+
+    .feature-row,
+    .feature-row.flex-row-reverse {
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+
+    .feature-title {
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .feature-desc {
+        font-size: 1.05rem;
+    }
+
+    .feature-media {
+        width: 100%;
+        max-width: 728px;
+    }
+
+    .video-container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+}
+

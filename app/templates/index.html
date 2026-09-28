@@ -40,19 +40,19 @@
     {% set active_lang = 'fr' %}
 {% endif %}
 
-<!-- Presentation of the 3 main features in a clean vertical flow -->
+<!-- Presentation of the 3 main features in alternating 2-column showcase -->
 <section class="feature-presentation mb-5">
-    <div class="d-flex flex-column">
-        <!-- 1. Mobile setup -->
-        <article class="feature-block">
-            <header class="feature-block-header">
-                <h2 class="feature-block-title">
-                    <i class="bi bi-diagram-3 text-primary"></i>
-                    {{ _('Mobile Setup') }}
-                </h2>
-                <p class="feature-block-desc">{{ _('Build your digital binders for the mobile app.') }}</p>
-            </header>
-            <div class="feature-video-frame">
+    <!-- Bloc 1: Mobile Setup (Texte gauche / Vidéo desktop droite) -->
+    <article class="feature-row">
+        <div class="feature-text">
+            <h3 class="feature-title">
+                <i class="bi bi-diagram-3 text-primary"></i>
+                {{ _('Mobile Setup') }}
+            </h3>
+            <p class="feature-desc">{{ _('Build your digital binders for the mobile app.') }}</p>
+        </div>
+        <div class="feature-media">
+            <div class="video-container">
                 <video controls preload="metadata" playsinline width="100%">
                     <source src="{{ url_for('static', filename='media/mobile-setup.mp4') }}" type="video/mp4">
                     <track kind="subtitles" srclang="fr" label="Français" src="{{ url_for('static', filename='media/subtitles/mobile-setup.fr.vtt') }}"{% if active_lang == 'fr' %} default{% endif %}>
@@ -66,18 +66,20 @@
                     {{ _('Your browser does not support the video tag.') }}
                 </video>
             </div>
-        </article>
+        </div>
+    </article>
 
-        <!-- 2. The mobile app -->
-        <article class="feature-block">
-            <header class="feature-block-header">
-                <h2 class="feature-block-title">
-                    <i class="bi bi-phone text-success"></i>
-                    {{ _('The Mobile App') }}
-                </h2>
-                <p class="feature-block-desc">{{ _('Carry your Time Timer and pictograms anywhere.') }}</p>
-            </header>
-            <div class="feature-video-frame">
+    <!-- Bloc 2: App Mobile (Vidéo gauche / Texte droite) -->
+    <article class="feature-row flex-row-reverse">
+        <div class="feature-text">
+            <h3 class="feature-title">
+                <i class="bi bi-phone text-success"></i>
+                {{ _('The Mobile App') }}
+            </h3>
+            <p class="feature-desc">{{ _('Carry your Time Timer and pictograms anywhere.') }}</p>
+        </div>
+        <div class="feature-media">
+            <div class="video-container">
                 <video controls preload="metadata" playsinline width="100%">
                     <source src="{{ url_for('static', filename='media/mobile-app.mp4') }}" type="video/mp4">
                     <track kind="subtitles" srclang="fr" label="Français" src="{{ url_for('static', filename='media/subtitles/mobile-app.fr.vtt') }}"{% if active_lang == 'fr' %} default{% endif %}>
@@ -91,18 +93,20 @@
                     {{ _('Your browser does not support the video tag.') }}
                 </video>
             </div>
-        </article>
+        </div>
+    </article>
 
-        <!-- 3. Paper tools -->
-        <article class="feature-block">
-            <header class="feature-block-header">
-                <h2 class="feature-block-title">
-                    <i class="bi bi-printer text-warning"></i>
-                    {{ _('Paper Tools') }}
-                </h2>
-                <p class="feature-block-desc">{{ _('Simplify printing your pictograms.') }}</p>
-            </header>
-            <div class="feature-video-frame">
+    <!-- Bloc 3: Paper Tools (Texte gauche / Vidéo droite) -->
+    <article class="feature-row">
+        <div class="feature-text">
+            <h3 class="feature-title">
+                <i class="bi bi-printer text-warning"></i>
+                {{ _('Paper Tools') }}
+            </h3>
+            <p class="feature-desc">{{ _('Simplify printing your pictograms.') }}</p>
+        </div>
+        <div class="feature-media">
+            <div class="video-container">
                 <video controls preload="metadata" playsinline width="100%">
                     <source src="{{ url_for('static', filename='media/paper-tools.mp4') }}" type="video/mp4">
                     <track kind="subtitles" srclang="fr" label="Français" src="{{ url_for('static', filename='media/subtitles/paper-tools.fr.vtt') }}"{% if active_lang == 'fr' %} default{% endif %}>
@@ -116,8 +120,8 @@
                     {{ _('Your browser does not support the video tag.') }}
                 </video>
             </div>
-        </article>
-    </div>
+        </div>
+    </article>
 </section>
 
 <style>
@@ -136,73 +140,80 @@
         z-index: 1;
     }
     
-    /* Presentation Cards - Wide, responsive, harmonious & accessible */
+    /* 1. Conteneur principal */
     .feature-presentation {
-        width: 100%;
-        max-width: 1320px;
+        max-width: 1280px;
         margin: 0 auto;
-        padding: 0 clamp(0.5rem, 2vw, 1.5rem);
+        padding: 40px 20px;
     }
 
-    .feature-presentation > .d-flex {
-        gap: clamp(2rem, 3.5vw, 3.25rem) !important;
-    }
-
-    .feature-block {
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: clamp(1.25rem, 2.5vw, 2.25rem);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-
-    .feature-block:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
-    }
-
-    .feature-block-header {
-        margin-bottom: 1.25rem;
-    }
-
-    .feature-block-title {
-        font-family: 'Outfit', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: clamp(1.35rem, 2vw, 1.75rem);
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 0.4rem;
+    /* 2. Structure 2 colonnes avec vidéos 1.3x plus grandes (max 728px) */
+    .feature-row {
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        gap: 48px;
+        margin-bottom: 80px;
     }
 
-    .feature-block-desc {
+    .feature-row:last-child {
+        margin-bottom: 20px;
+    }
+
+    .feature-row.flex-row-reverse {
+        flex-direction: row-reverse;
+    }
+
+    .feature-text {
+        flex: 1 1 380px;
+    }
+
+    .feature-media {
+        flex: 1.3 1 540px;
+        max-width: 728px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 4. Style du texte */
+    .feature-title {
+        font-family: 'Outfit', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        line-height: 1.3;
+    }
+
+    .feature-desc {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: clamp(1rem, 1.2vw, 1.15rem);
+        font-size: 1.15rem;
         color: #475569;
-        line-height: 1.55;
+        line-height: 1.6;
         margin-bottom: 0;
     }
 
-    .feature-video-frame {
+    /* 3. Style des lecteurs vidéo (taille uniforme pour les 3 vidéos) */
+    .video-container {
+        width: 100%;
+        max-width: 728px;
         background: #090d16;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        position: relative;
-        aspect-ratio: 16 / 9;
-        box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.16);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        line-height: 0;
     }
 
-    .feature-video-frame video {
+    .video-container video {
         display: block;
         width: 100%;
-        height: 100%;
-        object-fit: contain;
-        border-radius: 12px;
+        height: auto;
+        border-radius: 11px;
     }
 
     video::cue {
@@ -214,12 +225,46 @@
         border-radius: 4px;
         padding: 0.2em 0.5em;
     }
+
+    /* Responsive < 900px : 1 seule colonne verticale */
+    @media (max-width: 900px) {
+        .feature-presentation {
+            padding: 20px 15px;
+        }
+
+        .feature-row,
+        .feature-row.flex-row-reverse {
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .feature-title {
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .feature-desc {
+            font-size: 1.05rem;
+        }
+
+        .feature-media {
+            width: 100%;
+            max-width: 728px;
+        }
+
+        .video-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+    }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var activeLang = "{{ active_lang }}";
-    var videos = document.querySelectorAll('.feature-video-frame video');
+    var videos = document.querySelectorAll('.feature-presentation video');
 
     function syncVideoSubtitles(video) {
         if (!video.textTracks || video.textTracks.length === 0) return;
