@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **Paper Tools PDF Export Reliability & Canvas Conversion (`ListPdfExporter.js`, `files.py`, `app/__init__.py`, `list.html`, `builder.html`)**:
+  - Unified image URL resolution using `this.resolveImageUrl(item)` in `exportToPdf()`, guaranteeing identical image resolution between the live preview (`.page-content`) and the generated PDF.
+  - Replaced fragile synchronous `XMLHttpRequest` via jsPDF's internal `loadFile` by loading images into `new Image()` and converting them to base64 PNG data URLs using an offscreen canvas (`toDataURL('image/png')`), seamlessly rasterizing all formats (PNG, JPEG, WebP, SVG, GIF) without format errors or network round-trips.
+  - Added `https://static.arasaac.org` to `connect-src` in Content-Security-Policy (`app/__init__.py`) and added `Access-Control-Allow-Origin: *` to `/pictograms/` and `/pictogramsmin/` endpoints (`files.py`) to prevent cross-origin canvas tainting and CSP connection blocks.
+  - Added local bundle fallback (`app/static/js/lib/jspdf.umd.min.js`) in `list.html` and `builder.html` in case CDN is blocked or unavailable.
+  - Protected `doc.addImage` calls with per-item exception handling to prevent a single faulty image from aborting the entire document generation, and improved error alert messaging with contextual details.
 - **Tree Builder Drag & Drop Alignment & Zone Capture Harmonization (`builder.css`, `BuilderNode.js`, `builder.js`)**:
   - Restored and stabilized reserved vertical spacing (`margin-bottom: 35px` with smooth transition `0.15s` on `.node-content.drag-over-child`), pushing the subtree down and providing clear visual volume so the L-shaped connector does not overlap the icon below.
   - Aligned L-shaped green branch connector (`└`) accurately at `left: 20px; top: 100%;` directly matching the tree's vertical trunk line (`.children::before`) and pointing directly into the child indentation.

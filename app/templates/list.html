@@ -523,5 +523,10 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    if (!window.jspdf) {
+        document.write('<script src="{{ url_for("static", filename="js/lib/jspdf.umd.min.js") }}"><\/script>');
+    }
+</script>
 <script type="module" src="{{ url_for('static', filename='js/list.js', v='1.4') }}"></script>
 {% endblock %}

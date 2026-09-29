@@ -252,6 +252,16 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Uniformisation parfaite affichage/capture (`builder.js`) : détection prioritaire de l'indicateur visuel actif lors du `drop`, nettoyage automatique des indicateurs orphelins et seuillage précis `before` (< 25%), `child` (25%-65%), `after` (> 65%).
   - [x] Résolution de la dépose sous le dernier élément de l'arbre : levée du blocage en mode `child`, association `_builderNode` et extension de confort de la zone de dépose du canvas (jusqu'à 40px sous le dernier nœud) permettant de glisser et insérer immédiatement en-dessous (`after`) sans être contraint d'insérer à l'intérieur.
 
+## Phase 10 : Fiabilisation de l'Export PDF dans Paper Tools (/list)
+- [x] **Fiabilisation de la génération de PDF (`ListPdfExporter.js`, `files.py`, `app/__init__.py`, `list.html`, `builder.html`)** :
+  - [x] Unification de la résolution d'URL d'image avec `this.resolveImageUrl(item)` dans `exportToPdf()`, assurant une parité parfaite avec la miniature affichée dans la page.
+  - [x] Remplacement du chargement synchrone XHR jsPDF par un préchargement HTML5 Canvas avec conversion en DataURL PNG base64, éliminant les échecs liés aux formats d'images (JPEG, WebP, SVG, PNG) et aux requêtes réseau bloquées.
+  - [x] Autorisation de `https://static.arasaac.org` dans la directive `connect-src` de la Content-Security-Policy (`app/__init__.py`).
+  - [x] Ajout de l'en-tête `Access-Control-Allow-Origin: *` sur les routes de distribution d'images `/pictograms/` et `/pictogramsmin/` (`app/routes/files.py`).
+  - [x] Ajout du script jsPDF en local (`app/static/js/lib/jspdf.umd.min.js`) avec repli automatique (fallback) dans `list.html` et `builder.html` si le CDN est indisponible.
+  - [x] Sécurisation par try/catch unitaire autour de `doc.addImage` pour éviter qu'une image isolée ne bloque la génération du PDF complet, et enrichissement du message d'erreur avec le détail contextuel.
+  - [x] Validation intégrale de la suite de tests (`make test`).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

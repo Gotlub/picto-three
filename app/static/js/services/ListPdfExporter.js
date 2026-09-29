@@ -903,6 +903,9 @@ export class ListPdfExporter {
         }
 
         try {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                throw new Error('The jsPDF library is not loaded on the page.');
+            }
             const { jsPDF } = window.jspdf;
             const settings = this.readSettings();
             const layout = this.calculateLayout(items, settings);
@@ -939,27 +942,36 @@ export class ListPdfExporter {
                 format: [794, 1123]
             });
 
-            const loadImage = (src, imgId) => {
+            const loadImage = (src) => {
+                if (!src) return Promise.resolve(null);
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = 'Anonymous';
-                    img.onload = () => resolve(img);
-                    img.onerror = () => resolve(null);
-
-                    let fullSrc = src;
-                    const imageId = Number(imgId);
-                    if (src && src.startsWith('http')) {
-                        // Keep HTTP URL
-                    } else if (!isNaN(imageId) && imageId >= 0) {
-                        fullSrc = `/pictograms/${imageId}`;
-                    } else if (src && src.startsWith('data:')) {
-                        // Keep data URI
-                    } else if (src && !src.startsWith('/')) {
-                        fullSrc = '/pictograms/' + src;
-                    } else if (!src) {
-                        fullSrc = '/static/images/prohibit-bold.png';
-                    }
-                    img.src = fullSrc;
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const w = img.naturalWidth || img.width || 100;
+                            const h = img.naturalHeight || img.height || 100;
+                            canvas.width = w;
+                            canvas.height = h;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/png');
+                            resolve({ dataUrl, width: w, height: h });
+                        } catch (canvasErr) {
+                            console.warn('Canvas conversion fallback:', canvasErr);
+                            resolve({
+                                imgElement: img,
+                                width: img.naturalWidth || img.width || 100,
+                                height: img.naturalHeight || img.height || 100
+                            });
+                        }
+                    };
+                    img.onerror = () => {
+                        console.warn('Failed to load image for PDF:', src);
+                        resolve(null);
+                    };
+                    img.src = src;
                 });
             };
 
@@ -986,7 +998,8 @@ export class ListPdfExporter {
 
                 const item = itemsToRender[i];
                 const itemData = item.data || item;
-                const imgElement = await loadImage(itemData.path || itemData.url, itemData.image_id);
+                const resolvedSrc = this.resolveImageUrl(item);
+                const imgData = await loadImage(resolvedSrc);
 
                 let imgBoxX = x;
                 let imgBoxY = y;
@@ -1021,10 +1034,10 @@ export class ListPdfExporter {
                     doc.rect(imgBoxX, imgBoxY, imageSize, imageSize, 'F');
                 }
 
-                if (imgElement) {
+                if (imgData) {
                     const innerSize = imageSize;
-                    const iw = imgElement.naturalWidth || imgElement.width || 1;
-                    const ih = imgElement.naturalHeight || imgElement.height || 1;
+                    const iw = imgData.width || 1;
+                    const ih = imgData.height || 1;
                     const scale = Math.min(innerSize / iw, innerSize / ih);
                     const w = iw * scale;
                     const h = ih * scale;
@@ -1032,7 +1045,15 @@ export class ListPdfExporter {
                     const ix = imgBoxX + effectiveBorderWidth + (innerSize - w) / 2;
                     const iy = imgBoxY + effectiveBorderWidth + (innerSize - h) / 2;
 
-                    doc.addImage(imgElement, 'PNG', ix, iy, w, h);
+                    try {
+                        if (imgData.dataUrl) {
+                            doc.addImage(imgData.dataUrl, 'PNG', ix, iy, w, h);
+                        } else if (imgData.imgElement) {
+                            doc.addImage(imgData.imgElement, 'PNG', ix, iy, w, h);
+                        }
+                    } catch (addErr) {
+                        console.warn('Failed to add image to PDF document:', addErr);
+                    }
                 }
 
                 if (showText) {
@@ -1061,7 +1082,7 @@ export class ListPdfExporter {
                         const textX = rectX + rectW / 2;
                         const textY = rectY + textSize;
                         const splitTextInside = doc.splitTextToSize(textStr, rectW - 4);
-                        doc.text(splitTextInside[0], textX, textY, { align: 'center' });
+                        doc.text(splitTextInside[0] || '', textX, textY, { align: 'center' });
                     } else {
                         const textX = imgBoxX + totalBoxW / 2;
                         const rectHeight = textSize + 6;
@@ -1081,7 +1102,7 @@ export class ListPdfExporter {
 
                         const textY = rectY + textSize;
                         const splitTextOutside = doc.splitTextToSize(textStr, totalBoxW - 4);
-                        doc.text(splitTextOutside[0], textX, textY, { align: 'center' });
+                        doc.text(splitTextOutside[0] || '', textX, textY, { align: 'center' });
                     }
                 }
             }
@@ -1089,8 +1110,9 @@ export class ListPdfExporter {
             doc.save('pictograms-list.pdf');
 
         } catch (error) {
-            console.error(error);
-            NotificationService.alert('An error occurred during PDF generation.');
+            console.error('PDF generation error:', error);
+            const detail = error && error.message ? ` (${error.message})` : '';
+            NotificationService.alert(`An error occurred during PDF generation.${detail}`);
         } finally {
             if (this.exportPdfBtn) {
                 this.exportPdfBtn.innerHTML = originalBtnText;
