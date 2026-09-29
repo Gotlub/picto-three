@@ -795,14 +795,14 @@ export class ListPdfExporter {
                 contentDiv.style.flexWrap = 'nowrap';
                 if (chainDirection === 'vertical') {
                     contentDiv.style.flexDirection = 'column';
-                    contentDiv.style.justifyContent = 'center';
+                    contentDiv.style.justifyContent = 'flex-start';
                     contentDiv.style.alignItems = 'center';
                     contentDiv.style.alignContent = 'center';
                     contentDiv.style.rowGap = `${marginY}px`;
                     contentDiv.style.columnGap = `${marginX}px`;
                 } else {
                     contentDiv.style.flexDirection = 'row';
-                    contentDiv.style.justifyContent = 'center';
+                    contentDiv.style.justifyContent = 'flex-start';
                     contentDiv.style.alignItems = 'center';
                     contentDiv.style.alignContent = 'center';
                     contentDiv.style.columnGap = `${marginX}px`;
@@ -1035,21 +1035,18 @@ export class ListPdfExporter {
                 let x, y;
 
                 if (mode === 'chain' && chainAlignment === 'center') {
-                    const itemsOnThisPage = Math.min(itemsPerPage, itemsToRender.length - pageIndex * itemsPerPage);
                     const rawItemW = imageSize + 2 * effectiveBorderWidth;
                     const rawItemH = imageSize + 2 * effectiveBorderWidth + (showText && textPlacement === 'outside' ? textHeight : 0);
 
                     if (chainDirection === 'vertical') {
-                        const totalStripH = itemsOnThisPage * rawItemH + Math.max(0, itemsOnThisPage - 1) * marginY;
+                        // Centered horizontally, top-aligned vertically (starts at pagePadding)
                         const startX = (pageWidth - rawItemW) / 2;
-                        const startY = (pageHeight - totalStripH) / 2;
                         x = startX;
-                        y = startY + indexOnPage * (rawItemH + marginY);
+                        y = pagePadding + indexOnPage * (rawItemH + marginY);
                     } else {
-                        const totalStripW = itemsOnThisPage * rawItemW + Math.max(0, itemsOnThisPage - 1) * marginX;
-                        const startX = (pageWidth - totalStripW) / 2;
+                        // Centered vertically, left-aligned horizontally (starts at pagePadding)
                         const startY = (pageHeight - rawItemH) / 2;
-                        x = startX + indexOnPage * (rawItemW + marginX);
+                        x = pagePadding + indexOnPage * (rawItemW + marginX);
                         y = startY;
                     }
                 } else {

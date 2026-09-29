@@ -1438,23 +1438,23 @@ msgstr ""
 
 #: app/templates/list.html:298
 msgid "Chain Alignment"
-msgstr ""
+msgstr "Alinhamento da cadeia"
 
 #: app/templates/list.html:301
 msgid "Optimize space on page (multiple rows/columns)"
-msgstr ""
+msgstr "Otimizar o espaço na página (várias linhas/colunas)"
 
 #: app/templates/list.html:302
 msgid "Stack"
-msgstr ""
+msgstr "Empilhar"
 
 #: app/templates/list.html:305
 msgid "Center strip on the page"
-msgstr ""
+msgstr "Centrar a tira na página"
 
 #: app/templates/list.html:306
 msgid "Center"
-msgstr ""
+msgstr "Centrar"
 
 #: app/templates/list.html:311
 msgid "Horiz. Margin"

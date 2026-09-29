@@ -270,11 +270,13 @@ Liste des jalons et tâches à réaliser par les agents IA.
 - [x] **Option d'alignement de chaîne dans Paper Tools (`list.html`, `ListPdfExporter.js`)** :
   - [x] Ajout du bouton radio `print-chain-alignment` sous "Mode Liste Chaînée" avec les options `stack` (par défaut) et `center`.
   - [x] Mode `stack` : comportement standard optimisant la surface de la page (remplissage en plusieurs colonnes / lignes).
-  - [x] Mode `center` : centrage de la bande sur la feuille (centré verticalement pour le mode horizontal, centré horizontalement pour le mode vertical ; une seule bande par page avec répartition sur les pages suivantes).
-  - [x] Prise en charge dans la prévisualisation temps réel (`renderPreview`) et l'export PDF (`exportToPdf`).
-  - [x] Tests unitaires couvrant le calcul de layout et le rendu DOM en mode centré.
-  - [x] Extraction et mise à jour des traductions i18n (`pybabel`).
-  - [x] Validation de la suite complète de validation (`make test`).
+  - [x] Mode `center` : centrage de la bande sur l'axe perpendiculaire :
+    - Horizontal : centré au milieu de la hauteur (axe vertical), 1er pictogramme aligné à gauche puis enchaînement un à un vers la droite.
+    - Vertical : centré au milieu de la largeur (axe horizontal), 1er pictogramme aligné en haut puis enchaînement un à un vers le bas.
+  - [x] Prise en charge identique dans la prévisualisation temps réel (`renderPreview`) et l'export PDF (`exportToPdf`).
+  - [x] Tests unitaires couvrant le calcul de layout, le rendu DOM (`flex-start` + `center`) et les coordonnées calculées.
+  - [x] Traduction complète et compilation i18n dans l'ensemble des 7 langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+  - [x] Validation intégrale de la suite de tests (`make test`).
 
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :

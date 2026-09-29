@@ -9,12 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Chained List Alignment (Stack vs Center) in Paper Tools (`list.html`, `ListPdfExporter.js`)**:
   - Added "Chain Alignment" option under "Chained List Mode" with two choices: `Stack` (default) and `Center`.
   - `Stack`: optimizes space on the page by packing items across multiple rows/columns.
-  - `Center`: centers the strip on the sheet. For horizontal mode, the strip is centered at mid-height (vertical axis) with elements sequenced along the horizontal axis (single row per page). For vertical mode, the strip is centered at mid-width (horizontal axis) with elements sequenced along the vertical axis (single column per page).
-  - Implemented identical centering in both real-time WYSIWYG preview (`.page-content` flexbox alignment) and `exportToPdf()` (precise mathematical offset calculation).
-  - Added i18n translations for French and catalog updates for all supported locales.
+  - `Center`: centers the strip along the perpendicular axis:
+    - Horizontal mode: centered vertically at mid-height of the page, starts from the left (`pagePadding`), and elements sequence one by one towards the right (single row per page).
+    - Vertical mode: centered horizontally at mid-width of the page, starts from the top (`pagePadding`), and elements sequence one by one downwards (single column per page).
+  - Implemented identical layout in both real-time WYSIWYG preview (`.page-content` flexbox alignment with `justifyContent: flex-start`, `alignItems: center`) and `exportToPdf()` (precise single-axis mathematical offset calculation).
+  - Full internationalization: translated and compiled all chain alignment UI strings across all 7 supported locales (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
 - **Unit Tests for PDF Export & Chain Alignment (`tests/unit/list_pdf_exporter.test.js`)**:
   - Added unit test validating layout calculations for horizontal and vertical chain directions in both `stack` and `center` alignments.
-  - Added unit test validating DOM flexbox properties in live preview for `center` alignment (`justifyContent: center`, `alignItems: center`, `flexWrap: nowrap`).
+  - Added unit test validating DOM flexbox properties in live preview for `center` alignment (`justifyContent: flex-start`, `alignItems: center`, `flexWrap: nowrap`).
   - Added unit test validating end-to-end PDF export execution (`exportToPdf`) with mocked `jsPDF`, HTML5 canvas PNG conversion, and coordinate verification.
 
 ### Fixed

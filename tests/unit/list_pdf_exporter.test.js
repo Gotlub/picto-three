@@ -337,7 +337,7 @@ describe('ListPdfExporter Unit Tests', () => {
             assert.equal(printWrapper.children.length, 1);
             const contentDivHoriz = printWrapper.children[0].children[0];
             assert.equal(contentDivHoriz.style.flexDirection, 'row');
-            assert.equal(contentDivHoriz.style.justifyContent, 'center');
+            assert.equal(contentDivHoriz.style.justifyContent, 'flex-start');
             assert.equal(contentDivHoriz.style.alignItems, 'center');
             assert.equal(contentDivHoriz.style.flexWrap, 'nowrap');
 
@@ -358,7 +358,7 @@ describe('ListPdfExporter Unit Tests', () => {
             assert.equal(printWrapper.children.length, 1);
             const contentDivVert = printWrapper.children[0].children[0];
             assert.equal(contentDivVert.style.flexDirection, 'column');
-            assert.equal(contentDivVert.style.justifyContent, 'center');
+            assert.equal(contentDivVert.style.justifyContent, 'flex-start');
             assert.equal(contentDivVert.style.alignItems, 'center');
             assert.equal(contentDivVert.style.flexWrap, 'nowrap');
         } finally {
@@ -481,8 +481,10 @@ describe('ListPdfExporter Unit Tests', () => {
 
             // In horizontal center mode, both items share the exact same vertically centered Y coordinate
             assert.equal(lastCreatedDoc.imagesAdded[0].y, lastCreatedDoc.imagesAdded[1].y);
-            // And item 1 is positioned before item 2 horizontally
-            assert.ok(lastCreatedDoc.imagesAdded[0].x < lastCreatedDoc.imagesAdded[1].x);
+            // Item 1 starts at pagePadding (40) + effectiveBorderWidth (2) on the left
+            assert.equal(lastCreatedDoc.imagesAdded[0].x, 42);
+            // And item 2 follows horizontally with rawItemW (104) + marginX (10)
+            assert.equal(lastCreatedDoc.imagesAdded[1].x, 42 + 104 + 10);
         } finally {
             globalThis.document = originalDoc;
             globalThis.window = originalWindow;

@@ -1609,25 +1609,23 @@ msgstr ""
 
 #: app/templates/list.html:298
 msgid "Chain Alignment"
-msgstr ""
+msgstr "Kettinguitlijning"
 
 #: app/templates/list.html:301
 msgid "Optimize space on page (multiple rows/columns)"
-msgstr ""
+msgstr "Ruimte op pagina optimaliseren (meerdere rijen/kolommen)"
 
 #: app/templates/list.html:302
 msgid "Stack"
-msgstr ""
+msgstr "Stapelen"
 
 #: app/templates/list.html:305
-#, fuzzy
 msgid "Center strip on the page"
-msgstr "Voer boomnaam in"
+msgstr "Strook centreren op de pagina"
 
 #: app/templates/list.html:306
-#, fuzzy
 msgid "Center"
-msgstr "Maken"
+msgstr "Centreren"
 
 #: app/templates/list.html:311
 msgid "Horiz. Margin"
