@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-29 14:46+0000\n"
+"POT-Creation-Date: 2026-09-29 15:32+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -578,7 +578,7 @@ msgstr "Para confirmar, por favor escribe tu nombre de usuario a continuación:"
 msgid "Your username"
 msgstr "Tu nombre de usuario"
 
-#: app/templates/account.html:59 app/templates/list.html:532
+#: app/templates/account.html:59 app/templates/list.html:534
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -799,7 +799,7 @@ msgstr "Visualizar árbol"
 msgid "Interactive Tree Visualization"
 msgstr "Visualización interactiva del árbol"
 
-#: app/templates/builder.html:151 app/templates/list.html:523
+#: app/templates/builder.html:151 app/templates/list.html:525
 msgid "Close"
 msgstr "Cerrar"
 
@@ -1638,7 +1638,7 @@ msgstr ""
 msgid "Vert. Margin"
 msgstr ""
 
-#: app/templates/list.html:328 app/templates/list.html:522
+#: app/templates/list.html:328 app/templates/list.html:524
 #, fuzzy
 msgid "Save Print Options"
 msgstr "Opciones de importación"
@@ -1707,24 +1707,28 @@ msgstr "Constructor de listas encadenadas"
 msgid "Import Picture"
 msgstr "Importar imagen"
 
-#: app/templates/list.html:484
+#: app/templates/list.html:485 app/templates/list.html:486
 msgid "Delete Selected Link"
 msgstr "Eliminar enlace seleccionado"
 
-#: app/templates/list.html:485
+#: app/templates/list.html:486
+msgid "Delete Selected Links"
+msgstr "Eliminar enlaces seleccionados"
+
+#: app/templates/list.html:487
 msgid "New Chain"
 msgstr "Nueva cadena"
 
-#: app/templates/list.html:527
+#: app/templates/list.html:529
 #, fuzzy
 msgid "Option Name"
 msgstr "Nombre de la carpeta"
 
-#: app/templates/list.html:528
+#: app/templates/list.html:530
 msgid "e.g. My Custom Strip"
 msgstr ""
 
-#: app/templates/list.html:533
+#: app/templates/list.html:535
 #, fuzzy
 msgid "Save"
 msgstr "Guardar árbol"

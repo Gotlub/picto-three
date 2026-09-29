@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
+- **Chained List Locking in Print Tab & Multi-Selection Shortcuts (`ChainedListManager.js`, `list.html`, `list.css`, `list.js`)**:
+  - **Print Tab Lock**: Chained list builder is automatically locked exclusively when active in the Print tab (`shown.bs.tab`), removing draggable attributes, suppressing drag-and-drop reorganization events, and styling items and container with `.locked` (`cursor: default`, `user-select: none`).
+  - **Multi-Selection with `Ctrl` and `Shift`**:
+    - Single click: selects the clicked item and deselects others.
+    - `Ctrl + Click` / `Cmd + Click`: toggles item selection state into a multi-selection array and updates selection pivot.
+    - `Shift + Click`: contiguous range selection between the anchor/pivot item and the clicked item.
+    - Container click: clears selection when clicking empty space.
+  - **Description & Delete Button Dynamic States**:
+    - `#selected-link-description` is editable only when exactly 1 item is selected; disabled (`disabled`) and emptied when 0 or multiple items are selected.
+    - `#delete-link-btn` is disabled with `cursor: not-allowed` (while maintaining its red action theme) when 0 items are selected; displays singular ("Delete Selected Link") when 1 item is selected; displays plural ("Delete Selected Links") when multiple items are selected and deletes all selected items in batch.
+  - **Internationalization & Tests**:
+    - Translated and compiled `Delete Selected Links` across all 7 supported locales (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+    - Added unit test suite in `tests/unit/chained_list_manager.test.js` covering locking, single selection, multi-selection with Ctrl/Shift, pivot handling, description textarea sync, and plural delete button state.
 - **Chained List Alignment (Stack vs Center) in Paper Tools (`list.html`, `ListPdfExporter.js`)**:
   - Added "Chain Alignment" option under "Chained List Mode" with two choices: `Stack` (default) and `Center`.
   - `Stack`: optimizes space on the page by packing items across multiple rows/columns.

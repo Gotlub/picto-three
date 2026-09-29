@@ -56,6 +56,13 @@ class ListBuilder {
             getItemsCallback: () => this.chainedList.items
         });
 
+        // Onglets principaux (Import/Describe vs Print)
+        this.printTab = document.getElementById('print-tab');
+        this.importTab = document.getElementById('import-describe-tab');
+        if (this.printTab && this.printTab.classList.contains('active')) {
+            this.chainedList.setLocked(true);
+        }
+
         this.initEventListeners();
         this.loadSavedLists();
         this.loadSavedTrees();
@@ -74,6 +81,10 @@ class ListBuilder {
         // Panneau Droit - Filtre d'images locales
         this.imageSearchInput?.addEventListener('input', () => this.filterImages());
         this.imageSearchMode?.addEventListener('change', () => this.filterImages());
+
+        // Verrouillage de la liste chaînée lors de l'accès à l'onglet Print
+        this.printTab?.addEventListener('shown.bs.tab', () => this.chainedList.setLocked(true));
+        this.importTab?.addEventListener('shown.bs.tab', () => this.chainedList.setLocked(false));
     }
 
     handleSourceDragStart(e, payload) {

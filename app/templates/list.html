@@ -439,7 +439,7 @@
                             <div class="form-group mt-2">
                                 <label for="selected-link-description">{{ _('Selected Link Description') }}</label>
                                 <textarea id="selected-link-description" class="form-control" rows="2"
-                                    placeholder="{{ _('Select a link from the bottom list to edit its description...') }}"></textarea>
+                                    placeholder="{{ _('Select a link from the bottom list to edit its description...') }}" disabled></textarea>
                             </div>
                         </div>
                     </div>
@@ -481,7 +481,9 @@
                     <button id="import-local-pic-btn" class="btn btn-info text-white me-1">
                         <i class="bi bi-upload"></i> {{ _('Import Picture') }}
                     </button>
-                    <button id="delete-link-btn" class="btn btn-danger">{{ _('Delete Selected Link') }}</button>
+                    <button id="delete-link-btn" class="btn btn-danger"
+                        data-text-singular="{{ _('Delete Selected Link') }}"
+                        data-text-plural="{{ _('Delete Selected Links') }}" disabled>{{ _('Delete Selected Link') }}</button>
                     <button id="new-chain-btn" class="btn btn-secondary">{{ _('New Chain') }}</button>
                 </div>
             </div>

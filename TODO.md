@@ -278,6 +278,25 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Traduction complète et compilation i18n dans l'ensemble des 7 langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
   - [x] Validation intégrale de la suite de tests (`make test`).
 
+## Phase 12 : Verrouillage Chained List en Impression & Sélection Multiple (Ctrl / Maj)
+- [x] **Verrouillage de la liste chaînée dans l'onglet Print (`list.html`, `list.css`, `ChainedListManager.js`, `list.js`)** :
+  - [x] Ajout de l'état `isLocked` dans `ChainedListManager` et méthode `setLocked(locked)`.
+  - [x] Désactivation des attributs `draggable` et blocage des événements de réorganisation `dragstart`, `dragover` et `drop` en mode verrouillé.
+  - [x] Ajout de la classe CSS `.locked` (`cursor: default`, `user-select: none`) sur le conteneur et les éléments de chaîne.
+  - [x] Synchronisation automatique avec les onglets Bootstrap (`shown.bs.tab`) : verrouillé uniquement sur l'onglet "Print", déverrouillé sur "Import and describe".
+- [x] **Gestion de la sélection multiple (Ctrl et Maj) dans le Chained List Builder (`ChainedListManager.js`, `list.html`, `list.css`)** :
+  - [x] Clic simple : sélectionne l'élément cliqué et désélectionne les autres.
+  - [x] `Ctrl + Clic` (ou `Cmd + Clic`) : bascule (ajoute ou retire) l'élément de la sélection multiple avec mise à jour du pivot.
+  - [x] `Maj + Clic` : sélectionne en continu tous les éléments entre le pivot actif et l'élément cliqué.
+  - [x] Clic dans le fond du conteneur : désélectionne tous les éléments.
+  - [x] Gestion du champ de description (`#selected-link-description`) : actif et modifiable quand exactement 1 élément est sélectionné ; grisé, désactivé (`disabled`) et vidé quand 0 ou plusieurs éléments sont sélectionnés.
+  - [x] Gestion du bouton de suppression (`#delete-link-btn`) :
+    - Désactivé (`disabled`) quand 0 élément est sélectionné, avec curseur `not-allowed` et préservation de la teinte rouge d'action destructrice.
+    - Singulier ("Supprimer le lien sélectionné") quand 1 élément est sélectionné.
+    - Pluriel ("Supprimer les liens sélectionnés") quand plusieurs éléments sont sélectionnés, avec suppression en bloc de tous les éléments sélectionnés.
+  - [x] Traduction complète de `Delete Selected Links` dans toutes les langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`) et compilation des catalogues gettext `.mo`.
+  - [x] Tests unitaires complets ajoutés dans `tests/unit/chained_list_manager.test.js`.
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

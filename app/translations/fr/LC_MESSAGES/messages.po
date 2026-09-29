@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-29 14:46+0000\n"
+"POT-Creation-Date: 2026-09-29 15:32+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -568,7 +568,7 @@ msgstr "Pour confirmer, veuillez taper votre nom d'utilisateur ci-dessous :"
 msgid "Your username"
 msgstr "Votre nom d'utilisateur"
 
-#: app/templates/account.html:59 app/templates/list.html:532
+#: app/templates/account.html:59 app/templates/list.html:534
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -787,7 +787,7 @@ msgstr "Visualiser l'arbre"
 msgid "Interactive Tree Visualization"
 msgstr "Visualisation interactive de l'arbre"
 
-#: app/templates/builder.html:151 app/templates/list.html:523
+#: app/templates/builder.html:151 app/templates/list.html:525
 msgid "Close"
 msgstr "Fermer"
 
@@ -1622,7 +1622,7 @@ msgstr "Marge horiz."
 msgid "Vert. Margin"
 msgstr "Marge vert."
 
-#: app/templates/list.html:328 app/templates/list.html:522
+#: app/templates/list.html:328 app/templates/list.html:524
 msgid "Save Print Options"
 msgstr "Enregistrer les options d'impression"
 
@@ -1687,23 +1687,27 @@ msgstr "Constructeur de listes chaînées"
 msgid "Import Picture"
 msgstr "Importer une image"
 
-#: app/templates/list.html:484
+#: app/templates/list.html:485 app/templates/list.html:486
 msgid "Delete Selected Link"
 msgstr "Supprimer le lien sélectionné"
 
-#: app/templates/list.html:485
+#: app/templates/list.html:486
+msgid "Delete Selected Links"
+msgstr "Supprimer les liens sélectionnés"
+
+#: app/templates/list.html:487
 msgid "New Chain"
 msgstr "Nouvelle chaîne"
 
-#: app/templates/list.html:527
+#: app/templates/list.html:529
 msgid "Option Name"
 msgstr "Nom de l'option"
 
-#: app/templates/list.html:528
+#: app/templates/list.html:530
 msgid "e.g. My Custom Strip"
 msgstr "ex. Ma bande personnalisée"
 
-#: app/templates/list.html:533
+#: app/templates/list.html:535
 msgid "Save"
 msgstr "Enregistrer"
 
