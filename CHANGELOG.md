@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+### Added
+- **Chained List Alignment (Stack vs Center) in Paper Tools (`list.html`, `ListPdfExporter.js`)**:
+  - Added "Chain Alignment" option under "Chained List Mode" with two choices: `Stack` (default) and `Center`.
+  - `Stack`: optimizes space on the page by packing items across multiple rows/columns.
+  - `Center`: centers the strip on the sheet. For horizontal mode, the strip is centered at mid-height (vertical axis) with elements sequenced along the horizontal axis (single row per page). For vertical mode, the strip is centered at mid-width (horizontal axis) with elements sequenced along the vertical axis (single column per page).
+  - Implemented identical centering in both real-time WYSIWYG preview (`.page-content` flexbox alignment) and `exportToPdf()` (precise mathematical offset calculation).
+  - Added i18n translations for French and catalog updates for all supported locales.
+- **Unit Tests for PDF Export & Chain Alignment (`tests/unit/list_pdf_exporter.test.js`)**:
+  - Added unit test validating layout calculations for horizontal and vertical chain directions in both `stack` and `center` alignments.
+  - Added unit test validating DOM flexbox properties in live preview for `center` alignment (`justifyContent: center`, `alignItems: center`, `flexWrap: nowrap`).
+  - Added unit test validating end-to-end PDF export execution (`exportToPdf`) with mocked `jsPDF`, HTML5 canvas PNG conversion, and coordinate verification.
+
 ### Fixed
 - **Paper Tools PDF Export Reliability & Canvas Conversion (`ListPdfExporter.js`, `files.py`, `app/__init__.py`, `list.html`, `builder.html`)**:
   - Unified image URL resolution using `this.resolveImageUrl(item)` in `exportToPdf()`, guaranteeing identical image resolution between the live preview (`.page-content`) and the generated PDF.

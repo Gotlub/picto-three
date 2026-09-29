@@ -293,6 +293,20 @@
                                                     </label>
                                                 </div>
                                             </div>
+                                            <!-- Chain Alignment -->
+                                            <div class="mb-2">
+                                                <label class="form-label form-label-sm fw-bold mb-1">{{ _('Chain Alignment') }}</label>
+                                                <div class="btn-group w-100" role="group">
+                                                    <input type="radio" class="btn-check" name="print-chain-alignment" id="print-chain-align-stack" value="stack" checked>
+                                                    <label class="btn btn-outline-secondary btn-sm py-1" for="print-chain-align-stack" title="{{ _('Optimize space on page (multiple rows/columns)') }}">
+                                                        <i class="bi bi-grid-fill"></i> {{ _('Stack') }}
+                                                    </label>
+                                                    <input type="radio" class="btn-check" name="print-chain-alignment" id="print-chain-align-center" value="center">
+                                                    <label class="btn btn-outline-secondary btn-sm py-1" for="print-chain-align-center" title="{{ _('Center strip on the page') }}">
+                                                        <i class="bi bi-align-center"></i> {{ _('Center') }}
+                                                    </label>
+                                                </div>
+                                            </div>
                                             <div class="input-group input-group-sm mb-1">
                                                 <span class="input-group-text">{{ _('Horiz. Margin') }}</span>
                                                 <input type="number" class="form-control" id="print-margin-x" value="10" min="0" max="100">

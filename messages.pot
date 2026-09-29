@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-28 03:20+0200\n"
+"POT-Creation-Date: 2026-09-29 14:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: app/forms.py:19
 msgid "be at least 9 characters long"
@@ -526,7 +526,7 @@ msgstr ""
 msgid "Your username"
 msgstr ""
 
-#: app/templates/account.html:59 app/templates/list.html:518
+#: app/templates/account.html:59 app/templates/list.html:532
 msgid "Cancel"
 msgstr ""
 
@@ -538,11 +538,11 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
-#: app/templates/base.html:121 app/templates/index.html:43
+#: app/templates/base.html:121 app/templates/index.html:50
 msgid "Mobile Setup"
 msgstr ""
 
-#: app/templates/base.html:124 app/templates/index.html:87
+#: app/templates/base.html:124 app/templates/index.html:104
 msgid "Paper Tools"
 msgstr ""
 
@@ -721,7 +721,7 @@ msgstr ""
 msgid "Interactive Tree Visualization"
 msgstr ""
 
-#: app/templates/builder.html:151 app/templates/list.html:509
+#: app/templates/builder.html:151 app/templates/list.html:523
 msgid "Close"
 msgstr ""
 
@@ -742,32 +742,32 @@ msgid "Images"
 msgstr ""
 
 #: app/templates/builder.html:176 app/templates/builder.html:361
-#: app/templates/list.html:383
+#: app/templates/list.html:397
 msgid "Local"
 msgstr ""
 
 #: app/templates/builder.html:195 app/templates/builder.html:370
-#: app/templates/list.html:402
+#: app/templates/list.html:416
 msgid "Search local images..."
 msgstr ""
 
-#: app/templates/builder.html:197 app/templates/list.html:404
+#: app/templates/builder.html:197 app/templates/list.html:418
 msgid "Search mode"
 msgstr ""
 
-#: app/templates/builder.html:198 app/templates/list.html:405
+#: app/templates/builder.html:198 app/templates/list.html:419
 msgid "Relevance"
 msgstr ""
 
-#: app/templates/builder.html:199 app/templates/list.html:406
+#: app/templates/builder.html:199 app/templates/list.html:420
 msgid "Exact (\"Is\")"
 msgstr ""
 
-#: app/templates/builder.html:200 app/templates/list.html:407
+#: app/templates/builder.html:200 app/templates/list.html:421
 msgid "Starts with"
 msgstr ""
 
-#: app/templates/builder.html:201 app/templates/list.html:408
+#: app/templates/builder.html:201 app/templates/list.html:422
 msgid "Contains"
 msgstr ""
 
@@ -951,24 +951,24 @@ msgstr ""
 msgid "Login / Register"
 msgstr ""
 
-#: app/templates/index.html:44
+#: app/templates/index.html:52
 msgid "Build your digital binders for the mobile app."
 msgstr ""
 
-#: app/templates/index.html:57 app/templates/index.html:79
-#: app/templates/index.html:101
+#: app/templates/index.html:66 app/templates/index.html:93
+#: app/templates/index.html:120
 msgid "Your browser does not support the video tag."
 msgstr ""
 
-#: app/templates/index.html:65
+#: app/templates/index.html:77
 msgid "The Mobile App"
 msgstr ""
 
-#: app/templates/index.html:66
+#: app/templates/index.html:79
 msgid "Carry your Time Timer and pictograms anywhere."
 msgstr ""
 
-#: app/templates/index.html:88
+#: app/templates/index.html:106
 msgid "Simplify printing your pictograms."
 msgstr ""
 
@@ -1423,95 +1423,115 @@ msgstr ""
 msgid "Vertical"
 msgstr ""
 
-#: app/templates/list.html:297
-msgid "Horiz. Margin"
+#: app/templates/list.html:298
+msgid "Chain Alignment"
+msgstr ""
+
+#: app/templates/list.html:301
+msgid "Optimize space on page (multiple rows/columns)"
 msgstr ""
 
 #: app/templates/list.html:302
-msgid "Vert. Margin"
+msgid "Stack"
 msgstr ""
 
-#: app/templates/list.html:314 app/templates/list.html:508
-msgid "Save Print Options"
+#: app/templates/list.html:305
+msgid "Center strip on the page"
+msgstr ""
+
+#: app/templates/list.html:306
+msgid "Center"
+msgstr ""
+
+#: app/templates/list.html:311
+msgid "Horiz. Margin"
 msgstr ""
 
 #: app/templates/list.html:316
+msgid "Vert. Margin"
+msgstr ""
+
+#: app/templates/list.html:328 app/templates/list.html:522
+msgid "Save Print Options"
+msgstr ""
+
+#: app/templates/list.html:330
 msgid "Load Print Options"
 msgstr ""
 
-#: app/templates/list.html:319
+#: app/templates/list.html:333
 msgid "Select saved options"
 msgstr ""
 
-#: app/templates/list.html:321
+#: app/templates/list.html:335
 msgid "Delete Option"
 msgstr ""
 
-#: app/templates/list.html:337
+#: app/templates/list.html:351
 msgid "Import and Describe"
 msgstr ""
 
-#: app/templates/list.html:340
+#: app/templates/list.html:354
 msgid "Print"
 msgstr ""
 
-#: app/templates/list.html:352
+#: app/templates/list.html:366
 msgid "Select from Tree"
 msgstr ""
 
-#: app/templates/list.html:357
+#: app/templates/list.html:371
 msgid "Element"
 msgstr ""
 
-#: app/templates/list.html:362
+#: app/templates/list.html:376
 msgid "Branch"
 msgstr ""
 
-#: app/templates/list.html:365 app/templates/list.html:376
+#: app/templates/list.html:379 app/templates/list.html:390
 msgid "Drag to copy to list"
 msgstr ""
 
-#: app/templates/list.html:375
+#: app/templates/list.html:389
 msgid "Select from Images"
 msgstr ""
 
-#: app/templates/list.html:426
+#: app/templates/list.html:440
 msgid "Selected Link Description"
 msgstr ""
 
-#: app/templates/list.html:428
+#: app/templates/list.html:442
 msgid "Select a link from the bottom list to edit its description..."
 msgstr ""
 
-#: app/templates/list.html:445
+#: app/templates/list.html:459
 msgid "Generate PDF"
 msgstr ""
 
-#: app/templates/list.html:465
+#: app/templates/list.html:479
 msgid "Chained List Builder"
 msgstr ""
 
-#: app/templates/list.html:468
+#: app/templates/list.html:482
 msgid "Import Picture"
 msgstr ""
 
-#: app/templates/list.html:470
+#: app/templates/list.html:484
 msgid "Delete Selected Link"
 msgstr ""
 
-#: app/templates/list.html:471
+#: app/templates/list.html:485
 msgid "New Chain"
 msgstr ""
 
-#: app/templates/list.html:513
+#: app/templates/list.html:527
 msgid "Option Name"
 msgstr ""
 
-#: app/templates/list.html:514
+#: app/templates/list.html:528
 msgid "e.g. My Custom Strip"
 msgstr ""
 
-#: app/templates/list.html:519
+#: app/templates/list.html:533
 msgid "Save"
 msgstr ""
 

@@ -248,5 +248,246 @@ describe('ListPdfExporter Unit Tests', () => {
             globalThis.document = originalDoc;
         }
     });
+
+    it('calculates chain layout with center vs stack alignment', () => {
+        const items = [
+            { data: { image_id: 1, name: 'Step 1' } },
+            { data: { image_id: 2, name: 'Step 2' } },
+            { data: { image_id: 3, name: 'Step 3' } }
+        ];
+
+        // Horizontal Stack: multi-row allowed
+        const horizStack = exporter.calculateLayout(items, {
+            orientation: 'portrait',
+            imageSize: 100,
+            mode: 'chain',
+            chainDirection: 'horizontal',
+            chainAlignment: 'stack'
+        });
+        assert.ok(horizStack.rows >= 1);
+        assert.ok(horizStack.cols >= 1);
+        assert.equal(horizStack.chainAlignment, 'stack');
+
+        // Horizontal Center: single centered row per page
+        const horizCenter = exporter.calculateLayout(items, {
+            orientation: 'portrait',
+            imageSize: 100,
+            mode: 'chain',
+            chainDirection: 'horizontal',
+            chainAlignment: 'center'
+        });
+        assert.equal(horizCenter.rows, 1);
+        assert.ok(horizCenter.cols >= 1);
+        assert.equal(horizCenter.itemsPerPage, horizCenter.cols);
+        assert.equal(horizCenter.chainAlignment, 'center');
+
+        // Vertical Center: single centered column per page
+        const vertCenter = exporter.calculateLayout(items, {
+            orientation: 'portrait',
+            imageSize: 100,
+            mode: 'chain',
+            chainDirection: 'vertical',
+            chainAlignment: 'center'
+        });
+        assert.equal(vertCenter.cols, 1);
+        assert.ok(vertCenter.rows >= 1);
+        assert.equal(vertCenter.itemsPerPage, vertCenter.rows);
+        assert.equal(vertCenter.chainAlignment, 'center');
+    });
+
+    it('renders preview in chain center alignment with centered flexbox alignment', () => {
+        const makeMockEl = (tag) => ({
+            tag,
+            className: '',
+            style: {},
+            children: [],
+            appendChild(child) { this.children.push(child); }
+        });
+
+        const originalDoc = globalThis.document;
+        globalThis.document = {
+            createElement: (tag) => makeMockEl(tag),
+            getElementById: () => null,
+            querySelectorAll: () => [],
+            querySelector: () => null
+        };
+
+        try {
+            const testExporter = new ListPdfExporter();
+            const printWrapper = makeMockEl('div');
+            testExporter.printPagesWrapper = printWrapper;
+            testExporter.getItemsCallback = () => [
+                { data: { image_id: 1, name: 'A', path: 'a.png' } },
+                { data: { image_id: 2, name: 'B', path: 'b.png' } }
+            ];
+
+            // Test Horizontal Center
+            testExporter.readSettings = () => ({
+                orientation: 'landscape',
+                imageSize: 80,
+                showBorders: false,
+                mode: 'chain',
+                chainDirection: 'horizontal',
+                chainAlignment: 'center',
+                marginX: 10,
+                marginY: 10
+            });
+            testExporter.renderPreview();
+
+            assert.equal(printWrapper.children.length, 1);
+            const contentDivHoriz = printWrapper.children[0].children[0];
+            assert.equal(contentDivHoriz.style.flexDirection, 'row');
+            assert.equal(contentDivHoriz.style.justifyContent, 'center');
+            assert.equal(contentDivHoriz.style.alignItems, 'center');
+            assert.equal(contentDivHoriz.style.flexWrap, 'nowrap');
+
+            // Test Vertical Center
+            printWrapper.children = [];
+            testExporter.readSettings = () => ({
+                orientation: 'portrait',
+                imageSize: 80,
+                showBorders: false,
+                mode: 'chain',
+                chainDirection: 'vertical',
+                chainAlignment: 'center',
+                marginX: 10,
+                marginY: 10
+            });
+            testExporter.renderPreview();
+
+            assert.equal(printWrapper.children.length, 1);
+            const contentDivVert = printWrapper.children[0].children[0];
+            assert.equal(contentDivVert.style.flexDirection, 'column');
+            assert.equal(contentDivVert.style.justifyContent, 'center');
+            assert.equal(contentDivVert.style.alignItems, 'center');
+            assert.equal(contentDivVert.style.flexWrap, 'nowrap');
+        } finally {
+            globalThis.document = originalDoc;
+        }
+    });
+
+    it('exports to PDF successfully with mocked jsPDF, offscreen canvas, and image conversion', async () => {
+        let lastCreatedDoc = null;
+        class MockJsPDF {
+            constructor(options) {
+                this.options = options;
+                this.pages = 1;
+                this.imagesAdded = [];
+                this.savedFilename = null;
+                lastCreatedDoc = this;
+            }
+            addPage() { this.pages++; }
+            setFillColor() {}
+            rect() {}
+            roundedRect() {}
+            addImage(data, format, x, y, w, h) {
+                this.imagesAdded.push({ data, format, x, y, w, h });
+            }
+            setFontSize() {}
+            setTextColor() {}
+            setDrawColor() {}
+            setLineWidth() {}
+            splitTextToSize(text) { return [text]; }
+            text() {}
+            save(filename) {
+                this.savedFilename = filename;
+            }
+        }
+
+        class MockImage {
+            constructor() {
+                this.naturalWidth = 120;
+                this.naturalHeight = 120;
+                this.width = 120;
+                this.height = 120;
+                this._src = '';
+            }
+            set src(val) {
+                this._src = val;
+                if (typeof this.onload === 'function') {
+                    this.onload();
+                }
+            }
+            get src() { return this._src; }
+        }
+
+        const makeMockEl = (tag) => {
+            if (tag === 'canvas') {
+                return {
+                    width: 120,
+                    height: 120,
+                    getContext: () => ({
+                        drawImage: () => {}
+                    }),
+                    toDataURL: (type) => `data:${type};base64,mockPngBase64Data`
+                };
+            }
+            return {
+                tag,
+                innerHTML: '',
+                disabled: false
+            };
+        };
+
+        const originalDoc = globalThis.document;
+        const originalWindow = globalThis.window;
+        const originalImage = globalThis.Image;
+
+        globalThis.window = {
+            jspdf: { jsPDF: MockJsPDF },
+            alert: () => {}
+        };
+        globalThis.Image = MockImage;
+        globalThis.document = {
+            createElement: (tag) => makeMockEl(tag),
+            getElementById: () => null,
+            querySelectorAll: () => [],
+            querySelector: () => null
+        };
+
+        try {
+            const testExporter = new ListPdfExporter();
+            testExporter.getItemsCallback = () => [
+                { data: { image_id: 1, name: 'Sun', path: 'sun.png' } },
+                { data: { image_id: 2, name: 'Moon', path: 'https://static.arasaac.org/moon.png' } }
+            ];
+            testExporter.readSettings = () => ({
+                orientation: 'portrait',
+                imageSize: 100,
+                showBorders: true,
+                borders: [{ width: 2, color: '#000000' }],
+                showText: true,
+                textBox: false,
+                textPosition: 'bottom',
+                textPlacement: 'outside',
+                textSize: 14,
+                mode: 'chain',
+                chainDirection: 'horizontal',
+                chainAlignment: 'center',
+                marginX: 10,
+                marginY: 10
+            });
+
+            await testExporter.exportToPdf();
+
+            assert.ok(lastCreatedDoc !== null, 'jsPDF instance should be created');
+            assert.equal(lastCreatedDoc.savedFilename, 'pictograms-list.pdf');
+            assert.equal(lastCreatedDoc.imagesAdded.length, 2);
+
+            // Both images converted to PNG Data URLs
+            assert.ok(lastCreatedDoc.imagesAdded[0].data.startsWith('data:image/png;base64,'));
+            assert.equal(lastCreatedDoc.imagesAdded[0].format, 'PNG');
+            assert.ok(lastCreatedDoc.imagesAdded[1].data.startsWith('data:image/png;base64,'));
+
+            // In horizontal center mode, both items share the exact same vertically centered Y coordinate
+            assert.equal(lastCreatedDoc.imagesAdded[0].y, lastCreatedDoc.imagesAdded[1].y);
+            // And item 1 is positioned before item 2 horizontally
+            assert.ok(lastCreatedDoc.imagesAdded[0].x < lastCreatedDoc.imagesAdded[1].x);
+        } finally {
+            globalThis.document = originalDoc;
+            globalThis.window = originalWindow;
+            globalThis.Image = originalImage;
+        }
+    });
 });
 

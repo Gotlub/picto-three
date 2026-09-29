@@ -262,6 +262,20 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Sécurisation par try/catch unitaire autour de `doc.addImage` pour éviter qu'une image isolée ne bloque la génération du PDF complet, et enrichissement du message d'erreur avec le détail contextuel.
   - [x] Validation intégrale de la suite de tests (`make test`).
 
+## Phase 11 : Tests Unitaires Export PDF & Alignement Chaîne (Stack / Center)
+- [x] **Tests unitaires dédiés pour l'export PDF (`tests/unit/list_pdf_exporter.test.js`)** :
+  - [x] Simulation de jsPDF (`MockJsPDF`) et de canvas HTML5 hors-écran pour valider la génération sans crash en environnement headless.
+  - [x] Validation de la conversion de multiples images locales et distantes en DataURL PNG base64.
+  - [x] Vérification de l'appel `addImage` avec les dimensions et coordonnées calculées.
+- [x] **Option d'alignement de chaîne dans Paper Tools (`list.html`, `ListPdfExporter.js`)** :
+  - [x] Ajout du bouton radio `print-chain-alignment` sous "Mode Liste Chaînée" avec les options `stack` (par défaut) et `center`.
+  - [x] Mode `stack` : comportement standard optimisant la surface de la page (remplissage en plusieurs colonnes / lignes).
+  - [x] Mode `center` : centrage de la bande sur la feuille (centré verticalement pour le mode horizontal, centré horizontalement pour le mode vertical ; une seule bande par page avec répartition sur les pages suivantes).
+  - [x] Prise en charge dans la prévisualisation temps réel (`renderPreview`) et l'export PDF (`exportToPdf`).
+  - [x] Tests unitaires couvrant le calcul de layout et le rendu DOM en mode centré.
+  - [x] Extraction et mise à jour des traductions i18n (`pybabel`).
+  - [x] Validation de la suite complète de validation (`make test`).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.
