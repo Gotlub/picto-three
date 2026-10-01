@@ -42,7 +42,9 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: margin-bottom 0.2s ease-out;
+    position: relative;
+    box-sizing: border-box;
+    transition: margin-bottom 0.15s ease-out;
 }
 
 .node-content:hover {
@@ -120,40 +122,66 @@
 
 .node-content.drag-over-child {
     background-color: #d4edda; /* Light green */
-    border: 2px dashed #28a745;
-    position: relative;
-    margin-bottom: 35px; /* Décalage pour faire glisser le reste de l'arbre vers le bas */
+    outline: 2px dashed #28a745;
+    outline-offset: -2px;
+    border-radius: 4px;
+    margin-bottom: 35px; /* Décalage pour faire glisser le reste de l'arbre et loger le connecteur sans juxtaposition */
 }
 
-/* L-shaped branch connector for a single child └ */
+/* L-shaped branch connector for child insertion └ */
 .node-content.drag-over-child::after {
     content: "";
     position: absolute;
-    left: -10px;
+    left: 20px;
     top: 100%;
-    width: 30px;
-    height: 25px;
-    border-left: 4px solid #28a745;
-    border-bottom: 4px solid #28a745;
-    border-bottom-left-radius: 8px; /* Smooth curve */
+    width: 25px;
+    height: 18px;
+    border-left: 3px solid #28a745;
+    border-bottom: 3px solid #28a745;
+    border-bottom-left-radius: 6px;
+    pointer-events: none;
     z-index: 10;
 }
 
 .node-content.drag-over-replace {
     background-color: #cce5ff; /* Light blue */
-    border: 2px dashed #007bff;
+    outline: 2px dashed #007bff;
+    outline-offset: -2px;
+    border-radius: 4px;
 }
 
 .node-content.drag-over-before {
     background-color: #f8f9fa;
-    border-top: 5px solid #28a745;
-    border-bottom: 2px solid transparent; /* Maintain size parity */
+}
+
+.node-content.drag-over-before::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #28a745;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .node-content.drag-over-after {
     background-color: #f8f9fa;
-    border-bottom: 5px solid #28a745;
-    border-top: 2px solid transparent;
+}
+
+.node-content.drag-over-after::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #28a745;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 10;
 }
 
 /* Style for the T-connector of the selected node */

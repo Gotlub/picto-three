@@ -118,15 +118,47 @@ export class TreeBuilder {
             } else if (rect.right - e.clientX < threshold) {
                 container.scrollLeft += scrollSpeed;
             }
+
+            // Gestion de confort pour la dépose sous le dernier élément
+            if (e.target === this.treeDisplay) {
+                const allNodes = this.treeDisplay.querySelectorAll('.node-content');
+                const lastContent = allNodes.length > 0 ? allNodes[allNodes.length - 1] : null;
+                if (lastContent && lastContent._builderNode) {
+                    const lastRect = lastContent.getBoundingClientRect();
+                    // Si le curseur est dans une zone de 40px directement sous le dernier élément
+                    if (e.clientY >= lastRect.bottom && e.clientY <= lastRect.bottom + 40 &&
+                        e.clientX >= lastRect.left - 30 && e.clientX <= lastRect.right + 30) {
+                        this.handleDragOver(e, lastContent._builderNode);
+                        return;
+                    }
+                }
+                // Si on s'éloigne du dernier élément sur le fond du canvas, retirer les indicateurs orphelins
+                this.treeDisplay.querySelectorAll('.drag-over-before, .drag-over-after, .drag-over-child, .drag-over-replace').forEach(el => {
+                    el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
+                });
+            }
         });
 
-        this.treeDisplay.addEventListener('dragleave', () => {
-            this.treeDisplay.classList.remove('drag-over');
+        this.treeDisplay.addEventListener('dragleave', (e) => {
+            if (!this.treeDisplay.contains(e.relatedTarget)) {
+                this.treeDisplay.classList.remove('drag-over');
+                this.treeDisplay.querySelectorAll('.drag-over-before, .drag-over-after, .drag-over-child, .drag-over-replace').forEach(el => {
+                    el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
+                });
+            }
         });
 
         this.treeDisplay.addEventListener('drop', (e) => {
             e.preventDefault();
             this.treeDisplay.classList.remove('drag-over');
+
+            // Si un indicateur drag-over-after est actif sur le dernier nœud lors du drop sur le fond du canvas
+            const activeAfter = this.treeDisplay.querySelector('.drag-over-after');
+            if (activeAfter && activeAfter._builderNode) {
+                this.handleDrop(e, activeAfter._builderNode);
+                return;
+            }
+
             const dragDataString = e.dataTransfer.getData('application/json');
             if (dragDataString) {
                 try {
@@ -492,6 +524,16 @@ export class TreeBuilder {
         if (targetNode !== this.draggedNode) {
             const targetContent = targetNode.element.querySelector('.node-content');
             if (targetContent) {
+                // S'assurer qu'aucun autre nœud ne conserve une classe d'indicateur active
+                if (this.treeDisplay) {
+                    const activeElements = this.treeDisplay.querySelectorAll('.drag-over-before, .drag-over-after, .drag-over-child, .drag-over-replace');
+                    activeElements.forEach(el => {
+                        if (el !== targetContent) {
+                            el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
+                        }
+                    });
+                }
+
                 targetContent.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-child', 'drag-over-replace');
 
                 const rect = targetContent.getBoundingClientRect();
@@ -507,7 +549,7 @@ export class TreeBuilder {
                 } else {
                     if (offsetY < height * 0.25) {
                         targetContent.classList.add('drag-over-before');
-                    } else if (offsetY > height * 0.75) {
+                    } else if (offsetY > height * 0.65) {
                         targetContent.classList.add('drag-over-after');
                     } else {
                         targetContent.classList.add('drag-over-child');
@@ -528,18 +570,30 @@ export class TreeBuilder {
         let zone = 'child';
         const targetContent = targetNode.element.querySelector('.node-content');
         if (targetContent) {
-            const rect = targetContent.getBoundingClientRect();
-            const offsetY = e.clientY - rect.top;
-            const height = rect.height;
-            if (targetNode.isRoot) {
-                zone = offsetY < height / 2 ? 'replace' : 'child';
+            // Priorité absolue à l'indicateur visuel actuellement affiché à l'écran
+            if (targetContent.classList.contains('drag-over-before')) {
+                zone = 'before';
+            } else if (targetContent.classList.contains('drag-over-after')) {
+                zone = 'after';
+            } else if (targetContent.classList.contains('drag-over-replace')) {
+                zone = 'replace';
+            } else if (targetContent.classList.contains('drag-over-child')) {
+                zone = 'child';
             } else {
-                if (offsetY < height * 0.25) {
-                    zone = 'before';
-                } else if (offsetY > height * 0.75) {
-                    zone = 'after';
+                // Repli sur les coordonnées (ex: tests automatisés déclenchant drop sans dragover)
+                const rect = targetContent.getBoundingClientRect();
+                const offsetY = e.clientY - rect.top;
+                const height = rect.height;
+                if (targetNode.isRoot) {
+                    zone = offsetY < height / 2 ? 'replace' : 'child';
                 } else {
-                    zone = 'child';
+                    if (offsetY < height * 0.25) {
+                        zone = 'before';
+                    } else if (offsetY > height * 0.65) {
+                        zone = 'after';
+                    } else {
+                        zone = 'child';
+                    }
                 }
             }
         }

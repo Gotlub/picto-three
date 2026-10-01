@@ -33,6 +33,23 @@
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
+/* Locked chained list in Print tab */
+.chained-list-container.locked {
+    user-select: none;
+}
+
+.chained-list-container.locked .chained-list-item,
+.chained-list-item.locked {
+    cursor: default;
+}
+
+/* Disabled state for delete link button preserving red tint with not-allowed cursor */
+#delete-link-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+
 /* Drag and drop indicator */
 .drop-indicator {
     width: 4px;

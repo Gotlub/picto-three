@@ -39,13 +39,18 @@ export class ChainedListItem {
         // Événements pour sélection et drag & drop
         itemElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.manager.selectItem(this);
+            this.manager.selectItem(this, e);
         });
 
         itemElement.addEventListener('dragstart', (e) => {
             e.stopPropagation();
             this.manager.handleChainedListDragStart(e, this);
         });
+
+        if (this.manager?.isLocked) {
+            itemElement.setAttribute('draggable', 'false');
+            itemElement.classList.add('locked');
+        }
 
         return itemElement;
     }
@@ -75,12 +80,52 @@ export class ChainedListManager {
         this.selectedLinkDescription = selectedLinkDescription;
 
         this.items = [];
-        this.selectedItem = null;
+        this.selectedItems = [];
+        this.pivotIndex = null;
+        this.isLocked = false;
         this.draggedSource = null;
         this.draggedListItem = null;
         this.dropIndicator = this.createDropIndicator();
 
         this.initEventListeners();
+        this.updateSelectionUI();
+    }
+
+    get selectedItem() {
+        return this.selectedItems.length === 1 ? this.selectedItems[0] : null;
+    }
+
+    set selectedItem(item) {
+        if (item) {
+            this.clearSelectionVisuals();
+            this.selectedItems = [item];
+            item.element?.classList.add('selected');
+            this.pivotIndex = this.items.indexOf(item);
+        } else {
+            this.clearSelection();
+        }
+        this.updateSelectionUI();
+    }
+
+    setLocked(locked) {
+        this.isLocked = Boolean(locked);
+        if (this.container) {
+            if (this.isLocked) {
+                this.container.classList.add('locked');
+            } else {
+                this.container.classList.remove('locked');
+            }
+        }
+        this.items.forEach(item => {
+            if (item && item.element) {
+                item.element.setAttribute('draggable', this.isLocked ? 'false' : 'true');
+                if (this.isLocked) {
+                    item.element.classList.add('locked');
+                } else {
+                    item.element.classList.remove('locked');
+                }
+            }
+        });
     }
 
     createDropIndicator() {
@@ -132,6 +177,11 @@ export class ChainedListManager {
         });
 
         if (this.container) {
+            this.container.addEventListener('click', (e) => {
+                if (!e.target.closest('.chained-list-item')) {
+                    this.clearSelection();
+                }
+            });
             this.container.addEventListener('dragover', (e) => this.handleDragOver(e));
             this.container.addEventListener('dragleave', (e) => this.handleDragLeave(e));
             this.container.addEventListener('drop', (e) => this.handleDrop(e));
@@ -168,24 +218,117 @@ export class ChainedListManager {
         this.renderChainedList();
     }
 
-    selectItem(item) {
-        if (this.selectedItem) {
-            this.selectedItem.element.classList.remove('selected');
+    clearSelectionVisuals() {
+        this.selectedItems.forEach(item => {
+            if (item && item.element) {
+                item.element.classList.remove('selected');
+            }
+        });
+    }
+
+    clearSelection() {
+        this.clearSelectionVisuals();
+        this.selectedItems = [];
+        this.pivotIndex = null;
+        this.updateSelectionUI();
+    }
+
+    selectItem(item, e = null) {
+        if (!item) return;
+
+        const isCtrl = e && (e.ctrlKey || e.metaKey);
+        const isShift = e && e.shiftKey;
+        const clickedIndex = this.items.indexOf(item);
+
+        const validPivot = (this.pivotIndex !== null && this.pivotIndex >= 0 && this.pivotIndex < this.items.length);
+
+        if (isShift && validPivot) {
+            // Shift + click: select range between pivot and clicked item
+            const start = Math.min(this.pivotIndex, clickedIndex);
+            const end = Math.max(this.pivotIndex, clickedIndex);
+
+            this.clearSelectionVisuals();
+            this.selectedItems = [];
+
+            for (let i = start; i <= end; i++) {
+                const rangeItem = this.items[i];
+                if (rangeItem) {
+                    this.selectedItems.push(rangeItem);
+                    if (rangeItem.element) {
+                        rangeItem.element.classList.add('selected');
+                    }
+                }
+            }
+        } else if (isCtrl) {
+            // Ctrl + click: toggle item in selection
+            const existingIndex = this.selectedItems.indexOf(item);
+            if (existingIndex > -1) {
+                this.selectedItems.splice(existingIndex, 1);
+                if (item.element) {
+                    item.element.classList.remove('selected');
+                }
+                if (this.selectedItems.length > 0) {
+                    this.pivotIndex = this.items.indexOf(this.selectedItems[this.selectedItems.length - 1]);
+                } else {
+                    this.pivotIndex = null;
+                }
+            } else {
+                this.selectedItems.push(item);
+                if (item.element) {
+                    item.element.classList.add('selected');
+                }
+                this.pivotIndex = clickedIndex;
+            }
+        } else {
+            // Standard click: select only this item
+            this.clearSelectionVisuals();
+            this.selectedItems = [item];
+            if (item.element) {
+                item.element.classList.add('selected');
+            }
+            this.pivotIndex = clickedIndex;
         }
 
-        this.selectedItem = item;
-        this.selectedItem.element.classList.add('selected');
+        this.updateSelectionUI();
+    }
 
+    updateSelectionUI() {
+        const count = this.selectedItems.length;
+
+        // Update description textarea
         if (this.selectedLinkDescription) {
-            this.selectedLinkDescription.value = this.selectedItem.data.description || '';
-            this.selectedLinkDescription.disabled = false;
+            if (count === 1) {
+                this.selectedLinkDescription.disabled = false;
+                this.selectedLinkDescription.value = this.selectedItems[0].data?.description || '';
+            } else {
+                this.selectedLinkDescription.value = '';
+                this.selectedLinkDescription.disabled = true;
+            }
+        }
+
+        // Update delete button
+        if (this.deleteLinkBtn) {
+            const singularText = this.deleteLinkBtn.dataset?.textSingular || 'Delete Selected Link';
+            const pluralText = this.deleteLinkBtn.dataset?.textPlural || 'Delete Selected Links';
+
+            if (count === 0) {
+                this.deleteLinkBtn.disabled = true;
+                this.deleteLinkBtn.textContent = singularText;
+            } else if (count === 1) {
+                this.deleteLinkBtn.disabled = false;
+                this.deleteLinkBtn.textContent = singularText;
+            } else {
+                this.deleteLinkBtn.disabled = false;
+                this.deleteLinkBtn.textContent = pluralText;
+            }
         }
     }
 
     updateSelectedLinkDescription() {
-        if (this.selectedItem && this.selectedLinkDescription) {
-            this.selectedItem.data.description = this.selectedLinkDescription.value;
-            const descriptionElement = this.selectedItem.element.querySelector('p');
+        if (this.selectedItems.length === 1 && this.selectedLinkDescription) {
+            const singleItem = this.selectedItems[0];
+            singleItem.data.description = this.selectedLinkDescription.value;
+            const descriptionElement = singleItem.element?.querySelector('p');
             if (descriptionElement) {
                 descriptionElement.textContent = this.selectedLinkDescription.value;
             }
@@ -193,27 +336,20 @@ export class ChainedListManager {
     }
 
     deleteSelectedLink() {
-        if (!this.selectedItem) {
+        if (this.selectedItems.length === 0) {
             NotificationService.alert('Please select a link to delete.');
             return;
         }
-        this.items = this.items.filter(item => item !== this.selectedItem);
-        this.selectedItem = null;
-        if (this.selectedLinkDescription) {
-            this.selectedLinkDescription.value = '';
-            this.selectedLinkDescription.disabled = true;
-        }
+        const toDelete = new Set(this.selectedItems);
+        this.items = this.items.filter(item => !toDelete.has(item));
+        this.clearSelection();
         this.renderChainedList();
     }
 
     clearChain() {
         if (NotificationService.confirm('Are you sure you want to clear the entire chain?')) {
             this.items = [];
-            this.selectedItem = null;
-            if (this.selectedLinkDescription) {
-                this.selectedLinkDescription.value = '';
-                this.selectedLinkDescription.disabled = true;
-            }
+            this.clearSelection();
             this.renderChainedList();
         }
     }
@@ -222,7 +358,15 @@ export class ChainedListManager {
         if (!this.container) return;
         this.container.innerHTML = '';
         this.items.forEach(item => {
-            this.container.appendChild(item.element);
+            if (item && item.element) {
+                item.element.setAttribute('draggable', this.isLocked ? 'false' : 'true');
+                if (this.isLocked) {
+                    item.element.classList.add('locked');
+                } else {
+                    item.element.classList.remove('locked');
+                }
+                this.container.appendChild(item.element);
+            }
         });
         setTimeout(() => this.updateScrollButtonsVisibility(), 50);
     }
@@ -251,12 +395,17 @@ export class ChainedListManager {
     }
 
     handleChainedListDragStart(e, item) {
+        if (this.isLocked) {
+            e.preventDefault();
+            return;
+        }
         this.draggedListItem = item;
         e.dataTransfer.effectAllowed = 'move';
         setTimeout(() => item.element.classList.add('dragging'), 0);
     }
 
     handleDragOver(e) {
+        if (this.isLocked) return;
         e.preventDefault();
         if (!this.container || !this.dropIndicator) return;
         const container = this.container;
@@ -295,6 +444,7 @@ export class ChainedListManager {
     }
 
     handleDrop(e) {
+        if (this.isLocked) return;
         e.preventDefault();
         this.removeDropIndicator();
 
@@ -391,6 +541,7 @@ export class ChainedListManager {
     }
 
     setItemsFromPayload(payload) {
+        this.clearSelection();
         this.items = payload.map(itemData => {
             const imageInfo = {
                 id: itemData.image_id,

@@ -64,6 +64,10 @@
 
             <h3>{{ _('7. License') }}</h3>
             <p>{{ _('This software is open source and licensed under the GNU AGPL v3.') }}</p>
+
+            <h3>{{ _('8. ARASAAC Pictograms') }}</h3>
+            {% set arasaac_legal_url = '<a href="https://www.arasaac.org" target="_blank" rel="noopener noreferrer">https://www.arasaac.org</a>' | safe %}
+            <p>{{ _('The pictographic symbols used in PictoTree are the property of the Government of Aragón and have been created by Sergio Palao for ARASAAC (%(url)s), which distributes them under Creative Commons License BY-NC-SA.', url=arasaac_legal_url) }}</p>
         </section>
 
         <hr class="my-5">

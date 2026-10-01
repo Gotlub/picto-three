@@ -45,6 +45,7 @@ def serve_pictogram(img_id):
     response.headers['X-Image-Hash'] = image.image_hash or ''
     response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
     response.headers['X-Image-Id'] = str(image.id)
+    response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -75,4 +76,5 @@ def serve_pictogram_min(img_id):
     response.headers['X-Image-Hash'] = image.image_hash or ''
     response.headers['X-Image-Updated-At'] = image.updated_at.isoformat() if image.updated_at else ''
     response.headers['X-Image-Id'] = str(image.id)
+    response.headers['Access-Control-Allow-Origin'] = '*'
     return response

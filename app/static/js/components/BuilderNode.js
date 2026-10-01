@@ -62,9 +62,11 @@ export class BuilderNode {
         const nodeElement = document.createElement('div');
         nodeElement.classList.add('node');
         nodeElement.setAttribute('draggable', (!this.isRoot).toString());
+        nodeElement._builderNode = this;
 
         const contentElement = document.createElement('div');
         contentElement.classList.add('node-content');
+        contentElement._builderNode = this;
 
         const imgElement = document.createElement('img');
         imgElement.src = resolveBuilderImageUrl(this.image);
@@ -139,30 +141,65 @@ export class BuilderNode {
                 builder.handleDragStart(e, this);
             }
         });
-        nodeElement.addEventListener('dragover', (e) => {
+        nodeElement.addEventListener('dragend', (e) => {
+            e.stopPropagation();
+            if (builder && typeof builder.handleDragEnd === 'function') {
+                builder.handleDragEnd(e, this);
+            }
+        });
+
+        // La capture précise du survol et du drop s'effectue sur contentElement
+        contentElement.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (builder && typeof builder.handleDragOver === 'function') {
                 builder.handleDragOver(e, this);
             }
         });
-        nodeElement.addEventListener('dragleave', (e) => {
+        contentElement.addEventListener('dragleave', (e) => {
             e.stopPropagation();
-            if (builder && typeof builder.handleDragLeave === 'function') {
-                builder.handleDragLeave(e, this);
+            const isInside = nodeElement && typeof nodeElement.contains === 'function'
+                ? nodeElement.contains(e.relatedTarget)
+                : false;
+            if (!isInside) {
+                if (builder && typeof builder.handleDragLeave === 'function') {
+                    builder.handleDragLeave(e, this);
+                }
             }
         });
-        nodeElement.addEventListener('drop', (e) => {
+        contentElement.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (builder && typeof builder.handleDrop === 'function') {
                 builder.handleDrop(e, this);
             }
         });
-        nodeElement.addEventListener('dragend', (e) => {
-            e.stopPropagation();
-            if (builder && typeof builder.handleDragEnd === 'function') {
-                builder.handleDragEnd(e, this);
+
+        // Support de repli si l'événement est dispatché directement sur nodeElement
+        nodeElement.addEventListener('dragover', (e) => {
+            if (e.target === nodeElement) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (builder && typeof builder.handleDragOver === 'function') {
+                    builder.handleDragOver(e, this);
+                }
+            }
+        });
+        nodeElement.addEventListener('dragleave', (e) => {
+            if (e.target === nodeElement && !nodeElement.contains(e.relatedTarget)) {
+                e.stopPropagation();
+                if (builder && typeof builder.handleDragLeave === 'function') {
+                    builder.handleDragLeave(e, this);
+                }
+            }
+        });
+        nodeElement.addEventListener('drop', (e) => {
+            if (e.target === nodeElement) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (builder && typeof builder.handleDrop === 'function') {
+                    builder.handleDrop(e, this);
+                }
             }
         });
 

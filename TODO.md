@@ -242,6 +242,71 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Tests de non-rejouabilité du token de reset et nettoyage complet du compte (`tests/test_auth.py`).
   - [x] Suite complète validée avec succès : `make test` (Ruff, ESLint, 54 tests JS, 66 tests Pytest, 11 tests Playwright E2E - 100% succès).
 
+## Phase 9 : Audit & Harmonisation UX du Drag & Drop dans le Tree Builder
+- [x] **Audit et synchronisation du Drag & Drop dans le Tree Builder (`/builder`)** :
+  - [x] Rétablissement et stabilisation de l'espace factice (`margin-bottom: 35px` et `transition: margin-bottom 0.15s ease-out` sur `.node-content.drag-over-child`) : crée un volume réservé sous le nœud parent pour accueillir le connecteur coudé sans chevaucher l'icône suivante.
+  - [x] Alignement géométrique rigoureux du trait coudé vert (`└`) : positionné à `left: 20px; top: 100%;` en parfaite continuité avec la ligne de tronc des nœuds enfants (`.children::before`).
+  - [x] Affichage net et stable au contact des éléments pour les déposes au-dessus (`drag-over-before`) et au-dessous (`drag-over-after`) via pseudo-éléments `::before` et `::after` (barre verte 4px sans distorsion ni variation de hauteur du nœud).
+  - [x] Remplacement du contour destructeur par `outline: 2px dashed` pour `drag-over-child` et `drag-over-replace` afin de préserver l'intégrité du box-model.
+  - [x] Optimisation de la capture d'événements (`BuilderNode.js`) : ciblage de `contentElement` avec étanchéité `nodeElement.contains(e.relatedTarget)` pour éradiquer le clignotement `dragleave` lors du survol de l'espace réservé au connecteur ou des éléments internes (`img`, `span`).
+  - [x] Uniformisation parfaite affichage/capture (`builder.js`) : détection prioritaire de l'indicateur visuel actif lors du `drop`, nettoyage automatique des indicateurs orphelins et seuillage précis `before` (< 25%), `child` (25%-65%), `after` (> 65%).
+  - [x] Résolution de la dépose sous le dernier élément de l'arbre : levée du blocage en mode `child`, association `_builderNode` et extension de confort de la zone de dépose du canvas (jusqu'à 40px sous le dernier nœud) permettant de glisser et insérer immédiatement en-dessous (`after`) sans être contraint d'insérer à l'intérieur.
+
+## Phase 10 : Fiabilisation de l'Export PDF dans Paper Tools (/list)
+- [x] **Fiabilisation de la génération de PDF (`ListPdfExporter.js`, `files.py`, `app/__init__.py`, `list.html`, `builder.html`)** :
+  - [x] Unification de la résolution d'URL d'image avec `this.resolveImageUrl(item)` dans `exportToPdf()`, assurant une parité parfaite avec la miniature affichée dans la page.
+  - [x] Remplacement du chargement synchrone XHR jsPDF par un préchargement HTML5 Canvas avec conversion en DataURL PNG base64, éliminant les échecs liés aux formats d'images (JPEG, WebP, SVG, PNG) et aux requêtes réseau bloquées.
+  - [x] Autorisation de `https://static.arasaac.org` dans la directive `connect-src` de la Content-Security-Policy (`app/__init__.py`).
+  - [x] Ajout de l'en-tête `Access-Control-Allow-Origin: *` sur les routes de distribution d'images `/pictograms/` et `/pictogramsmin/` (`app/routes/files.py`).
+  - [x] Ajout du script jsPDF en local (`app/static/js/lib/jspdf.umd.min.js`) avec repli automatique (fallback) dans `list.html` et `builder.html` si le CDN est indisponible.
+  - [x] Sécurisation par try/catch unitaire autour de `doc.addImage` pour éviter qu'une image isolée ne bloque la génération du PDF complet, et enrichissement du message d'erreur avec le détail contextuel.
+  - [x] Validation intégrale de la suite de tests (`make test`).
+
+## Phase 11 : Tests Unitaires Export PDF & Alignement Chaîne (Stack / Center)
+- [x] **Tests unitaires dédiés pour l'export PDF (`tests/unit/list_pdf_exporter.test.js`)** :
+  - [x] Simulation de jsPDF (`MockJsPDF`) et de canvas HTML5 hors-écran pour valider la génération sans crash en environnement headless.
+  - [x] Validation de la conversion de multiples images locales et distantes en DataURL PNG base64.
+  - [x] Vérification de l'appel `addImage` avec les dimensions et coordonnées calculées.
+- [x] **Option d'alignement de chaîne dans Paper Tools (`list.html`, `ListPdfExporter.js`)** :
+  - [x] Ajout du bouton radio `print-chain-alignment` sous "Mode Liste Chaînée" avec les options `stack` (par défaut) et `center`.
+  - [x] Mode `stack` : comportement standard optimisant la surface de la page (remplissage en plusieurs colonnes / lignes).
+  - [x] Mode `center` : centrage de la bande sur l'axe perpendiculaire :
+    - Horizontal : centré au milieu de la hauteur (axe vertical), 1er pictogramme aligné à gauche puis enchaînement un à un vers la droite.
+    - Vertical : centré au milieu de la largeur (axe horizontal), 1er pictogramme aligné en haut puis enchaînement un à un vers le bas.
+  - [x] Prise en charge identique dans la prévisualisation temps réel (`renderPreview`) et l'export PDF (`exportToPdf`).
+  - [x] Tests unitaires couvrant le calcul de layout, le rendu DOM (`flex-start` + `center`) et les coordonnées calculées.
+  - [x] Traduction complète et compilation i18n dans l'ensemble des 7 langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+  - [x] Validation intégrale de la suite de tests (`make test`).
+
+## Phase 12 : Verrouillage Chained List en Impression & Sélection Multiple (Ctrl / Maj)
+- [x] **Verrouillage de la liste chaînée dans l'onglet Print (`list.html`, `list.css`, `ChainedListManager.js`, `list.js`)** :
+  - [x] Ajout de l'état `isLocked` dans `ChainedListManager` et méthode `setLocked(locked)`.
+  - [x] Désactivation des attributs `draggable` et blocage des événements de réorganisation `dragstart`, `dragover` et `drop` en mode verrouillé.
+  - [x] Ajout de la classe CSS `.locked` (`cursor: default`, `user-select: none`) sur le conteneur et les éléments de chaîne.
+  - [x] Synchronisation automatique avec les onglets Bootstrap (`shown.bs.tab`) : verrouillé uniquement sur l'onglet "Print", déverrouillé sur "Import and describe".
+- [x] **Gestion de la sélection multiple (Ctrl et Maj) dans le Chained List Builder (`ChainedListManager.js`, `list.html`, `list.css`)** :
+  - [x] Clic simple : sélectionne l'élément cliqué et désélectionne les autres.
+  - [x] `Ctrl + Clic` (ou `Cmd + Clic`) : bascule (ajoute ou retire) l'élément de la sélection multiple avec mise à jour du pivot.
+  - [x] `Maj + Clic` : sélectionne en continu tous les éléments entre le pivot actif et l'élément cliqué.
+  - [x] Clic dans le fond du conteneur : désélectionne tous les éléments.
+  - [x] Gestion du champ de description (`#selected-link-description`) : actif et modifiable quand exactement 1 élément est sélectionné ; grisé, désactivé (`disabled`) et vidé quand 0 ou plusieurs éléments sont sélectionnés.
+  - [x] Gestion du bouton de suppression (`#delete-link-btn`) :
+    - Désactivé (`disabled`) quand 0 élément est sélectionné, avec curseur `not-allowed` et préservation de la teinte rouge d'action destructrice.
+    - Singulier ("Supprimer le lien sélectionné") quand 1 élément est sélectionné.
+    - Pluriel ("Supprimer les liens sélectionnés") quand plusieurs éléments sont sélectionnés, avec suppression en bloc de tous les éléments sélectionnés.
+  - [x] Traduction complète de `Delete Selected Links` dans toutes les langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`) et compilation des catalogues gettext `.mo`.
+  - [x] Tests unitaires complets ajoutés dans `tests/unit/chained_list_manager.test.js`.
+
+## Phase 13 : Améliorations Page d'Accueil & Mentions Légales ARASAAC
+- [x] **Agrandissement des vidéos de la page d'accueil (`app/templates/index.html`)** :
+  - [x] Augmentation de 50% de la taille maximale des lecteurs vidéo (passage de 728px à 1092px) sur `.feature-media`, `.video-container` et en responsive.
+  - [x] Élargissement du conteneur `.feature-presentation` (de 1280px à 1560px) pour permettre aux vidéos de s'étendre confortablement sur grand écran tout en préservant l'équilibre de la colonne texte.
+- [x] **Lien officiel ARASAAC sur la page d'accueil (`app/templates/index.html`)** :
+  - [x] Ajout du lien externe vers le site officiel `https://arasaac.org` sur "Arasaac" dans la liste des fonctionnalités phares.
+- [x] **Mentions légales des pictogrammes ARASAAC (`app/templates/legal.html`)** :
+  - [x] Ajout de la section "8. ARASAAC Pictograms" dans les conditions d'utilisation rappelant la propriété du Gouvernement d'Aragon, la création par Sergio Palao et la licence Creative Commons BY-NC-SA avec lien vers le site officiel.
+  - [x] Traduction complète et compilation i18n dans l'ensemble des 7 langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

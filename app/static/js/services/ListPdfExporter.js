@@ -487,6 +487,11 @@ export class ListPdfExporter {
         const chainDirRadio = document.querySelector(`input[name="print-chain-direction"][value="${preset.chainDirection}"]`);
         if (chainDirRadio) chainDirRadio.checked = true;
 
+        if (preset.chainAlignment) {
+            const chainAlignRadio = document.querySelector(`input[name="print-chain-alignment"][value="${preset.chainAlignment}"]`);
+            if (chainAlignRadio) chainAlignRadio.checked = true;
+        }
+
         const marginXInput = document.getElementById('print-margin-x');
         if (marginXInput && preset.marginX !== undefined) marginXInput.value = preset.marginX;
         const marginYInput = document.getElementById('print-margin-y');
@@ -526,6 +531,7 @@ export class ListPdfExporter {
                 mode: 'grid',
                 gridMultiplier: 1,
                 chainDirection: 'horizontal',
+                chainAlignment: 'stack',
                 marginX: 10,
                 marginY: 10
             };
@@ -571,6 +577,9 @@ export class ListPdfExporter {
         const chainDirRadios = document.querySelector('input[name="print-chain-direction"]:checked');
         const chainDirection = chainDirRadios ? chainDirRadios.value : 'horizontal';
 
+        const chainAlignRadios = document.querySelector('input[name="print-chain-alignment"]:checked');
+        const chainAlignment = chainAlignRadios ? chainAlignRadios.value : 'stack';
+
         const rawMarginX = parseInt(document.getElementById('print-margin-x')?.value, 10);
         const marginX = isNaN(rawMarginX) ? 10 : rawMarginX;
 
@@ -594,6 +603,7 @@ export class ListPdfExporter {
             mode,
             gridMultiplier,
             chainDirection,
+            chainAlignment,
             marginX,
             marginY
         };
@@ -610,6 +620,7 @@ export class ListPdfExporter {
             borders = [],
             textBox = false,
             chainDirection = 'horizontal',
+            chainAlignment = 'stack',
             showText,
             textPlacement,
             textSize,
@@ -667,12 +678,22 @@ export class ListPdfExporter {
 
         let cols, rows;
         if (mode === 'chain') {
-            if (chainDirection === 'vertical') {
-                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
-                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+            if (chainAlignment === 'center') {
+                if (chainDirection === 'vertical') {
+                    rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                    cols = 1;
+                } else {
+                    cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+                    rows = 1;
+                }
             } else {
-                cols = Math.max(1, Math.floor(availWidth / itemTotalW));
-                rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                if (chainDirection === 'vertical') {
+                    rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                    cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+                } else {
+                    cols = Math.max(1, Math.floor(availWidth / itemTotalW));
+                    rows = Math.max(1, Math.floor(availHeight / itemTotalH));
+                }
             }
         } else {
             cols = Math.max(1, Math.floor(availWidth / itemTotalW));
@@ -696,7 +717,8 @@ export class ListPdfExporter {
             borderCount,
             borders,
             textBox,
-            chainDirection
+            chainDirection,
+            chainAlignment
         };
     }
 
@@ -748,6 +770,7 @@ export class ListPdfExporter {
             textSize,
             mode,
             chainDirection,
+            chainAlignment = 'stack',
             marginX,
             marginY
         } = settings;
@@ -760,14 +783,34 @@ export class ListPdfExporter {
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'page-content';
+            contentDiv.style.boxSizing = 'border-box';
             contentDiv.style.padding = `${pagePadding}px`;
             contentDiv.style.display = 'flex';
-            contentDiv.style.flexWrap = 'wrap';
-            contentDiv.style.alignContent = 'flex-start';
 
             if (mode === 'grid') {
+                contentDiv.style.flexWrap = 'wrap';
+                contentDiv.style.alignContent = 'flex-start';
                 contentDiv.style.gap = '5px';
+            } else if (mode === 'chain' && chainAlignment === 'center') {
+                contentDiv.style.flexWrap = 'nowrap';
+                if (chainDirection === 'vertical') {
+                    contentDiv.style.flexDirection = 'column';
+                    contentDiv.style.justifyContent = 'flex-start';
+                    contentDiv.style.alignItems = 'center';
+                    contentDiv.style.alignContent = 'center';
+                    contentDiv.style.rowGap = `${marginY}px`;
+                    contentDiv.style.columnGap = `${marginX}px`;
+                } else {
+                    contentDiv.style.flexDirection = 'row';
+                    contentDiv.style.justifyContent = 'flex-start';
+                    contentDiv.style.alignItems = 'center';
+                    contentDiv.style.alignContent = 'center';
+                    contentDiv.style.columnGap = `${marginX}px`;
+                    contentDiv.style.rowGap = `${marginY}px`;
+                }
             } else {
+                contentDiv.style.flexWrap = 'wrap';
+                contentDiv.style.alignContent = 'flex-start';
                 contentDiv.style.columnGap = `${marginX}px`;
                 contentDiv.style.rowGap = `${marginY}px`;
                 if (chainDirection === 'vertical') {
@@ -903,6 +946,9 @@ export class ListPdfExporter {
         }
 
         try {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                throw new Error('The jsPDF library is not loaded on the page.');
+            }
             const { jsPDF } = window.jspdf;
             const settings = this.readSettings();
             const layout = this.calculateLayout(items, settings);
@@ -918,11 +964,16 @@ export class ListPdfExporter {
                 textPlacement,
                 textSize,
                 mode,
-                chainDirection
+                chainDirection,
+                chainAlignment = 'stack',
+                marginX = 10,
+                marginY = 10
             } = settings;
 
             const {
                 itemsToRender,
+                pageWidth,
+                pageHeight,
                 pagePadding,
                 cols,
                 rows,
@@ -939,27 +990,36 @@ export class ListPdfExporter {
                 format: [794, 1123]
             });
 
-            const loadImage = (src, imgId) => {
+            const loadImage = (src) => {
+                if (!src) return Promise.resolve(null);
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = 'Anonymous';
-                    img.onload = () => resolve(img);
-                    img.onerror = () => resolve(null);
-
-                    let fullSrc = src;
-                    const imageId = Number(imgId);
-                    if (src && src.startsWith('http')) {
-                        // Keep HTTP URL
-                    } else if (!isNaN(imageId) && imageId >= 0) {
-                        fullSrc = `/pictograms/${imageId}`;
-                    } else if (src && src.startsWith('data:')) {
-                        // Keep data URI
-                    } else if (src && !src.startsWith('/')) {
-                        fullSrc = '/pictograms/' + src;
-                    } else if (!src) {
-                        fullSrc = '/static/images/prohibit-bold.png';
-                    }
-                    img.src = fullSrc;
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const w = img.naturalWidth || img.width || 100;
+                            const h = img.naturalHeight || img.height || 100;
+                            canvas.width = w;
+                            canvas.height = h;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/png');
+                            resolve({ dataUrl, width: w, height: h });
+                        } catch (canvasErr) {
+                            console.warn('Canvas conversion fallback:', canvasErr);
+                            resolve({
+                                imgElement: img,
+                                width: img.naturalWidth || img.width || 100,
+                                height: img.naturalHeight || img.height || 100
+                            });
+                        }
+                    };
+                    img.onerror = () => {
+                        console.warn('Failed to load image for PDF:', src);
+                        resolve(null);
+                    };
+                    img.src = src;
                 });
             };
 
@@ -972,21 +1032,41 @@ export class ListPdfExporter {
                 }
 
                 const indexOnPage = i % itemsPerPage;
-                let col, row;
-                if (mode === 'chain' && chainDirection === 'vertical') {
-                    col = Math.floor(indexOnPage / rows);
-                    row = indexOnPage % rows;
-                } else {
-                    row = Math.floor(indexOnPage / cols);
-                    col = indexOnPage % cols;
-                }
+                let x, y;
 
-                const x = pagePadding + col * itemTotalW;
-                const y = pagePadding + row * itemTotalH;
+                if (mode === 'chain' && chainAlignment === 'center') {
+                    const rawItemW = imageSize + 2 * effectiveBorderWidth;
+                    const rawItemH = imageSize + 2 * effectiveBorderWidth + (showText && textPlacement === 'outside' ? textHeight : 0);
+
+                    if (chainDirection === 'vertical') {
+                        // Centered horizontally, top-aligned vertically (starts at pagePadding)
+                        const startX = (pageWidth - rawItemW) / 2;
+                        x = startX;
+                        y = pagePadding + indexOnPage * (rawItemH + marginY);
+                    } else {
+                        // Centered vertically, left-aligned horizontally (starts at pagePadding)
+                        const startY = (pageHeight - rawItemH) / 2;
+                        x = pagePadding + indexOnPage * (rawItemW + marginX);
+                        y = startY;
+                    }
+                } else {
+                    let col, row;
+                    if (mode === 'chain' && chainDirection === 'vertical') {
+                        col = Math.floor(indexOnPage / rows);
+                        row = indexOnPage % rows;
+                    } else {
+                        row = Math.floor(indexOnPage / cols);
+                        col = indexOnPage % cols;
+                    }
+
+                    x = pagePadding + col * itemTotalW;
+                    y = pagePadding + row * itemTotalH;
+                }
 
                 const item = itemsToRender[i];
                 const itemData = item.data || item;
-                const imgElement = await loadImage(itemData.path || itemData.url, itemData.image_id);
+                const resolvedSrc = this.resolveImageUrl(item);
+                const imgData = await loadImage(resolvedSrc);
 
                 let imgBoxX = x;
                 let imgBoxY = y;
@@ -1021,10 +1101,10 @@ export class ListPdfExporter {
                     doc.rect(imgBoxX, imgBoxY, imageSize, imageSize, 'F');
                 }
 
-                if (imgElement) {
+                if (imgData) {
                     const innerSize = imageSize;
-                    const iw = imgElement.naturalWidth || imgElement.width || 1;
-                    const ih = imgElement.naturalHeight || imgElement.height || 1;
+                    const iw = imgData.width || 1;
+                    const ih = imgData.height || 1;
                     const scale = Math.min(innerSize / iw, innerSize / ih);
                     const w = iw * scale;
                     const h = ih * scale;
@@ -1032,7 +1112,15 @@ export class ListPdfExporter {
                     const ix = imgBoxX + effectiveBorderWidth + (innerSize - w) / 2;
                     const iy = imgBoxY + effectiveBorderWidth + (innerSize - h) / 2;
 
-                    doc.addImage(imgElement, 'PNG', ix, iy, w, h);
+                    try {
+                        if (imgData.dataUrl) {
+                            doc.addImage(imgData.dataUrl, 'PNG', ix, iy, w, h);
+                        } else if (imgData.imgElement) {
+                            doc.addImage(imgData.imgElement, 'PNG', ix, iy, w, h);
+                        }
+                    } catch (addErr) {
+                        console.warn('Failed to add image to PDF document:', addErr);
+                    }
                 }
 
                 if (showText) {
@@ -1061,7 +1149,7 @@ export class ListPdfExporter {
                         const textX = rectX + rectW / 2;
                         const textY = rectY + textSize;
                         const splitTextInside = doc.splitTextToSize(textStr, rectW - 4);
-                        doc.text(splitTextInside[0], textX, textY, { align: 'center' });
+                        doc.text(splitTextInside[0] || '', textX, textY, { align: 'center' });
                     } else {
                         const textX = imgBoxX + totalBoxW / 2;
                         const rectHeight = textSize + 6;
@@ -1081,7 +1169,7 @@ export class ListPdfExporter {
 
                         const textY = rectY + textSize;
                         const splitTextOutside = doc.splitTextToSize(textStr, totalBoxW - 4);
-                        doc.text(splitTextOutside[0], textX, textY, { align: 'center' });
+                        doc.text(splitTextOutside[0] || '', textX, textY, { align: 'center' });
                     }
                 }
             }
@@ -1089,8 +1177,9 @@ export class ListPdfExporter {
             doc.save('pictograms-list.pdf');
 
         } catch (error) {
-            console.error(error);
-            NotificationService.alert('An error occurred during PDF generation.');
+            console.error('PDF generation error:', error);
+            const detail = error && error.message ? ` (${error.message})` : '';
+            NotificationService.alert(`An error occurred during PDF generation.${detail}`);
         } finally {
             if (this.exportPdfBtn) {
                 this.exportPdfBtn.innerHTML = originalBtnText;

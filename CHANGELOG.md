@@ -5,7 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+### Added
+- **Homepage Video Sizing & ARASAAC Legal Attribution (`index.html`, `legal.html`)**:
+  - **Homepage Video Max-Width**: Increased video max-width by 50% (from 728px to 1092px) across `.feature-media`, `.video-container`, and mobile responsive queries. Expanded `.feature-presentation` container max-width to 1560px for responsive wide-screen display with optimal text-to-media ratio.
+  - **ARASAAC Official Link on Homepage**: Added clickable link pointing to `https://arasaac.org` for "Arasaac" within the core features bullet points (`index.html`).
+  - **Section 8 ARASAAC Legal Attribution**: Added section "8. ARASAAC Pictograms" in `legal.html` Terms of Service declaring property of the Government of Aragón, creation by Sergio Palao, and distribution under Creative Commons License BY-NC-SA with link to `https://www.arasaac.org`.
+  - **Full i18n Translation & Compilation**: Extracted, translated, and compiled new strings across all 7 supported locales (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+- **Chained List Locking in Print Tab & Multi-Selection Shortcuts (`ChainedListManager.js`, `list.html`, `list.css`, `list.js`)**:
+  - **Print Tab Lock**: Chained list builder is automatically locked exclusively when active in the Print tab (`shown.bs.tab`), removing draggable attributes, suppressing drag-and-drop reorganization events, and styling items and container with `.locked` (`cursor: default`, `user-select: none`).
+  - **Multi-Selection with `Ctrl` and `Shift`**:
+    - Single click: selects the clicked item and deselects others.
+    - `Ctrl + Click` / `Cmd + Click`: toggles item selection state into a multi-selection array and updates selection pivot.
+    - `Shift + Click`: contiguous range selection between the anchor/pivot item and the clicked item.
+    - Container click: clears selection when clicking empty space.
+  - **Description & Delete Button Dynamic States**:
+    - `#selected-link-description` is editable only when exactly 1 item is selected; disabled (`disabled`) and emptied when 0 or multiple items are selected.
+    - `#delete-link-btn` is disabled with `cursor: not-allowed` (while maintaining its red action theme) when 0 items are selected; displays singular ("Delete Selected Link") when 1 item is selected; displays plural ("Delete Selected Links") when multiple items are selected and deletes all selected items in batch.
+  - **Internationalization & Tests**:
+    - Translated and compiled `Delete Selected Links` across all 7 supported locales (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+    - Added unit test suite in `tests/unit/chained_list_manager.test.js` covering locking, single selection, multi-selection with Ctrl/Shift, pivot handling, description textarea sync, and plural delete button state.
+- **Chained List Alignment (Stack vs Center) in Paper Tools (`list.html`, `ListPdfExporter.js`)**:
+  - Added "Chain Alignment" option under "Chained List Mode" with two choices: `Stack` (default) and `Center`.
+  - `Stack`: optimizes space on the page by packing items across multiple rows/columns.
+  - `Center`: centers the strip along the perpendicular axis:
+    - Horizontal mode: centered vertically at mid-height of the page, starts from the left (`pagePadding`), and elements sequence one by one towards the right (single row per page).
+    - Vertical mode: centered horizontally at mid-width of the page, starts from the top (`pagePadding`), and elements sequence one by one downwards (single column per page).
+  - Implemented identical layout in both real-time WYSIWYG preview (`.page-content` flexbox alignment with `justifyContent: flex-start`, `alignItems: center`) and `exportToPdf()` (precise single-axis mathematical offset calculation).
+  - Full internationalization: translated and compiled all chain alignment UI strings across all 7 supported locales (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+- **Unit Tests for PDF Export & Chain Alignment (`tests/unit/list_pdf_exporter.test.js`)**:
+  - Added unit test validating layout calculations for horizontal and vertical chain directions in both `stack` and `center` alignments.
+  - Added unit test validating DOM flexbox properties in live preview for `center` alignment (`justifyContent: flex-start`, `alignItems: center`, `flexWrap: nowrap`).
+  - Added unit test validating end-to-end PDF export execution (`exportToPdf`) with mocked `jsPDF`, HTML5 canvas PNG conversion, and coordinate verification.
+
+### Fixed
+- **Paper Tools PDF Export Reliability & Canvas Conversion (`ListPdfExporter.js`, `files.py`, `app/__init__.py`, `list.html`, `builder.html`)**:
+  - Unified image URL resolution using `this.resolveImageUrl(item)` in `exportToPdf()`, guaranteeing identical image resolution between the live preview (`.page-content`) and the generated PDF.
+  - Replaced fragile synchronous `XMLHttpRequest` via jsPDF's internal `loadFile` by loading images into `new Image()` and converting them to base64 PNG data URLs using an offscreen canvas (`toDataURL('image/png')`), seamlessly rasterizing all formats (PNG, JPEG, WebP, SVG, GIF) without format errors or network round-trips.
+  - Added `https://static.arasaac.org` to `connect-src` in Content-Security-Policy (`app/__init__.py`) and added `Access-Control-Allow-Origin: *` to `/pictograms/` and `/pictogramsmin/` endpoints (`files.py`) to prevent cross-origin canvas tainting and CSP connection blocks.
+  - Added local bundle fallback (`app/static/js/lib/jspdf.umd.min.js`) in `list.html` and `builder.html` in case CDN is blocked or unavailable.
+  - Protected `doc.addImage` calls with per-item exception handling to prevent a single faulty image from aborting the entire document generation, and improved error alert messaging with contextual details.
+- **Tree Builder Drag & Drop Alignment & Zone Capture Harmonization (`builder.css`, `BuilderNode.js`, `builder.js`)**:
+  - Restored and stabilized reserved vertical spacing (`margin-bottom: 35px` with smooth transition `0.15s` on `.node-content.drag-over-child`), pushing the subtree down and providing clear visual volume so the L-shaped connector does not overlap the icon below.
+  - Aligned L-shaped green branch connector (`└`) accurately at `left: 20px; top: 100%;` directly matching the tree's vertical trunk line (`.children::before`) and pointing directly into the child indentation.
+  - Positioned crisp insertion bars right in contact with the element for drop above (`drag-over-before` with `::before` at `top: -2px`) and drop below (`drag-over-after` with `::after` at `bottom: -2px`), preventing node height expansion and content shifting.
+  - Adopted non-disruptive `outline: 2px dashed` for `drag-over-child` and `drag-over-replace` to preserve box-model dimensions.
+  - Harmonized drop capture in `builder.js` by prioritizing the active visual indicator class on release, adjusting thresholds (`before` < 25%, `child` 25%-65%, `after` > 65%), and cleaning up any stale drag-over classes across the tree canvas.
+  - Resolved drop zone below the last tree element: removed the child-mode trap condition, attached `_builderNode` back-references to DOM elements, and extended canvas proximity capture up to 40px below the last item so users can smoothly drop and insert items directly below (`after`) without being forced inside.
+
 ### Added
 - **Astra Cybersecurity Local Audit Remediation (Lots 1 to 4)**:
   - **Lot 1 (Hygiene & CSP)**: Added `.env*` to `.dockerignore` to prevent local environment secret leakage into Docker images; updated CSP `img-src` to include `https://static.arasaac.org` alongside `https://api.arasaac.org`; added `frame-ancestors 'self'` and `form-action 'self'` to CSP; enforced fail-fast `RuntimeError` in `config.py` if default insecure secret key is used in production.
