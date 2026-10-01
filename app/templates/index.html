@@ -19,9 +19,10 @@
             <p>{{ _('PictoTree is a tool designed to simplify the daily use of communication binders (like PECS). The goal is not to replace paper, but to offer a practical mobile alternative that is completely free and respects your privacy.') }}</p>
             
             <h3 class="h4 mt-4 mb-3 fw-bold">{{ _('What the app offers:') }}</h3>
+            {% set arasaac_link = '<a href="https://arasaac.org" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-underline">Arasaac</a>' | safe %}
             <ul class="list-unstyled ps-4">
                 <li class="mb-3"><strong>📱 {{ _('Pocket-sized (offline):') }}</strong> {{ _('Always have your binder on your phone to communicate outside (in stores, on walks), without needing an internet connection.') }}</li>
-                <li class="mb-3"><strong>🔍 {{ _('Built-in Arasaac search:') }}</strong> {{ _('A search engine to directly find and add pictograms from the official Arasaac database.') }}</li>
+                <li class="mb-3"><strong>🔍 {{ _('Built-in %(arasaac)s search:', arasaac=arasaac_link) }}</strong> {{ _('A search engine to directly find and add pictograms from the official %(arasaac)s database.', arasaac=arasaac_link) }}</li>
                 <li class="mb-3"><strong>🔒 {{ _('Your own photos:') }}</strong> {{ _('A secure import system to use photos of your surroundings or objects as private pictograms.') }}</li>
                 <li class="mb-3"><strong>🖨️ {{ _('PDF Generator:') }}</strong> {{ _('A tool to easily create and print pictogram boards to update your actual physical binder.') }}</li>
             </ul>
@@ -142,12 +143,12 @@
     
     /* 1. Conteneur principal */
     .feature-presentation {
-        max-width: 1280px;
+        max-width: 1560px;
         margin: 0 auto;
         padding: 40px 20px;
     }
 
-    /* 2. Structure 2 colonnes avec vidéos 1.3x plus grandes (max 728px) */
+    /* 2. Structure 2 colonnes avec vidéos 1.5x plus grandes (max 1092px) */
     .feature-row {
         display: flex;
         align-items: center;
@@ -164,12 +165,12 @@
     }
 
     .feature-text {
-        flex: 1 1 380px;
+        flex: 1 1 360px;
     }
 
     .feature-media {
-        flex: 1.3 1 540px;
-        max-width: 728px;
+        flex: 1.8 1 600px;
+        max-width: 1092px;
         width: 100%;
         display: flex;
         justify-content: center;
@@ -200,7 +201,7 @@
     /* 3. Style des lecteurs vidéo (taille uniforme pour les 3 vidéos) */
     .video-container {
         width: 100%;
-        max-width: 728px;
+        max-width: 1092px;
         background: #090d16;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
@@ -251,7 +252,7 @@
 
         .feature-media {
             width: 100%;
-            max-width: 728px;
+            max-width: 1092px;
         }
 
         .video-container {

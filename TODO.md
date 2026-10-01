@@ -297,6 +297,16 @@ Liste des jalons et tâches à réaliser par les agents IA.
   - [x] Traduction complète de `Delete Selected Links` dans toutes les langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`) et compilation des catalogues gettext `.mo`.
   - [x] Tests unitaires complets ajoutés dans `tests/unit/chained_list_manager.test.js`.
 
+## Phase 13 : Améliorations Page d'Accueil & Mentions Légales ARASAAC
+- [x] **Agrandissement des vidéos de la page d'accueil (`app/templates/index.html`)** :
+  - [x] Augmentation de 50% de la taille maximale des lecteurs vidéo (passage de 728px à 1092px) sur `.feature-media`, `.video-container` et en responsive.
+  - [x] Élargissement du conteneur `.feature-presentation` (de 1280px à 1560px) pour permettre aux vidéos de s'étendre confortablement sur grand écran tout en préservant l'équilibre de la colonne texte.
+- [x] **Lien officiel ARASAAC sur la page d'accueil (`app/templates/index.html`)** :
+  - [x] Ajout du lien externe vers le site officiel `https://arasaac.org` sur "Arasaac" dans la liste des fonctionnalités phares.
+- [x] **Mentions légales des pictogrammes ARASAAC (`app/templates/legal.html`)** :
+  - [x] Ajout de la section "8. ARASAAC Pictograms" dans les conditions d'utilisation rappelant la propriété du Gouvernement d'Aragon, la création par Sergio Palao et la licence Creative Commons BY-NC-SA avec lien vers le site officiel.
+  - [x] Traduction complète et compilation i18n dans l'ensemble des 7 langues supportées (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
+
 ## Idées d'améliorations futures (Backlog)
 - [ ] **Mode Administration** :
   - Interface et droits dédiés pour les administrateurs.

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-29 15:32+0000\n"
+"POT-Creation-Date: 2026-10-01 16:15+0000\n"
 "PO-Revision-Date: 2025-09-01 21:04+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -590,11 +590,11 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr "Alternar navegación"
 
-#: app/templates/base.html:121 app/templates/index.html:50
+#: app/templates/base.html:121 app/templates/index.html:51
 msgid "Mobile Setup"
 msgstr ""
 
-#: app/templates/base.html:124 app/templates/index.html:104
+#: app/templates/base.html:124 app/templates/index.html:105
 msgid "Paper Tools"
 msgstr ""
 
@@ -998,11 +998,11 @@ msgstr ""
 msgid "What the app offers:"
 msgstr "Lo que ofrece la aplicación:"
 
-#: app/templates/index.html:23
+#: app/templates/index.html:24
 msgid "Pocket-sized (offline):"
 msgstr "Formato de bolsillo (sin conexión):"
 
-#: app/templates/index.html:23
+#: app/templates/index.html:24
 msgid ""
 "Always have your binder on your phone to communicate outside (in stores, "
 "on walks), without needing an internet connection."
@@ -1010,23 +1010,25 @@ msgstr ""
 "Lleve siempre su cuaderno en el teléfono para comunicarse fuera (en "
 "tiendas, de paseo), sin necesidad de conexión a internet."
 
-#: app/templates/index.html:24
-msgid "Built-in Arasaac search:"
-msgstr "Búsqueda Arasaac integrada:"
-
-#: app/templates/index.html:24
-msgid ""
-"A search engine to directly find and add pictograms from the official "
-"Arasaac database."
-msgstr ""
-"Un motor de búsqueda para encontrar y añadir directamente pictogramas "
-"desde la base de datos oficial de Arasaac."
+#: app/templates/index.html:25
+#, python-format
+msgid "Built-in %(arasaac)s search:"
+msgstr "Búsqueda integrada de %(arasaac)s:"
 
 #: app/templates/index.html:25
+#, python-format
+msgid ""
+"A search engine to directly find and add pictograms from the official "
+"%(arasaac)s database."
+msgstr ""
+"Un motor de búsqueda para encontrar y añadir directamente pictogramas "
+"desde la base de datos oficial de %(arasaac)s."
+
+#: app/templates/index.html:26
 msgid "Your own photos:"
 msgstr "Tus propias fotos:"
 
-#: app/templates/index.html:25
+#: app/templates/index.html:26
 msgid ""
 "A secure import system to use photos of your surroundings or objects as "
 "private pictograms."
@@ -1034,11 +1036,11 @@ msgstr ""
 "Un sistema de importación seguro para utilizar fotos de tu entorno u "
 "objetos como pictogramas privados."
 
-#: app/templates/index.html:26
+#: app/templates/index.html:27
 msgid "PDF Generator:"
 msgstr "Generador de PDF:"
 
-#: app/templates/index.html:26
+#: app/templates/index.html:27
 msgid ""
 "A tool to easily create and print pictogram boards to update your actual "
 "physical binder."
@@ -1046,28 +1048,28 @@ msgstr ""
 "Una herramienta para crear e imprimir fácilmente tableros de pictogramas "
 "para actualizar su cuaderno físico real."
 
-#: app/templates/index.html:31
+#: app/templates/index.html:32
 msgid "Login / Register"
 msgstr "Iniciar sesión / Registrarse"
 
-#: app/templates/index.html:52
+#: app/templates/index.html:53
 msgid "Build your digital binders for the mobile app."
 msgstr "Construya sus cuadernos digitales para la aplicación móvil."
 
-#: app/templates/index.html:66 app/templates/index.html:93
-#: app/templates/index.html:120
+#: app/templates/index.html:67 app/templates/index.html:94
+#: app/templates/index.html:121
 msgid "Your browser does not support the video tag."
 msgstr "Su navegador no soporta la etiqueta de vídeo."
 
-#: app/templates/index.html:77
+#: app/templates/index.html:78
 msgid "The Mobile App"
 msgstr "La aplicación móvil"
 
-#: app/templates/index.html:79
+#: app/templates/index.html:80
 msgid "Carry your Time Timer and pictograms anywhere."
 msgstr "Lleve su Time Timer y sus pictogramas a cualquier lugar."
 
-#: app/templates/index.html:106
+#: app/templates/index.html:107
 msgid "Simplify printing your pictograms."
 msgstr "Simplifique la impresión de sus pictogramas."
 
@@ -1075,11 +1077,11 @@ msgstr "Simplifique la impresión de sus pictogramas."
 msgid "TERMS OF SERVICE"
 msgstr "TÉRMINOS DE SERVICIO"
 
-#: app/templates/legal.html:39 app/templates/legal.html:73
+#: app/templates/legal.html:39 app/templates/legal.html:77
 msgid "Last Revision:"
 msgstr "Última revisión:"
 
-#: app/templates/legal.html:39 app/templates/legal.html:73
+#: app/templates/legal.html:39 app/templates/legal.html:77
 msgid "April 25, 2026"
 msgstr "25 de abril de 2026"
 
@@ -1218,15 +1220,31 @@ msgstr "7. Licencia"
 msgid "This software is open source and licensed under the GNU AGPL v3."
 msgstr "Este software es de código abierto y tiene licencia GNU AGPL v3."
 
-#: app/templates/legal.html:72
+#: app/templates/legal.html:68
+msgid "8. ARASAAC Pictograms"
+msgstr "8. Pictogramas de ARASAAC"
+
+#: app/templates/legal.html:70
+#, python-format
+msgid ""
+"The pictographic symbols used in PictoTree are the property of the "
+"Government of Aragón and have been created by Sergio Palao for ARASAAC "
+"(%(url)s), which distributes them under Creative Commons License BY-NC-"
+"SA."
+msgstr ""
+"Los símbolos pictográficos utilizados en PictoTree son propiedad del "
+"Gobierno de Aragón y han sido creados por Sergio Palao para ARASAAC "
+"(%(url)s), que los distribuye bajo Licencia Creative Commons BY-NC-SA."
+
+#: app/templates/legal.html:76
 msgid "PRIVACY POLICY"
 msgstr "POLÍTICA DE PRIVACIDAD"
 
-#: app/templates/legal.html:75
+#: app/templates/legal.html:79
 msgid "1. Introduction"
 msgstr "1. Introducción"
 
-#: app/templates/legal.html:76
+#: app/templates/legal.html:80
 msgid ""
 "This Privacy Policy outlines how Pictotree.eu (the \"Service\") collects,"
 " uses, and protects your personal data. We are committed to protecting "
@@ -1241,19 +1259,19 @@ msgstr ""
 "este Servicio es el equipo de Pictotree.eu, al que se puede contactar a "
 "través del formulario de contacto."
 
-#: app/templates/legal.html:78
+#: app/templates/legal.html:82
 msgid "2. Personal Data We Collect"
 msgstr "2. Datos personales que recopilamos"
 
-#: app/templates/legal.html:79
+#: app/templates/legal.html:83
 msgid "We collect the following types of personal data:"
 msgstr "Recopilamos los siguientes tipos de datos personales:"
 
-#: app/templates/legal.html:81
+#: app/templates/legal.html:85
 msgid "Account Data:"
 msgstr "Datos de la cuenta:"
 
-#: app/templates/legal.html:81
+#: app/templates/legal.html:85
 msgid ""
 "Information you provide upon registration, such as username and email "
 "address. The lawful basis for this processing is the performance of a "
@@ -1263,11 +1281,11 @@ msgstr ""
 "la dirección de correo electrónico. La base legal para este procesamiento"
 " es la ejecución de un contrato (nuestros Términos de servicio)."
 
-#: app/templates/legal.html:82
+#: app/templates/legal.html:86
 msgid "User-Generated Content:"
 msgstr "Contenido generado por el usuario:"
 
-#: app/templates/legal.html:82
+#: app/templates/legal.html:86
 msgid ""
 "Images and other data you voluntarily upload to the Service. The lawful "
 "basis is your consent and our legitimate interest in providing the "
@@ -1277,11 +1295,11 @@ msgstr ""
 " base legal es su consentimiento y nuestro interés legítimo en "
 "proporcionar la funcionalidad principal del Servicio."
 
-#: app/templates/legal.html:83 app/templates/legal.html:89
+#: app/templates/legal.html:87 app/templates/legal.html:93
 msgid "Technical Log Data:"
 msgstr "Datos de registro técnico:"
 
-#: app/templates/legal.html:83
+#: app/templates/legal.html:87
 msgid ""
 "For the purpose of maintaining the security and integrity of our systems,"
 " we process server logs which may include your IP address, user-agent "
@@ -1294,15 +1312,15 @@ msgstr ""
 "base legal para este procesamiento es nuestro interés legítimo en "
 "prevenir el fraude y proteger nuestro Servicio."
 
-#: app/templates/legal.html:86
+#: app/templates/legal.html:90
 msgid "3. Data Retention"
 msgstr "3. Retención de datos"
 
-#: app/templates/legal.html:88
+#: app/templates/legal.html:92
 msgid "Account and User-Generated Content:"
 msgstr "Contenido de la cuenta y generado por el usuario:"
 
-#: app/templates/legal.html:88
+#: app/templates/legal.html:92
 msgid ""
 "This data is retained for the duration of your account's existence. It is"
 " permanently and irrevocably deleted upon your request to terminate the "
@@ -1311,17 +1329,17 @@ msgstr ""
 "Estos datos se conservan mientras exista su cuenta. Se eliminan de forma "
 "permanente e irrevocable si solicita la cancelación de la cuenta."
 
-#: app/templates/legal.html:89
+#: app/templates/legal.html:93
 msgid "Server logs are automatically purged after a period of six (6) months."
 msgstr ""
 "Los registros del servidor se eliminan automáticamente después de un "
 "período de seis (6) meses."
 
-#: app/templates/legal.html:92
+#: app/templates/legal.html:96
 msgid "4. Your Rights as a Data Subject"
 msgstr "4. Sus derechos como interesado"
 
-#: app/templates/legal.html:93
+#: app/templates/legal.html:97
 msgid ""
 "Under the GDPR, you have the following rights regarding your personal "
 "data:"
@@ -1329,11 +1347,11 @@ msgstr ""
 "En virtud del RGPD, usted tiene los siguientes derechos sobre sus datos "
 "personales:"
 
-#: app/templates/legal.html:95
+#: app/templates/legal.html:99
 msgid "The right to access: You can request copies of your personal data."
 msgstr "El derecho de acceso: puede solicitar copias de sus datos personales."
 
-#: app/templates/legal.html:96
+#: app/templates/legal.html:100
 msgid ""
 "The right to rectification: You can request that we correct any "
 "information you believe is inaccurate."
@@ -1341,7 +1359,7 @@ msgstr ""
 "El derecho de rectificación: puede solicitar que corrijamos cualquier "
 "información que crea que es inexacta."
 
-#: app/templates/legal.html:97
+#: app/templates/legal.html:101
 msgid ""
 "The right to erasure (right to be forgotten): You can request the erasure"
 " of your personal data. This is actioned by deleting your account."
@@ -1349,7 +1367,7 @@ msgstr ""
 "El derecho de supresión (derecho al olvido): puede solicitar la supresión"
 " de sus datos personales. Esto se realiza eliminando su cuenta."
 
-#: app/templates/legal.html:98
+#: app/templates/legal.html:102
 msgid ""
 "The right to restrict processing: You can request that we restrict the "
 "processing of your personal data under certain conditions."
@@ -1357,7 +1375,7 @@ msgstr ""
 "El derecho a la limitación del tratamiento: puede solicitar que limitemos"
 " el tratamiento de sus datos personales en determinadas condiciones."
 
-#: app/templates/legal.html:99
+#: app/templates/legal.html:103
 msgid ""
 "The right to object to processing: You can object to our processing of "
 "your personal data."
@@ -1365,7 +1383,7 @@ msgstr ""
 "El derecho de oposición al tratamiento: puede oponerse a nuestro "
 "tratamiento de sus datos personales."
 
-#: app/templates/legal.html:100
+#: app/templates/legal.html:104
 msgid ""
 "The right to data portability: You can request that we transfer the data "
 "that we have collected to another organization, or directly to you."
@@ -1374,7 +1392,7 @@ msgstr ""
 "transfiramos los datos que hemos recopilado a otra organización o "
 "directamente a usted."
 
-#: app/templates/legal.html:102
+#: app/templates/legal.html:106
 msgid ""
 "To exercise any of these rights, please contact us with the form contact."
 " You also have the right to lodge a complaint with a supervisory "
@@ -1385,11 +1403,11 @@ msgstr ""
 "presentar una reclamación ante una autoridad de control (como la CNIL en "
 "Francia)."
 
-#: app/templates/legal.html:104
+#: app/templates/legal.html:108
 msgid "5. Data Security & Transfer"
 msgstr "5. Seguridad y transferencia de datos"
 
-#: app/templates/legal.html:105
+#: app/templates/legal.html:109
 msgid ""
 "We implement appropriate technical and organizational measures to ensure "
 "a level of security appropriate to the risk. Your data is stored on "

@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
+- **Homepage Video Sizing & ARASAAC Legal Attribution (`index.html`, `legal.html`)**:
+  - **Homepage Video Max-Width**: Increased video max-width by 50% (from 728px to 1092px) across `.feature-media`, `.video-container`, and mobile responsive queries. Expanded `.feature-presentation` container max-width to 1560px for responsive wide-screen display with optimal text-to-media ratio.
+  - **ARASAAC Official Link on Homepage**: Added clickable link pointing to `https://arasaac.org` for "Arasaac" within the core features bullet points (`index.html`).
+  - **Section 8 ARASAAC Legal Attribution**: Added section "8. ARASAAC Pictograms" in `legal.html` Terms of Service declaring property of the Government of Aragón, creation by Sergio Palao, and distribution under Creative Commons License BY-NC-SA with link to `https://www.arasaac.org`.
+  - **Full i18n Translation & Compilation**: Extracted, translated, and compiled new strings across all 7 supported locales (`fr`, `de`, `es`, `it`, `nl`, `pl`, `pt`).
 - **Chained List Locking in Print Tab & Multi-Selection Shortcuts (`ChainedListManager.js`, `list.html`, `list.css`, `list.js`)**:
   - **Print Tab Lock**: Chained list builder is automatically locked exclusively when active in the Print tab (`shown.bs.tab`), removing draggable attributes, suppressing drag-and-drop reorganization events, and styling items and container with `.locked` (`cursor: default`, `user-select: none`).
   - **Multi-Selection with `Ctrl` and `Shift`**:
